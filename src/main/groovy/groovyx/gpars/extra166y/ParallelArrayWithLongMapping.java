@@ -40,7 +40,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
     }
 
     /**
-     * Applies the given procedure
+     * Applies the given procedure.
      * @param procedure the procedure
      */
     public void apply(LongProcedure procedure) {
@@ -48,7 +48,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
     }
 
     /**
-     * Returns reduction of mapped elements
+     * Returns reduction of mapped elements.
      * @param reducer the reducer
      * @param base the result for an empty array
      * @return reduction
@@ -61,7 +61,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
     }
 
     /**
-     * Returns the minimum element, or Long.MAX_VALUE if empty
+     * Returns the minimum element, or Long.MAX_VALUE if empty.
      * @return minimum element, or Long.MAX_VALUE if empty
      */
     public long min() {
@@ -69,7 +69,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
     }
 
     /**
-     * Returns the minimum element, or Long.MAX_VALUE if empty
+     * Returns the minimum element, or Long.MAX_VALUE if empty.
      * @param comparator the comparator
      * @return minimum element, or Long.MAX_VALUE if empty
      */
@@ -78,7 +78,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
     }
 
     /**
-     * Returns the maximum element, or Long.MIN_VALUE if empty
+     * Returns the maximum element, or Long.MIN_VALUE if empty.
      * @return maximum element, or Long.MIN_VALUE if empty
      */
     public long max() {
@@ -86,7 +86,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
     }
 
     /**
-     * Returns the maximum element, or Long.MIN_VALUE if empty
+     * Returns the maximum element, or Long.MIN_VALUE if empty.
      * @param comparator the comparator
      * @return maximum element, or Long.MIN_VALUE if empty
      */
@@ -95,7 +95,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
     }
 
     /**
-     * Returns the sum of elements
+     * Returns the sum of elements.
      * @return the sum of elements
      */
     public long sum() {
@@ -103,10 +103,10 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
     }
 
     /**
-     * Returns summary statistics
+     * Returns summary statistics.
      * @param comparator the comparator to use for
      * locating minimum and maximum elements
-     * @return the summary.
+     * @return the summary
      */
     public ParallelLongArray.SummaryStatistics summary
         (LongComparator comparator) {
@@ -117,15 +117,15 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
     }
 
     /**
-     * Returns summary statistics, using natural comparator
-     * @return the summary.
+     * Returns summary statistics, using natural comparator.
+     * @return the summary
      */
     public ParallelLongArray.SummaryStatistics summary() {
         return summary(CommonOps.naturalLongComparator());
     }
 
     /**
-     * Returns a new ParallelLongArray holding mappings
+     * Returns a new ParallelLongArray holding mappings.
      * @return a new ParallelLongArray holding mappings
      */
     public ParallelLongArray all() {
@@ -164,7 +164,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V,W,X> ParallelArrayWithMapping<T,W> withMapping
         (LongAndObjectToObject<? super V, ? extends W> combiner,
@@ -181,7 +181,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V> ParallelArrayWithMapping<T,V> withMapping
         (LongAndDoubleToObject<? extends V> combiner,
@@ -198,7 +198,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V> ParallelArrayWithMapping<T,V> withMapping
         (LongAndLongToObject<? extends V> combiner,
@@ -215,7 +215,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V,W> ParallelArrayWithDoubleMapping<T> withMapping
         (LongAndObjectToDouble<? super V> combiner,
@@ -232,7 +232,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelArrayWithDoubleMapping<T> withMapping
         (LongAndDoubleToDouble combiner,
@@ -250,7 +250,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelArrayWithDoubleMapping<T> withMapping
         (LongAndLongToDouble combiner,
@@ -267,7 +267,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V,W> ParallelArrayWithLongMapping<T> withMapping
         (LongAndObjectToLong<? super V> combiner,
@@ -285,7 +285,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelArrayWithLongMapping<T> withMapping
         (LongAndDoubleToLong combiner,
@@ -303,7 +303,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelArrayWithLongMapping<T> withMapping
         (BinaryLongOp combiner,
@@ -352,7 +352,7 @@ public abstract class ParallelArrayWithLongMapping<T> extends AbstractParallelAn
     /**
      * Returns an Iterable view to sequentially step through mapped
      * elements also obeying bound and filter constraints, without
-     * performing computations to evaluate them in parallel
+     * performing computations to evaluate them in parallel.
      * @return the Iterable view
      */
     public Iterable<Long> sequentially() {

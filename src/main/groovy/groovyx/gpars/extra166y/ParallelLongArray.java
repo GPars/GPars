@@ -131,7 +131,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Creates a new ParallelLongArray using the given executor and
-     * an array of the given size
+     * an array of the given size.
      * @param size the array size
      * @param executor the executor
      */
@@ -224,13 +224,13 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     }
 
     /**
-     * Returns the executor used for computations
+     * Returns the executor used for computations.
      * @return the executor
      */
     public ForkJoinPool getExecutor() { return ex; }
 
     /**
-     * Applies the given procedure to elements
+     * Applies the given procedure to elements.
      * @param procedure the procedure
      */
     public void apply(LongProcedure procedure) {
@@ -238,7 +238,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     }
 
     /**
-     * Returns reduction of elements
+     * Returns reduction of elements.
      * @param reducer the reducer
      * @param base the result for an empty array
      * @return reduction
@@ -248,7 +248,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     }
 
     /**
-     * Returns a new ParallelLongArray holding all elements
+     * Returns a new ParallelLongArray holding all elements.
      * @return a new ParallelLongArray holding all elements
      */
     public ParallelLongArray all() {
@@ -279,7 +279,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Replaces elements with the results of applying the given
-     * mapping to each index and current element value
+     * mapping to each index and current element value.
      * @param op the op
      * @return this (to simplify use in expressions)
      */
@@ -292,7 +292,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Replaces elements with the results of applying the given
      * generator. For example, to fill the array with uniform random
      * values, use
-     * <tt>replaceWithGeneratedValue(Ops.longRandom())</tt>
+     * <tt>replaceWithGeneratedValue(Ops.longRandom())</tt>.
      * @param generator the generator
      * @return this (to simplify use in expressions)
      */
@@ -313,7 +313,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Replaces elements with results of applying
-     * <tt>op(thisElement, otherElement)</tt>
+     * <tt>op(thisElement, otherElement)</tt>.
      * @param other the other array
      * @param combiner the combiner
      * @return this (to simplify use in expressions)
@@ -327,7 +327,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Replaces elements with results of applying
-     * <tt>op(thisElement, otherElement)</tt>
+     * <tt>op(thisElement, otherElement)</tt>.
      * @param other the other array
      * @param combiner the combiner
      * @return this (to simplify use in expressions)
@@ -342,7 +342,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Returns the index of some element equal to given target, or -1
-     * if not present
+     * if not present.
      * @param target the element to search for
      * @return the index or -1 if not present
      */
@@ -379,7 +379,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * to locate minimum and maximum elements.
      * @param comparator the comparator to use for
      * locating minimum and maximum elements
-     * @return the summary.
+     * @return the summary
      */
     public ParallelLongArray.SummaryStatistics summary
         (LongComparator comparator) {
@@ -387,15 +387,15 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     }
 
     /**
-     * Returns summary statistics, using natural comparator
-     * @return the summary.
+     * Returns summary statistics, using natural comparator.
+     * @return the summary
      */
     public ParallelLongArray.SummaryStatistics summary() {
         return super.summary();
     }
 
     /**
-     * Returns the minimum element, or Long.MAX_VALUE if empty
+     * Returns the minimum element, or Long.MAX_VALUE if empty.
      * @param comparator the comparator
      * @return minimum element, or Long.MAX_VALUE if empty
      */
@@ -404,7 +404,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     }
 
     /**
-     * Returns the minimum element, or Long.MAX_VALUE if empty,
+     * Returns the minimum element, or Long.MAX_VALUE if empty.
      * @return minimum element, or Long.MAX_VALUE if empty
      */
     public long min() {
@@ -412,7 +412,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     }
 
     /**
-     * Returns the maximum element, or Long.MIN_VALUE if empty
+     * Returns the maximum element, or Long.MIN_VALUE if empty.
      * @param comparator the comparator
      * @return maximum element, or Long.MIN_VALUE if empty
      */
@@ -421,7 +421,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     }
 
     /**
-     * Returns the maximum element, or Long.MIN_VALUE if empty
+     * Returns the maximum element, or Long.MIN_VALUE if empty.
      * @return maximum element, or Long.MIN_VALUE if empty
      */
     public long max() {
@@ -475,7 +475,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Sorts the array, assuming all elements are Comparable. Unlike
      * Arrays.sort, this sort does not guarantee that elements
      * with equal keys maintain their relative position in the array.
-     * @throws ClassCastException if any element is not Comparable.
+     * @throws ClassCastException if any element is not Comparable
      * @return this (to simplify use in expressions)
      */
     public ParallelLongArray sort() {
@@ -582,7 +582,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     }
 
     /**
-     * Returns the sum of elements
+     * Returns the sum of elements.
      * @return the sum of elements
      */
     public long sum() {
@@ -590,7 +590,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     }
 
     /**
-     * Replaces each element with the running sum
+     * Replaces each element with the running sum.
      * @return this (to simplify use in expressions)
      */
     public ParallelLongArray cumulateSum() {
@@ -599,7 +599,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     }
 
     /**
-     * Replaces each element with its prefix sum
+     * Replaces each element with its prefix sum.
      * @return the total sum
      */
     public long precumulateSum() {
@@ -622,7 +622,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Returns an operation prefix that causes a method to operate
      * only on the elements of the array for which the given selector
-     * returns true
+     * returns true.
      * @param selector the selector
      * @return operation prefix
      */
@@ -633,7 +633,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Returns an operation prefix that causes a method to operate
      * only on elements for which the given binary selector returns
-     * true
+     * true.
      * @param selector the selector
      * @return operation prefix
      */
@@ -646,7 +646,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Returns an operation prefix that causes a method to operate
      * only on elements for which the given indexed selector returns
-     * true
+     * true.
      * @param selector the selector
      * @return operation prefix
      */
@@ -694,7 +694,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V,W,X> ParallelLongArrayWithMapping<W> withMapping
         (LongAndObjectToObject<? super V, ? extends W> combiner,
@@ -709,7 +709,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V> ParallelLongArrayWithMapping<V> withMapping
         (LongAndDoubleToObject<? extends V> combiner,
@@ -724,7 +724,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V> ParallelLongArrayWithMapping<V> withMapping
         (LongAndLongToObject<? extends V> combiner,
@@ -739,7 +739,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V,W> ParallelLongArrayWithDoubleMapping withMapping
         (LongAndObjectToDouble<? super V> combiner,
@@ -754,7 +754,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelLongArrayWithDoubleMapping withMapping
         (LongAndDoubleToDouble combiner,
@@ -769,7 +769,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelLongArrayWithDoubleMapping withMapping
         (LongAndLongToDouble combiner,
@@ -784,7 +784,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V,W> ParallelLongArrayWithLongMapping withMapping
         (LongAndObjectToLong<? super V> combiner,
@@ -799,7 +799,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelLongArrayWithLongMapping withMapping
         (LongAndDoubleToLong combiner,
@@ -814,7 +814,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelLongArrayWithLongMapping withMapping
         (BinaryLongOp combiner,
@@ -867,7 +867,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * support the remove operation. However, a full
      * <tt>ListIterator</tt> supporting add, remove, and set
      * operations is available via {@link #asList}.
-     * @return an iterator stepping through each element.
+     * @return an iterator stepping through each element
      */
     public Iterator<Long> iterator() {
         return new ParallelLongArrayIterator(array, fence);
@@ -919,20 +919,20 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     public int size() { return fence; }
 
     /**
-     * Returns the underlying array used for computations
+     * Returns the underlying array used for computations.
      * @return the array
      */
     public long[] getArray() { return array; }
 
     /**
-     * Returns the element of the array at the given index
+     * Returns the element of the array at the given index.
      * @param i the index
      * @return the element of the array at the given index
      */
     public long get(int i) { return array[i]; }
 
     /**
-     * Sets the element of the array at the given index to the given value
+     * Sets the element of the array at the given index to the given value.
      * @param i the index
      * @param x the value
      */
@@ -953,7 +953,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * than the length of the underlying array, causes computations to
      * ignore elements past the given limit.
      * @param newLimit the new upper bound
-     * @throws IllegalArgumentException if newLimit less than zero.
+     * @throws IllegalArgumentException if newLimit less than zero
      */
     public final void setLimit(int newLimit) {
         if (newLimit < 0)

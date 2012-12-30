@@ -41,7 +41,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
     }
 
     /**
-     * Applies the given procedure to elements
+     * Applies the given procedure to elements.
      * @param procedure the procedure
      */
     public void apply(Procedure<? super U> procedure) {
@@ -49,7 +49,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
     }
 
     /**
-     * Returns reduction of elements
+     * Returns reduction of elements.
      * @param reducer the reducer
      * @param base the result for an empty array
      * @return reduction
@@ -64,7 +64,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
     /**
      * Returns some element matching bound and filter
      * constraints, or null if none.
-     * @return an element, or null if none.
+     * @return an element, or null if none
      */
     public U any() {
         int i = anyIndex();
@@ -72,7 +72,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
     }
 
     /**
-     * Returns the minimum element, or null if empty
+     * Returns the minimum element, or null if empty.
      * @param comparator the comparator
      * @return minimum element, or null if empty
      */
@@ -82,16 +82,16 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
 
     /**
      * Returns the minimum element, or null if empty,
-     * assuming that all elements are Comparables
+     * assuming that all elements are Comparables.
      * @return minimum element, or null if empty
-     * @throws ClassCastException if any element is not Comparable.
+     * @throws ClassCastException if any element is not Comparable
      */
     public U min() {
         return reduce((Reducer<U>)(CommonOps.castedMinReducer()), null);
     }
 
     /**
-     * Returns the maximum element, or null if empty
+     * Returns the maximum element, or null if empty.
      * @param comparator the comparator
      * @return maximum element, or null if empty
      */
@@ -100,10 +100,10 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
     }
 
     /**
-     * Returns the maximum element, or null if empty
-     * assuming that all elements are Comparables
+     * Returns the maximum element, or null if empty,
+     * assuming that all elements are Comparables.
      * @return maximum element, or null if empty
-     * @throws ClassCastException if any element is not Comparable.
+     * @throws ClassCastException if any element is not Comparable
      */
     public U max() {
         return reduce((Reducer<U>)(CommonOps.castedMaxReducer()), null);
@@ -114,7 +114,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
      * to locate minimum and maximum elements.
      * @param comparator the comparator to use for
      * locating minimum and maximum elements
-     * @return the summary.
+     * @return the summary
      */
     public ParallelArray.SummaryStatistics<U> summary
         (Comparator<? super U> comparator) {
@@ -126,15 +126,15 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
 
     /**
      * Returns summary statistics, assuming that all elements are
-     * Comparables
-     * @return the summary.
+     * Comparables.
+     * @return the summary
      */
     public ParallelArray.SummaryStatistics<U> summary() {
         return summary((Comparator<? super U>)(CommonOps.castedComparator()));
     }
 
     /**
-     * Returns a new ParallelArray holding elements
+     * Returns a new ParallelArray holding elements.
      * @return a new ParallelArray holding elements
      */
     public ParallelArray<U> all() {
@@ -143,7 +143,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
 
     /**
      * Returns a new ParallelArray with the given element type
-     * holding elements
+     * holding elements.
      * @param elementType the type of the elements
      * @return a new ParallelArray holding elements
      */
@@ -154,7 +154,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op
-     * applied to current op's results
+     * applied to current op's results.
      * @param op the op
      * @return operation prefix
      */
@@ -164,7 +164,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op
-     * applied to current op's results
+     * applied to current op's results.
      * @param op the op
      * @return operation prefix
      */
@@ -174,7 +174,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op
-     * applied to current op's results
+     * applied to current op's results.
      * @param op the op
      * @return operation prefix
      */
@@ -188,7 +188,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V,W,X> ParallelArrayWithMapping<T,W> withMapping
         (BinaryOp<? super U, ? super V, ? extends W> combiner,
@@ -205,7 +205,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V> ParallelArrayWithMapping<T,V> withMapping
         (ObjectAndDoubleToObject<? super U, ? extends V> combiner,
@@ -222,7 +222,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V> ParallelArrayWithMapping<T,V> withMapping
         (ObjectAndLongToObject<? super U, ? extends V> combiner,
@@ -239,7 +239,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V,W> ParallelArrayWithDoubleMapping<T> withMapping
         (ObjectAndObjectToDouble<? super U, ? super V> combiner,
@@ -256,7 +256,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelArrayWithDoubleMapping<T> withMapping
         (ObjectAndDoubleToDouble<? super U> combiner,
@@ -273,7 +273,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelArrayWithDoubleMapping<T> withMapping
         (ObjectAndLongToDouble<? super U> combiner,
@@ -290,7 +290,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V,W> ParallelArrayWithLongMapping<T> withMapping
         (ObjectAndObjectToLong<? super U, ? super V> combiner,
@@ -307,7 +307,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelArrayWithLongMapping<T> withMapping
         (ObjectAndDoubleToLong<? super U> combiner,
@@ -324,7 +324,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelArrayWithLongMapping<T> withMapping
         (ObjectAndLongToLong<? super U> combiner,
@@ -373,7 +373,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
     /**
      * Returns an Iterable view to sequentially step through mapped
      * elements also obeying bound and filter constraints, without
-     * performing computations to evaluate them in parallel
+     * performing computations to evaluate them in parallel.
      * @return the Iterable view
      */
     public Iterable<U> sequentially() {

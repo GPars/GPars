@@ -41,7 +41,7 @@ public abstract class ParallelDoubleArrayWithBounds extends ParallelDoubleArrayW
 
     /**
      * Returns the index of some element equal to given target,
-     * or -1 if not present
+     * or -1 if not present.
      * @param target the element to search for
      * @return the index or -1 if not present
      */
@@ -78,7 +78,7 @@ public abstract class ParallelDoubleArrayWithBounds extends ParallelDoubleArrayW
     public abstract ParallelDoubleArrayWithBounds cumulate(DoubleReducer reducer, double base);
 
     /**
-     * Replaces each element with the running sum
+     * Replaces each element with the running sum.
      * @return this (to simplify use in expressions)
      */
     public abstract ParallelDoubleArrayWithBounds cumulateSum();
@@ -94,7 +94,7 @@ public abstract class ParallelDoubleArrayWithBounds extends ParallelDoubleArrayW
     public abstract double precumulate(DoubleReducer reducer, double base);
 
     /**
-     * Replaces each element with its prefix sum
+     * Replaces each element with its prefix sum.
      * @return the total sum
      */
     public abstract double precumulateSum();
@@ -114,7 +114,7 @@ public abstract class ParallelDoubleArrayWithBounds extends ParallelDoubleArrayW
      * Comparable. Unlike Arrays.sort, this sort does not
      * guarantee that elements with equal keys maintain their relative
      * position in the array.
-     * @throws ClassCastException if any element is not Comparable.
+     * @throws ClassCastException if any element is not Comparable
      * @return this (to simplify use in expressions)
      */
     public abstract ParallelDoubleArrayWithBounds sort();

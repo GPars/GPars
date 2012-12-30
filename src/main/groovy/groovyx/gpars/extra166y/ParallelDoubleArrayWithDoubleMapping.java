@@ -40,7 +40,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
     }
 
     /**
-     * Applies the given procedure to elements
+     * Applies the given procedure to elements.
      * @param procedure the procedure
      */
     public void apply(DoubleProcedure procedure) {
@@ -48,7 +48,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
     }
 
     /**
-     * Returns reduction of elements
+     * Returns reduction of elements.
      * @param reducer the reducer
      * @param base the result for an empty array
      * @return reduction
@@ -61,7 +61,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
     }
 
     /**
-     * Returns the minimum element, or Double.MAX_VALUE if empty
+     * Returns the minimum element, or Double.MAX_VALUE if empty.
      * @return minimum element, or Double.MAX_VALUE if empty
      */
     public double min() {
@@ -69,7 +69,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
     }
 
     /**
-     * Returns the minimum element, or Double.MAX_VALUE if empty
+     * Returns the minimum element, or Double.MAX_VALUE if empty.
      * @param comparator the comparator
      * @return minimum element, or Double.MAX_VALUE if empty
      */
@@ -78,7 +78,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
     }
 
     /**
-     * Returns the maximum element, or -Double.MAX_VALUE if empty
+     * Returns the maximum element, or -Double.MAX_VALUE if empty.
      * @return maximum element, or -Double.MAX_VALUE if empty
      */
     public double max() {
@@ -86,7 +86,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
     }
 
     /**
-     * Returns the maximum element, or -Double.MAX_VALUE if empty
+     * Returns the maximum element, or -Double.MAX_VALUE if empty.
      * @param comparator the comparator
      * @return maximum element, or -Double.MAX_VALUE if empty
      */
@@ -95,7 +95,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
     }
 
     /**
-     * Returns the sum of elements
+     * Returns the sum of elements.
      * @return the sum of elements
      */
     public double sum() {
@@ -103,10 +103,10 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
     }
 
     /**
-     * Returns summary statistics
+     * Returns summary statistics.
      * @param comparator the comparator to use for
      * locating minimum and maximum elements
-     * @return the summary.
+     * @return the summary
      */
     public ParallelDoubleArray.SummaryStatistics summary
         (DoubleComparator comparator) {
@@ -117,15 +117,15 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
     }
 
     /**
-     * Returns summary statistics, using natural comparator
-     * @return the summary.
+     * Returns summary statistics, using natural comparator.
+     * @return the summary
      */
     public ParallelDoubleArray.SummaryStatistics summary() {
         return summary(CommonOps.naturalDoubleComparator());
     }
 
     /**
-     * Returns a new ParallelDoubleArray holding elements
+     * Returns a new ParallelDoubleArray holding elements.
      * @return a new ParallelDoubleArray holding elements
      */
     public ParallelDoubleArray all() {
@@ -166,7 +166,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V,W,X> ParallelDoubleArrayWithMapping<W> withMapping
         (DoubleAndObjectToObject<? super V, ? extends W> combiner,
@@ -183,7 +183,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V> ParallelDoubleArrayWithMapping<V> withMapping
         (DoubleAndDoubleToObject<? extends V> combiner,
@@ -200,7 +200,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V> ParallelDoubleArrayWithMapping<V> withMapping
         (DoubleAndLongToObject<? extends V> combiner,
@@ -217,7 +217,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V,W> ParallelDoubleArrayWithDoubleMapping withMapping
         (DoubleAndObjectToDouble<? super V> combiner,
@@ -234,7 +234,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelDoubleArrayWithDoubleMapping withMapping
         (BinaryDoubleOp combiner,
@@ -251,7 +251,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelDoubleArrayWithDoubleMapping withMapping
         (DoubleAndLongToDouble combiner,
@@ -268,7 +268,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public <V,W> ParallelDoubleArrayWithLongMapping withMapping
         (DoubleAndObjectToLong<? super V> combiner,
@@ -285,7 +285,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelDoubleArrayWithLongMapping withMapping
         (DoubleAndDoubleToLong combiner,
@@ -302,7 +302,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
      * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     * filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelDoubleArrayWithLongMapping withMapping
         (DoubleAndLongToLong combiner,
@@ -351,7 +351,7 @@ public abstract class ParallelDoubleArrayWithDoubleMapping extends AbstractParal
     /**
      * Returns an Iterable view to sequentially step through mapped
      * elements also obeying bound and filter constraints, without
-     * performing computations to evaluate them in parallel
+     * performing computations to evaluate them in parallel.
      * @return the Iterable view
      */
     public Iterable<Double> sequentially() {

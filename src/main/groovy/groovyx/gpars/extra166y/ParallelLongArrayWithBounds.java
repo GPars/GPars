@@ -41,7 +41,7 @@ public abstract class ParallelLongArrayWithBounds extends ParallelLongArrayWithF
 
     /**
      * Returns the index of some element equal to given target, or
-     * -1 if not present
+     * -1 if not present.
      * @param target the element to search for
      * @return the index or -1 if not present
      */
@@ -77,7 +77,7 @@ public abstract class ParallelLongArrayWithBounds extends ParallelLongArrayWithF
     public abstract ParallelLongArrayWithBounds cumulate(LongReducer reducer, long base);
 
     /**
-     * Replaces each element with the running sum
+     * Replaces each element with the running sum.
      * @return this (to simplify use in expressions)
      */
     public abstract ParallelLongArrayWithBounds cumulateSum();
@@ -93,7 +93,7 @@ public abstract class ParallelLongArrayWithBounds extends ParallelLongArrayWithF
     public abstract long precumulate(LongReducer reducer, long base);
 
     /**
-     * Replaces each element with its prefix sum
+     * Replaces each element with its prefix sum.
      * @return the total sum
      */
     public abstract long precumulateSum();
@@ -113,7 +113,7 @@ public abstract class ParallelLongArrayWithBounds extends ParallelLongArrayWithF
      * Comparable. Unlike Arrays.sort, this sort does not
      * guarantee that elements with equal keys maintain their relative
      * position in the array.
-     * @throws ClassCastException if any element is not Comparable.
+     * @throws ClassCastException if any element is not Comparable
      * @return this (to simplify use in expressions)
      */
     public abstract ParallelLongArrayWithBounds sort();
