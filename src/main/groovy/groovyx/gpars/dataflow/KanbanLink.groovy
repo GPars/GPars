@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright � 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package groovyx.gpars.dataflow
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import groovyx.gpars.dataflow.operator.DataflowProcessor
 
 /**
@@ -28,6 +30,7 @@ import groovyx.gpars.dataflow.operator.DataflowProcessor
  * @see KanbanTray
  * @author Dierk Koenig
  */
+@CompileStatic(value = TypeCheckingMode.PASS)
 class KanbanLink {
     KanbanFlow flow
     ProcessingNode producerSpec, consumerSpec
@@ -42,7 +45,7 @@ class KanbanLink {
     KanbanLink to(ProcessingNode consumerSpec) {
         assert consumerSpec != null
         if (!flow.cycleAllowed) {
-            if (consumerSpec == producerSpec || flow.links.any { it.producerSpec.is consumerSpec}) {
+            if (consumerSpec == producerSpec || flow.links.any { KanbanLink link -> link.producerSpec.is consumerSpec }) {
                 throw new IllegalArgumentException("""You try to link to a consumer that is already a producer. This is not allowed as it may result in cyclic messaging.""")
             }
         }
@@ -74,18 +77,18 @@ class KanbanLink {
 
     protected boolean producerAlreadyStarted() {
         if (producer != null) return true
-        flow.links.any {
-            if (it.consumerSpec.is(producerSpec) && it.consumer != null) return true
-            if (it.producerSpec.is(producerSpec) && it.producer != null) return true
+        flow.links.any { KanbanLink link ->
+            if (link.consumerSpec.is(producerSpec) && link.consumer != null) return true
+            if (link.producerSpec.is(producerSpec) && link.producer != null) return true
             false
         }
     }
 
     protected boolean consumerAlreadyStarted() {
         if (consumer != null) return true
-        flow.links.any {
-            if (it.consumerSpec.is(consumerSpec) && it.consumer != null) return true
-            if (it.producerSpec.is(consumerSpec) && it.producer != null) return true
+        flow.links.any { KanbanLink link ->
+            if (link.consumerSpec.is(consumerSpec) && link.consumer != null) return true
+            if (link.producerSpec.is(consumerSpec) && link.producer != null) return true
             false
         }
     }

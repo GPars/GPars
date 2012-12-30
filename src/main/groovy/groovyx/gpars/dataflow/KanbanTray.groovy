@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright � 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 
 package groovyx.gpars.dataflow
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
+
 /**
  * A KanbanTray is a container for passing a product around a {@KanbanLink}.
  * A tray always stays within the same {@link KanbanLink}, which allows methods like
@@ -26,6 +29,7 @@ package groovyx.gpars.dataflow
  * @see KanbanLink
  * @author Dierk Koenig
  */
+@CompileStatic(value = TypeCheckingMode.PASS)
 class KanbanTray {
 
     KanbanLink link
