@@ -39,7 +39,7 @@ or version 1.1-SNAPSHOT if using the latest snapshot.
 
 h3. Transitive Dependencies
 
-GPars as a library depends on Groovy version equal or greater than 1.8. Also, the Fork/Join concurrency library namely "jsr166y":http://gee.cs.oswego.edu/dl/jsr166/dist/jsr166y.jar
+GPars as a library depends on Groovy version equal or greater than 2.0. Also, the Fork/Join concurrency library namely "jsr166y":http://gee.cs.oswego.edu/dl/jsr166/dist/jsr166y.jar
 (an artifact from the "JSR-166 Project":http://g.oswego.edu/dl/concurrency-interest/ ) must be on the
 classpath the programs, which use GPars, to compile and execute.
 Released versions of this artifact are in the main Maven and Codehaus repositories.  Development versions
