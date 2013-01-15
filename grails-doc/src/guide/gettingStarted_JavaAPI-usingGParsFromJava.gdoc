@@ -159,7 +159,7 @@ public class DataflowTaskDemo {
             }
         });
 
-        final DataflowVariable result = group.task(new Callable() {
+        final Promise result = group.task(new Callable() {
             public Object call() throws Exception {
                 return (Integer)a.getVal() + 10;
             }
