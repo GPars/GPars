@@ -28,9 +28,9 @@ public abstract class ParallelLongArrayWithBounds extends ParallelLongArrayWithF
      * only on the elements of the array between firstIndex
      * (inclusive) and upperBound (exclusive).  The bound
      * arguments are relative to the current bounds.  For example
-     * <tt>pa.withBounds(2, 8).withBounds(3, 5)</tt> indexes the
+     * {@code pa.withBounds(2, 8).withBounds(3, 5)} indexes the
      * 5th (= 2+3) and 6th elements of pa. However, indices
-     * returned by methods such as <tt>indexOf</tt> are
+     * returned by methods such as {@code indexOf} are
      * with respect to the underlying ParallelLongArray.
      * @param firstIndex the lower bound (inclusive)
      * @param upperBound the upper bound (exclusive)

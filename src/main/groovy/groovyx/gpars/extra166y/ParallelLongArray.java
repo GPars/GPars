@@ -292,7 +292,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Replaces elements with the results of applying the given
      * generator. For example, to fill the array with uniform random
      * values, use
-     * <tt>replaceWithGeneratedValue(Ops.longRandom())</tt>.
+     * {@code replaceWithGeneratedValue(Ops.longRandom())}.
      * @param generator the generator
      * @return this (to simplify use in expressions)
      */
@@ -313,7 +313,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Replaces elements with results of applying
-     * <tt>op(thisElement, otherElement)</tt>.
+     * {@code op(thisElement, otherElement)}.
      * @param other the other array
      * @param combiner the combiner
      * @return this (to simplify use in expressions)
@@ -327,7 +327,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Replaces elements with results of applying
-     * <tt>op(thisElement, otherElement)</tt>.
+     * {@code op(thisElement, otherElement)}.
      * @param other the other array
      * @param combiner the combiner
      * @return this (to simplify use in expressions)
@@ -431,9 +431,9 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Replaces each element with the running cumulation of applying
      * the given reducer. For example, if the contents are the numbers
-     * <tt>1, 2, 3</tt>, and the reducer operation adds numbers, then
-     * after invocation of this method, the contents would be <tt>1,
-     * 3, 6</tt> (that is, <tt>1, 1+2, 1+2+3</tt>);
+     * {@code 1, 2, 3}, and the reducer operation adds numbers, then
+     * after invocation of this method, the contents would be {@code 1,
+     * 3, 6} (that is, {@code 1, 1+2, 1+2+3});
      * @param reducer the reducer
      * @param base the result for an empty array
      * @return this (to simplify use in expressions)
@@ -446,11 +446,11 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Replaces each element with the cumulation of applying the given
      * reducer to all previous values, and returns the total
-     * reduction. For example, if the contents are the numbers <tt>1,
-     * 2, 3</tt>, and the reducer operation adds numbers, then after
-     * invocation of this method, the contents would be <tt>0, 1,
-     * 3</tt> (that is, <tt>0, 0+1, 0+1+2</tt>, and the return value
-     * would be 6 (that is, <tt> 1+2+3</tt>);
+     * reduction. For example, if the contents are the numbers {@code 1,
+     * 2, 3}, and the reducer operation adds numbers, then after
+     * invocation of this method, the contents would be {@code 0, 1,
+     * 3} (that is, {@code 0, 0+1, 0+1+2}, and the return value
+     * would be 6 (that is, {@code  1+2+3});
      * @param reducer the reducer
      * @param base the result for an empty array
      * @return the total reduction
@@ -508,7 +508,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     }
 
     /**
-     * Equivalent to <tt>asList().addAll</tt> but specialized for array
+     * Equivalent to {@code asList().addAll} but specialized for array
      * arguments and likely to be more efficient.
      * @param other the elements to add
      * @return this (to simplify use in expressions)
@@ -865,7 +865,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Returns an iterator stepping through each element of the array
      * up to the current limit. This iterator does <em>not</em>
      * support the remove operation. However, a full
-     * <tt>ListIterator</tt> supporting add, remove, and set
+     * {@code ListIterator} supporting add, remove, and set
      * operations is available via {@link #asList}.
      * @return an iterator stepping through each element
      */
@@ -939,7 +939,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     public void set(int i, long x) { array[i] = x; }
 
     /**
-     * Equivalent to <tt>asList().toString()</tt>
+     * Equivalent to {@code asList().toString()}
      * @return a string representation
      */
     public String toString() {

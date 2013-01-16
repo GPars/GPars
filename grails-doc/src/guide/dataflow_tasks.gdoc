@@ -271,14 +271,14 @@ new Dataflows().with {
 h2. Returning a value from a task
 
 Typically dataflow tasks communicate through dataflow variables. On top of that, tasks can also return values, again through a dataflow variable.
- When you invoke the _task()_ factory method, you get back an instance of DataflowVariable, on which you can listen for the task's return value,
- just like when using any other DataflowVariable.
+ When you invoke the _task()_ factory method, you get back an instance of Promise (implemented as DataflowVariable), through which you can listen for the task's return value,
+ just like when using any other Promise or DataflowVariable.
 
  {code}
-    final DataflowVariable t1 = task {
+    final Promise t1 = task {
         return 10
     }
-    final DataflowVariable t2 = task {
+    final Promise t2 = task {
         return 20
     }
     def results = [t1, t2]*.val
@@ -301,10 +301,10 @@ task >> {value -> println "The task finished and returned $value"}
 
  {code}
  task {
-     final DataflowVariable t1 = task {
+     final Promise t1 = task {
          println 'First sub-task running.'
      }
-     final DataflowVariable t2 = task {
+     final Promise t2 = task {
          println 'Second sub-task running'
      }
      [t1, t2]*.join()

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,21 +16,22 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataflowVariable
+import groovyx.gpars.dataflow.Promise
+
 import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * Demonstrates composing tasks and obtaining their return values
- * When creating a task, a dataflow variable is returned, through which the task communicates back its return value and which can also be used to join the task.
+ * When creating a task, a promise is returned, through which the task communicates back its return value and which can also be used to join the task.
  *
  * @author Vaclav Pech
  */
 
 task {
-    final DataflowVariable t1 = task {
+    final Promise t1 = task {
         return 10
     }
-    final DataflowVariable t2 = task {
+    final Promise t2 = task {
         return 20
     }
     def results = [t1, t2]*.val
@@ -43,4 +44,4 @@ def task = task {
     println 'The task is running and calculating the return value'
     30
 }
-task >> {value -> println "The task finished and returned $value"}
+task >> { value -> println "The task finished and returned $value" }
