@@ -73,15 +73,15 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * <p>A ParallelArray is not a List. It relies on random access across
  * array elements to support efficient parallel operations.  However,
  * a ParallelArray can be viewed and manipulated as a List, via method
- * {@link ParallelArray#asList}. The <tt>asList</tt> view allows
+ * {@link ParallelArray#asList}. The {@code asList} view allows
  * incremental insertion and modification of elements while setting up
  * a ParallelArray, generally before using it for parallel
  * operations. Similarly, the list view may be useful when accessing
  * the results of computations in sequential contexts.  A
  * ParallelArray may also be created using the elements of any other
  * Collection, by constructing from the array returned by the
- * Collection's <tt>toArray</tt> method. The effects of mutative
- * <tt>asList</tt> operations may also be achieved directly using
+ * Collection's {@code toArray} method. The effects of mutative
+ * {@code asList} operations may also be achieved directly using
  * method {@link #setLimit} along with element-by-element access
  * methods {@link #get}</tt> and {@link #set}.
  *
@@ -92,8 +92,8 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * {@link ParallelDoubleArray} are also supplied, and designed to
  * smoothly interoperate with ParallelArrays. You should also use a
  * ParallelLongArray for processing other integral scalar data
- * (<tt>int</tt>, <tt>short</tt>, etc).  And similarly use a
- * ParallelDoubleArray for <tt>float</tt> data.  (Further
+ * ({@code int}, {@code short}, etc).  And similarly use a
+ * ParallelDoubleArray for {@code float} data.  (Further
  * specializations for these other types would add clutter without
  * significantly improving performance beyond that of the Long and
  * Double versions.)
@@ -101,12 +101,12 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * <p>Most usages of ParallelArray involve sets of operations prefixed
  * with range bounds, filters, and mappings (including mappings that
  * combine elements from other ParallelArrays), using
- * <tt>withBounds</tt>, <tt>withFilter</tt>, and <tt>withMapping</tt>,
+ * {@code withBounds}, {@code withFilter}, and {@code withMapping},
  * respectively. For example,
- * <tt>aParallelArray.withFilter(aPredicate).all()</tt> creates a new
+ * {@code aParallelArray.withFilter(aPredicate).all()} creates a new
  * ParallelArray containing only those elements matching the
  * predicate. And for ParallelLongArrays a, b, and c,
- * <tt>a.withMapping(CommonOps.longAdder(),b).withMapping(CommonOps.longAdder(),c).min()</tt>
+ * {@code a.withMapping(CommonOps.longAdder(),b).withMapping(CommonOps.longAdder(),c).min()}
  * returns the minimum value of a[i]+b[i]+c[i] for all i.  As
  * illustrated below, a <em>mapping</em> often represents accessing
  * some field or invoking some method of an element.  These versions
@@ -118,21 +118,21 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * be cascaded, but all filter prefixes must precede all mapping
  * prefixes, to ensure efficient execution in a single parallel step.
  * In cases of combined mapping expressions, this rule is only
- * dynamically enforced. For example, <tt>pa.withMapping(op,
- * pb.withFilter(f))</tt> will compile but throw an exception upon
+ * dynamically enforced. For example, {@code pa.withMapping(op,
+ * pb.withFilter(f))} will compile but throw an exception upon
  * execution because the filter precedes the mapping.
  *
  * <p>While series of filters and mappings are allowed, it is
  * usually more efficient to combine them into single filters or
  * mappings when possible. For example
- * <tt>pa.withMapping(addOne).withMapping(addOne)</tt> is generally
- * less efficient than <tt>pa.withMapping(addTwo)</tt>. Methods
- * <tt>withIndexedFilter</tt> and <tt>withIndexedMapping</tt> may be
+ * {@code pa.withMapping(addOne).withMapping(addOne)} is generally
+ * less efficient than {@code pa.withMapping(addTwo)}. Methods
+ * {@code withIndexedFilter} and {@code withIndexedMapping} may be
  * useful when combining such expressions.
  *
- * <p>This class includes some reductions, such as <tt>min</tt>, that
+ * <p>This class includes some reductions, such as {@code min}, that
  * are commonly useful for most element types, as well as a combined
- * version, <tt>summary</tt>, that computes all of them in a single
+ * version, {@code summary}, that computes all of them in a single
  * parallel step, which is normally more efficient than computing each
  * in turn.
  *
@@ -148,7 +148,7 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * programming with aggregates is that you must separately define each
  * of the component functions on elements. For example, the following
  * returns the maximum Grade Point Average across all senior students,
- * given a (fictional) <tt>Student</tt> class:
+ * given a (fictional) {@code Student} class:
  *
  * <pre>
  * import static Ops.*;
@@ -417,7 +417,7 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
 
     /**
      * Replaces elements with results of applying
-     * <tt>op(thisElement, otherElement)</tt>.
+     * {@code op(thisElement, otherElement)}.
      * @param other the other array
      * @param combiner the combiner
      * @return this (to simplify use in expressions)
@@ -431,7 +431,7 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
 
     /**
      * Replaces elements with results of applying
-     * <tt>op(thisElement, otherElement)</tt>.
+     * {@code op(thisElement, otherElement)}.
      * @param other the other array
      * @param combiner the combiner
      * @return this (to simplify use in expressions)
@@ -538,9 +538,9 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Replaces each element with the running cumulation of applying
      * the given reducer. For example, if the contents are the numbers
-     * <tt>1, 2, 3</tt>, and the reducer operation adds numbers, then
-     * after invocation of this method, the contents would be <tt>1,
-     * 3, 6</tt> (that is, <tt>1, 1+2, 1+2+3</tt>);
+     * {@code 1, 2, 3}, and the reducer operation adds numbers, then
+     * after invocation of this method, the contents would be {@code 1,
+     * 3, 6} (that is, {@code 1, 1+2, 1+2+3});
      * @param reducer the reducer
      * @param base the result for an empty array
      * @return this (to simplify use in expressions)
@@ -553,11 +553,11 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Replaces each element with the cumulation of applying the given
      * reducer to all previous values, and returns the total
-     * reduction. For example, if the contents are the numbers <tt>1,
-     * 2, 3</tt>, and the reducer operation adds numbers, then after
-     * invocation of this method, the contents would be <tt>0, 1,
-     * 3</tt> (that is, <tt>0, 0+1, 0+1+2</tt>, and the return value
-     * would be 6 (that is, <tt> 1+2+3</tt>);
+     * reduction. For example, if the contents are the numbers {@code 1,
+     * 2, 3}, and the reducer operation adds numbers, then after
+     * invocation of this method, the contents would be {@code 0, 1,
+     * 3} (that is, {@code 0, 0+1, 0+1+2}, and the return value
+     * would be 6 (that is, {@code  1+2+3});
      * @param reducer the reducer
      * @param base the result for an empty array
      * @return the total reduction
@@ -593,7 +593,7 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Returns a new ParallelArray containing only the non-null unique
      * elements of this array (that is, without any duplicates), using
-     * each element's <tt>equals</tt> method to test for duplication.
+     * each element's {@code equals} method to test for duplication.
      * @return the new ParallelArray
      */
     public ParallelArray<T> allUniqueElements() {
@@ -688,7 +688,7 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     }
 
     /**
-     * Equivalent to <tt>asList().addAll</tt> but specialized for array
+     * Equivalent to {@code asList().addAll} but specialized for array
      * arguments and likely to be more efficient.
      * @param other the elements to add
      * @return this (to simplify use in expressions)
@@ -994,7 +994,7 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Returns an iterator stepping through each element of the array
      * up to the current limit. This iterator does <em>not</em>
      * support the remove operation. However, a full
-     * <tt>ListIterator</tt> supporting add, remove, and set
+     * {@code ListIterator} supporting add, remove, and set
      * operations is available via {@link #asList}.
      * @return an iterator stepping through each element
      */
@@ -1068,7 +1068,7 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     public T[] getArray() { return array; }
 
     /**
-     * Equivalent to <tt>asList().toString()</tt>
+     * Equivalent to {@code asList().toString()}
      * @return a string representation
      */
     public String toString() {

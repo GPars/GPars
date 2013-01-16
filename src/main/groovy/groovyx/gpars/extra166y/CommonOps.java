@@ -127,7 +127,7 @@ public class CommonOps {
 
     /**
      * Returns a reducer returning maximum of two values, or
-     * <tt>null</tt> if both arguments are null, and that casts
+     * {@code null} if both arguments are null, and that casts
      * its arguments as Comparable on each comparison, throwing
      * ClassCastException on failure.
      */
@@ -145,7 +145,7 @@ public class CommonOps {
 
     /**
      * Returns a reducer returning minimum of two values, or
-     * <tt>null</tt> if both arguments are null, and that casts
+     * {@code null} if both arguments are null, and that casts
      * its arguments as Comparable on each comparison, throwing
      * ClassCastException on failure.
      */
@@ -979,7 +979,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument <tt>equals</tt> the second
+     * first argument {@code equals} the second
      */
     public static BinaryPredicate<Object, Object> equalityPredicate() {
         return EqualityPredicate.predicate;
@@ -994,7 +994,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument <tt>==</tt> the second
+     * first argument {@code ==} the second
      */
     public static BinaryPredicate<Object, Object> identityPredicate() {
         return IdentityPredicate.predicate;
@@ -1009,7 +1009,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument <tt>==</tt> the second
+     * first argument {@code ==} the second
      */
     public static BinaryIntPredicate intEqualityPredicate() {
         return IntEqualityPredicate.predicate;
@@ -1024,7 +1024,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument <tt>==</tt> the second
+     * first argument {@code ==} the second
      */
     public static BinaryLongPredicate longEqualityPredicate() {
         return LongEqualityPredicate.predicate;
@@ -1039,7 +1039,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument <tt>==</tt> the second
+     * first argument {@code ==} the second
      */
     public static BinaryDoublePredicate doubleEqualityPredicate() {
         return DoubleEqualityPredicate.predicate;
@@ -1055,7 +1055,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument <tt>!equals</tt> the second
+     * first argument {@code !equals} the second
      */
     public static BinaryPredicate<Object, Object> inequalityPredicate() {
         return InequalityPredicate.predicate;
@@ -1070,7 +1070,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument <tt>!=</tt> the second
+     * first argument {@code !=} the second
      */
     public static BinaryPredicate<Object, Object> nonidentityPredicate() {
         return NonidentityPredicate.predicate;
@@ -1085,7 +1085,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument <tt>!=</tt> the second
+     * first argument {@code !=} the second
      */
     public static BinaryIntPredicate intInequalityPredicate() {
         return IntInequalityPredicate.predicate;
@@ -1100,7 +1100,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument <tt>==</tt> the second
+     * first argument {@code ==} the second
      */
     public static BinaryLongPredicate longInequalityPredicate() {
         return LongInequalityPredicate.predicate;
@@ -1115,7 +1115,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument <tt>!=</tt> the second
+     * first argument {@code !=} the second
      */
     public static BinaryDoublePredicate doubleInequalityPredicate() {
         return DoubleInequalityPredicate.predicate;

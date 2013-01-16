@@ -91,7 +91,7 @@ public abstract class ParallelLongArrayWithFilter extends ParallelLongArrayWithL
 
     /**
      * Replaces elements with results of applying
-     * <tt>op(thisElement, otherElement)</tt>.
+     * {@code op(thisElement, otherElement)}.
      * @param other the other array
      * @param combiner the combiner
      * @return this (to simplify use in expressions)
@@ -106,7 +106,7 @@ public abstract class ParallelLongArrayWithFilter extends ParallelLongArrayWithL
 
     /**
      * Replaces elements with results of applying
-     * <tt>op(thisElement, otherElement)</tt>.
+     * {@code op(thisElement, otherElement)}.
      * @param other the other array
      * @param combiner the combiner
      * @return this (to simplify use in expressions)
