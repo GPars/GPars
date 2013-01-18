@@ -86,7 +86,7 @@ class PAS {
      * subclass, prefixed FJO (object reference), FJD (double) and FJL
      * (long).
      */
-    static abstract class FJBase extends RecursiveAction {
+    abstract static class FJBase extends RecursiveAction {
         final AbstractParallelAnyArray pap;
         final int lo;
         final int hi;
@@ -936,7 +936,7 @@ class PAS {
      * Base for cancellable search tasks. Same idea as FJBase
      * but cancels tasks when result nonnegative.
      */
-    static abstract class FJSearchBase extends RecursiveAction {
+    abstract static class FJSearchBase extends RecursiveAction {
         final AbstractParallelAnyArray pap;
         final int lo;
         final int hi;
@@ -1164,7 +1164,7 @@ class PAS {
         }
     }
 
-    static abstract class FJSelectAllDriver extends RecursiveAction {
+    abstract static class FJSelectAllDriver extends RecursiveAction {
         final int[] indices;
         final AbstractParallelAnyArray pap;
         final int initialOffset;
@@ -2493,7 +2493,7 @@ class PAS {
      * maintain the "in" and "out" fields, and *Ops classes perform
      * computations
      */
-    static abstract class FJScan extends ForkJoinTask<Void> {
+    abstract static class FJScan extends ForkJoinTask<Void> {
         static final short CUMULATE = (short)1;
         static final short SUMMED   = (short)2;
         static final short FINISHED = (short)4;
@@ -2662,7 +2662,7 @@ class PAS {
     /**
      * Computational operations for FJScan
      */
-    static abstract class FJScanOp {
+    abstract static class FJScanOp {
         final int threshold;
         final int origin;
         final int fence;
@@ -2679,7 +2679,7 @@ class PAS {
         abstract FJScan newSubtask(FJScan parent, int lo, int hi);
     }
 
-    static abstract class FJOScanOp extends FJScanOp {
+    abstract static class FJOScanOp extends FJScanOp {
         final Object[] array;
         final Reducer reducer;
         final Object base;
@@ -2769,7 +2769,7 @@ class PAS {
         }
     }
 
-    static abstract class FJDScanOp extends FJScanOp {
+    abstract static class FJDScanOp extends FJScanOp {
         final double[] array;
         final DoubleReducer reducer;
         final double base;
@@ -2859,7 +2859,7 @@ class PAS {
         }
     }
 
-    static abstract class FJLScanOp extends FJScanOp {
+    abstract static class FJLScanOp extends FJScanOp {
         final long[] array;
         final LongReducer reducer;
         final long base;
@@ -2951,7 +2951,7 @@ class PAS {
 
     // specialized versions for plus
 
-    static abstract class FJDScanPlusOp extends FJScanOp {
+    abstract static class FJDScanPlusOp extends FJScanOp {
         final double[] array;
         FJDScanPlusOp(AbstractParallelAnyArray.DPap pap) {
             super(pap);
@@ -3033,7 +3033,7 @@ class PAS {
         }
     }
 
-    static abstract class FJLScanPlusOp extends FJScanOp {
+    abstract static class FJLScanPlusOp extends FJScanOp {
         final long[] array;
         FJLScanPlusOp(AbstractParallelAnyArray.LPap pap) {
             super(pap);
