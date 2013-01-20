@@ -405,14 +405,12 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
         final Node[] resizeTable(CustomConcurrentHashMap cchm) {
             Node[] oldTable = table;
             if (oldTable == null)
-                return table = (Node[])
-                    new Node[cchm.initialSegmentCapacity];
+                return table = new Node[cchm.initialSegmentCapacity];
 
             int oldCapacity = oldTable.length;
             if (oldCapacity >= MAX_SEGMENT_CAPACITY)
                 return oldTable;
-            Node[] newTable =
-                (Node[])new Node[oldCapacity<<1];
+            Node[] newTable = new Node[oldCapacity<<1];
             int sizeMask = newTable.length - 1;
             NodeFactory fac = cchm.factory;
             for (int i = 0; i < oldCapacity ; i++) {
@@ -554,7 +552,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
                 capacity = MAX_SEGMENT_CAPACITY;
             this.initialSegmentCapacity = capacity;
         }
-        this.segments = (Segment[])new Segment[NSEGMENTS];
+        this.segments = new Segment[NSEGMENTS];
     }
 
     /**
@@ -1590,7 +1588,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
     private void readObject(java.io.ObjectInputStream s)
         throws IOException, ClassNotFoundException {
         s.defaultReadObject();
-        this.segments = (Segment[])(new Segment[NSEGMENTS]);
+        this.segments = new Segment[NSEGMENTS];
         for (;;) {
             K key = (K) s.readObject();
             V value = (V) s.readObject();
@@ -3021,15 +3019,15 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
         try {
             UNSAFE = getUnsafe();
             tableBase = UNSAFE.arrayBaseOffset(Node[].class);
-            int s = UNSAFE.arrayIndexScale(Node[].class);
-            if ((s & (s-1)) != 0)
+            int scale = UNSAFE.arrayIndexScale(Node[].class);
+            if ((scale & (scale - 1)) != 0)
                 throw new Error("data type scale not a power of two");
-            tableShift = 31 - Integer.numberOfLeadingZeros(s);
+            tableShift = 31 - Integer.numberOfLeadingZeros(scale);
             segmentsBase = UNSAFE.arrayBaseOffset(Segment[].class);
-            s = UNSAFE.arrayIndexScale(Segment[].class);
-            if ((s & (s-1)) != 0)
+            scale = UNSAFE.arrayIndexScale(Segment[].class);
+            if ((scale & (scale - 1)) != 0)
                 throw new Error("data type scale not a power of two");
-            segmentsShift = 31 - Integer.numberOfLeadingZeros(s);
+            segmentsShift = 31 - Integer.numberOfLeadingZeros(scale);
         } catch (Throwable e) {
             throw new RuntimeException("Could not initialize intrinsics", e);
         }

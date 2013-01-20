@@ -563,7 +563,7 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * @return the total reduction
      */
     public T precumulate(Reducer<T> reducer, T base) {
-        return (T)(super.precumulate(reducer, base));
+        return super.precumulate(reducer, base);
     }
 
     /**
