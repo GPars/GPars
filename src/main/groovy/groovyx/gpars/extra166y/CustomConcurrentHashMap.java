@@ -238,7 +238,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
 
     /**
      * A function computing a mapping from the given key to a value,
-     *  or {@code null} if there is no mapping.
+     * or {@code null} if there is no mapping.
      */
     public static interface MappingFunction<K, V> {
         /**
@@ -259,7 +259,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
     /**
      * A function computing a new mapping from the given key and its
      * current value to a new value, or {@code null} if there is
-     * no mapping
+     * no mapping.
      */
     public static interface RemappingFunction<K, V> {
         /**
@@ -358,14 +358,14 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
          * Records the linkage to be returned by the next call to getLinkage.
          * @param linkage the linkage
          */
-        void setLinkage(Node r);
+        void setLinkage(Node linkage);
     }
 
     /**
      * Each Segment holds a count and table corresponding to a segment
      * of the table. This class contains only those methods for
      * directly assigning these fields, which must only be called
-     * while holding locks
+     * while holding locks.
      */
     static final class Segment extends ReentrantLock {
         volatile Node[] table;
@@ -400,7 +400,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
         }
 
         /**
-         * See the similar code in ConcurrentHashMap for explanation
+         * See the similar code in ConcurrentHashMap for explanation.
          */
         final Node[] resizeTable(CustomConcurrentHashMap cchm) {
             Node[] oldTable = table;
@@ -712,8 +712,8 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * if no such mapping exists.
      *
      * @param  key   possible key
-     * @return the value associated with the key or {@code null} if
-     * there is no mapping.
+     * @return the value associated with the key, or {@code null} if
+     * there is no mapping
      * @throws NullPointerException if the specified key is null
      */
     public V get(Object key) {
@@ -1104,11 +1104,11 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * @param mappingFunction the function to compute a value
      * @return the current (existing or computed) value associated with
      *         the specified key, or {@code null} if the computation
-     *         returned {@code null}.
+     *         returned {@code null}
      * @throws NullPointerException if the specified key or mappingFunction
-     *         is null,
+     *         is null
      * @throws RuntimeException or Error if the mappingFunction does so,
-     *         in which case the mapping is left unestablished.
+     *         in which case the mapping is left unestablished
      */
     public V computeIfAbsent(K key, MappingFunction<? super K, ? extends V> mappingFunction) {
         if (key == null || mappingFunction == null)
@@ -1179,7 +1179,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * @return the updated value or
      *         {@code null} if the computation returned {@code null}
      * @throws NullPointerException if the specified key or remappingFunction
-     *         is null,
+     *         is null
      * @throws RuntimeException or Error if the remappingFunction does so,
      *         in which case the mapping is left in its previous state
      */
@@ -1734,7 +1734,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * to {@link java.lang.ref.Reference} constructors to arrange
      * removal of reclaimed nodes from maps via a background thread.
      * @return the reference queue associated with the background
-     * cleanup thread.
+     * cleanup thread
      */
     static ReferenceQueue<Object> getReclamationQueue() {
         ReferenceQueue<Object> q = refQueue;
@@ -1833,7 +1833,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedStrongKeySelfValueNode
@@ -1845,7 +1845,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class StrongKeySelfValueNodeFactory
@@ -1883,7 +1883,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedStrongKeyStrongValueNode
@@ -1896,7 +1896,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class StrongKeyStrongValueNodeFactory
@@ -1938,7 +1938,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedStrongKeyIntValueNode
@@ -1951,7 +1951,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class StrongKeyIntValueNodeFactory
@@ -2006,7 +2006,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value, cchm);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedStrongKeyWeakValueNode
@@ -2020,7 +2020,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class StrongKeyWeakValueNodeFactory
@@ -2074,7 +2074,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value, cchm);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedStrongKeySoftValueNode
@@ -2088,7 +2088,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class StrongKeySoftValueNodeFactory
@@ -2142,7 +2142,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, cchm);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedWeakKeySelfValueNode
@@ -2155,7 +2155,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class WeakKeySelfValueNodeFactory
@@ -2195,7 +2195,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value, cchm);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedWeakKeyStrongValueNode
@@ -2209,7 +2209,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class WeakKeyStrongValueNodeFactory
@@ -2250,7 +2250,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value, cchm);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedWeakKeyIntValueNode
@@ -2264,7 +2264,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class WeakKeyIntValueNodeFactory
@@ -2312,7 +2312,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value, cchm);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedWeakKeyWeakValueNode
@@ -2326,7 +2326,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class WeakKeyWeakValueNodeFactory
@@ -2375,7 +2375,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value, cchm);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedWeakKeySoftValueNode
@@ -2389,7 +2389,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class WeakKeySoftValueNodeFactory
@@ -2443,7 +2443,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, cchm);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedSoftKeySelfValueNode
@@ -2456,7 +2456,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class SoftKeySelfValueNodeFactory
@@ -2496,7 +2496,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value, cchm);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedSoftKeyStrongValueNode
@@ -2510,7 +2510,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class SoftKeyStrongValueNodeFactory
@@ -2551,7 +2551,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value, cchm);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedSoftKeyIntValueNode
@@ -2565,7 +2565,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class SoftKeyIntValueNodeFactory
@@ -2613,7 +2613,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value, cchm);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedSoftKeyWeakValueNode
@@ -2627,7 +2627,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class SoftKeyWeakValueNodeFactory
@@ -2676,7 +2676,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value, cchm);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedSoftKeySoftValueNode
@@ -2690,7 +2690,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class SoftKeySoftValueNodeFactory
@@ -2735,7 +2735,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedIntKeySelfValueNode
@@ -2747,7 +2747,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class IntKeySelfValueNodeFactory
@@ -2785,7 +2785,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedIntKeyStrongValueNode
@@ -2798,7 +2798,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class IntKeyStrongValueNodeFactory
@@ -2838,7 +2838,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedIntKeyIntValueNode
@@ -2851,7 +2851,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class IntKeyIntValueNodeFactory
@@ -2904,7 +2904,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value, cchm);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedIntKeyWeakValueNode
@@ -2918,7 +2918,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class IntKeyWeakValueNodeFactory
@@ -2972,7 +2972,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             super(locator, key, value, cchm);
         }
         public final Node getLinkage() { return null; }
-        public final void setLinkage(Node r) { }
+        public final void setLinkage(Node linkage) { }
     }
 
     static final class LinkedIntKeySoftValueNode
@@ -2986,7 +2986,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
             this.linkage = linkage;
         }
         public final Node getLinkage() { return linkage; }
-        public final void setLinkage(Node r) { linkage = r; }
+        public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class IntKeySoftValueNodeFactory

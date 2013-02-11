@@ -44,7 +44,7 @@ public class CommonOps {
     private CommonOps() {} // disable construction
 
     /**
-     * Returns a Comparator for Comparable objects
+     * Returns a Comparator for Comparable objects.
      */
     public static <T extends Comparable<? super T>> Comparator<T>
                              naturalComparator(Class<T> type) {
@@ -163,7 +163,7 @@ public class CommonOps {
 
 
     /**
-     * Returns a comparator for doubles relying on natural ordering
+     * Returns a comparator for doubles relying on natural ordering.
      */
     public static DoubleComparator naturalDoubleComparator() {
         return NaturalDoubleComparator.comparator;
@@ -179,7 +179,7 @@ public class CommonOps {
 
     /**
      * Returns a reducer returning the maximum of two double elements,
-     * using natural comparator
+     * using natural comparator.
      */
     public static DoubleReducer naturalDoubleMaxReducer() {
         return NaturalDoubleMaxReducer.max;
@@ -194,7 +194,7 @@ public class CommonOps {
 
     /**
      * Returns a reducer returning the minimum of two double elements,
-     * using natural comparator
+     * using natural comparator.
      */
     public static DoubleReducer naturalDoubleMinReducer() {
         return NaturalDoubleMinReducer.min;
@@ -208,7 +208,7 @@ public class CommonOps {
 
     /**
      * Returns a reducer returning the maximum of two double elements,
-     * using the given comparator
+     * using the given comparator.
      */
     public static DoubleReducer doubleMaxReducer
         (final DoubleComparator comparator) {
@@ -221,7 +221,7 @@ public class CommonOps {
 
     /**
      * Returns a reducer returning the minimum of two double elements,
-     * using the given comparator
+     * using the given comparator.
      */
     public static DoubleReducer doubleMinReducer
         (final DoubleComparator comparator) {
@@ -233,7 +233,7 @@ public class CommonOps {
     }
 
     /**
-     * Returns a comparator for longs relying on natural ordering
+     * Returns a comparator for longs relying on natural ordering.
      */
     public static LongComparator naturalLongComparator() {
         return NaturalLongComparator.comparator;
@@ -249,7 +249,7 @@ public class CommonOps {
 
     /**
      * Returns a reducer returning the maximum of two long elements,
-     * using natural comparator
+     * using natural comparator.
      */
     public static LongReducer naturalLongMaxReducer() {
         return NaturalLongMaxReducer.max;
@@ -264,7 +264,7 @@ public class CommonOps {
 
     /**
      * A reducer returning the minimum of two long elements,
-     * using natural comparator
+     * using natural comparator.
      */
     public static LongReducer naturalLongMinReducer() {
         return NaturalLongMinReducer.min;
@@ -278,7 +278,7 @@ public class CommonOps {
 
     /**
      * Returns a reducer returning the maximum of two long elements,
-     * using the given comparator
+     * using the given comparator.
      */
     public static LongReducer longMaxReducer
         (final LongComparator comparator) {
@@ -291,7 +291,7 @@ public class CommonOps {
 
     /**
      * Returns a reducer returning the minimum of two long elements,
-     * using the given comparator
+     * using the given comparator.
      */
     public static LongReducer longMinReducer
         (final LongComparator comparator) {
@@ -304,7 +304,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T,U,V> Op<T,V> compoundOp
         (final Op<? super T, ? extends U> first,
@@ -316,7 +316,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T,V> Op<T,V> compoundOp
         (final ObjectToDouble<? super T> first,
@@ -328,7 +328,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T,V> Op<T,V> compoundOp
         (final ObjectToLong<? super T> first,
@@ -340,7 +340,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T,V> DoubleToObject<V> compoundOp
         (final DoubleToObject<? extends T> first,
@@ -352,7 +352,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T,V> LongToObject<V> compoundOp
         (final LongToObject<? extends T> first,
@@ -364,7 +364,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T,U> ObjectToDouble<T> compoundOp
         (final Op<? super T, ? extends U> first,
@@ -376,7 +376,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T,U> ObjectToLong<T> compoundOp
         (final Op<? super T, ? extends U> first,
@@ -388,7 +388,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T> ObjectToDouble<T> compoundOp
         (final ObjectToDouble<? super T> first,
@@ -400,7 +400,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T> ObjectToLong<T> compoundOp
         (final ObjectToDouble<? super T> first,
@@ -412,7 +412,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T> ObjectToLong<T> compoundOp
         (final ObjectToLong<? super T> first,
@@ -424,7 +424,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T> ObjectToDouble<T> compoundOp
         (final ObjectToLong<? super T> first,
@@ -436,7 +436,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static DoubleOp compoundOp
         (final DoubleOp first,
@@ -448,7 +448,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static DoubleToLong compoundOp
         (final DoubleOp first,
@@ -460,7 +460,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static DoubleToLong compoundOp
         (final DoubleToLong first,
@@ -472,7 +472,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T> DoubleToObject<T> compoundOp
         (final DoubleToLong first,
@@ -484,7 +484,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T> LongToObject<T> compoundOp
         (final LongToDouble first,
@@ -496,7 +496,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static LongToDouble compoundOp
         (final LongOp first,
@@ -508,7 +508,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static LongToDouble compoundOp
         (final LongToDouble first,
@@ -520,7 +520,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T> DoubleToObject<T> compoundOp
         (final DoubleOp first,
@@ -532,7 +532,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T> LongToObject<T> compoundOp
         (final LongOp first,
@@ -544,7 +544,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T> DoubleOp compoundOp
         (final DoubleToObject<? extends T> first,
@@ -556,7 +556,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T> LongToDouble compoundOp
         (final LongToObject<? extends T> first,
@@ -568,7 +568,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T> DoubleToLong compoundOp
         (final DoubleToObject<? extends T> first,
@@ -580,7 +580,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static <T> LongOp compoundOp
         (final LongToObject<? extends T> first,
@@ -592,7 +592,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static LongOp compoundOp
         (final LongOp first,
@@ -604,7 +604,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static DoubleOp compoundOp
         (final DoubleToLong first,
@@ -616,7 +616,7 @@ public class CommonOps {
 
     /**
      * Returns a composite mapper that applies a second mapper to the results
-     * of applying the first one
+     * of applying the first one.
      */
     public static LongOp compoundOp
         (final LongToDouble first,
@@ -627,7 +627,7 @@ public class CommonOps {
     }
 
     /**
-     * Returns a predicate evaluating to the negation of its contained predicate
+     * Returns a predicate evaluating to the negation of its contained predicate.
      */
     public static <T> Predicate<T> notPredicate
         (final Predicate<T> pred) {
@@ -637,7 +637,7 @@ public class CommonOps {
     }
 
     /**
-     * Returns a predicate evaluating to the negation of its contained predicate
+     * Returns a predicate evaluating to the negation of its contained predicate.
      */
     public static DoublePredicate notPredicate
         (final DoublePredicate pred) {
@@ -647,7 +647,7 @@ public class CommonOps {
     }
 
     /**
-     * Returns a predicate evaluating to the negation of its contained predicate
+     * Returns a predicate evaluating to the negation of its contained predicate.
      */
     public static LongPredicate notPredicate
         (final LongPredicate pred) {
@@ -657,7 +657,7 @@ public class CommonOps {
     }
 
     /**
-     * Returns a predicate evaluating to the conjunction of its contained predicates
+     * Returns a predicate evaluating to the conjunction of its contained predicates.
      */
     public static <S, T extends S> Predicate<T> andPredicate
                                 (final Predicate<S> first,
@@ -670,7 +670,7 @@ public class CommonOps {
     }
 
     /**
-     * Returns a predicate evaluating to the disjunction of its contained predicates
+     * Returns a predicate evaluating to the disjunction of its contained predicates.
      */
     public static <S, T extends S> Predicate<T> orPredicate
                                 (final Predicate<S> first,
@@ -683,7 +683,7 @@ public class CommonOps {
     }
 
     /**
-     * Returns a predicate evaluating to the conjunction of its contained predicates
+     * Returns a predicate evaluating to the conjunction of its contained predicates.
      */
     public static DoublePredicate andPredicate
         (final DoublePredicate first,
@@ -696,7 +696,7 @@ public class CommonOps {
     }
 
     /**
-     * Returns a predicate evaluating to the disjunction of its contained predicates
+     * Returns a predicate evaluating to the disjunction of its contained predicates.
      */
     public static DoublePredicate orPredicate
         (final DoublePredicate first,
@@ -710,7 +710,7 @@ public class CommonOps {
 
 
     /**
-     * Returns a predicate evaluating to the conjunction of its contained predicates
+     * Returns a predicate evaluating to the conjunction of its contained predicates.
      */
     public static LongPredicate andPredicate
         (final LongPredicate first,
@@ -723,7 +723,7 @@ public class CommonOps {
     }
 
     /**
-     * Returns a predicate evaluating to the disjunction of its contained predicates
+     * Returns a predicate evaluating to the disjunction of its contained predicates.
      */
     public static LongPredicate orPredicate
         (final LongPredicate first,
@@ -736,7 +736,7 @@ public class CommonOps {
     }
 
     /**
-     * Returns a predicate evaluating to true if its argument is non-null
+     * Returns a predicate evaluating to true if its argument is non-null.
      */
     public static Predicate<Object> isNonNullPredicate() {
         return IsNonNullPredicate.predicate;
@@ -750,7 +750,7 @@ public class CommonOps {
     }
 
     /**
-     * Returns a predicate evaluating to true if its argument is null
+     * Returns a predicate evaluating to true if its argument is null.
      */
     public static Predicate<Object> isNullPredicate() {
         return IsNullPredicate.predicate;
@@ -788,7 +788,7 @@ public class CommonOps {
     }
 
     /**
-     * Returns a reducer that adds two double elements
+     * Returns a reducer that adds two double elements.
      */
     public static DoubleReducer doubleAdder() { return DoubleAdder.adder; }
     static final class DoubleAdder implements DoubleReducer {
@@ -797,7 +797,7 @@ public class CommonOps {
     }
 
     /**
-     * Returns a reducer that adds two long elements
+     * Returns a reducer that adds two long elements.
      */
     public static LongReducer longAdder() { return LongAdder.adder; }
     static final class LongAdder implements LongReducer {
@@ -806,7 +806,7 @@ public class CommonOps {
     }
 
     /**
-     * Returns a reducer that adds two int elements
+     * Returns a reducer that adds two int elements.
      */
     public static IntReducer intAdder() { return IntAdder.adder; }
     static final class IntAdder implements IntReducer {
@@ -817,7 +817,7 @@ public class CommonOps {
     /**
      * Returns a generator producing uniform random values between
      * zero and one, with the same properties as {@link
-     * java.util.Random#nextDouble}
+     * java.util.Random#nextDouble}.
      */
     public static DoubleGenerator doubleRandom() {
         return DoubleRandomGenerator.generator;
@@ -849,7 +849,7 @@ public class CommonOps {
 
     /**
      * Returns a generator producing uniform random values between the
-     * given least value (inclusive) and bound (exclusive)
+     * given least value (inclusive) and bound (exclusive).
      * @param least the least value returned
      * @param bound the upper bound (exclusive) of opd values
      */
@@ -869,7 +869,7 @@ public class CommonOps {
 
     /**
      * Returns a generator producing uniform random values with the
-     * same properties as {@link java.util.Random#nextLong}
+     * same properties as {@link java.util.Random#nextLong}.
      */
     public static LongGenerator longRandom() {
         return LongRandomGenerator.generator;
@@ -884,7 +884,7 @@ public class CommonOps {
 
     /**
      * Returns a generator producing uniform random values with the
-     * same properties as {@link java.util.Random#nextInt(int)}
+     * same properties as {@link java.util.Random#nextInt(int)}.
      * @param bound the upper bound (exclusive) of opd values
      */
     public static LongGenerator longRandom(long bound) {
@@ -924,7 +924,7 @@ public class CommonOps {
 
     /**
      * Returns a generator producing uniform random values with the
-     * same properties as {@link java.util.Random#nextInt}
+     * same properties as {@link java.util.Random#nextInt}.
      */
     public static IntGenerator intRandom() {
         return IntRandomGenerator.generator;
@@ -939,7 +939,7 @@ public class CommonOps {
 
     /**
      * Returns a generator producing uniform random values with the
-     * same properties as {@link java.util.Random#nextInt(int)}
+     * same properties as {@link java.util.Random#nextInt(int)}.
      * @param bound the upper bound (exclusive) of opd values
      */
     public static IntGenerator intRandom(int bound) {
@@ -957,7 +957,7 @@ public class CommonOps {
 
     /**
      * Returns a generator producing uniform random values between the
-     * given least value (inclusive) and bound (exclusive)
+     * given least value (inclusive) and bound (exclusive).
      * @param least the least value returned
      * @param bound the upper bound (exclusive) of opd values
      */
@@ -979,7 +979,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument {@code equals} the second
+     * first argument {@code equals} the second.
      */
     public static BinaryPredicate<Object, Object> equalityPredicate() {
         return EqualityPredicate.predicate;
@@ -994,7 +994,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument {@code ==} the second
+     * first argument {@code ==} the second.
      */
     public static BinaryPredicate<Object, Object> identityPredicate() {
         return IdentityPredicate.predicate;
@@ -1009,7 +1009,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument {@code ==} the second
+     * first argument {@code ==} the second.
      */
     public static BinaryIntPredicate intEqualityPredicate() {
         return IntEqualityPredicate.predicate;
@@ -1024,7 +1024,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument {@code ==} the second
+     * first argument {@code ==} the second.
      */
     public static BinaryLongPredicate longEqualityPredicate() {
         return LongEqualityPredicate.predicate;
@@ -1039,7 +1039,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument {@code ==} the second
+     * first argument {@code ==} the second.
      */
     public static BinaryDoublePredicate doubleEqualityPredicate() {
         return DoubleEqualityPredicate.predicate;
@@ -1055,7 +1055,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument {@code !equals} the second
+     * first argument {@code !equals} the second.
      */
     public static BinaryPredicate<Object, Object> inequalityPredicate() {
         return InequalityPredicate.predicate;
@@ -1070,7 +1070,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument {@code !=} the second
+     * first argument {@code !=} the second.
      */
     public static BinaryPredicate<Object, Object> nonidentityPredicate() {
         return NonidentityPredicate.predicate;
@@ -1085,7 +1085,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument {@code !=} the second
+     * first argument {@code !=} the second.
      */
     public static BinaryIntPredicate intInequalityPredicate() {
         return IntInequalityPredicate.predicate;
@@ -1100,7 +1100,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument {@code ==} the second
+     * first argument {@code ==} the second.
      */
     public static BinaryLongPredicate longInequalityPredicate() {
         return LongInequalityPredicate.predicate;
@@ -1115,7 +1115,7 @@ public class CommonOps {
 
     /**
      * Returns a predicate evaluating to true if the
-     * first argument {@code !=} the second
+     * first argument {@code !=} the second.
      */
     public static BinaryDoublePredicate doubleInequalityPredicate() {
         return DoubleInequalityPredicate.predicate;
