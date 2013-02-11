@@ -150,6 +150,7 @@ public abstract class AbstractParallelAnyArray {
      * oget, dget, etc. But most are overridden in most concrete
      * classes to avoid per-element dispatching.
      */
+
     void leafApply(int lo, int hi, Procedure procedure) {
         for (int i = lo; i < hi; ++i)
             if (isSelected(i))
@@ -279,7 +280,7 @@ public abstract class AbstractParallelAnyArray {
     /**
      * Shared support for select/map all -- probe filter, map, and
      * type to start selection driver, or do parallel mapping, or
-     * just copy,
+     * just copy.
      */
     final Object[] allObjects(Class elementType) {
         if (hasFilter()) {
