@@ -154,7 +154,7 @@ public abstract class ParallelArrayWithDoubleMapping<T> extends AbstractParallel
      * @param op the op
      * @return operation prefix
      */
-    public abstract <U> ParallelArrayWithMapping<T, U> withMapping
+    public abstract <U> ParallelArrayWithMapping<T,U> withMapping
         (DoubleToObject<? extends U> op);
 
     /**
