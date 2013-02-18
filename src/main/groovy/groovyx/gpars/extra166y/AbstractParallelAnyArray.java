@@ -519,7 +519,7 @@ public abstract class AbstractParallelAnyArray {
             return new ORPap<T>(ex, origin, fence, array, selector);
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (Op<? super T, ? extends U> op) {
             return new OUOMPap<T,U>(ex, origin, fence, array, op);
         }
@@ -1175,7 +1175,7 @@ public abstract class AbstractParallelAnyArray {
                  compoundIndexedSelector(this.selector, selector));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (Op<? super T, ? extends U> op) {
             return new OFOMPap<T,U>(ex, origin, fence, array, selector, op);
         }
@@ -1716,7 +1716,7 @@ public abstract class AbstractParallelAnyArray {
                  compoundIndexedSelector(this.selector, selector));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (Op<? super T, ? extends U> op) {
             return new OROMPap<T,U>(ex, origin, fence, array, selector, op);
         }
@@ -2330,7 +2330,7 @@ public abstract class AbstractParallelAnyArray {
             super(ex, origin, fence, array, op);
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withMapping
+        public <V> ParallelArrayWithMapping<T,V> withMapping
             (Op<? super U, ? extends V> op) {
             return new OUOMPap<T,V>(ex, origin, fence, array,
                                     CommonOps.compoundOp(this.op, op));
@@ -2524,7 +2524,7 @@ public abstract class AbstractParallelAnyArray {
         boolean hasFilter() { return true; }
         boolean isSelected(int i) { return selector.op(this.array[i]); }
 
-        public <V> ParallelArrayWithMapping<T, V> withMapping
+        public <V> ParallelArrayWithMapping<T,V> withMapping
             (Op<? super U, ? extends V> op) {
             return new OFOMPap<T,V>
                 (ex, origin, fence, array, selector,
@@ -2779,7 +2779,7 @@ public abstract class AbstractParallelAnyArray {
         boolean hasFilter() { return true; }
         boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
-        public <V> ParallelArrayWithMapping<T, V> withMapping
+        public <V> ParallelArrayWithMapping<T,V> withMapping
             (Op<? super U, ? extends V> op) {
             return new OROMPap<T,V>
                 (ex, origin, fence, array, selector,
@@ -3121,7 +3121,7 @@ public abstract class AbstractParallelAnyArray {
             super(ex, origin, fence, array, op);
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withMapping
+        public <V> ParallelArrayWithMapping<T,V> withMapping
             (Op<? super U, ? extends V> op) {
             return new OUOCPap<T,V>(ex, origin, fence, array,
                                     compoundIndexedOp(this.op, op));
@@ -3315,7 +3315,7 @@ public abstract class AbstractParallelAnyArray {
         boolean hasFilter() { return true; }
         boolean isSelected(int i) { return selector.op(this.array[i]); }
 
-        public <V> ParallelArrayWithMapping<T, V> withMapping
+        public <V> ParallelArrayWithMapping<T,V> withMapping
             (Op<? super U, ? extends V> op) {
             return new OFOCPap<T,V>(ex, origin, fence, array, selector,
                                     compoundIndexedOp(this.op, op));
@@ -3558,7 +3558,7 @@ public abstract class AbstractParallelAnyArray {
         boolean hasFilter() { return true; }
         boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
-        public <V> ParallelArrayWithMapping<T, V> withMapping
+        public <V> ParallelArrayWithMapping<T,V> withMapping
             (Op<? super U, ? extends V> op) {
             return new OROCPap<T,V>(ex, origin, fence, array, selector,
                                     compoundIndexedOp(this.op, op));
@@ -3898,7 +3898,7 @@ public abstract class AbstractParallelAnyArray {
                                   CommonOps.compoundOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (DoubleToObject<? extends U> op) {
             return new OUOMPap<T,U>(ex, origin, fence, array,
                                     CommonOps.compoundOp(this.op, op));
@@ -4086,7 +4086,7 @@ public abstract class AbstractParallelAnyArray {
                                   CommonOps.compoundOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (DoubleToObject<? extends U> op) {
             return new OFOMPap<T,U>(ex, origin, fence, array, selector,
                                     CommonOps.compoundOp(this.op, op));
@@ -4322,7 +4322,7 @@ public abstract class AbstractParallelAnyArray {
                                   CommonOps.compoundOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (DoubleToObject<? extends U> op) {
             return new OROMPap<T,U>(ex, origin, fence, array, selector,
                                     CommonOps.compoundOp(this.op, op));
@@ -4647,7 +4647,7 @@ public abstract class AbstractParallelAnyArray {
                                   compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (DoubleToObject<? extends U> op) {
             return new OUOCPap<T,U>(ex, origin, fence, array,
                                     compoundIndexedOp(this.op, op));
@@ -4834,7 +4834,7 @@ public abstract class AbstractParallelAnyArray {
                                   compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (DoubleToObject<? extends U> op) {
             return new OFOCPap<T,U>(ex, origin, fence, array, selector,
                                     compoundIndexedOp(this.op, op));
@@ -5072,7 +5072,7 @@ public abstract class AbstractParallelAnyArray {
                                   compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (DoubleToObject<? extends U> op) {
             return new OROCPap<T,U>(ex, origin, fence, array, selector,
                                     compoundIndexedOp(this.op, op));
@@ -5393,7 +5393,7 @@ public abstract class AbstractParallelAnyArray {
                                   CommonOps.compoundOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (LongToObject<? extends U> op) {
             return new OUOMPap<T,U>(ex, origin, fence, array,
                                     CommonOps.compoundOp(this.op, op));
@@ -5582,7 +5582,7 @@ public abstract class AbstractParallelAnyArray {
                                   CommonOps.compoundOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (LongToObject<? extends U> op) {
             return new OFOMPap<T,U>(ex, origin, fence, array, selector,
                                     CommonOps.compoundOp(this.op, op));
@@ -5822,7 +5822,7 @@ public abstract class AbstractParallelAnyArray {
                                   CommonOps.compoundOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (LongToObject<? extends U> op) {
             return new OROMPap<T,U>(ex, origin, fence, array, selector,
                                     CommonOps.compoundOp(this.op, op));
@@ -6148,7 +6148,7 @@ public abstract class AbstractParallelAnyArray {
                                   compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (LongToObject<? extends U> op) {
             return new OUOCPap<T,U>(ex, origin, fence, array,
                                     compoundIndexedOp(this.op, op));
@@ -6333,7 +6333,7 @@ public abstract class AbstractParallelAnyArray {
                                   compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (LongToObject<? extends U> op) {
             return new OFOCPap<T,U>(ex, origin, fence, array,
                                     selector,
@@ -6575,7 +6575,7 @@ public abstract class AbstractParallelAnyArray {
                                   compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
+        public <U> ParallelArrayWithMapping<T,U> withMapping
             (LongToObject<? extends U> op) {
             return new OROCPap<T,U>(ex, origin, fence, array,
                                     selector,

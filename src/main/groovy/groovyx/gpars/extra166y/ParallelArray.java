@@ -786,7 +786,7 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * @param op the op
      * @return operation prefix
      */
-    public <U> ParallelArrayWithMapping<T, U> withMapping
+    public <U> ParallelArrayWithMapping<T,U> withMapping
         (Op<? super T, ? extends U> op) {
         return super.withMapping(op);
     }

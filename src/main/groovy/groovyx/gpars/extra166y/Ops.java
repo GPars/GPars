@@ -340,7 +340,7 @@ public class Ops {
     public static interface BinaryPredicate<A,B>         { boolean op(A a, B b);}
     public static interface Procedure<A>                 { void    op(A a);}
     public static interface Generator<R>                 { R       op();}
-    public static interface Reducer<A> extends BinaryOp<A, A, A> {}
+    public static interface Reducer<A> extends BinaryOp<A,A,A> {}
 
     public static interface IntOp                        { int     op(int a);}
     public static interface BinaryIntOp                  { int     op(int a, int b);}

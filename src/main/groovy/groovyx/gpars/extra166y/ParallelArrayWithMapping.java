@@ -158,7 +158,7 @@ public abstract class ParallelArrayWithMapping<T,U> extends AbstractParallelAnyA
      * @param op the op
      * @return operation prefix
      */
-    public abstract <V> ParallelArrayWithMapping<T, V> withMapping
+    public abstract <V> ParallelArrayWithMapping<T,V> withMapping
         (Op<? super U, ? extends V> op);
 
     /**

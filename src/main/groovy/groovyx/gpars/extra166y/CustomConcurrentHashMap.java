@@ -124,8 +124,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * @param <K> the type of keys maintained by this map
  * @param <V> the type of mapped values
  */
-public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
-    implements ConcurrentMap<K, V>, Serializable {
+public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
+    implements ConcurrentMap<K,V>, Serializable {
     private static final long serialVersionUID = 7249069246764182397L;
 
     /*
@@ -240,7 +240,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * A function computing a mapping from the given key to a value,
      * or {@code null} if there is no mapping.
      */
-    public static interface MappingFunction<K, V> {
+    public static interface MappingFunction<K,V> {
         /**
          * Returns a value for the given key, or null if there is no
          * mapping. If this function throws an (unchecked) exception,
@@ -261,7 +261,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * current value to a new value, or {@code null} if there is
      * no mapping.
      */
-    public static interface RemappingFunction<K, V> {
+    public static interface RemappingFunction<K,V> {
         /**
          * Returns a new value for the given key and its current, or
          * null if there is no mapping.
@@ -693,7 +693,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * Returns {@code true} if this map contains a key equivalent to
      * the given key with respect to this map's key Equivalence.
      *
-     * @param  key   possible key
+     * @param  key possible key
      * @return {@code true} if this map contains the specified key
      * @throws NullPointerException if the specified key is null
      */
@@ -711,7 +711,7 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * key with respect to this map's key Equivalence, or {@code null}
      * if no such mapping exists.
      *
-     * @param  key   possible key
+     * @param  key possible key
      * @return the value associated with the key, or {@code null} if
      * there is no mapping
      * @throws NullPointerException if the specified key is null
