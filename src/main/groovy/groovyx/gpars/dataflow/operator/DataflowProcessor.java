@@ -91,13 +91,14 @@ public abstract class DataflowProcessor {
 
     static List<DataflowReadChannel> extractInputs(final Map<String, Object> channels) {
         final List<DataflowReadChannel> inputs = (List<DataflowReadChannel>) channels.get(INPUTS);
+        if (inputs == null) return Collections.emptyList();
         return Collections.unmodifiableList(inputs);
     }
 
     static List<DataflowWriteChannel> extractOutputs(final Map<String, Object> channels) {
         final List<DataflowWriteChannel> outputs = (List<DataflowWriteChannel>) channels.get(OUTPUTS);
-        if (outputs != null) return Collections.unmodifiableList(outputs);
-        return null;
+        if (outputs == null) return Collections.emptyList();
+        return Collections.unmodifiableList(outputs);
     }
 
     private static Object extractState(final Map<String, Object> channels) {
@@ -303,6 +304,7 @@ public abstract class DataflowProcessor {
 
     /**
      * Registers the provided handler to all input channels
+     *
      * @param handler The closure to invoke whenever a value gets bound to any of the input channels
      */
     public final void registerChannelListenersToAllInputs(final DataflowChannelListener<Object> handler) {
