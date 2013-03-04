@@ -87,9 +87,9 @@ public class GParsPool {
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * GParsPool.withPool {GParsPool pool ->
+     * GParsPool.withPool {GParsPool pool -&gt;
      *     def result = Collections.synchronizedSet(new HashSet())
-     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *     [1, 2, 3, 4, 5].eachParallel {Number number -&gt; result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param cl The block of code to invoke with the DSL enabled
      */
@@ -107,9 +107,9 @@ public class GParsPool {
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * GParsPool.withPool(5) {GParsPool pool ->
+     * GParsPool.withPool(5) {GParsPool pool -&gt;
      *     def result = Collections.synchronizedSet(new HashSet())
-     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *     [1, 2, 3, 4, 5].eachParallel {Number number -&gt; result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param numberOfThreads Number of threads in the newly created thread pool
      * @param cl The block of code to invoke with the DSL enabled
@@ -128,9 +128,9 @@ public class GParsPool {
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * GParsPool.withPool(5, handler) {GParsPool pool ->
+     * GParsPool.withPool(5, handler) {GParsPool pool -&gt;
      *     def result = Collections.synchronizedSet(new HashSet())
-     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *     [1, 2, 3, 4, 5].eachParallel {Number number -&gt; result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param numberOfThreads Number of threads in the newly created thread pool
      * @param handler Handler for uncaught exceptions raised in code performed by the pooled threads
@@ -156,9 +156,9 @@ public class GParsPool {
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * GParsPool.withExistingPool(anotherPool) {GParsPool pool ->
+     * GParsPool.withExistingPool(anotherPool) {GParsPool pool -&gt;
      *     def result = Collections.synchronizedSet(new HashSet())
-     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *     [1, 2, 3, 4, 5].eachParallel {Number number -&gt; result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}*  </pre>
      * @param pool The thread pool to use, the pool will not be shutdown after this method returns
      */
