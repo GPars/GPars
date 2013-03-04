@@ -20,7 +20,7 @@ import static groovyx.gpars.GParsPool.withPool
 import static groovyx.gpars.dataflow.Dataflow.whenAllBound
 
 /**
- * Uses the Dataflow.whenAllBound() and Promise.then() (aka rightShift '>>') methods to wire together multiple asynchronous functions.
+ * Uses the Dataflow.whenAllBound() and Promise.then() (aka rightShift) methods to wire together multiple asynchronous functions.
  */
 
 withPool {

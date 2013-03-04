@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,23 +18,19 @@ package groovyx.gpars
 
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.util.PoolUtils
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
-import java.util.concurrent.ThreadFactory
-import java.util.concurrent.TimeUnit
+
+import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Enables a ExecutorService-based DSL on closures, objects and collections.
  * E.g.
- * GParsExecutorsPool.withPool(5) {ExecutorService service ->
+ * GParsExecutorsPool.withPool(5) {ExecutorService service -&gt;
  *     Collection<Future> result = [1, 2, 3, 4, 5].collectParallel({it * 10}.async())
  *     assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result*.get()))
  *}*
- * GParsExecutorsPool.withPool(5) {ExecutorService service ->
- *     def result = [1, 2, 3, 4, 5].findParallel{Number number -> number > 2}*     assert result in [3, 4, 5]
+ * GParsExecutorsPool.withPool(5) {ExecutorService service -&gt;
+ *     def result = [1, 2, 3, 4, 5].findParallel{Number number -&gt; number > 2}*     assert result in [3, 4, 5]
  *}*
  * @author Vaclav Pech
  * Date: Oct 23, 2008
@@ -79,7 +75,7 @@ class GParsExecutorsPool {
     }
 
     private static ThreadFactory createDefaultThreadFactory() {
-        return {Runnable runnable ->
+        return { Runnable runnable ->
             final Thread thread = new Thread(runnable)
             thread.daemon = false
             thread
@@ -99,8 +95,8 @@ class GParsExecutorsPool {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * GParsExecutorsPool.withPool {ExecutorService service ->
-     *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * GParsExecutorsPool.withPool {ExecutorService service -&gt;
+     *     [1, 2, 3, 4, 5].eachParallel{Number number -&gt; result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param cl The block of code to invoke with the DSL enabled
      */
@@ -121,8 +117,8 @@ class GParsExecutorsPool {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * GParsExecutorsPool.withPool(5) {ExecutorService service ->
-     *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * GParsExecutorsPool.withPool(5) {ExecutorService service -&gt;
+     *     [1, 2, 3, 4, 5].eachParallel{Number number -&gt; result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param numberOfThreads Number of threads in the newly created thread pool
      * @param cl The block of code to invoke with the DSL enabled
@@ -144,8 +140,8 @@ class GParsExecutorsPool {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * GParsExecutorsPool.withPool(5) {ExecutorService service ->
-     *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * GParsExecutorsPool.withPool(5) {ExecutorService service -&gt;
+     *     [1, 2, 3, 4, 5].eachParallel{Number number -&gt; result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param numberOfThreads Number of threads in the newly created thread pool
      * @param threadFactory Factory for threads in the pool
@@ -174,8 +170,8 @@ class GParsExecutorsPool {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * GParsExecutorsPool.withPool(5) {ExecutorService service ->
-     *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * GParsExecutorsPool.withPool(5) {ExecutorService service -&gt;
+     *     [1, 2, 3, 4, 5].eachParallel{Number number -&gt; result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param pool The <i>ExecutorService</i> to use, the service will not be shutdown after this method returns
      */
@@ -224,7 +220,7 @@ class GParsExecutorsPool {
     public static List<Future<Object>> executeAsync(Closure... closures) {
         ExecutorService executorService = retrieveCurrentPool()
         if (executorService == null) throw new IllegalStateException("No active thread pool available to execute closures asynchronously. Consider wrapping the function call with GParsExecutorsPool.withPool().")
-        List<Future<Object>> result = closures.collect {cl ->
+        List<Future<Object>> result = closures.collect { cl ->
             executorService.submit({
                 cl.call()
             } as Callable<Object>)
@@ -268,19 +264,19 @@ class GParsExecutorsPool {
         final AtomicInteger failureCounter = new AtomicInteger(0)
         futures << GParsExecutorsPool.executeAsync(alternatives.collect {
             original ->
-            {->
-                //noinspection GroovyEmptyCatchBlock
-                try {
-                    def localResult = original()
-                    futures.val*.cancel(true)
-                    result << localResult
-                } catch (Exception e) {
-                    int counter = failureCounter.incrementAndGet()
-                    if (counter == alternatives.size()) {
-                        result << new IllegalStateException('All speculations failed', e)
+                {->
+                    //noinspection GroovyEmptyCatchBlock
+                    try {
+                        def localResult = original()
+                        futures.val*.cancel(true)
+                        result << localResult
+                    } catch (Exception e) {
+                        int counter = failureCounter.incrementAndGet()
+                        if (counter == alternatives.size()) {
+                            result << new IllegalStateException('All speculations failed', e)
+                        }
                     }
                 }
-            }
         })
         def r = result.val
         if (r instanceof Exception) throw r

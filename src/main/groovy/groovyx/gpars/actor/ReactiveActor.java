@@ -23,11 +23,11 @@ import groovy.lang.Closure;
  * as a parameter and the result of the code is send in reply.
  * <p/>
  * <pre>
- * final def doubler = reactor {message ->
+ * final def doubler = reactor {message -&gt;
  *     2 * message
  * }*
  * def result = doubler.sendAndWait(10)
- * <p/>
+ *
  * </pre>
  *
  * @author Vaclav Pech, Alex Tkachman

@@ -15,7 +15,7 @@
  */
 
 /*
- *  @author <who were the original authors?>
+ *  @author who were the original authors?
  *
  *   @author Russel Winder.
  */
@@ -28,16 +28,17 @@ import grails.doc.PdfBuilder
 
 class PdfGuide extends DefaultTask {
 
-    @OutputDirectory @Input File outputDirectory
-	@Input String pdfName
-	
-	public PdfGuide() {
-		super()
-	}
-	
-	@TaskAction
+    @OutputDirectory
+    @Input File outputDirectory
+    @Input String pdfName
+
+    public PdfGuide() {
+        super()
+    }
+
+    @TaskAction
     def publish() {
-		try {
+        try {
             PdfBuilder.build(
                     basedir: outputDirectory.absolutePath,
                     home: project.file('grails-doc').absolutePath,
@@ -48,7 +49,7 @@ class PdfGuide extends DefaultTask {
             // the renderer 'finishes' but it actually does
             // ignore for now
         }
-		project.file(outputDirectory.absolutePath + '/guide/single.pdf')
-			   .renameTo(new File(outputDirectory, pdfName).absolutePath)
-	}
+        project.file(outputDirectory.absolutePath + '/guide/single.pdf')
+                .renameTo(new File(outputDirectory, pdfName).absolutePath)
+    }
 }

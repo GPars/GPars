@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -124,7 +124,7 @@ abstract class AbstractPAWrapper<T> {
      * @param cl A one or two-argument closure
      * @return A sorted collection holding all the elements
      */
-    public final AbstractPAWrapper sort(final Closure cl = {it}) {
+    public final AbstractPAWrapper sort(final Closure cl = { it }) {
         final def npa = pa.all()
         npa.sort(createComparator(cl))
         return new PAWrapper(npa)
@@ -140,7 +140,7 @@ abstract class AbstractPAWrapper<T> {
      * @return A map following the Groovy specification for groupBy
      */
     public Map groupBy(Closure cl) {
-        return combineImpl(cl, {it}, {[]}, {list, item -> list << item})
+        return combineImpl(cl, { it }, { [] }, { list, item -> list << item })
     }
 
     /**
@@ -157,9 +157,9 @@ abstract class AbstractPAWrapper<T> {
      * An 'initial accumulator value' needs to be provided as well. Since the 'combine' method processes items in parallel, the 'initial accumulator value' will be reused multiple times.
      * Thus the provided value must allow for reuse. It should be either a cloneable or immutable value or a closure returning a fresh initial accumulator each time requested.
      * Good combinations of accumulator functions and reusable initial values include:
-     * <br/>accumulator = {List acc, value -> acc << value} initialValue = []
-     * <br/>accumulator = {List acc, value -> acc << value} initialValue = {-> []}* <br/>accumulator = {int sum, int value -> acc + value} initialValue = 0
-     * <br/>accumulator = {int sum, int value -> sum + value} initialValue = {-> 0}* <br/>accumulator = {ShoppingCart cart, Item value -> cart.addItem(value)} initialValue = {-> new ShoppingCart()}* <br/>
+     * <br/>accumulator = {List acc, value -&gt; acc << value} initialValue = []
+     * <br/>accumulator = {List acc, value -&gt; acc << value} initialValue = {-&gt; []}* <br/>accumulator = {int sum, int value -&gt; acc + value} initialValue = 0
+     * <br/>accumulator = {int sum, int value -&gt; sum + value} initialValue = {-&gt; 0}* <br/>accumulator = {ShoppingCart cart, Item value -&gt; cart.addItem(value)} initialValue = {-&gt; new ShoppingCart()}* <br/>
      * The return type is a map.
      * E.g. [['he', 1], ['she', 2], ['he', 2], ['me', 1], ['she, 5], ['he', 1] with the initial value provided a 0 will be combined into
      * ['he' : 4, 'she' : 7, 'he', : 2, 'me' : 1]
@@ -173,18 +173,18 @@ abstract class AbstractPAWrapper<T> {
     public Map combine(final Object initialValue, final Closure accumulation) {
         switch (initialValue) {
             case Closure: return combineImpl((Closure) initialValue, accumulation)
-            case Cloneable: return combineImpl({initialValue.clone()}, accumulation)
-            default: return combineImpl({initialValue}, accumulation)
+            case Cloneable: return combineImpl({ initialValue.clone() }, accumulation)
+            default: return combineImpl({ initialValue }, accumulation)
         }
     }
 
     public Map combineImpl(final Closure initialValue, final Closure accumulation) {
-        combineImpl({it[0]}, {it[1]}, initialValue, accumulation)
+        combineImpl({ it[0] }, { it[1] }, initialValue, accumulation)
     }
 
     public Map combineImpl(extractKey, extractValue, Closure initialValue, Closure accumulation) {
 
-        def result = reduce {a, b ->
+        def result = reduce { a, b ->
             if (a in CombineHolder) {
                 if (b in CombineHolder) return a.merge(b, accumulation, initialValue)
                 else return a.addToMap(extractKey(b), extractValue(b), accumulation, initialValue)
@@ -199,8 +199,7 @@ abstract class AbstractPAWrapper<T> {
                     if (aKey == bKey) {
                         def c = accumulation(accumulation(initialValue(), aValue), bValue)
                         return [(aKey): c] as CombineHolder
-                    }
-                    else {
+                    } else {
                         def c = accumulation(initialValue(), aValue)
                         def holder = [(aKey): c] as CombineHolder
                         return holder.addToMap(bKey, bValue, accumulation, initialValue)

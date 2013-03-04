@@ -16,9 +16,9 @@
 
 package groovyx.gpars;
 
-import groovyx.gpars.extra166y.Ops;
 import groovy.lang.Closure;
 import groovy.time.Duration;
+import groovyx.gpars.extra166y.Ops;
 import groovyx.gpars.extra166y.ParallelArray;
 import groovyx.gpars.memoize.LRUProtectionStorage;
 import groovyx.gpars.pa.CallAsyncTask;
@@ -337,7 +337,7 @@ public class GParsPoolUtil {
      * Example:
      * <pre>
      * GParsPool.withPool {*     def result = new ConcurrentSkipListSet()
-     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *     [1, 2, 3, 4, 5].eachParallel {Number number -&gt; result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      * }* </pre>
      * Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
@@ -357,7 +357,7 @@ public class GParsPoolUtil {
      * Example:
      * <pre>
      * GParsPool.withPool {*     def result = new ConcurrentSkipListSet()
-     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *     [1, 2, 3, 4, 5].eachParallel {Number number -&gt; result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      * }* </pre>
      * Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
@@ -377,7 +377,7 @@ public class GParsPoolUtil {
      * Example:
      * <pre>
      * GParsPool.withPool {*     def result = new ConcurrentSkipListSet()
-     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *     [1, 2, 3, 4, 5].eachParallel {Number number -&gt; result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      * }* </pre>
      * Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
@@ -398,7 +398,7 @@ public class GParsPoolUtil {
      * Example:
      * <pre>
      * GParsPool.withPool {*     def result = new ConcurrentSkipListSet()
-     *     [1, 2, 3, 4, 5].eachWithIndexParallel {Number number, int index -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *     [1, 2, 3, 4, 5].eachWithIndexParallel {Number number, int index -&gt; result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      * }* </pre>
      * Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
@@ -425,7 +425,7 @@ public class GParsPoolUtil {
      * Example:
      * <pre>
      * GParsPool.withPool {*     def result = new ConcurrentSkipListSet()
-     *     [1, 2, 3, 4, 5].eachWithIndexParallel {Number number, int index -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *     [1, 2, 3, 4, 5].eachWithIndexParallel {Number number, int index -&gt; result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      * }* </pre>
      * Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
@@ -452,7 +452,7 @@ public class GParsPoolUtil {
      * have a new <i>collectParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -&gt; number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      * }* </pre>
      */
     public static <T> Collection<T> collectParallel(final Collection collection, final Closure<? extends T> cl) {
@@ -469,7 +469,7 @@ public class GParsPoolUtil {
      * have a new <i>collectParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -&gt; number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      * }* </pre>
      */
     public static <T> Collection<T> collectParallel(final Object collection, final Closure<? extends T> cl) {
@@ -486,7 +486,7 @@ public class GParsPoolUtil {
      * have a new <i>collectParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -&gt; number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      * }* </pre>
      */
     public static <T> Collection<T> collectParallel(final Map collection, final Closure<? extends T> cl) {
@@ -503,7 +503,7 @@ public class GParsPoolUtil {
      * have a new <i>collectManyParallel(Closure projection)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     def squaresAndCubesOfOdds = [1, 2, 3, 4, 5].collectManyParallel { Number number ->
+     * GParsPool.withPool {*     def squaresAndCubesOfOdds = [1, 2, 3, 4, 5].collectManyParallel { Number number -&gt;
      *         number % 2 ? [number ** 2, number ** 3] : []
      * }*     assert squaresAndCubesOfOdds == [1, 1, 9, 27, 25, 125]
      * }* </pre>
@@ -522,7 +522,7 @@ public class GParsPoolUtil {
      * have a new <i>collectManyParallel(Closure projection)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     def squaresAndCubesOfOdds = [1, 2, 3, 4, 5].collectManyParallel { Number number ->
+     * GParsPool.withPool {*     def squaresAndCubesOfOdds = [1, 2, 3, 4, 5].collectManyParallel { Number number -&gt;
      *         number % 2 ? [number ** 2, number ** 3] : []
      * }*     assert squaresAndCubesOfOdds == [1, 1, 9, 27, 25, 125]
      * }* </pre>
@@ -541,7 +541,7 @@ public class GParsPoolUtil {
      * have a new <i>collectManyParallel(Closure projection)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     def squaresAndCubesOfOdds = [1, 2, 3, 4, 5].collectManyParallel { Number number ->
+     * GParsPool.withPool {*     def squaresAndCubesOfOdds = [1, 2, 3, 4, 5].collectManyParallel { Number number -&gt;
      *         number % 2 ? [number ** 2, number ** 3] : []
      * }*     assert squaresAndCubesOfOdds == [1, 1, 9, 27, 25, 125]
      * }* </pre>
@@ -560,7 +560,7 @@ public class GParsPoolUtil {
      * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -&gt; number > 3}*     assertEquals(new HashSet([4, 5]), result)
      * }* </pre>
      */
     public static <T> Collection<T> findAllParallel(final Collection<T> collection, final Closure cl) {
@@ -577,7 +577,7 @@ public class GParsPoolUtil {
      * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -&gt; number > 3}*     assertEquals(new HashSet([4, 5]), result)
      * }* </pre>
      */
     public static Collection<Object> findAllParallel(final Object collection, final Closure cl) {
@@ -594,7 +594,7 @@ public class GParsPoolUtil {
      * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <code>
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -&gt; number > 3}*     assertEquals(new HashSet([4, 5]), result)
      * }* </code>
      */
     public static <K, V> Map<K, V> findAllParallel(final Map<K, V> collection, final Closure cl) {
@@ -611,7 +611,7 @@ public class GParsPoolUtil {
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -&gt; number > 3}*     assert (result in [4, 5])
      * }* </pre>
      */
     @SuppressWarnings("GroovyAssignabilityCheck")
@@ -629,7 +629,7 @@ public class GParsPoolUtil {
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -&gt; number > 3}*     assert (result in [4, 5])
      * }* </pre>
      */
     public static Object findParallel(final Object collection, final Closure cl) {
@@ -646,7 +646,7 @@ public class GParsPoolUtil {
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -&gt; number > 3}*     assert (result in [4, 5])
      * }* </pre>
      */
     public static <K, V> Map.Entry<K, V> findParallel(final Map<K, V> collection, final Closure cl) {
@@ -666,7 +666,7 @@ public class GParsPoolUtil {
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -&gt; number > 3}*     assert (result in [4, 5])
      * }* </pre>
      */
     public static <T> T findAnyParallel(final Collection<T> collection, final Closure cl) {
@@ -686,7 +686,7 @@ public class GParsPoolUtil {
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * </pre>
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAnyParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAnyParallel {Number number -&gt; number > 3}*     assert (result in [4, 5])
      * }* </pre>
      */
     public static Object findAnyParallel(final Object collection, final Closure cl) {
@@ -706,7 +706,7 @@ public class GParsPoolUtil {
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAnyParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAnyParallel {Number number -&gt; number > 3}*     assert (result in [4, 5])
      * }* </pre>
      */
     public static <K, V> Map.Entry<K, V> findAnyParallel(final Map<K, V> collection, final Closure cl) {
@@ -897,7 +897,7 @@ public class GParsPoolUtil {
      * have a new <i>anyParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}* </pre>
+     * GParsPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -&gt; number > 3}*     assert ![1, 2, 3].anyParallel {Number number -&gt; number > 3}*}* </pre>
      */
     public static boolean anyParallel(final Collection collection, final Closure cl) {
         return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withFilter(new ClosurePredicate(cl)).any() != null;
@@ -916,7 +916,7 @@ public class GParsPoolUtil {
      * have a new <i>anyParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}* </pre>
+     * GParsPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -&gt; number > 3}*     assert ![1, 2, 3].anyParallel {Number number -&gt; number > 3}*}* </pre>
      */
     public static boolean anyParallel(final Object collection, final Closure cl) {
         return GParsPoolUtilHelper.createPA(collection, retrievePool()).withFilter(new ClosurePredicate(cl)).any() != null;
@@ -935,7 +935,7 @@ public class GParsPoolUtil {
      * have a new <i>anyParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}* </pre>
+     * GParsPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -&gt; number > 3}*     assert ![1, 2, 3].anyParallel {Number number -&gt; number > 3}*}* </pre>
      */
     public static boolean anyParallel(final Map collection, final Closure cl) {
         final Closure mapClosure = buildClosureForMaps(cl);
@@ -953,7 +953,7 @@ public class GParsPoolUtil {
      * have a new <i>everyParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}* </pre>
+     * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -&gt; number > 3}*     assert [1, 2, 3].everyParallel() {Number number -&gt; number <= 3}*}* </pre>
      */
     public static boolean everyParallel(final Collection collection, final Closure cl) {
         return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withFilter(new ClosureNegationPredicate(cl)).any() == null;
@@ -970,7 +970,7 @@ public class GParsPoolUtil {
      * have a new <i>everyParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}* </pre>
+     * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -&gt; number > 3}*     assert [1, 2, 3].everyParallel() {Number number -&gt; number <= 3}*}* </pre>
      */
     public static boolean everyParallel(final Object collection, final Closure cl) {
         return GParsPoolUtilHelper.createPA(collection, retrievePool()).withFilter(new ClosureNegationPredicate(cl)).any() == null;
@@ -987,7 +987,7 @@ public class GParsPoolUtil {
      * have a new <i>everyParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}* </pre>
+     * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -&gt; number > 3}*     assert [1, 2, 3].everyParallel() {Number number -&gt; number <= 3}*}* </pre>
      */
     public static boolean everyParallel(final Map collection, final Closure cl) {
         final Closure mapClosure = buildClosureForMaps(cl);
@@ -1005,7 +1005,7 @@ public class GParsPoolUtil {
      * have a new <i>groupByParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}).size() == 2
+     * GParsPool.withPool {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -&gt; number % 2}).size() == 2
      * }* </pre>
      */
     public static <K, T> Map<K, List<T>> groupByParallel(final Collection<T> collection, final Closure<K> cl) {
@@ -1023,7 +1023,7 @@ public class GParsPoolUtil {
      * have a new <i>groupByParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
      * <pre>
-     * GParsPool.withPool {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}).size() == 2
+     * GParsPool.withPool {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -&gt; number % 2}).size() == 2
      * }* </pre>
      */
     public static <K> Map<K, List<Object>> groupByParallel(final Object collection, final Closure<K> cl) {
@@ -1052,7 +1052,7 @@ public class GParsPoolUtil {
      */
     @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T minParallel(final Collection<T> collection, final Closure cl) {
-        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).min((Comparator<T>)createComparator(cl));
+        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).min((Comparator<T>) createComparator(cl));
     }
 
     /**
@@ -1110,7 +1110,7 @@ public class GParsPoolUtil {
      */
     @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T maxParallel(final Collection<T> collection, final Closure cl) {
-        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).max((Comparator<T>)createComparator(cl));
+        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).max((Comparator<T>) createComparator(cl));
     }
 
     /**

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import groovyx.gpars.actor.DynamicDispatchActor
  *
  * In principle, the algorithm consists of concurrently run chained filters,
  * each of which detects whether the current number can be divided by a single prime number.
- * (generate nums 1, 2, 3, 4, 5, ...) -> (filter by mod 2) -> (filter by mod 3) -> (filter by mod 5) -> (filter by mod 7) -> (filter by mod 11) -> (caution! Primes falling out here)
+ * (generate nums 1, 2, 3, 4, 5, ...) -&gt; (filter by mod 2) -&gt; (filter by mod 3) -&gt; (filter by mod 5) -&gt; (filter by mod 7) -&gt; (filter by mod 11) -&gt; (caution! Primes falling out here)
  * The chain is built (grows) on the fly, whenever a new prime is found.
  */
 
@@ -74,7 +74,7 @@ final class FilterActor extends DynamicDispatchActor {
     def onMessage(def poisson) {
         if (follower) {
             def sender = sender
-            follower.sendAndContinue(poisson, {this.stop(); sender?.send('Done')})  //Pass the poisson along and stop after a reply
+            follower.sendAndContinue(poisson, { this.stop(); sender?.send('Done') })  //Pass the poisson along and stop after a reply
         } else {  //I am the last in the chain
             stop()
             reply 'Done'
