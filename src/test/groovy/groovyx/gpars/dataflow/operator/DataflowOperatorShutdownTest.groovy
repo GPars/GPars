@@ -19,7 +19,10 @@ package groovyx.gpars.dataflow.operator
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.DataflowVariable
 
-import static groovyx.gpars.dataflow.Dataflow.*
+import static groovyx.gpars.dataflow.Dataflow.operator
+import static groovyx.gpars.dataflow.Dataflow.prioritySelector
+import static groovyx.gpars.dataflow.Dataflow.selector
+import static groovyx.gpars.dataflow.Dataflow.splitter
 
 /**
  * @author Vaclav Pech

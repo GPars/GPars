@@ -6,7 +6,7 @@ Virtually unlimited scalability in number of actors is the main advantage of _ev
 Here are some examples of how to use actors. This is how you create an actor that prints out all messages that it receives.
 
 {code}
-import static groovyx.gpars.actor.Actors.*
+import static groovyx.gpars.actor.Actors.actor
 
 def console = actor {
     loop {
@@ -49,7 +49,7 @@ console.sendAndContinue 'Message', {reply -> println "I received reply: $reply"}
 h3. Creating an asynchronous service
 
 {code}
-import static groovyx.gpars.actor.Actors.*
+import static groovyx.gpars.actor.Actors.actor
 
 final def decryptor = actor {
     loop {

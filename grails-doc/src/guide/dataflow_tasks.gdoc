@@ -8,7 +8,7 @@ h3. A simple mashup example
 
 In the example we're downloading the front pages of three popular web sites, each in their own task, while in a separate task we're filtering out sites talking about Groovy today and forming the output. The output task synchronizes automatically with the three download tasks on the three Dataflow variables through which the content of each website is passed to the output task.
 
-{code}import static groovyx.gpars.GParsPool.*
+{code}import static groovyx.gpars.GParsPool.withPool
 import groovyx.gpars.dataflow.DataflowVariable
 import static groovyx.gpars.dataflow.Dataflow.task
 
@@ -114,7 +114,7 @@ To avoid giving you wrong impression about structuring the Dataflow code, here's
 Dataflow variables can obviously be passed around as parameters or return values.
 {code}package groovyx.gpars.samples.dataflow
 
-import static groovyx.gpars.GParsExecutorsPool.*
+import static groovyx.gpars.GParsExecutorsPool.withPool
 import groovyx.gpars.dataflow.DataflowVariable
 import static groovyx.gpars.dataflow.Dataflow.task
 
