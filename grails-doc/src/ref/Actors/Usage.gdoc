@@ -1,6 +1,6 @@
 h3. Creating an actor using a factory method
 {code}
-import static groovyx.gpars.actor.Actors.*
+import static groovyx.gpars.actor.Actors.actor
 
 def console = actor {
     loop {
@@ -36,7 +36,7 @@ console.sendAndWait 'Message'
 
 h3. Timeouts
 {code}
-import static groovyx.gpars.actor.Actors.*
+import static groovyx.gpars.actor.Actors.actor
 
 def me = actor {
     friend.send('Hi')
@@ -57,7 +57,7 @@ When a timeout expires when waiting for a message, the Actor.TIMEOUT message arr
 is invoked, if present on the actor:
 
 {code}
-import static groovyx.gpars.actor.Actors.*
+import static groovyx.gpars.actor.Actors.actor
 
 def me = actor {
     delegate.metaClass.onTimeout = {->

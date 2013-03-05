@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 
 package groovyx.gpars.samples.collections
 
-import static groovyx.gpars.GParsPool.*;
 import groovy.transform.TupleConstructor
+
+import static groovyx.gpars.GParsPool.withPool
 
 /**
  * @author Mario Garcia
@@ -54,7 +55,7 @@ withPool {
     def result =
         cars.parallel.map {
             [it, it.price]
-        }.combine(0) {sum, value ->
+        }.combine(0) { sum, value ->
             sum + value
         }
 

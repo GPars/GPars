@@ -24,7 +24,7 @@ import groovyx.gpars.group.DefaultPGroup;
  * Provides handy helper methods to create pooled actors and customize the underlying thread pool.
  * Use static import to be able to call Actors methods without the need to prepend them with the Actors identifier.
  * <pre>
- * import static org.gpars.actor.Actors.*
+ * import static org.gpars.actor.Actors.actor
  *
  * Actors.defaultActorPGroup.resize 1
  *

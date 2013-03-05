@@ -23,13 +23,20 @@ import groovyx.gpars.scheduler.Pool
 import groovyx.gpars.util.GeneralTimer
 import groovyx.gpars.util.PAUtils
 
-import java.util.concurrent.*
+import java.util.concurrent.Callable
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
+import java.util.concurrent.Semaphore
+import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
 import static groovyx.gpars.util.PAGroovyUtils.createCollection
-import static groovyx.gpars.util.PAUtils.*
+import static groovyx.gpars.util.PAUtils.buildClosureForMaps
+import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex
+import static groovyx.gpars.util.PAUtils.buildResultMap
 
 /**
  * This class forms the core of the DSL initialized by <i>GParsExecutorsPool</i>. The static methods of <i>GParsExecutorsPoolUtil</i>
