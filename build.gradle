@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008–2012  The original author or authors
+// Copyright © 2008–2013 The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -321,7 +321,7 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.3'
+    gradleVersion = '1.5'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
@@ -390,7 +390,8 @@ idea {
         excludeDirs += file('java-demo') // A separate module of a pure-java gpars usage
     }
     project {
-        ext.javaVersion = '1.6'
+        jdkName '1.6'
+        languageLevel 'JDK_1_6'
         ipr {
             withXml { provider ->
                 def node = provider.asNode()
@@ -413,9 +414,6 @@ idea {
 
                 def gradleSettings = node.appendNode('component', [name: 'GradleSettings'])
                 gradleSettings.appendNode('option', [name: 'SDK_HOME', value: gradle.gradleHomeDir.absolutePath])
-            }
-            whenMerged { project ->
-                project.jdk.languageLevel = 'JDK_1_6'
             }
         }
     }
