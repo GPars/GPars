@@ -114,12 +114,15 @@ configurations {
 dependencies {
     groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.0.7'
     compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
-    compile('org.multiverse:multiverse:0.7.0') { transitive = false }
-    testCompile fileTree(dir: 'lib', include: '*.jar')
+    compile('org.multiverse:multiverse-beta:0.7-RC-1') { transitive = false }
+    //compile('org.multiverse:multiverse:0.7.0') { transitive = false }
     compile group: 'org.jboss.netty', name: 'netty', version: project.hasProperty('gpars_nettyVersion') ? gpars_nettyVersion : '3.2.9.Final'
     compile 'org.codehaus.jcsp:jcsp:1.1-rc5'
     testCompile group: 'junit', name: 'junit', version: project.hasProperty('gpars_junitVersion') ? gpars_junitVersion : '4.11'
     testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.7-groovy-2.0'
+    testCompile 'com.google.code.gson:gson:2.2.2'
+    testCompile 'com.google.guava:guava:14.0.1'
+    testCompile fileTree(dir: 'lib', include: '*.jar')
     //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
     //  Grails, including all the SpringRoo stuff.
     docs group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.0.7'
@@ -228,7 +231,7 @@ gradle.taskGraph.whenReady { taskGraph ->
             pom.whenConfigured { pom ->
                 // dependency is a native Maven dependency object (With properties artifactId, groupId, ...)
                 pom.dependencies.each { dependency ->
-                    if (dependency.artifactId in ['netty', 'jcsp', 'multiverse-beta']) {
+                    if (dependency.artifactId in ['netty', 'jcsp', 'multiverse']) {
                         dependency.optional = true
                     }
                 }
@@ -390,7 +393,7 @@ idea {
         excludeDirs += file('java-demo') // A separate module of a pure-java gpars usage
     }
     project {
-        jdkName '1.6'
+        jdkName '1.7'
         languageLevel 'JDK_1_6'
         ipr {
             withXml { provider ->
