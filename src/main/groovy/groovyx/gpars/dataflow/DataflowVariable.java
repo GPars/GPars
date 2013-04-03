@@ -95,7 +95,7 @@ public class DataflowVariable<T> extends DataflowExpression<T> implements Datafl
      */
     @Override
     @SuppressWarnings({"ProhibitedExceptionDeclared"})
-    public T get() throws Throwable {
+    public final T get() throws Throwable {
         final T result = getVal();
         if (error != null) throw error;
         return result;
@@ -133,7 +133,7 @@ public class DataflowVariable<T> extends DataflowExpression<T> implements Datafl
      * @return True, if an error has been bound
      */
     @Override
-    public final boolean isError() {
+    public boolean isError() {
         return isBound() && error != null;
     }
 
@@ -144,9 +144,14 @@ public class DataflowVariable<T> extends DataflowExpression<T> implements Datafl
      * @throws IllegalStateException If not bound or not bound to an error
      */
     @Override
-    public final Throwable getError() {
+    public Throwable getError() {
         if (isError()) return error;
         else throw new IllegalStateException("No error has been bound to the dataflow variable.");
+    }
+
+    @Override
+    public void touch() {
+        //Intentionally left empty
     }
 
     /**
@@ -159,7 +164,7 @@ public class DataflowVariable<T> extends DataflowExpression<T> implements Datafl
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     @Override
-    public final <V> Promise<V> then(final Closure<V> closure, final Closure<V> errorHandler) {
+    public <V> Promise<V> then(final Closure<V> closure, final Closure<V> errorHandler) {
         final DataflowVariable<V> result = new DataflowVariable<V>();
         whenBound(new ThenMessagingRunnable<T, V>(result, closure, errorHandler));
         return result;
@@ -176,7 +181,7 @@ public class DataflowVariable<T> extends DataflowExpression<T> implements Datafl
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     @Override
-    public final <V> Promise<V> then(final Pool pool, final Closure<V> closure, final Closure<V> errorHandler) {
+    public <V> Promise<V> then(final Pool pool, final Closure<V> closure, final Closure<V> errorHandler) {
         final DataflowVariable<V> result = new DataflowVariable<V>();
         whenBound(pool, new ThenMessagingRunnable<T, V>(result, closure, errorHandler));
         return result;
@@ -193,7 +198,7 @@ public class DataflowVariable<T> extends DataflowExpression<T> implements Datafl
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     @Override
-    public final <V> Promise<V> then(final PGroup group, final Closure<V> closure, final Closure<V> errorHandler) {
+    public <V> Promise<V> then(final PGroup group, final Closure<V> closure, final Closure<V> errorHandler) {
         final DataflowVariable<V> result = new DataflowVariable<V>();
         whenBound(group, new ThenMessagingRunnable<T, V>(result, closure, errorHandler));
         return result;

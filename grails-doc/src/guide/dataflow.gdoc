@@ -629,6 +629,79 @@ Notice that only the initial action (function) needs to be asynchronous. The fun
 asynchronously by the promise even if the are synchronous.
 {note}
 
+h2. Lazy dataflow variables
+
+Sometimes you may like to combine the qualities of dataflow variables with their lazy initialization.
+{code}
+Closure<String> download = {url ->
+    println "Downloading"
+    url.toURL().text
+}
+
+def pageContent = new LazyDataflowVariable(download.curry("http://gpars.codehaus.org"))
+{code}
+
+Instances of _LazyDataflowVariable_ have an initializer specified at construction time, which only gets triggered
+when someone asks for its value, either through the blocking _get()_ method or using any of the non-blocking callback
+methods, such as _then()_ .
+Since _LazyDataflowVariables_ preserve all the goodies of ordinary _DataflowVariables_ , you can again chain them easily
+ with other _lazy_ or _ordinary_ dataflow variables.
+
+h4. Example
+
+This deserves a more practical example. Taking inspiration from http://blog.jcoglan.com/2013/03/30/callbacks-are-imperative-promises-are-functional-nodes-biggest-missed-opportunity/
+the following piece of code demonstrates use of _LazyDataflowVariables_ to lazily and asynchronously load mutually dependent components into memory.
+The components (modules) will be loaded in the order of their dependencies and concurrently, if possible.
+Each module will only be loaded once irrespective of the number of modules that depend on it.
+Thanks to laziness only the modules that are transitively needed will be loaded.
+Our example uses a simple "diamond" dependency scheme:
+
+* D depends on B and C
+* C depends on A
+* B depends on A
+
+When loading D, A will get loaded first. B and C will be loaded concurrently once A has been loaded. D will start loading
+once both B and C have been loaded.
+
+{code}
+def moduleA = new LazyDataflowVariable({->
+    println "Loading moduleA into memory"
+    sleep 3000
+    println "Loaded moduleA into memory"
+    return "moduleA"
+})
+
+def moduleB = new LazyDataflowVariable({->
+    moduleA.then {
+        println "->Loading moduleB into memory"
+        sleep 3000
+        println "  Loaded moduleB into memory"
+        return "moduleB"
+    }
+})
+
+def moduleC = new LazyDataflowVariable({->
+    moduleA.then {
+        println "->Loading moduleC into memory"
+        sleep 3000
+        println "  Loaded moduleC into memory"
+        return "moduleC"
+    }
+})
+
+def moduleD = new LazyDataflowVariable({->
+    whenAllBound(moduleB, moduleC) {b, c ->
+        println "-->Loading moduleD into memory"
+        sleep 3000
+        println "   Loaded moduleD into memory"
+        return "moduleD"
+    }
+})
+
+println "Received module: " + moduleD.get()
+
+{code}
+
 h2. Dataflow Expressions
 
 Look at the magic below:
