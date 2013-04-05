@@ -660,6 +660,9 @@ public abstract class PGroup {
         if (promises.size() != code.getMaximumNumberOfParameters() && !isListAccepting(code)) {
             throw new IllegalArgumentException("Cannot run whenAllBound(), since the number of promises does not match the number of arguments to the supplied closure.");
         }
+        for (final Promise promise : promises) {
+            promise.touch();
+        }
         final DataflowVariable result = new DataflowVariable();
         whenAllBound(promises, 0, new ArrayList<Object>(promises.size()), result, code, errorHandler);
         return result;

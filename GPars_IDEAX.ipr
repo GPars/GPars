@@ -9434,6 +9434,28 @@
     </Base>
   </component>
   <component name="libraryTable">
+    <library name="Maven: com.google.code.gson:gson:2.2.2">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.2.2/gson-2.2.2.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.2.2/gson-2.2.2-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.2.2/gson-2.2.2-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: com.google.guava:guava:14.0.1">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/14.0.1/guava-14.0.1.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/14.0.1/guava-14.0.1-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/14.0.1/guava-14.0.1-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Maven: junit:junit:4.8.2">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.8.2/junit-4.8.2.jar!/" />
@@ -9466,6 +9488,13 @@
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/2.0.6/groovy-all-2.0.6-sources.jar!/" />
       </SOURCES>
+    </library>
+    <library name="Maven: org.codehaus.groovy:groovy-all:2.0.7">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/2.0.7/groovy-all-2.0.7.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="Maven: org.codehaus.jcsp:jcsp:1.1-rc5">
       <CLASSES>

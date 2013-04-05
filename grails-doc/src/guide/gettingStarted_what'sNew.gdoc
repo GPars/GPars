@@ -19,6 +19,8 @@ h3. Actors
 
 h3. Dataflow
 
+* LazyDataflowVariable added to allow for lazy asynchronous values
+
 h3. Agent
 
 h3. Stm

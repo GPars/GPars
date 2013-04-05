@@ -166,7 +166,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * @param callback An actor to send the bound value to.
      */
     @Override
-    public final void getValAsync(final MessageStream callback) {
+    public void getValAsync(final MessageStream callback) {
         getValAsync(null, callback);
     }
 
@@ -183,7 +183,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * @param callback   An actor to send the bound value plus the supplied index to.
      */
     @Override
-    public final void getValAsync(final Object attachment, final MessageStream callback) {
+    public void getValAsync(final Object attachment, final MessageStream callback) {
         if (callback == null) {
             throw new NullPointerException();
         }

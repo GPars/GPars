@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,8 +23,9 @@ import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.dataflow.Dataflows
 import groovyx.gpars.group.DefaultPGroup
-import java.util.concurrent.TimeUnit
 import org.codehaus.groovy.runtime.NullObject
+
+import java.util.concurrent.TimeUnit
 
 public class DynamicDispatchActorTest extends GroovyTestCase {
     public void testDispatch() {
@@ -55,6 +56,8 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         assertFalse actor.objectFlag
         assert actor.listFlag
         actor.clearFlags();
+
+        actor.terminate()
     }
 
     public void testDispatchWithWhen() {
@@ -63,9 +66,9 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         boolean objectFlag = false
 
         final Actor actor = new DynamicDispatchActor().become {
-            when {String msg -> stringFlag = true; reply false}
-            when {Double msg -> doubleFlag = true; reply false}
-            when {msg -> objectFlag = true; reply false}
+            when { String msg -> stringFlag = true; reply false }
+            when { Double msg -> doubleFlag = true; reply false }
+            when { msg -> objectFlag = true; reply false }
         }.start()
 
         actor.sendAndWait 1.0 as Double
@@ -78,6 +81,8 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
 
         actor.sendAndWait new ArrayList()
         assert objectFlag
+
+        actor.terminate()
     }
 
     public void testSendingList() {
@@ -86,18 +91,22 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
 
         actor.sendAndWait(new ArrayList())
         assert actor.listFlag
+
+        actor.terminate()
     }
 
     public void testSendingListViaWhen() {
         boolean flag = false
 
         final Actor actor = new DynamicDispatchActor().become {
-            when {List msg -> flag = true; reply false}
+            when { List msg -> flag = true; reply false }
         }
         actor.start()
 
         actor.sendAndWait(new ArrayList())
         assert flag
+
+        actor.terminate()
     }
 
     public void testSendingSubclassViaWhen() {
@@ -105,8 +114,8 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         boolean doubleFlag = false
 
         final Actor actor = new DynamicDispatchActor().become {
-            when {Number msg -> numberFlag = true; reply false}
-            when {Double msg -> doubleFlag = true; reply false}
+            when { Number msg -> numberFlag = true; reply false }
+            when { Double msg -> doubleFlag = true; reply false }
         }.start()
 
         actor.sendAndWait(1.0)
@@ -118,6 +127,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         assertFalse numberFlag
         assert doubleFlag
 
+        actor.terminate()
     }
 
     public void testDispatcher() {
@@ -126,17 +136,17 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         boolean objectFlag = false
 
         def actor = Actors.messageHandler {
-            when {String message ->
+            when { String message ->
                 stringFlag = true
                 reply false
             }
 
-            when {Integer message ->
+            when { Integer message ->
                 integerFlag = true
                 reply false
             }
 
-            when {Object message ->
+            when { Object message ->
                 objectFlag = true
                 reply false
             }
@@ -161,14 +171,16 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         assert stringFlag
         assert integerFlag
         assert objectFlag
+
+        actor.terminate()
     }
 
     public void testWhenAttachedAfterStart() {
         boolean stringFlag = false
         boolean integerFlag = false
 
-        def dda = new DynamicDispatchActor().become {when {msg ->}}
-        dda.when {String message ->
+        def dda = new DynamicDispatchActor().become { when { msg -> } }
+        dda.when { String message ->
             stringFlag = true
             reply false
         }
@@ -178,20 +190,21 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         assert stringFlag
         assertFalse integerFlag
 
-        dda.when {int message ->
+        dda.when { int message ->
             integerFlag = true
             reply false
         }
 
         dda.sendAndWait 1
         assert stringFlag
+        dda.terminate()
     }
 
     public void testNullHandlerForSendWithNull() {
         boolean nullFlag = false
 
         def dda = new DynamicDispatchActor()
-        dda.when {NullObject message ->
+        dda.when { NullObject message ->
             nullFlag = true
             reply false
         }
@@ -199,19 +212,21 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
 
         dda.sendAndWait(null)
         assert nullFlag
+        dda.terminate()
     }
 
     public void testClosureMessage() {
         boolean flag = false
 
         def dda = new DynamicDispatchActor()
-        dda.when {Closure cl ->
+        dda.when { Closure cl ->
             reply cl()
         }
         dda.start()
 
         dda.sendAndWait { flag = true }
         assert flag
+        dda.terminate()
     }
 
     public void testGroup() {
@@ -223,7 +238,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
 
     public void testReplies() {
         def dda = Actors.messageHandler {
-            when {message ->
+            when { message ->
                 reply 10
                 sender.send 20
             }
@@ -233,7 +248,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
 
         Actors.actor {
             dda << 1
-            react(1000, TimeUnit.MILLISECONDS) {a ->
+            react(1000, TimeUnit.MILLISECONDS) { a ->
                 react(1000, TimeUnit.MILLISECONDS) { b ->
                     results << [a, b]
                 }
@@ -241,11 +256,13 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
             dda.stop()
         }
         assert results.val == [10, 20]
+
+        dda.terminate()
     }
 
     public void testSendAndWait() {
         def dda = Actors.messageHandler {
-            when {message ->
+            when { message ->
                 reply 10
             }
         }
@@ -253,35 +270,38 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         Actors.actor {
             assert 10 == dda.sendAndWait(1)
             assert 10 == dda.sendAndWait(1)
+            dda.terminate()
         }
     }
 
     public void testSendAndContinue() {
         def dda = Actors.messageHandler {
-            when {message ->
+            when { message ->
                 reply 2 * message
             }
         }
 
         final Dataflows results = new Dataflows()
 
-        dda.sendAndContinue(1) {results.d1 = it}
-        dda.sendAndContinue(2) {results.d2 = it}
-        dda.sendAndContinue(3) {results.d3 = it}
+        dda.sendAndContinue(1) { results.d1 = it }
+        dda.sendAndContinue(2) { results.d2 = it }
+        dda.sendAndContinue(3) { results.d3 = it }
         Actors.actor {
-            dda.sendAndContinue(4) {results.d4 = it}
+            dda.sendAndContinue(4) { results.d4 = it }
         }
         assert results.d1 == 2
         assert results.d2 == 4
         assert results.d3 == 6
         assert results.d4 == 8
+
+        dda.terminate()
     }
 
     public void testWhenInConstructor() {
 
         final def actor = new MyActor({
-            when {BigDecimal num -> results << 'BigDecimal'}
-            when {Double num -> results << 'Double'}
+            when { BigDecimal num -> results << 'BigDecimal' }
+            when { Double num -> results << 'Double' }
         }).start()
 
         actor 1
@@ -294,13 +314,15 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         assert 'string' == actor.results.val
         assert 'BigDecimal' == actor.results.val
         assert 'list' == actor.results.val
+
+        actor.terminate()
     }
 
     public void testWhenInBecome() {
 
         final def actor = new MyActor().become {
-            when {BigDecimal num -> results << 'BigDecimal'}
-            when {Double num -> results << 'Double'}
+            when { BigDecimal num -> results << 'BigDecimal' }
+            when { Double num -> results << 'Double' }
         }.start()
 
         actor 1
@@ -313,6 +335,8 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         assert 'string' == actor.results.val
         assert 'BigDecimal' == actor.results.val
         assert 'list' == actor.results.val
+
+        actor.terminate()
     }
 
     public void testWhenOverOnMessage() {
@@ -325,15 +349,16 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         assert 'Integer' == actor.results.val
         assert 'string' == actor.results.val
 
-        actor.when {Integer num -> results << 'Integer2'}
+        actor.when { Integer num -> results << 'Integer2' }
         actor 1
         assert 'Integer2' == actor.results.val
-        actor.when {Integer num -> results << 'Integer3'}
+        actor.when { Integer num -> results << 'Integer3' }
         actor 1
         assert 'Integer3' == actor.results.val
         actor.stop()
         actor.join()
 
+        actor.terminate()
     }
 
     public void testWhenOverMoreGenericOnMessage() {
@@ -346,34 +371,35 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         assert 'Object' == actor.results.val
         assert 'string' == actor.results.val
 
-        actor.when {Integer num -> results << 'Integer2'}
+        actor.when { Integer num -> results << 'Integer2' }
         actor 1
         assert 'Integer2' == actor.results.val
-        actor.when {Integer num -> results << 'Integer3'}
+        actor.when { Integer num -> results << 'Integer3' }
         actor 1
         assert 'Integer3' == actor.results.val
         actor.stop()
         actor.join()
 
+        actor.terminate()
     }
 
     public void testWhenOverWhen() {
 
-        final def actor = new MyActor().become {
-            when {BigDecimal num -> results << 'BigDecimal'}
-            when {Double num -> results << 'Double'}
-        }.start()
+        final def actor = new MyActor()
+        actor.metaClass.onMessage { BigDecimal num -> results << 'BigDecimal' }
+        actor.metaClass.onMessage { Double num -> results << 'Double' }
+        actor.start()
 
         actor 1
         actor ''
-        actor 1.0
+        actor 1.0G
 
         assert 'Integer' == actor.results.val
         assert 'string' == actor.results.val
         assert 'BigDecimal' == actor.results.val
 
-        actor.when {BigDecimal num -> results << 'BigDecimal2'}
-        actor 1.0
+        actor.metaClass.onMessage { BigDecimal num -> results << 'BigDecimal2' }
+        actor 1.0G
         assert 'BigDecimal2' == actor.results.val
         actor.stop()
         actor.join()
@@ -385,7 +411,7 @@ final class MyActor extends DynamicDispatchActor {
 
     def results = new DataflowQueue()
 
-    def MyActor() { }
+    def MyActor() {}
 
     def MyActor(final closure) {
         super()
@@ -403,7 +429,7 @@ final class MyGenericActor extends DynamicDispatchActor {
 
     def results = new DataflowQueue()
 
-    def MyActor() { }
+    def MyActor() {}
 
     void onMessage(String message) { results << 'string' }
 
@@ -424,7 +450,7 @@ final class TestDynamicDispatchActor extends DynamicDispatchActor {
     }
 
     TestDynamicDispatchActor() {
-        when {String message ->
+        when { String message ->
             stringFlag = true
             reply false
         }
