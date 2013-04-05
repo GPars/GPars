@@ -242,4 +242,9 @@ public interface Promise<T> {
      * @throws IllegalStateException If not bound or not bound to an error
      */
     Throwable getError();
+
+    /**
+     * May be used by lazy implementations to warm up
+     */
+    void touch();
 }
