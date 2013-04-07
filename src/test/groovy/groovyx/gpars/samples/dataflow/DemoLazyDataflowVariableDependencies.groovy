@@ -23,7 +23,7 @@ import static groovyx.gpars.dataflow.Dataflow.whenAllBound
 /**
  * Demonstrates use of LazyDataflowVariables to lazily and asynchronously load mutually dependent components into memory.
  * The components (modules) will be loaded in the order of their dependencies and concurrently, if possible.
- * Each module will only be loaded once irrespective of the number of modules that depend on it.
+ * Each module will only be loaded once, irrespective of the number of modules that depend on it.
  * Thanks to laziness only the modules that are transitively needed will be loaded.
  * Our example uses a simple "diamond" dependency scheme: <br/>
  * D depends on B and C <br/>
@@ -42,7 +42,7 @@ def moduleA = new LazyDataflowVariable({->
 
 def moduleB = new LazyDataflowVariable({->
     moduleA.then {
-        println "->Loading moduleB into memory"
+        println "->Loading moduleB into memory, since moduleA is ready"
         sleep 3000
         println "  Loaded moduleB into memory"
         return "moduleB"
@@ -51,7 +51,7 @@ def moduleB = new LazyDataflowVariable({->
 
 def moduleC = new LazyDataflowVariable({->
     moduleA.then {
-        println "->Loading moduleC into memory"
+        println "->Loading moduleC into memory, since moduleA is ready"
         sleep 3000
         println "  Loaded moduleC into memory"
         return "moduleC"
@@ -60,11 +60,15 @@ def moduleC = new LazyDataflowVariable({->
 
 def moduleD = new LazyDataflowVariable({->
     whenAllBound(moduleB, moduleC) { b, c ->
-        println "-->Loading moduleD into memory"
+        println "-->Loading moduleD into memory, since moduleB and moduleC are ready"
         sleep 3000
         println "   Loaded moduleD into memory"
         return "moduleD"
     }
 })
 
-println "Received module: " + moduleD.get()
+println "Nothing loaded so far"
+println "==================================================================="
+println "Load module: " + moduleD.get()
+println "==================================================================="
+println "All requested modules loaded"

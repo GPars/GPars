@@ -652,7 +652,7 @@ h4. Example
 This deserves a more practical example. Taking inspiration from http://blog.jcoglan.com/2013/03/30/callbacks-are-imperative-promises-are-functional-nodes-biggest-missed-opportunity/
 the following piece of code demonstrates use of _LazyDataflowVariables_ to lazily and asynchronously load mutually dependent components into memory.
 The components (modules) will be loaded in the order of their dependencies and concurrently, if possible.
-Each module will only be loaded once irrespective of the number of modules that depend on it.
+Each module will only be loaded once, irrespective of the number of modules that depend on it.
 Thanks to laziness only the modules that are transitively needed will be loaded.
 Our example uses a simple "diamond" dependency scheme:
 
@@ -673,7 +673,7 @@ def moduleA = new LazyDataflowVariable({->
 
 def moduleB = new LazyDataflowVariable({->
     moduleA.then {
-        println "->Loading moduleB into memory"
+        println "->Loading moduleB into memory, since moduleA is ready"
         sleep 3000
         println "  Loaded moduleB into memory"
         return "moduleB"
@@ -682,7 +682,7 @@ def moduleB = new LazyDataflowVariable({->
 
 def moduleC = new LazyDataflowVariable({->
     moduleA.then {
-        println "->Loading moduleC into memory"
+        println "->Loading moduleC into memory, since moduleA is ready"
         sleep 3000
         println "  Loaded moduleC into memory"
         return "moduleC"
@@ -690,16 +690,19 @@ def moduleC = new LazyDataflowVariable({->
 })
 
 def moduleD = new LazyDataflowVariable({->
-    whenAllBound(moduleB, moduleC) {b, c ->
-        println "-->Loading moduleD into memory"
+    whenAllBound(moduleB, moduleC) { b, c ->
+        println "-->Loading moduleD into memory, since moduleB and moduleC are ready"
         sleep 3000
         println "   Loaded moduleD into memory"
         return "moduleD"
     }
 })
 
-println "Received module: " + moduleD.get()
-
+println "Nothing loaded so far"
+println "==================================================================="
+println "Load module: " + moduleD.get()
+println "==================================================================="
+println "All requested modules loaded"
 {code}
 
 h2. Dataflow Expressions
