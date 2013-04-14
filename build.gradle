@@ -112,7 +112,7 @@ configurations {
 // symbol look up works correctly without qualification.
 
 dependencies {
-    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.0.7'
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.0.8'
     compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
     compile('org.multiverse:multiverse-beta:0.7-RC-1') { transitive = false }
     //compile('org.multiverse:multiverse:0.7.0') { transitive = false }
@@ -125,7 +125,7 @@ dependencies {
     testCompile fileTree(dir: 'lib', include: '*.jar')
     //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
     //  Grails, including all the SpringRoo stuff.
-    docs group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.0.7'
+    docs group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.0.8'
     docs 'org.yaml:snakeyaml:1.12'
     docs 'commons-lang:commons-lang:2.6'
     docs ext.grailsDocs
