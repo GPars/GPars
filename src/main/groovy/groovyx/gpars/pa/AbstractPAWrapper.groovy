@@ -207,7 +207,14 @@ abstract class AbstractPAWrapper<T> {
                 }
             }
         }
-        return result.getContent()
+        if (result instanceof CombineHolder) {
+            return result.getContent()
+        } else {
+            final Object newValue = accumulation.call(initialValue.call(), extractValue(result));
+            def map = [:]
+            map[extractKey(result)] = newValue
+            return map
+        }
     }
 
     /**
