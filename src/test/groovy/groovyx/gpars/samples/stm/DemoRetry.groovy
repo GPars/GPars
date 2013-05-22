@@ -21,7 +21,7 @@ import org.multiverse.api.AtomicBlock
 import org.multiverse.api.PropagationLevel
 import static org.multiverse.api.StmUtils.newIntRef
 
-final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+final AtomicBlock block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
 
 def counter = newIntRef(0)
 final int max = 100

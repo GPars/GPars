@@ -25,8 +25,8 @@ import static org.multiverse.api.StmUtils.newIntRef
 public class CustomAccount {
     private final IntRef amount = newIntRef(0);
 
-    private static AtomicBlock writeBlock = GParsStm.createAtomicBlock(familyName: 'Write', PropagationLevel: PropagationLevel.Requires)
-    private static AtomicBlock readBlock = GParsStm.createAtomicBlock(readonly: true, PropagationLevel: PropagationLevel.RequiresNew, familyName: 'Read')
+    private static AtomicBlock writeBlock = GParsStm.createTxnExecutor(familyName: 'Write', PropagationLevel: PropagationLevel.Requires)
+    private static AtomicBlock readBlock = GParsStm.createTxnExecutor(readonly: true, PropagationLevel: PropagationLevel.RequiresNew, familyName: 'Read')
 
     public void transfer(final int a) {
         GParsStm.atomic(writeBlock) {
