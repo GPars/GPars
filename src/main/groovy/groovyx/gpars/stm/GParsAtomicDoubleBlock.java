@@ -18,15 +18,15 @@ package groovyx.gpars.stm;
 
 import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.InvokerInvocationException;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.closures.AtomicDoubleClosure;
+import org.multiverse.api.Txn;
+import org.multiverse.api.callables.TxnDoubleCallable;
 
 /**
  * A default implementation of org.multiverse.api.closures.AtomicDoubleClosure properly handling exception propagation
  *
  * @author Vaclav Pech
  */
-final class GParsAtomicDoubleBlock implements AtomicDoubleClosure {
+final class GParsAtomicDoubleBlock implements TxnDoubleCallable {
     private final Closure code;
 
     GParsAtomicDoubleBlock(final Closure code) {
@@ -36,7 +36,7 @@ final class GParsAtomicDoubleBlock implements AtomicDoubleClosure {
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public double execute(final Transaction transaction) {
+    public double call(final Txn transaction) {
         try {
             return (Double) code.call(transaction);
         } catch (InvokerInvocationException e) {

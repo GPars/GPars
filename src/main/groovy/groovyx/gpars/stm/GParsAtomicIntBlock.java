@@ -18,15 +18,15 @@ package groovyx.gpars.stm;
 
 import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.InvokerInvocationException;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.closures.AtomicIntClosure;
+import org.multiverse.api.Txn;
+import org.multiverse.api.callables.TxnIntCallable;
 
 /**
  * A default implementation of org.multiverse.api.closures.AtomicIntClosure properly handling exception propagation
  *
  * @author Vaclav Pech
  */
-final class GParsAtomicIntBlock implements AtomicIntClosure {
+final class GParsAtomicIntBlock implements TxnIntCallable {
     private final Closure code;
 
     GParsAtomicIntBlock(final Closure code) {
@@ -36,7 +36,7 @@ final class GParsAtomicIntBlock implements AtomicIntClosure {
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public int execute(final Transaction transaction) {
+    public int call(final Txn transaction) {
         try {
             return (Integer) code.call(transaction);
         } catch (InvokerInvocationException e) {
