@@ -18,15 +18,15 @@ package groovyx.gpars.stm;
 
 import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.InvokerInvocationException;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.closures.AtomicBooleanClosure;
+import org.multiverse.api.Txn;
+import org.multiverse.api.callables.TxnBooleanCallable;
 
 /**
  * A default implementation of org.multiverse.api.closures.AtomicBooleanClosure properly handling exception propagation
  *
  * @author Vaclav Pech
  */
-final class GParsAtomicBooleanBlock implements AtomicBooleanClosure {
+final class GParsAtomicBooleanBlock implements TxnBooleanCallable {
     private final Closure code;
 
     GParsAtomicBooleanBlock(final Closure code) {
@@ -36,7 +36,7 @@ final class GParsAtomicBooleanBlock implements AtomicBooleanClosure {
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public boolean execute(final Transaction transaction) {
+    public boolean call(final Txn transaction) {
         try {
             return (Boolean) code.call(transaction);
         } catch (InvokerInvocationException e) {
