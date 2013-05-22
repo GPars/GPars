@@ -19,7 +19,7 @@ package groovyx.gpars.stm;
 import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.InvokerInvocationException;
 import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.TransactionFactoryBuilder;
+import org.multiverse.api.TxnFactoryBuilder;
 import org.multiverse.api.exceptions.ControlFlowError;
 
 import java.lang.reflect.InvocationTargetException;
@@ -41,9 +41,9 @@ public abstract class GParsStm {
     private static final String CANNOT_CREATE_AN_ATOMIC_BLOCK_SOME_OF_THE_SPECIFIED_PARAMETERS_ARE_NOT_SUPPORTED = "Cannot create an atomic block. Some of the specified parameters are not supported. ";
 
     /**
-     * Gives access to multiverse TransactionFactoryBuilder to allow customized creation of atomic blocks
+     * Gives access to multiverse TxnFactoryBuilder to allow customized creation of atomic blocks
      */
-    public static final TransactionFactoryBuilder transactionFactory = getGlobalStmInstance().createTransactionFactoryBuilder();
+    public static final TxnFactoryBuilder transactionFactory = getGlobalStmInstance().createTxnFactoryBuilder();
 
     /**
      * The atomic block to use when no block is specified explicitly
@@ -66,7 +66,7 @@ public abstract class GParsStm {
      * @return The newly created instance of AtomicBlock
      */
     public static AtomicBlock createAtomicBlock(final Map<String, Object> params) {
-        TransactionFactoryBuilder localFactory = transactionFactory;
+        TxnFactoryBuilder localFactory = transactionFactory;
 
         final Set<Map.Entry<String, Object>> entries = params.entrySet();
         for (final Map.Entry<String, Object> entry : entries) {
@@ -79,15 +79,15 @@ public abstract class GParsStm {
             try {
                 final Method method;
                 if (entry.getValue().getClass().equals(Long.class)) {
-                    method = TransactionFactoryBuilder.class.getDeclaredMethod(key, Long.TYPE);
+                    method = TxnFactoryBuilder.class.getDeclaredMethod(key, Long.TYPE);
                 } else if (entry.getValue().getClass().equals(Integer.class)) {
-                    method = TransactionFactoryBuilder.class.getDeclaredMethod(key, Integer.TYPE);
+                    method = TxnFactoryBuilder.class.getDeclaredMethod(key, Integer.TYPE);
                 } else if (entry.getValue().getClass().equals(Boolean.class)) {
-                    method = TransactionFactoryBuilder.class.getDeclaredMethod(key, Boolean.TYPE);
+                    method = TxnFactoryBuilder.class.getDeclaredMethod(key, Boolean.TYPE);
                 } else {
-                    method = TransactionFactoryBuilder.class.getDeclaredMethod(key, entry.getValue().getClass());
+                    method = TxnFactoryBuilder.class.getDeclaredMethod(key, entry.getValue().getClass());
                 }
-                localFactory = (TransactionFactoryBuilder) method.invoke(localFactory, entry.getValue());
+                localFactory = (TxnFactoryBuilder) method.invoke(localFactory, entry.getValue());
             } catch (NoSuchMethodException e) {
                 throw new IllegalArgumentException(CANNOT_CREATE_AN_ATOMIC_BLOCK_SOME_OF_THE_SPECIFIED_PARAMETERS_ARE_NOT_SUPPORTED + entry.getKey(), e);
             } catch (InvocationTargetException e) {
