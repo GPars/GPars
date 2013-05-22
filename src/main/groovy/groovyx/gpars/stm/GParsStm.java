@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package groovyx.gpars.stm;
 
 import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.InvokerInvocationException;
+import org.multiverse.api.GlobalStmInstance;
 import org.multiverse.api.TxnExecutor;
 import org.multiverse.api.TxnFactoryBuilder;
 import org.multiverse.api.exceptions.ControlFlowError;
@@ -48,15 +49,15 @@ public abstract class GParsStm {
     /**
      * The atomic block to use when no block is specified explicitly
      */
-    private static final TxnExecutor defaultTxnExecutor = transactionFactory.setFamilyName("GPars.Stm").newTxnExecutor();
+    private static TxnExecutor defaultAtomicBlock = GlobalStmInstance.getGlobalStmInstance().newTxnFactoryBuilder().setFamilyName("GPars.Stm").newTxnExecutor();
 
     /**
      * A factory method to create custom atomic blocks.
      *
      * @return The newly created instance of AtomicBlock
      */
-    public static TxnExecutor createTxnExecutor() {
-        return createTxnExecutor(Collections.<String, Object>emptyMap());
+    public static TxnExecutor createAtomicBlock() {
+        return createAtomicBlock(Collections.<String, Object>emptyMap());
     }
 
     /**
@@ -65,7 +66,7 @@ public abstract class GParsStm {
      * @param params A map holding all values that should be specified. See the Multiverse documentation for possible values
      * @return The newly created instance of AtomicBlock
      */
-    public static TxnExecutor createTxnExecutor(final Map<String, Object> params) {
+    public static TxnExecutor createAtomicBlock(final Map<String, Object> params) {
         TxnFactoryBuilder localFactory = transactionFactory;
 
         final Set<Map.Entry<String, Object>> entries = params.entrySet();
