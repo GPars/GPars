@@ -67,11 +67,7 @@ class AtomicTest extends GroovyTestCase {
 
     public void testSingleCustomAtomicBlock() {
         final Account account = new Account()
-<<<<<<< HEAD
-        final AtomicBlock block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
-=======
         final TxnExecutor block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
->>>>>>> updateReferences
         GParsStm.atomic(block) {
             account.transfer(10)
             def t1 = Thread.start {
