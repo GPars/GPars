@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ public abstract class GParsStm {
     /**
      * The atomic block to use when no block is specified explicitly
      */
-    private static TxnExecutor defaultAtomicBlock = GlobalStmInstance.getGlobalStmInstance().newTxnFactoryBuilder().setFamilyName("GPars.Stm").newTxnExecutor();
+    private static TxnExecutor defaultTxnExecutor = GlobalStmInstance.getGlobalStmInstance().newTxnFactoryBuilder().setFamilyName("GPars.Stm").newTxnExecutor();
 
     /**
      * A factory method to create custom atomic blocks.
