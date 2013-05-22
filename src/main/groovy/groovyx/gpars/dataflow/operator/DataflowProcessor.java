@@ -62,7 +62,7 @@ public abstract class DataflowProcessor {
      */
     protected final Object stateObject;
 
-    final Collection<DataflowEventListener> listeners = new CopyOnWriteArrayList<DataflowEventListener>();
+    protected final Collection<DataflowEventListener> listeners = new CopyOnWriteArrayList<DataflowEventListener>();
 
     /**
      * Creates a processor
@@ -78,7 +78,7 @@ public abstract class DataflowProcessor {
         stateObject = extractState(channels);
         listeners.addAll(extractListeners(channels));
         if (channels == null) return;
-        final Collection inputs = (Collection) channels.get(INPUTS);
+        final Collection<?> inputs = (Collection<?>) channels.get(INPUTS);
         if (inputs == null || inputs.isEmpty()) {
             throw new IllegalArgumentException("The processor body must take some inputs. The provided list of input channels is empty.");
         }
@@ -89,14 +89,14 @@ public abstract class DataflowProcessor {
         return maxForks != null && maxForks != 1;
     }
 
-    static List<DataflowReadChannel> extractInputs(final Map<String, Object> channels) {
-        final List<DataflowReadChannel> inputs = (List<DataflowReadChannel>) channels.get(INPUTS);
+    static List<DataflowReadChannel<?>> extractInputs(final Map<String, Object> channels) {
+        final List<DataflowReadChannel<?>> inputs = (List<DataflowReadChannel<?>>) channels.get(INPUTS);
         if (inputs == null) return Collections.emptyList();
         return Collections.unmodifiableList(inputs);
     }
 
-    static List<DataflowWriteChannel> extractOutputs(final Map<String, Object> channels) {
-        final List<DataflowWriteChannel> outputs = (List<DataflowWriteChannel>) channels.get(OUTPUTS);
+    static List<DataflowWriteChannel<?>> extractOutputs(final Map<String, Object> channels) {
+        final List<DataflowWriteChannel<?>> outputs = (List<DataflowWriteChannel<?>>) channels.get(OUTPUTS);
         if (outputs == null) return Collections.emptyList();
         return Collections.unmodifiableList(outputs);
     }
@@ -112,7 +112,7 @@ public abstract class DataflowProcessor {
         return listeners != null ? listeners : Collections.<DataflowEventListener>emptyList();
     }
 
-    protected static void checkMaxForks(final Map channels) {
+    protected static void checkMaxForks(final Map<?, ?> channels) {
         if ((Integer) channels.get(MAX_FORKS) < 1)
             throw new IllegalArgumentException("The maxForks argument must be a positive value. " + channels.get(MAX_FORKS) + " was provided.");
     }
@@ -192,7 +192,7 @@ public abstract class DataflowProcessor {
      * @param value The value to bind
      */
     public final void bindAllOutputs(final Object value) {
-        final List<DataflowWriteChannel> outputs = getOutputs();
+        final List<DataflowWriteChannel<?>> outputs = getOutputs();
         for (int i = 0; i < outputs.size(); i++) {
             final DataflowWriteChannel<Object> channel = (DataflowWriteChannel<Object>) outputs.get(i);
             channel.bind(fireMessageSentOut(channel, i, value));
@@ -210,7 +210,7 @@ public abstract class DataflowProcessor {
      * @param values Values to send to output channels of the same position index
      */
     public final void bindAllOutputValues(final Object... values) {
-        final List<DataflowWriteChannel> outputs = getOutputs();
+        final List<DataflowWriteChannel<?>> outputs = getOutputs();
         for (int i = 0; i < outputs.size(); i++) {
             final DataflowWriteChannel channel = outputs.get(i);
             channel.bind(fireMessageSentOut(channel, i, values[i]));
@@ -244,9 +244,9 @@ public abstract class DataflowProcessor {
      * @param idx The index of the channel to retrieve
      * @return The particular DataflowWriteChannel instance
      */
-    public final DataflowWriteChannel getOutputs(final int idx) {
+    public final DataflowWriteChannel<?> getOutputs(final int idx) {
         if (actor.outputs.isEmpty()) return null;
-        return (DataflowWriteChannel) actor.outputs.get(idx);
+        return (DataflowWriteChannel<?>) actor.outputs.get(idx);
     }
 
     /**
@@ -254,7 +254,7 @@ public abstract class DataflowProcessor {
      *
      * @return A List holding all output channels
      */
-    public final List<DataflowWriteChannel> getOutputs() {
+    public final List<DataflowWriteChannel<?>> getOutputs() {
         return actor.outputs;
     }
 
@@ -263,9 +263,9 @@ public abstract class DataflowProcessor {
      *
      * @return The particular DataflowWriteChannel instance
      */
-    public final DataflowWriteChannel getOutput() {
+    public final DataflowWriteChannel<?> getOutput() {
         if (actor.outputs.isEmpty()) return null;
-        return (DataflowWriteChannel) actor.outputs.get(0);
+        return (DataflowWriteChannel<?>) actor.outputs.get(0);
     }
 
     /**
