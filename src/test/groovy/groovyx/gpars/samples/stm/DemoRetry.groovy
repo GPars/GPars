@@ -22,7 +22,7 @@ import org.multiverse.api.TxnExecutor
 
 import static org.multiverse.api.StmUtils.newTxnInteger
 
-final TxnExecutor block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
 
 def counter = newTxnInteger(0)
 final int max = 100

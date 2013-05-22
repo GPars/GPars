@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ import static org.multiverse.api.StmUtils.newTxnInteger
 public class CustomAccount {
     private final TxnInteger amount = newTxnInteger(0);
 
-    private static TxnExecutor writeBlock = GParsStm.createAtomicBlock(familyName: 'Write', PropagationLevel: PropagationLevel.Requires)
-    private static TxnExecutor readBlock = GParsStm.createAtomicBlock(readonly: true, PropagationLevel: PropagationLevel.RequiresNew, familyName: 'Read')
+    private static TxnExecutor writeBlock = GParsStm.createTxnExecutor(familyName: 'Write', PropagationLevel: PropagationLevel.Requires)
+    private static TxnExecutor readBlock = GParsStm.createTxnExecutor(readonly: true, PropagationLevel: PropagationLevel.RequiresNew, familyName: 'Read')
 
     public void transfer(final int a) {
         GParsStm.atomic(writeBlock) {

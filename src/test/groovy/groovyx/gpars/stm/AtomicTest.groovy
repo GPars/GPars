@@ -16,12 +16,11 @@
 
 package groovyx.gpars.stm
 
-import org.multiverse.api.PropagationLevel
 import org.multiverse.api.TxnExecutor
 import org.multiverse.api.references.TxnInteger
 
 import java.util.concurrent.CountDownLatch
-
+import org.multiverse.api.PropagationLevel
 import static org.multiverse.api.StmUtils.newTxnInteger
 
 /**
@@ -67,7 +66,7 @@ class AtomicTest extends GroovyTestCase {
 
     public void testSingleCustomAtomicBlock() {
         final Account account = new Account()
-        final TxnExecutor block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
         GParsStm.atomic(block) {
             account.transfer(10)
             def t1 = Thread.start {
@@ -83,28 +82,28 @@ class AtomicTest extends GroovyTestCase {
     }
 
     public void testSingleCustomAtomicBooleanBlock() {
-        final TxnExecutor block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
         assert GParsStm.atomicWithBoolean(block) {
             true
         }
     }
 
     public void testSingleCustomAtomicLongBlock() {
-        final TxnExecutor block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
         assert 10L == GParsStm.atomicWithLong(block) {
             10L
         }
     }
 
     public void testSingleCustomAtomicIntBlock() {
-        final TxnExecutor block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
         assert 10 == GParsStm.atomicWithInt(block) {
             10
         }
     }
 
     public void testSingleCustomAtomicDoubleBlock() {
-        final TxnExecutor block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
         assert 10.0d == GParsStm.atomicWithDouble(block) {
             10.0d
         }
@@ -112,7 +111,7 @@ class AtomicTest extends GroovyTestCase {
 
     public void testCustomAtomicBlock() {
         final Account account = new Account()
-        final TxnExecutor block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
 
         final CountDownLatch latch = new CountDownLatch(1)
         def t1 = Thread.start {
@@ -132,7 +131,7 @@ class AtomicTest extends GroovyTestCase {
 
     public void testCustomAtomicBlockWithTimeout() {
         final Account account = new Account()
-        final TxnExecutor block = GParsStm.createAtomicBlock(timeoutNs: 1000L, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        final TxnExecutor block = GParsStm.createTxnExecutor(timeoutNs: 1000L, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
         GParsStm.atomic(block) {
             account.transfer(10)
             assert 20 == account.currentAmount
@@ -149,7 +148,7 @@ class AtomicTest extends GroovyTestCase {
     }
 
     public void testRetry() {
-        final TxnExecutor block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
 
         def counter = newTxnInteger(0)
         final int max = 100

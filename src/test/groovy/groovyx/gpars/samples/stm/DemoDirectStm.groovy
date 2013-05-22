@@ -17,10 +17,13 @@
 package groovyx.gpars.samples.stm
 
 import org.multiverse.api.Txn
+import org.multiverse.api.callables.TxnCallable
+import org.multiverse.api.callables.TxnIntCallable
+import org.multiverse.api.callables.TxnVoidCallable
 import org.multiverse.api.references.TxnInteger
 import org.multiverse.api.references.TxnRef
 
-import static groovyx.gpars.stm.GParsStm.atomic
+import static org.multiverse.api.StmUtils.atomic
 import static org.multiverse.api.StmUtils.newTxnInteger
 import static org.multiverse.api.StmUtils.newTxnRef
 
@@ -34,22 +37,22 @@ public class MyAccount {
     final private TxnRef date = newTxnRef(new Date());
 
     public void transfer(final int a) {
-        atomic({ Txn tx ->
+        atomic({Txn tx ->
             amount.increment(a);
             date.set(new Date());
-        })
+        } as TxnVoidCallable)
     }
 
     public Date getLastModifiedDate() {
-        atomic({ Txn tx ->
+        atomic({Txn tx ->
             date.get();
-        })
+        } as TxnCallable)
     }
 
     public int getCurrentAmount() {
-        atomic({ Txn tx ->
+        atomic({Txn tx ->
             amount.get();
-        })
+        } as TxnIntCallable)
     }
 }
 
