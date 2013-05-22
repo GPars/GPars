@@ -71,7 +71,7 @@ public abstract class DataflowProcessor {
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
      * @param code     The processor's body to run each time all inputs have a value to read
      */
-    protected DataflowProcessor(final Map<String, Object> channels, final Closure code) {
+    protected DataflowProcessor(final Map<String, Object> channels, final Closure<?> code) {
         //noinspection ThisEscapedInObjectConstruction
         code.setDelegate(this);
 

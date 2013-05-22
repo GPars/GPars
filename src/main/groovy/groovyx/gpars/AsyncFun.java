@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @GroovyASTTransformationClass(classes = {AsyncFunASTTransformation.class})
 public @interface AsyncFun {
-    Class value() default GParsPoolUtil.class;
+    Class<?> value() default GParsPoolUtil.class;
 
     /**
      * Set to true to execute the closure in blocking mode.
