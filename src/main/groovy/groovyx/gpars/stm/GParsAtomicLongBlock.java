@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@ package groovyx.gpars.stm;
 
 import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.InvokerInvocationException;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.closures.AtomicLongClosure;
+import org.multiverse.api.Txn;
+import org.multiverse.api.callables.TxnLongCallable;
 
 /**
  * A default implementation of org.multiverse.api.closures.AtomicLongClosure properly handling exception propagation
  *
  * @author Vaclav Pech
  */
-final class GParsAtomicLongBlock implements AtomicLongClosure {
+final class GParsAtomicLongBlock implements TxnLongCallable {
     private final Closure code;
 
     GParsAtomicLongBlock(final Closure code) {
@@ -36,7 +36,7 @@ final class GParsAtomicLongBlock implements AtomicLongClosure {
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public long execute(final Transaction transaction) {
+    public long call(final Txn transaction) {
         try {
             return (Long) code.call(transaction);
         } catch (InvokerInvocationException e) {

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@ package groovyx.gpars.stm;
 
 import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.InvokerInvocationException;
-import org.multiverse.api.AtomicBlock;
-import org.multiverse.api.TransactionFactoryBuilder;
+import org.multiverse.api.GlobalStmInstance;
+import org.multiverse.api.TxnExecutor;
+import org.multiverse.api.TxnFactoryBuilder;
 import org.multiverse.api.exceptions.ControlFlowError;
 
 import java.lang.reflect.InvocationTargetException;
@@ -41,21 +42,22 @@ public abstract class GParsStm {
     private static final String CANNOT_CREATE_AN_ATOMIC_BLOCK_SOME_OF_THE_SPECIFIED_PARAMETERS_ARE_NOT_SUPPORTED = "Cannot create an atomic block. Some of the specified parameters are not supported. ";
 
     /**
-     * Gives access to multiverse TransactionFactoryBuilder to allow customized creation of atomic blocks
+     * Gives access to multiverse TxnFactoryBuilder to allow customized creation of atomic blocks
      */
-    public static final TransactionFactoryBuilder transactionFactory = getGlobalStmInstance().createTransactionFactoryBuilder();
+    public static final TxnFactoryBuilder transactionFactory = getGlobalStmInstance().newTxnFactoryBuilder();
 
     /**
      * The atomic block to use when no block is specified explicitly
      */
-    private static final AtomicBlock defaultAtomicBlock = transactionFactory.setFamilyName("GPars.Stm").buildAtomicBlock();
+    private static TxnExecutor defaultAtomicBlock = GlobalStmInstance.getGlobalStmInstance().newTxnFactoryBuilder().setFamilyName("GPars.Stm").newTxnExecutor();
+
 
     /**
      * A factory method to create custom atomic blocks.
      *
      * @return The newly created instance of AtomicBlock
      */
-    public static AtomicBlock createAtomicBlock() {
+    public static TxnExecutor createAtomicBlock() {
         return createAtomicBlock(Collections.<String, Object>emptyMap());
     }
 
@@ -65,8 +67,8 @@ public abstract class GParsStm {
      * @param params A map holding all values that should be specified. See the Multiverse documentation for possible values
      * @return The newly created instance of AtomicBlock
      */
-    public static AtomicBlock createAtomicBlock(final Map<String, Object> params) {
-        TransactionFactoryBuilder localFactory = transactionFactory;
+    public static TxnExecutor createAtomicBlock(final Map<String, Object> params) {
+        TxnFactoryBuilder localFactory = transactionFactory;
 
         final Set<Map.Entry<String, Object>> entries = params.entrySet();
         for (final Map.Entry<String, Object> entry : entries) {
@@ -79,15 +81,15 @@ public abstract class GParsStm {
             try {
                 final Method method;
                 if (entry.getValue().getClass().equals(Long.class)) {
-                    method = TransactionFactoryBuilder.class.getDeclaredMethod(key, Long.TYPE);
+                    method = TxnFactoryBuilder.class.getDeclaredMethod(key, Long.TYPE);
                 } else if (entry.getValue().getClass().equals(Integer.class)) {
-                    method = TransactionFactoryBuilder.class.getDeclaredMethod(key, Integer.TYPE);
+                    method = TxnFactoryBuilder.class.getDeclaredMethod(key, Integer.TYPE);
                 } else if (entry.getValue().getClass().equals(Boolean.class)) {
-                    method = TransactionFactoryBuilder.class.getDeclaredMethod(key, Boolean.TYPE);
+                    method = TxnFactoryBuilder.class.getDeclaredMethod(key, Boolean.TYPE);
                 } else {
-                    method = TransactionFactoryBuilder.class.getDeclaredMethod(key, entry.getValue().getClass());
+                    method = TxnFactoryBuilder.class.getDeclaredMethod(key, entry.getValue().getClass());
                 }
-                localFactory = (TransactionFactoryBuilder) method.invoke(localFactory, entry.getValue());
+                localFactory = (TxnFactoryBuilder) method.invoke(localFactory, entry.getValue());
             } catch (NoSuchMethodException e) {
                 throw new IllegalArgumentException(CANNOT_CREATE_AN_ATOMIC_BLOCK_SOME_OF_THE_SPECIFIED_PARAMETERS_ARE_NOT_SUPPORTED + entry.getKey(), e);
             } catch (InvocationTargetException e) {
@@ -97,7 +99,7 @@ public abstract class GParsStm {
             }
 
         }
-        return localFactory.buildAtomicBlock();
+        return localFactory.newTxnExecutor();
     }
 
     /**
@@ -118,7 +120,7 @@ public abstract class GParsStm {
      * @param <T>  The type or the return value
      * @return The result returned from the supplied code when run in a transaction
      */
-    public static <T> T atomic(final AtomicBlock block, final Closure code) {
+    public static <T> T atomic(final TxnExecutor block, final Closure code) {
         return block.execute(new GParsAtomicBlock<T>(code));
     }
 
@@ -138,7 +140,7 @@ public abstract class GParsStm {
      * @param code The code to run inside a transaction
      * @return The result returned from the supplied code when run in a transaction
      */
-    public static int atomicWithInt(final AtomicBlock block, final Closure code) {
+    public static int atomicWithInt(final TxnExecutor block, final Closure code) {
         return block.execute(new GParsAtomicIntBlock(code));
     }
 
@@ -158,7 +160,7 @@ public abstract class GParsStm {
      * @param code The code to run inside a transaction
      * @return The result returned from the supplied code when run in a transaction
      */
-    public static long atomicWithLong(final AtomicBlock block, final Closure code) {
+    public static long atomicWithLong(final TxnExecutor block, final Closure code) {
         return block.execute(new GParsAtomicLongBlock(code));
     }
 
@@ -178,7 +180,7 @@ public abstract class GParsStm {
      * @param code The code to run inside a transaction
      * @return The result returned from the supplied code when run in a transaction
      */
-    public static boolean atomicWithBoolean(final AtomicBlock block, final Closure code) {
+    public static boolean atomicWithBoolean(final TxnExecutor block, final Closure code) {
         return block.execute(new GParsAtomicBooleanBlock(code));
     }
 
@@ -198,7 +200,7 @@ public abstract class GParsStm {
      * @param code The code to run inside a transaction
      * @return The result returned from the supplied code when run in a transaction
      */
-    public static double atomicWithDouble(final AtomicBlock block, final Closure code) {
+    public static double atomicWithDouble(final TxnExecutor block, final Closure code) {
         return block.execute(new GParsAtomicDoubleBlock(code));
     }
 
@@ -216,7 +218,7 @@ public abstract class GParsStm {
      *
      * @param code The code to run inside a transaction
      */
-    public static void atomicWithVoid(final AtomicBlock block, final Closure code) {
+    public static void atomicWithVoid(final TxnExecutor block, final Closure code) {
         block.execute(new GParsAtomicVoidBlock(code));
     }
 
