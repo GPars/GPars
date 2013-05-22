@@ -16,15 +16,16 @@
 
 package groovyx.gpars.samples.stm
 
-import org.multiverse.api.Transaction
-import org.multiverse.api.closures.AtomicClosure
-import org.multiverse.api.closures.AtomicIntClosure
-import org.multiverse.api.closures.AtomicVoidClosure
-import org.multiverse.api.references.IntRef
-import org.multiverse.api.references.Ref
-import static org.multiverse.api.StmUtils.execute
-import static org.multiverse.api.StmUtils.newIntRef
-import static org.multiverse.api.StmUtils.newRef
+import org.multiverse.api.Txn
+import org.multiverse.api.callables.TxnCallable
+import org.multiverse.api.callables.TxnIntCallable
+import org.multiverse.api.callables.TxnVoidCallable
+import org.multiverse.api.references.TxnInteger
+import org.multiverse.api.references.TxnRef
+
+import static org.multiverse.api.StmUtils.atomic
+import static org.multiverse.api.StmUtils.newTxnInteger
+import static org.multiverse.api.StmUtils.newTxnRef
 
 /**
  * Shows how to call Multiverse directly
@@ -32,26 +33,26 @@ import static org.multiverse.api.StmUtils.newRef
 
 
 public class MyAccount {
-    private final IntRef amount = newIntRef(0);
-    final private Ref date = newRef(new Date());
+    private final TxnInteger amount = newTxnInteger(0);
+    final private TxnRef date = newTxnRef(new Date());
 
     public void transfer(final int a) {
-        execute({Transaction tx ->
+        atomic({Txn tx ->
             amount.increment(a);
             date.set(new Date());
-        } as AtomicVoidClosure)
+        } as TxnVoidCallable)
     }
 
     public Date getLastModifiedDate() {
-        execute({Transaction tx ->
+        atomic({Txn tx ->
             date.get();
-        } as AtomicClosure)
+        } as TxnCallable)
     }
 
     public int getCurrentAmount() {
-        execute({Transaction tx ->
+        atomic({Txn tx ->
             amount.get();
-        } as AtomicIntClosure)
+        } as TxnIntCallable)
     }
 }
 
