@@ -17,13 +17,14 @@
 package groovyx.gpars.samples.stm
 
 import groovyx.gpars.stm.GParsStm
-import org.multiverse.api.AtomicBlock
 import org.multiverse.api.PropagationLevel
-import static org.multiverse.api.StmUtils.newIntRef
+import org.multiverse.api.TxnExecutor
 
-final AtomicBlock block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+import static org.multiverse.api.StmUtils.newTxnInteger
 
-def counter = newIntRef(0)
+final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+
+def counter = newTxnInteger(0)
 final int max = 100
 Thread.start {
     while (counter.atomicGet() < max) {

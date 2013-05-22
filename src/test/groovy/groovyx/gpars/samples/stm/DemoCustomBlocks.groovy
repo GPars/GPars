@@ -17,16 +17,17 @@
 package groovyx.gpars.samples.stm
 
 import groovyx.gpars.stm.GParsStm
-import org.multiverse.api.AtomicBlock
 import org.multiverse.api.PropagationLevel
-import org.multiverse.api.references.IntRef
-import static org.multiverse.api.StmUtils.newIntRef
+import org.multiverse.api.TxnExecutor
+import org.multiverse.api.references.TxnInteger
+
+import static org.multiverse.api.StmUtils.newTxnInteger
 
 public class CustomAccount {
-    private final IntRef amount = newIntRef(0);
+    private final TxnInteger amount = newTxnInteger(0);
 
-    private static AtomicBlock writeBlock = GParsStm.createTxnExecutor(familyName: 'Write', PropagationLevel: PropagationLevel.Requires)
-    private static AtomicBlock readBlock = GParsStm.createTxnExecutor(readonly: true, PropagationLevel: PropagationLevel.RequiresNew, familyName: 'Read')
+    private static TxnExecutor writeBlock = GParsStm.createTxnExecutor(familyName: 'Write', PropagationLevel: PropagationLevel.Requires)
+    private static TxnExecutor readBlock = GParsStm.createTxnExecutor(readonly: true, PropagationLevel: PropagationLevel.RequiresNew, familyName: 'Read')
 
     public void transfer(final int a) {
         GParsStm.atomic(writeBlock) {
