@@ -26,10 +26,10 @@ import org.multiverse.api.callables.TxnCallable;
  *
  * @author Vaclav Pech
  */
-final class GParsAtomicBlock<T> implements TxnCallable<T> {
+final class GParsTxnExecutor<T> implements TxnCallable<T> {
     private final Closure code;
 
-    GParsAtomicBlock(final Closure code) {
+    GParsTxnExecutor(final Closure code) {
         if (code == null) throw new IllegalArgumentException(GParsStm.THE_CODE_FOR_AN_ATOMIC_BLOCK_MUST_NOT_BE_NULL);
         this.code = code;
     }

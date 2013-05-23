@@ -27,7 +27,7 @@ import static org.multiverse.api.StmUtils.newTxnInteger
  * @author Vaclav Pech
  */
 class AtomicTest extends GroovyTestCase {
-    public void testAtomicBlock() {
+    public void testTxnExecutor() {
         final Account account = new Account()
         account.transfer(10)
         def t1 = Thread.start {
@@ -41,7 +41,7 @@ class AtomicTest extends GroovyTestCase {
         assert 260 == account.currentAmount
     }
 
-    public void testAtomicBlockException() {
+    public void testTxnExecutorException() {
         final Account account = new Account()
         account.transfer(10)
         shouldFail(IllegalArgumentException) {
@@ -64,7 +64,7 @@ class AtomicTest extends GroovyTestCase {
         assert 480 == account.currentAmount
     }
 
-    public void testSingleCustomAtomicBlock() {
+    public void testSingleCustomTxnExecutor() {
         final Account account = new Account()
         final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
         GParsStm.atomic(block) {
@@ -109,7 +109,7 @@ class AtomicTest extends GroovyTestCase {
         }
     }
 
-    public void testCustomAtomicBlock() {
+    public void testCustomTxnExecutor() {
         final Account account = new Account()
         final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
 
@@ -129,7 +129,7 @@ class AtomicTest extends GroovyTestCase {
         assert 220 == account.currentAmount
     }
 
-    public void testCustomAtomicBlockWithTimeout() {
+    public void testCustomTxnExecutorWithTimeout() {
         final Account account = new Account()
         final TxnExecutor block = GParsStm.createTxnExecutor(timeoutNs: 1000L, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
         GParsStm.atomic(block) {
@@ -138,7 +138,7 @@ class AtomicTest extends GroovyTestCase {
         }
     }
 
-    public void testCustomAtomicBlockWithInvalidParameters() {
+    public void testCustomTxnExecutorWithInvalidParameters() {
         shouldFail(IllegalArgumentException) {
             GParsStm.createTxnExecutor(familyNam: 'Custom')
         }

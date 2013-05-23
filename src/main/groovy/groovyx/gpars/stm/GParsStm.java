@@ -54,19 +54,19 @@ public abstract class GParsStm {
     /**
      * A factory method to create custom atomic blocks.
      *
-     * @return The newly created instance of AtomicBlock
+     * @return The newly created instance of TxnExecutor
      */
-    public static TxnExecutor createAtomicBlock() {
-        return createAtomicBlock(Collections.<String, Object>emptyMap());
+    public static TxnExecutor createTxnExecutor() {
+        return createTxnExecutor(Collections.<String, Object>emptyMap());
     }
 
     /**
      * A factory method to create custom atomic blocks allowing the caller to set desired transactional characteristics.
      *
      * @param params A map holding all values that should be specified. See the Multiverse documentation for possible values
-     * @return The newly created instance of AtomicBlock
+     * @return The newly created instance of TxnExecutor
      */
-    public static TxnExecutor createAtomicBlock(final Map<String, Object> params) {
+    public static TxnExecutor createTxnExecutor(final Map<String, Object> params) {
         TxnFactoryBuilder localFactory = transactionFactory;
 
         final Set<Map.Entry<String, Object>> entries = params.entrySet();
@@ -109,7 +109,7 @@ public abstract class GParsStm {
      * @return The result returned from the supplied code when run in a transaction
      */
     public static <T> T atomic(final Closure code) {
-        return defaultTxnExecutor.execute(new GParsAtomicBlock<T>(code));
+        return defaultTxnExecutor.execute(new GParsTxnExecutor<T>(code));
     }
 
     /**
@@ -120,7 +120,7 @@ public abstract class GParsStm {
      * @return The result returned from the supplied code when run in a transaction
      */
     public static <T> T atomic(final TxnExecutor block, final Closure code) {
-        return block.execute(new GParsAtomicBlock<T>(code));
+        return block.execute(new GParsTxnExecutor<T>(code));
     }
 
     /**
