@@ -35,12 +35,12 @@ import java.util.UUID;
  * </p>
  * <p>
  * Local host contains
+ * </p>
  * <ul>
  *   <li>remote hosts connected with this one</li>
  *   <li>remote nodes known to this host</li>
  *   <li>local nodes available on this host</li>
  * </ul>
- * </p>
  *
  * @author Alex Tkachman
  */

@@ -33,7 +33,7 @@ import groovyx.gpars.dataflow.stream.SyncDataflowStream;
  * DataflowWriteChannel broadcastStream = new DataflowBroadcast()
  * DataflowReadChannel stream1 = broadcastStream.createReadChannel()
  * DataflowReadChannel stream2 = broadcastStream.createReadChannel()
- * broadcastStream << 'Message'
+ * broadcastStream &lt;&lt; 'Message'
  * assert stream1.val == stream2.val
  * </pre>
  *

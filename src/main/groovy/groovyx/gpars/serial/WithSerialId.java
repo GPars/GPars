@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-2010, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,14 +23,14 @@ import java.io.Serializable;
  * Base class for objects which can be exposed to remote nodes via serialization.
  * <p>
  * Main concept is following:
- * <ol>
+ * </p>
+ * <ul>
  *   <li>each object belongs to some LocalHost</li>
  *   <li>every object can be exposed to any {@link groovyx.gpars.remote.RemoteHost}</li>
  *   <li>on remote host object is represented by proxy usually called remote object</li>
  *   <li>for serialization we use writeReplace method, which creates special handle to be serialized instead of the object</li>
  *   <li>for deserialization handle's readResolve method creates remote object (proxy)</li>
- * </ol>
- * </p>
+ * </ul>
  * <p>
  * See {@link java.io.Serializable} for detailed description how methods writeReplace &amp; readResolve works.
  * </p>

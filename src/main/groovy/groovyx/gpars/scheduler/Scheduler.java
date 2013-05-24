@@ -24,12 +24,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Prototype of self-regulated thread pooled scheduler
  * <p>
- * Self regulation happened according to following rules
- * <ol>
+ * Self regulation happened according to following rules:
+ * </p>
+ * <ul>
  *   <li>worker thread, which had nothing to do 10 seconds dies</li>
  *   <li>if no tasks were taken for processing during last 0.5sec new worker starts</li>
- * </ol>
- * </p.>
+ * </ul>
  */
 public final class Scheduler implements Pool {
     private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();

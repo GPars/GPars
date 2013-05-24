@@ -27,7 +27,7 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 /**
- * Represents a thread-safe synchronous data flow stream. Values or DataflowVariables are added using the '<<' operator
+ * Represents a thread-safe synchronous data flow stream. Values or DataflowVariables are added using the '&lt;&lt;' operator
  * and safely read once available using the 'val' property.
  * The iterative methods like each(), collect(), iterator(), any(), all() or the for loops work with snapshots
  * of the stream at the time of calling the particular method.

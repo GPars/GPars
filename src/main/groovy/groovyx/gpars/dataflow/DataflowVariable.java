@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Represents a thread-safe single-assignment, multi-read variable.
  * Each instance of DataflowVariable can be read repeatedly any time using the 'val' property and assigned once
- * in its lifetime using the '<<' operator. Reads preceding assignment will be blocked until the value
+ * in its lifetime using the '&lt;&lt;' operator. Reads preceding assignment will be blocked until the value
  * is assigned.
  * For actors and Dataflow Operators the asynchronous non-blocking variants of the getValAsync() methods can be used.
  * They register the request to read a value and will send a message to the actor or operator once the value is available.

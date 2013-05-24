@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Represents a thread-safe single-assignment, multi-read variable with delayed initialization.
  * Each instance of DataflowVariable can be read repeatedly any time using the 'val' property and assigned once
- * in its lifetime using the '<<' operator. Reads preceding assignment will be blocked until the value
+ * in its lifetime using the '&lt;&lt;' operator. Reads preceding assignment will be blocked until the value
  * is assigned.
  * For actors and Dataflow Operators the asynchronous non-blocking variants of the getValAsync() methods can be used.
  * They register the request to read a value and will send a message to the actor or operator once the value is available.
