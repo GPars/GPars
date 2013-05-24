@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@
 package groovyx.gpars.samples.stm
 
 import groovyx.gpars.stm.GParsStm
-import org.multiverse.api.references.IntRef
-import static org.multiverse.api.StmUtils.newIntRef
+import org.multiverse.api.references.TxnInteger
+
+import static org.multiverse.api.StmUtils.newTxnInteger
 
 public class Account {
-    private final IntRef amount = newIntRef(0);
+    private final TxnInteger amount = newTxnInteger(0);
 
     public void transfer(final int a) {
         GParsStm.atomic {

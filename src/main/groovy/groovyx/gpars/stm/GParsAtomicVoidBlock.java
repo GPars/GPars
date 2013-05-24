@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@ package groovyx.gpars.stm;
 
 import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.InvokerInvocationException;
-import org.multiverse.api.Transaction;
-import org.multiverse.api.closures.AtomicVoidClosure;
+import org.multiverse.api.Txn;
+import org.multiverse.api.callables.TxnVoidCallable;
 
 /**
  * A default implementation of org.multiverse.api.closures.AtomicVoidClosure properly handling exception propagation
  *
  * @author Vaclav Pech
  */
-final class GParsAtomicVoidBlock implements AtomicVoidClosure {
+final class GParsAtomicVoidBlock implements TxnVoidCallable {
     private final Closure code;
 
     GParsAtomicVoidBlock(final Closure code) {
@@ -36,7 +36,7 @@ final class GParsAtomicVoidBlock implements AtomicVoidClosure {
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public void execute(final Transaction transaction) {
+    public void call(final Txn transaction) {
         try {
             code.call(transaction);
         } catch (InvokerInvocationException e) {

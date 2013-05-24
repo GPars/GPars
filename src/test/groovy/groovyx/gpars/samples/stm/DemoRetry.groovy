@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,13 +17,14 @@
 package groovyx.gpars.samples.stm
 
 import groovyx.gpars.stm.GParsStm
-import org.multiverse.api.AtomicBlock
 import org.multiverse.api.PropagationLevel
-import static org.multiverse.api.StmUtils.newIntRef
+import org.multiverse.api.TxnExecutor
 
-final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+import static org.multiverse.api.StmUtils.newTxnInteger
 
-def counter = newIntRef(0)
+final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+
+def counter = newTxnInteger(0)
 final int max = 100
 Thread.start {
     while (counter.atomicGet() < max) {
@@ -31,7 +32,7 @@ Thread.start {
         sleep 10
     }
 }
-assert max + 1 == GParsStm.atomicWithInt(block) {tx ->
+assert max + 1 == GParsStm.atomicWithInt(block) { tx ->
     if (counter.get() == max) return counter.get() + 1
     tx.retry()
 }
