@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -287,6 +287,7 @@ final class Parallel {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
+    @Deprecated
     public def foldParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             GParsPoolUtil.foldParallel(getRealSelf(), cl)
@@ -303,7 +304,39 @@ final class Parallel {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * @param seed A seed value to initialize the operation
      */
+    @Deprecated
     public def foldParallel(seed, Closure cl) {
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.foldParallel(getRealSelf(), seed, cl)
+        }
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its reduce() method using the supplied
+     * closure as the reduction operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
+     */
+    public def injectParallel(Closure cl) {
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.foldParallel(getRealSelf(), cl)
+        }
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its reduce() method using the supplied
+     * closure as the reduction operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
+     * @param seed A seed value to initialize the operation
+     */
+    public def injectParallel(seed, Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             GParsPoolUtil.foldParallel(getRealSelf(), seed, cl)
         }
@@ -323,7 +356,7 @@ final class Parallel {
     /**
      * Indicates, whether the iterative methods like each() or collect() have been made parallel.
      */
-    public def boolean isConcurrent() {return false}
+    public def boolean isConcurrent() { return false }
 
     /**
      * Overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class

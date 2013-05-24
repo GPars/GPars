@@ -9562,6 +9562,13 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/multiverse/multiverse-beta/0.7-RC-1/multiverse-beta-0.7-RC-1-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Maven: org.multiverse:multiverse-core:0.7">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/multiverse/multiverse-core/0.7.0/multiverse-core-0.7.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="Maven: org.spockframework:spock-core:0.7-groovy-2.0">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/spockframework/spock-core/0.7-groovy-2.0/spock-core-0.7-groovy-2.0.jar!/" />

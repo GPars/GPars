@@ -13,6 +13,8 @@ h3. Asynchronous functions
 
 h3. Parallel collections
 
+* Deprecated foldParallel, renamed to injectParallel
+
 h3. Fork / Join
 
 h3. Actors
@@ -24,6 +26,8 @@ h3. Dataflow
 h3. Agent
 
 h3. Stm
+
+* Updated to the latest 0.7.0 GA version of Multiverse
 
 h3. Other
 

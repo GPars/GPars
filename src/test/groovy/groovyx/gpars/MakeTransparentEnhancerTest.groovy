@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance items
-        items.makeConcurrent().collect {it * 2}.findAll {it > 1}.each {
+        items.makeConcurrent().collect { it * 2 }.findAll { it > 1 }.each {
             Thread.sleep 500
             map[Thread.currentThread()] = ''
         }
@@ -145,7 +145,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeConcurrent().groupBy {it % 2}.each {
+        items.makeConcurrent().groupBy { it % 2 }.each {
             Thread.sleep 500
             map[Thread.currentThread()] = ''
         }
@@ -156,7 +156,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = 'abcde'
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeConcurrent().collect {it * 2}.findAll {it.size() > 1}.each {
+        items.makeConcurrent().collect { it * 2 }.findAll { it.size() > 1 }.each {
             Thread.sleep 500
             map[Thread.currentThread()] = ''
         }
@@ -167,7 +167,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5].iterator()
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeConcurrent().collect {it * 2}.findAll {it > 1}.each {
+        items.makeConcurrent().collect { it * 2 }.findAll { it > 1 }.each {
             Thread.sleep 500
             map[Thread.currentThread()] = ''
         }
@@ -185,7 +185,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
     private def foo(Collection c) {
         final Map map = new ConcurrentHashMap()
-        c.collect {it * 2}.findAll {it > 1}.each {
+        c.collect { it * 2 }.findAll { it > 1 }.each {
             Thread.sleep 50
             map[Thread.currentThread()] = ''
         }
@@ -196,7 +196,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeConcurrent().min {a, b ->
+        items.makeConcurrent().min { a, b ->
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return a - b
@@ -208,7 +208,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeConcurrent().max {a, b ->
+        items.makeConcurrent().max { a, b ->
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return a - b
@@ -234,27 +234,27 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
     }
 
     public void testSplit() {
-        def result = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeConcurrent().split {it > 2}
+        def result = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeConcurrent().split { it > 2 }
         assert [3, 4, 5] as Set == result[0] as Set
         assert [1, 2] as Set == result[1] as Set
         assert 2 == result.size()
-        assert [[], []] == ParallelEnhancer.enhanceInstance([]).makeConcurrent().split {it > 2}
-        result = ParallelEnhancer.enhanceInstance([3]).makeConcurrent().split {it > 2}
+        assert [[], []] == ParallelEnhancer.enhanceInstance([]).makeConcurrent().split { it > 2 }
+        result = ParallelEnhancer.enhanceInstance([3]).makeConcurrent().split { it > 2 }
         assert [[3], []] == result
-        result = ParallelEnhancer.enhanceInstance([1]).makeConcurrent().split {it > 2}
+        result = ParallelEnhancer.enhanceInstance([1]).makeConcurrent().split { it > 2 }
         assert [[], [1]] == result
     }
 
     public void testSplitOnString() {
-        def result = ParallelEnhancer.enhanceInstance(new String('abc')).makeConcurrent().split {it == 'b'}
+        def result = ParallelEnhancer.enhanceInstance(new String('abc')).makeConcurrent().split { it == 'b' }
         assert ['b'] as Set == result[0] as Set
         assert ['a', 'c'] as Set == result[1] as Set
         assert 2 == result.size()
-        result = ParallelEnhancer.enhanceInstance('').makeConcurrent().split {it == 'b'}
+        result = ParallelEnhancer.enhanceInstance('').makeConcurrent().split { it == 'b' }
         assert [[], []] == result
-        result = ParallelEnhancer.enhanceInstance('b').makeConcurrent().split {it == 'b'}
+        result = ParallelEnhancer.enhanceInstance('b').makeConcurrent().split { it == 'b' }
         assert [['b'], []] == result
-        result = ParallelEnhancer.enhanceInstance('a').makeConcurrent().split {it == 'b'}
+        result = ParallelEnhancer.enhanceInstance('a').makeConcurrent().split { it == 'b' }
         assert [[], ['a']] == result
     }
 
@@ -262,7 +262,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeConcurrent().fold {a, b ->
+        items.makeConcurrent().inject { a, b ->
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return a + b
@@ -274,7 +274,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeConcurrent().fold(10) {a, b ->
+        items.makeConcurrent().inject(10) { a, b ->
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return a + b

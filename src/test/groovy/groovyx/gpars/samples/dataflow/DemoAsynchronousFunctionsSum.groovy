@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataflowVariable
+
 import static groovyx.gpars.GParsPool.withPool
 
 /**
@@ -28,7 +29,7 @@ import static groovyx.gpars.GParsPool.withPool
  * @author Vaclav Pech
  */
 
-def asyncPlus = {a, b ->
+def asyncPlus = { a, b ->
     def result = new DataflowVariable()
     a >> {
         b >> {
@@ -40,15 +41,15 @@ def asyncPlus = {a, b ->
 
 def range = 0..100000
 withPool {
-    def result = range.collectParallel {new DataflowVariable() << it}.parallel.reduce(asyncPlus)
+    def result = range.collectParallel { new DataflowVariable() << it }.parallel.reduce(asyncPlus)
     println "Doing something else while the calculation is running"
     println result.val
 
-    result = range.collectParallel {new DataflowVariable() << it}.foldParallel(asyncPlus)
+    result = range.collectParallel { new DataflowVariable() << it }.injectParallel(asyncPlus)
     println "Doing something else while the calculation is running"
     println result.val
 }
 
-def result = range.collect {new DataflowVariable() << it}.inject(new DataflowVariable() << 0, asyncPlus)
+def result = range.collect { new DataflowVariable() << it }.inject(new DataflowVariable() << 0, asyncPlus)
 println "Doing something else while the calculation is running"
 println result.val
