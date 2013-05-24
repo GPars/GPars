@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * A {@link java.util.ConcurrentMap} supporting user-defined
+ * A { @link java.util.ConcurrentMap} supporting user-defined
  * equivalence comparisons, soft, weak, or strong keys and values, and
  * user-supplied computational methods for setting and updating
  * values. In particular: <ul>
@@ -104,7 +104,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * collections may violate the specifications of {@code Map} and/or
  * {@code Set} interfaces, which mandate the use of the
  * {@code equals} method when comparing objects.  The methods of this
- * class otherwise have properties similar to those of {@link
+ * class otherwise have properties similar to those of { @link
  * java.util.ConcurrentHashMap} under its default settings.  To
  * adaptively maintain semantics and performance under varying
  * conditions, this class does <em>not</em> support load factor or
