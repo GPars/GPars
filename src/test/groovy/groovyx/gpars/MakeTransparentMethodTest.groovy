@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeConcurrent().eachWithIndex {e, i ->
+            items.makeConcurrent().eachWithIndex { e, i ->
                 barrier.await()
                 map[Thread.currentThread()] = ''
             }
@@ -191,7 +191,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
-            items.makeConcurrent().min {a, b ->
+            items.makeConcurrent().min { a, b ->
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return a - b
@@ -204,7 +204,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
-            items.makeConcurrent().max {a, b ->
+            items.makeConcurrent().max { a, b ->
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return a - b
@@ -235,29 +235,29 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testSplit() {
         GParsPool.withPool(5) {
-            def result = [1, 2, 3, 4, 5].makeConcurrent().split {it > 2}
+            def result = [1, 2, 3, 4, 5].makeConcurrent().split { it > 2 }
             assert [3, 4, 5] as Set == result[0] as Set
             assert [1, 2] as Set == result[1] as Set
             assert 2 == result.size()
-            assert [[], []] == [].makeConcurrent().split {it > 2}
-            result = [3].makeConcurrent().split {it > 2}
+            assert [[], []] == [].makeConcurrent().split { it > 2 }
+            result = [3].makeConcurrent().split { it > 2 }
             assert [[3], []] == result
-            result = [1].makeConcurrent().split {it > 2}
+            result = [1].makeConcurrent().split { it > 2 }
             assert [[], [1]] == result
         }
     }
 
     public void testSplitOnString() {
         GParsPool.withPool(5) {
-            def result = new String('abc').makeConcurrent().split {it == 'b'}
+            def result = new String('abc').makeConcurrent().split { it == 'b' }
             assert ['b'] as Set == result[0] as Set
             assert ['a', 'c'] as Set == result[1] as Set
             assert 2 == result.size()
-            result = ''.makeConcurrent().split {it == 'b'}
+            result = ''.makeConcurrent().split { it == 'b' }
             assert [[], []] == result
-            result = 'b'.makeConcurrent().split {it == 'b'}
+            result = 'b'.makeConcurrent().split { it == 'b' }
             assert [['b'], []] == result
-            result = 'a'.makeConcurrent().split {it == 'b'}
+            result = 'a'.makeConcurrent().split { it == 'b' }
             assert [[], ['a']] == result
         }
     }
@@ -266,7 +266,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
-            items.makeConcurrent().fold {a, b ->
+            items.makeConcurrent().inject { a, b ->
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return a + b
@@ -279,7 +279,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
-            items.makeConcurrent().fold(10) {a, b ->
+            items.makeConcurrent().inject(10) { a, b ->
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return a + b
