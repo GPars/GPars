@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,9 +25,10 @@ import java.util.List;
 
 /**
  * An selector's internal actor. Repeatedly polls inputs and once they're all available it performs the selector's body.
- * <p/>
+ * <p>
  * Iteratively waits for values on the inputs.
  * Once all a value is available (received as a message), the selector's body is run.
+ * </p>
  *
  * @author Vaclav Pech
  */

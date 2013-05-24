@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008--2011  The original author or authors
+// Copyright © 2008--2011, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -183,8 +183,9 @@ public class GParsPoolUtil {
      * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
      * may not necessarily be able to benefit from each other's cached return value. With this having been mentioned,
      * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
-     * <p/>
+     * <p>
      * The cache gets garbage-collected together with the memoized closure.
+     * </p>
      *
      * @return A new function forwarding to the original one while caching the results
      */
@@ -202,8 +203,9 @@ public class GParsPoolUtil {
      * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
      * may not necessarily be able to benefit from each other's cached return value. With this having been mentioned,
      * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
-     * <p/>
+     * <p>
      * The cache gets garbage-collected together with the memoized closure.
+     * </p>
      *
      * @param maxCacheSize The maximum size the cache can grow to
      * @return A new function forwarding to the original one while caching the results
@@ -231,8 +233,9 @@ public class GParsPoolUtil {
      * may not necessarily be able to benefit from each other's cached return value. Also the protectedCacheSize parameter
      * might not be respected accurately in such scenarios for some periods of time. With this having been mentioned,
      * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
-     * <p/>
+     * <p>
      * The cache gets garbage-collected together with the memoized closure.
+     * </p>
      */
     public static <T> Closure<T> gmemoizeAtLeast(final Closure<T> cl, final int protectedCacheSize) {
         if (protectedCacheSize < 0)
@@ -259,8 +262,9 @@ public class GParsPoolUtil {
      * may not necessarily be able to benefit from each other's cached return value. Also the protectedCacheSize parameter
      * might not be respected accurately in such scenarios for some periods of time. With this having been mentioned,
      * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
-     * <p/>
+     * <p>
      * The cache gets garbage-collected together with the memoized closure.
+     * </p>
      */
     public static <T> Closure<T> gmemoizeBetween(final Closure<T> cl, final int protectedCacheSize, final int maxCacheSize) {
         if (protectedCacheSize < 0)

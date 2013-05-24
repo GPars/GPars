@@ -20,7 +20,7 @@ import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 /**
- * Represents a {a, b -> a + b} closure
+ * Represents a {a, b -&gt; a + b} closure
  *
  * @author Vaclav Pech
  */

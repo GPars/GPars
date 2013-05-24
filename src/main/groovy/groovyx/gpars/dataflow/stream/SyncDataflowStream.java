@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,14 +32,16 @@ import java.util.concurrent.TimeUnit;
  * On the other hand in offers handy methods for value filtering or transformation together with interesting performance characteristics.
  * For convenience and for the ability to use SyncDataflowStream with other dataflow constructs, like e.g. operators,
  * you can wrap SyncDataflowStreams with DataflowReadAdapter for read access or DataflowWriteAdapter for write access.
- * <p/>
+ * <p>
  * The SyncDataflowStream class is designed for single-threaded producers and consumers. If multiple threads are supposed to read or write values
  * to the stream, their access to the stream must be serialized externally or the adapters should be used.
- * <p/>
+ * </p>
+ * <p>
  * SyncDataflowStream uses SyncDataflowVariables to preform the actual data exchange. Unlike DataflowStream, which exchanges data
  * in asynchronous manner, SyncDataflowStream is synchronous. The writer as well as the readers are blocked until all the required
  * parties become ready for the data exchange. Writers can thus never get too far ahead of readers and also all the readers themselves
  * are always processing the same message in parallel and wait for one-another before getting the next one.
+ * </p>
  *
  * @param <T> Type for values to pass through the stream
  * @author Vaclav Pech
@@ -149,4 +151,3 @@ public final class SyncDataflowStream<T> extends StreamCore<T> {
         ((SyncDataflowVariable) first).decrementParties();
     }
 }
-

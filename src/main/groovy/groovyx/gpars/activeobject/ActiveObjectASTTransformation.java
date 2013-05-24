@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2011, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,10 +47,11 @@ import java.util.List;
 
 /**
  * Transforms active objects so that their active methods can be invoked asynchronously through an internal actor.
+ * <p>
+ * Inspired by org.codehaus.groovy.transform.LogASTTransformation
+ * </p>
  *
  * @author Vaclav Pech
- *         <p/>
- *         Inspired by org.codehaus.groovy.transform.LogASTTransformation
  */
 @SuppressWarnings({"CallToStringEquals"})
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
@@ -253,5 +254,3 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
         }
     }
 }
-
-

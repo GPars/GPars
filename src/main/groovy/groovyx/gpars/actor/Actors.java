@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,18 +28,21 @@ import groovyx.gpars.group.DefaultPGroup;
  *
  * Actors.defaultActorPGroup.resize 1
  *
- * def actor = actor {*     react {message -&gt;
+ * def actor = actor {
+ *     react {message -&gt;
  *         println message
- * }*     //this line will never be reached
+ *     }
+ *     // this line will never be reached
  * }.start()
  *
  * actor.send 'Hi!'
  * </pre>
- * <p/>
+ * <p>
  * All actors created through the Actors class will belong to the same default actor group and run
  * on daemon threads.
  * The DefaultPGroup class should be used when actors need to be grouped into multiple groups or when non-daemon
  * threads are to be used.
+ * </p>
  *
  * @author Vaclav Pech, Alex Tkachman
  *         Date: Feb 18, 2009

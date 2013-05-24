@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008--2011  The original author or authors
+// Copyright © 2008--2011, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ import java.util.List;
  * Implements the ForkJoin worker contract.
  * Subclasses need to implement the compute() to perform the actual Fork/Join algorithm leveraging the options
  * provided by the AbstractForkJoinWorker class. The AbstractForJoinWorker class takes care of the child sub-processes.
- * <p/>
- * Author: Vaclav Pech
+ *
+ * @author Vaclav Pech
  * Date: Nov 1, 2009
  */
 public abstract class AbstractForkJoinWorker<T> extends RecursiveTask<T> {

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-2010, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,8 +23,9 @@ import java.util.LinkedList;
  * An implementation of the message queue for actor and agent messaging.
  * It leverages the fact that in any moment there's only one reading thread accessing the queue
  * and that potential read thread swap at the actor or agent thread pool synchronizes thread memory.
- * <p/>
+ * <p>
  * We also count on writers not to call the isEmpty() method
+ * </p>
  *
  * @author Vaclav Pech
  */

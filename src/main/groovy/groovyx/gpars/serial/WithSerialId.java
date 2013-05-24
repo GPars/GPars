@@ -21,19 +21,24 @@ import java.io.Serializable;
 
 /**
  * Base class for objects which can be exposed to remote nodes via serialization.
- * <p/>
+ * <p>
  * Main concept is following:
- * - each object belongs to some LocalHost
- * - every object can be exposed to any {@link groovyx.gpars.remote.RemoteHost}
- * - on remote host object is represented by proxy usually called remote object
- * - for serialization we use writeReplace method, which creates special handle to be serialized instead of the object
- * - for deserialization handle's readResolve method creates remote object (proxy)
- * <p/>
- * See {@link java.io.Serializable} for detailed description how methods writeReplace & readResolve works.
- * <p/>
+ * <ol>
+ *   <li>each object belongs to some LocalHost</li>
+ *   <li>every object can be exposed to any {@link groovyx.gpars.remote.RemoteHost}</li>
+ *   <li>on remote host object is represented by proxy usually called remote object</li>
+ *   <li>for serialization we use writeReplace method, which creates special handle to be serialized instead of the object</li>
+ *   <li>for deserialization handle's readResolve method creates remote object (proxy)</li>
+ * </ol>
+ * </p>
+ * <p>
+ * See {@link java.io.Serializable} for detailed description how methods writeReplace &amp; readResolve works.
+ * </p>
+ * <p>
  * It is very important to know that (de)serialization never happens by itself but
  * always happens in context of {@link groovyx.gpars.remote.RemoteHost} and (@link LocalHost}.
  * Such context is used for right resolution/transformation of objects
+ * </p>
  *
  * @author Alex Tkachman
  */

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2011, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,12 +30,13 @@ import java.util.concurrent.CountDownLatch;
  * It can either pick a channel randomly, when using the plain select method, or with precedence towards channels with lower position indexes,
  * when the prioritySelect method is used.
  * If a value is not available immediately in any of the channels, Select will wait for the first value to arrive in any of the channels.
- * <p/>
+ * <p>
  * Both 'select' and 'prioritySelect' methods come in two flavours - blocking, which wait till a value is available in a channel,
  * and messaging, which send out a message to the specified message handler, as soon as a message is available.
  * Optionally, all methods allow the user to specify a boolean mask, assigning each select 's input channel a flag indicating,
  * whether it should be included in the select operation. This is useful when handling state to selectively block some inputs
  * in some states.
+ *</p>
  *
  * @author Vaclav Pech
  *         Date: 30th Sep 2010

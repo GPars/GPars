@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-2010, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,8 +32,9 @@ import java.util.UUID;
 /**
  * Weak reference to object, which was serialized to remote hosts.
  * Also keep ids of all hosts, where the object was serialized.
- * <p/>
+ * <p>
  * While subscribed by remote nodes it keeps object alive by holding strong reference (anchor) to it
+ * </p>
  *
  * @author Alex Tkachman
  */

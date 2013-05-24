@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-2010, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,14 +29,18 @@ import java.util.UUID;
 /**
  * Represents communication point with other local hosts.
  * Usually it is enough to have one LocalHost per JVM but it is possible to have several.
- * <p/>
+ * <p>
  * It can be one or several local nodes hosted on local host. For most applications one should be enough
  * but sometimes several can be useful as well.
- * <p/>
+ * </p>
+ * <p>
  * Local host contains
- * - remote hosts connected with this one
- * - remote nodes known to this host
- * - local nodes available on this host
+ * <ul>
+ *   <li>remote hosts connected with this one</li>
+ *   <li>remote nodes known to this host</li>
+ *   <li>local nodes available on this host</li>
+ * </ul>
+ * </p>
  *
  * @author Alex Tkachman
  */

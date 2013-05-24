@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,11 +34,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * into new values written to the output channels.
  * The output channels at the same time are suitable to be used as input channels by some other dataflow processors.
  * The channels allow processors to communicate.
- * <p/>
+ * <p>
  * Dataflow selectors and operators enable creation of highly concurrent applications yet the abstraction hides the low-level concurrency primitives
  * and exposes much friendlier API.
  * Since selectors and operators internally leverage the actor implementation, they reuse a pool of threads and so the actual number of threads
  * used by the calculation can be kept much lower than the actual number of processors used in the network.
+ * </p>
  *
  * @author Vaclav Pech
  *         Date: Sep 9, 2009
@@ -202,10 +203,11 @@ public abstract class DataflowProcessor {
     /**
      * Used by the processor's body to send a value to all output channels. The values passed as arguments will each be sent
      * to an output channel with identical position index.
-     * <p/>
+     * <p>
      * If the maxForks value is set to a value greater than 1, calls to bindAllOutputs may result in values written to different
      * channels to be in different order. If this is a problem for the application logic, the bindAllOutputsAtomically
      * method should be considered instead.
+     * </p>
      *
      * @param values Values to send to output channels of the same position index
      */
