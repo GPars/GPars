@@ -951,6 +951,7 @@
         <inspection_tool class="VoidMethodAnnotatedWithGET" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="W3CssValidation" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="myCssVersion" value="css3" />
+          <option name="myIgnoreVendorSpecificProperties" value="false" />
         </inspection_tool>
         <inspection_tool class="WSReferenceInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="WeakerAccess" enabled="false" level="WARNING" enabled_by_default="false">
@@ -2840,6 +2841,7 @@
         <inspection_tool class="VoidMethodAnnotatedWithGET" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="W3CssValidation" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="myCssVersion" value="css3" />
+          <option name="myIgnoreVendorSpecificProperties" value="false" />
         </inspection_tool>
         <inspection_tool class="WSReferenceInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="WeakerAccess" enabled="false" level="WARNING" enabled_by_default="false">
@@ -5060,6 +5062,7 @@
         <inspection_tool class="VoidMethodAnnotatedWithGET" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="W3CssValidation" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="myCssVersion" value="css3" />
+          <option name="myIgnoreVendorSpecificProperties" value="false" />
         </inspection_tool>
         <inspection_tool class="WSReferenceInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="WaitCalledOnCondition" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -6189,6 +6192,7 @@
         <inspection_tool class="IncompatibleMask" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="IncompatibleMaskJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="InconsistentLanguageLevel" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="InconsistentLineSeparators" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="InconsistentPropertyLocking" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="InconsistentPropertySynchronization" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="InconsistentResourceBundle" enabled="false" level="ERROR" enabled_by_default="false">
@@ -6434,6 +6438,7 @@
         <inspection_tool class="JspAbsolutePathInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JspDirectiveInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JspPropertiesInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="JspUnescapedEl" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="KeySetIterationMayUseEntrySet" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="LabeledStatement" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="LabeledStatementJS" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -7076,6 +7081,7 @@
           <option name="checkTestFiles" value="false" />
         </inspection_tool>
         <inspection_tool class="SpringFactoryMethodInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="SpringHandlersSchemasHighlighting" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="SpringIncorrectResourceTypeInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="SpringInjectionValueConsistencyInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="SpringInjectionValueStyleInspection" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -7084,6 +7090,7 @@
         <inspection_tool class="SpringJavaAutowiringInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="SpringJavaConfigExternalBeansErrorInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SpringJavaConfigInconsistencyInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="SpringMVCInitBinder" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="SpringMVCViewInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="SpringMessageDispatcherWebXmlInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="SpringModelInspection" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -7095,6 +7102,7 @@
         <inspection_tool class="SpringScopesInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="SpringSecurityElementsInconsistencyInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="SpringSecurityFiltersConfiguredInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="SpringStaticMembersAutowiringInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SpringTransactionalComponentInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="SpringWebServiceAnnotationsInconsistencyInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SpringWebServicesConfigurationsInspection" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -7563,6 +7571,7 @@
         <inspection_tool class="VolatileLongOrDoubleField" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="W3CssValidation" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="myCssVersion" value="css3" />
+          <option name="myIgnoreVendorSpecificProperties" value="false" />
         </inspection_tool>
         <inspection_tool class="WSReferenceInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="WaitCalledOnCondition" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -8127,6 +8136,7 @@
         <inspection_tool class="VoidMethodAnnotatedWithGET" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="W3CssValidation" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="myCssVersion" value="css3" />
+          <option name="myIgnoreVendorSpecificProperties" value="false" />
         </inspection_tool>
         <inspection_tool class="WSReferenceInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="WeakerAccess" enabled="false" level="WARNING" enabled_by_default="false">
@@ -8810,6 +8820,7 @@
         <inspection_tool class="UtilSchemaInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="W3CssValidation" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="myCssVersion" value="css3" />
+          <option name="myIgnoreVendorSpecificProperties" value="false" />
         </inspection_tool>
         <inspection_tool class="WeakerAccess" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="SUGGEST_PACKAGE_LOCAL_FOR_MEMBERS" value="true" />
