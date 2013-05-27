@@ -15,11 +15,11 @@ GPars allows developers to specify transaction boundaries by using the _atomic_ 
 
 {code}
 import groovyx.gpars.stm.GParsStm
-import org.multiverse.api.references.IntRef
-import static org.multiverse.api.StmUtils.newIntRef
+import org.multiverse.api.references.TxnInteger
+import static org.multiverse.api.StmUtils.newTxnInteger
 
 public class Account {
-    private final IntRef amount = newIntRef(0);
+    private final TxnInteger amount = newTxnInteger(0);
 
     public void transfer(final int a) {
         GParsStm.atomic {
@@ -57,7 +57,7 @@ import groovyx.gpars.stm.GParsStm
 import org.multiverse.api.AtomicBlock
 import org.multiverse.api.PropagationLevel
 
-final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
 assert GParsStm.atomicWithBoolean(block) {
     true
 }
@@ -67,19 +67,19 @@ The customized _AtomicBlock_ can then be used to create transactions following t
 
 h3. Using the _Transaction_ object
 
-The atomic closures are provided the current _Transaction_ as a parameter. The _Transaction_ objects can then be used
+The atomic closures are provided the current _Transaction_ as a parameter. The _Txn_ objects representing a transaction can then be used
 to manually control the transaction.
 This is illustrated in the example below, where we use the _retry()_ method to block the current transaction until the counter reaches the desired value:
  {code}
-
 import groovyx.gpars.stm.GParsStm
-import org.multiverse.api.AtomicBlock
 import org.multiverse.api.PropagationLevel
-import static org.multiverse.api.StmUtils.newIntRef
+import org.multiverse.api.TxnExecutor
 
-final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+import static org.multiverse.api.StmUtils.newTxnInteger
 
-def counter = newIntRef(0)
+final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+
+def counter = newTxnInteger(0)
 final int max = 100
 Thread.start {
     while (counter.atomicGet() < max) {
@@ -87,7 +87,7 @@ Thread.start {
         sleep 10
     }
 }
-assert max + 1 == GParsStm.atomicWithInt(block) {tx ->
+assert max + 1 == GParsStm.atomicWithInt(block) { tx ->
     if (counter.get() == max) return counter.get() + 1
     tx.retry()
 }
@@ -98,11 +98,11 @@ h3. Data structures
 You might have noticed in the code examples above that we use dedicated data structures to hold values. The fact is that normal Java classes
 do not support transactions and thus cannot be used directly, since Multiverse would not be able to share them safely among concurrent transactions, commit them nor roll them back.
 We need to use data that know about transactions:
-* IntRef
-* LongRef
-* BooleanRef
-* DoubleRef
-* Ref
+* TxnIntRef
+* TxnLongRef
+* TxnBooleanRef
+* TxnDoubleRef
+* TxnRef
 
 You typically create these through the factory methods of the _org.multiverse.api.StmUtils_ class.
 
