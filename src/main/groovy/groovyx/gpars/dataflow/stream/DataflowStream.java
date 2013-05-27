@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,9 +31,10 @@ import java.util.Collection;
  * On the other hand in offers handy methods for value filtering or transformation together with interesting performance characteristics.
  * For convenience and for the ability to use DataflowStream with other dataflow constructs, like e.g. operators,
  * you can wrap DataflowStreams with DataflowReadAdapter for read access or DataflowWriteAdapter for write access.
- * <p/>
+ * <p>
  * The DataflowStream class is designed for single-threaded producers and consumers. If multiple threads are supposed to read or write values
  * to the stream, their access to the stream must be serialized externally or the adapters should be used.
+ * </p>
  *
  * @param <T> Type for values to pass through the stream
  * @author Johannes Link, Vaclav Pech
@@ -92,4 +93,3 @@ public final class DataflowStream<T> extends StreamCore<T> {
         return "DataflowStream[" + getFirst() + getRest().appendingString() + ']';
     }
 }
-

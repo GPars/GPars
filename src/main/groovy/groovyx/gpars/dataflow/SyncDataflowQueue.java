@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2011, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,14 +27,15 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 /**
- * Represents a thread-safe synchronous data flow stream. Values or DataflowVariables are added using the '<<' operator
+ * Represents a thread-safe synchronous data flow stream. Values or DataflowVariables are added using the '&lt;&lt;' operator
  * and safely read once available using the 'val' property.
  * The iterative methods like each(), collect(), iterator(), any(), all() or the for loops work with snapshots
  * of the stream at the time of calling the particular method.
  * For actors and Dataflow Operators the asynchronous non-blocking variants of the getValAsync() methods can be used.
  * They register the request to read a value and will send a message to the actor or operator once the value is available.
- * <p/>
+ * <p>
  * Unlike DataflowQueue, which exchanges data asynchronously, SyncDataflowQueue blocks the writer until a reader is ready to consume the message.
+ * </p>
  *
  * @author Vaclav Pech
  *         Date: Jun 5, 2009

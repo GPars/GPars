@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2011, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -93,26 +93,29 @@ public final class ResizeableCountDownLatch {
     /**
      * Causes the current thread to wait until the latch has counted down to
      * zero, unless the thread is {@linkplain Thread#interrupt interrupted}.
-     * <p/>
-     * <p>If the current count is zero then this method returns immediately.
-     * <p/>
-     * <p>If the current count is greater than zero then the current
+     * <p>
+     * If the current count is zero then this method returns immediately.
+     * </p>
+     * <p>
+     * If the current count is greater than zero then the current
      * thread becomes disabled for thread scheduling purposes and lies
      * dormant until one of two things happen:
+     * </p>
      * <ul>
      * <li>The count reaches zero due to invocations of the
-     * {@link #countDown} method; or
+     * {@link #countDown} method; or</li>
      * <li>Some other thread {@linkplain Thread#interrupt interrupts}
-     * the current thread.
+     * the current thread.</li>
      * </ul>
-     * <p/>
-     * <p>If the current thread:
+     * <p>If the current thread:</p>
      * <ul>
-     * <li>has its interrupted status set on entry to this method; or
-     * <li>is {@linkplain Thread#interrupt interrupted} while waiting,
+     * <li>has its interrupted status set on entry to this method; or</li>
+     * <li>is {@linkplain Thread#interrupt interrupted} while waiting,</li>
      * </ul>
+     * <p>
      * then {@link InterruptedException} is thrown and the current thread's
      * interrupted status is cleared.
+     * </p>
      *
      * @throws InterruptedException if the current thread is interrupted
      *                              while waiting
@@ -125,35 +128,42 @@ public final class ResizeableCountDownLatch {
      * Causes the current thread to wait until the latch has counted down to
      * zero, unless the thread is {@linkplain Thread#interrupt interrupted},
      * or the specified waiting time elapses.
-     * <p/>
-     * <p>If the current count is zero then this method returns immediately
+     * <p>
+     * If the current count is zero then this method returns immediately
      * with the value {@code true}.
-     * <p/>
-     * <p>If the current count is greater than zero then the current
+     * </p>
+     * <p>
+     * If the current count is greater than zero then the current
      * thread becomes disabled for thread scheduling purposes and lies
      * dormant until one of three things happen:
+     * </p>
      * <ul>
      * <li>The count reaches zero due to invocations of the
-     * {@link #countDown} method; or
+     * {@link #countDown} method; or</li>
      * <li>Some other thread {@linkplain Thread#interrupt interrupts}
      * the current thread; or
-     * <li>The specified waiting time elapses.
+     * <li>The specified waiting time elapses.</li>
      * </ul>
-     * <p/>
-     * <p>If the count reaches zero then the method returns with the
+     * <p>
+     * If the count reaches zero then the method returns with the
      * value {@code true}.
-     * <p/>
-     * <p>If the current thread:
+     * </p>
+     * <p>
+     * If the current thread:
+     * </p>
      * <ul>
-     * <li>has its interrupted status set on entry to this method; or
-     * <li>is {@linkplain Thread#interrupt interrupted} while waiting,
+     * <li>has its interrupted status set on entry to this method; or</li>
+     * <li>is {@linkplain Thread#interrupt interrupted} while waiting,</li>
      * </ul>
+     * <p>
      * then {@link InterruptedException} is thrown and the current thread's
      * interrupted status is cleared.
-     * <p/>
-     * <p>If the specified waiting time elapses then the value {@code false}
+     * </p>
+     * <p>
+     * If the specified waiting time elapses then the value {@code false}
      * is returned.  If the time is less than or equal to zero, the method
      * will not wait at all.
+     * </p>
      *
      * @param timeout the maximum time to wait
      * @param unit    the time unit of the {@code timeout} argument
@@ -192,12 +202,14 @@ public final class ResizeableCountDownLatch {
     /**
      * Decrements the count of the latch, releasing all waiting threads if
      * the count reaches zero.
-     * <p/>
-     * <p>If the current count is greater than zero then it is decremented.
+     * <p>
+     * If the current count is greater than zero then it is decremented.
      * If the new count is zero then all waiting threads are re-enabled for
      * thread scheduling purposes.
-     * <p/>
-     * <p>If the current count equals zero then nothing happens.
+     * </p>
+     * <p>
+     * If the current count equals zero then nothing happens.
+     * </p>
      */
     public void countDown() {
         sync.releaseShared(1);
@@ -213,8 +225,9 @@ public final class ResizeableCountDownLatch {
 
     /**
      * Returns the current count.
-     * <p/>
-     * <p>This method is typically used for debugging and testing purposes.
+     * <p>
+     * This method is typically used for debugging and testing purposes.
+     * </p>
      *
      * @return the current count
      */

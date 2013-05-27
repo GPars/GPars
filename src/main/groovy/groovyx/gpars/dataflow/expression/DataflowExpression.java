@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -308,7 +308,6 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * Retrieves the bound value. Returns null, if no value is available.
      *
      * @return The value bound to the DFV or null
-     * @throws InterruptedException If the current thread is interrupted
      */
     @Override
     public final DataflowExpression<T> poll() {
@@ -344,7 +343,6 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     /**
      * Assigns a value to the variable. Can only be invoked once on each instance of DataflowVariable.
      * Allows attempts to bind to equal values.
-     * Throws exception if invoked on an already bound variable.
      *
      * @param value The value to assign
      */
@@ -367,7 +365,6 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     /**
      * Assigns a value to the variable. Can only be invoked once on each instance of DataflowVariable
      * Doesn't allow attempts to bind to equal values.
-     * Throws exception if invoked on an already bound variable.
      *
      * @param value The value to assign
      */

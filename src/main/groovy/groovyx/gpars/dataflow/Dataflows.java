@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2011, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,15 +28,16 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * Convenience class that makes working with DataflowVariables more comfortable.
- * <p/>
+ * <p>
  * See the implementation of groovyx.gpars.samples.dataflow.DemoDataflows for a full example.
- * <p/>
+ * </p>
+ * <p>
  * A Dataflows instance is a bean with properties of type DataflowVariable.
  * Property access is relayed to the access methods of DataflowVariable.
  * Each property is initialized lazily the first time it is accessed.
  * Non-String named properties can be also accessed using array-like indexing syntax
  * This allows a rather compact usage of DataflowVariables like
- * <p/>
+ * </p>
  * <pre>
  * final df = new Dataflows()
  * start { df[0] = df.x + df.y }
@@ -166,11 +167,14 @@ public final class Dataflows extends GroovyObjectSupport {
 
     /**
      * The idea is following:
-     * - we try to putIfAbsent dummy DFV in to map
-     * - if something real already there we are done
-     * - if not we obtain lock and put new DFV with double check
-     * <p/>
+     * <ul>
+     *   <li>we try to putIfAbsent dummy DFV in to map</li>
+     *   <li>if something real already there we are done</li>
+     *   <li>if not we obtain lock and put new DFV with double check</li>
+     * </ul>
+     * <p>
      * Unfortunately we have to sync on this as there is no better option (God forbid to sync on name)
+     * <p>
      *
      * @param name The key to ensure has a DFV bound to it
      * @return DataflowVariable corresponding to name

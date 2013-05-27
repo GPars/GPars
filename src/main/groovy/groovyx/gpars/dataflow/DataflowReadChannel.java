@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -80,8 +80,9 @@ public interface DataflowReadChannel<T> {
      * Schedule closure to be executed after data became available.
      * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled
-     * <p/>
-     * rightShift() redefines the >> operator so you can write df >> {println it} instead of df.whenBound{println it}
+     * <p>
+     * rightShift() redefines the &gt;&gt; operator so you can write df &gt;&gt; {println it} instead of df.whenBound{println it}
+     * </p>
      *
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,11 +28,12 @@ import java.util.Map;
  * the input channels the operator's body is triggered on the values, potentially generating values to be written into the output channels.
  * The output channels at the same time are suitable to be used as input channels by some other dataflow processors.
  * The channels allow processors to communicate.
- * <p/>
+ * <p>
  * Dataflow selectors and operators enable creation of highly concurrent applications yet the abstraction hides the low-level concurrency primitives
  * and exposes much friendlier API.
  * Since selectors and operators internally leverage the actor implementation, they reuse a pool of threads and so the actual number of threads
  * used by the calculation can be kept much lower than the actual number of processors used in the network.
+ * </p>
  *
  * @author Vaclav Pech
  *         Date: Sep 9, 2009
@@ -77,4 +78,3 @@ public final class DataflowOperator extends DataflowProcessor {
         return String.valueOf(inputs.size());
     }
 }
-

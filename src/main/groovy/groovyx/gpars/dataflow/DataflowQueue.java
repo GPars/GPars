@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 import static java.util.Arrays.asList;
 
 /**
- * Represents a thread-safe data flow stream. Values or DataflowVariables are added using the '<<' operator
+ * Represents a thread-safe data flow stream. Values or DataflowVariables are added using the '&lt;&lt;' operator
  * and safely read once available using the 'val' property.
  * The iterative methods like each(), collect(), iterator(), any(), all() or the for loops work with snapshots
  * of the stream at the time of calling the particular method.

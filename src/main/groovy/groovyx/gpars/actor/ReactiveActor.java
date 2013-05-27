@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-2010, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,13 +21,11 @@ import groovy.lang.Closure;
 /**
  * An actor representing a reactor. When it receives a message, the supplied block of code is run with the message
  * as a parameter and the result of the code is send in reply.
- * <p/>
  * <pre>
  * final def doubler = reactor {message -&gt;
  *     2 * message
- * }*
+ * }
  * def result = doubler.sendAndWait(10)
- *
  * </pre>
  *
  * @author Vaclav Pech, Alex Tkachman

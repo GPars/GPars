@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2011, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,14 +26,16 @@ import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
  * synchronizes all writes to the underlying stream allowing multiple threads accessing the stream concurrently.
  * On demand through the createReadChannel() method it will return an DataflowReadChannel through which the reader will receive
  * all messages written to the channel since then.
- * <p/>
+ * <p>
  * Typical use:
- * <p/>
+ * </p>
+ * <pre>
  * DataflowWriteChannel broadcastStream = new DataflowBroadcast()
  * DataflowReadChannel stream1 = broadcastStream.createReadChannel()
  * DataflowReadChannel stream2 = broadcastStream.createReadChannel()
- * broadcastStream << 'Message'
+ * broadcastStream &lt;&lt; 'Message'
  * assert stream1.val == stream2.val
+ * </pre>
  *
  * @param <T> The type of messages to pass through the stream
  * @author Vaclav Pech
@@ -64,4 +66,3 @@ public final class DataflowBroadcast<T> extends DataflowStreamWriteAdapter<T> {
         return new DataflowStreamReadAdapter<T>(getHead());
     }
 }
-

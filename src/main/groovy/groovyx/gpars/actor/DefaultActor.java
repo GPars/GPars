@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-2010, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  * The DefaultActor class is the base for all stateful actors, who need to maintain implicit state between subsequent message arrivals.
  * Allowing the actor creator to structure code in a continuation-like style with message retrieval react commands mixed within normal code
  * makes implementation of some algorithms particularly easy.
- * <p/>
+ * <p>
  * The DefaultActor upon start-up will grab a thread from the associated actor thread pool and run its body.
  * The body is either the parameter passed to the constructor, or the act() method, if no parameter has been set.
  * The parameter takes precedence over the act() method.
@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
  * To preserve the actor principle of at-most-one active thread per actor, the next message, however, will only be handled once the currently run code finishes and frees the current thread.
  * It is thus advisable to avoid code after call to react().
  * The loop() method will ensure its body is executed repeatedly, until the actor either finishes or an optional loop condition is not met.
+ * </p>
  *
  * @author Vaclav Pech
  *         Date: Nov 4th 2010

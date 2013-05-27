@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2011, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,9 +31,10 @@ import java.util.Map;
 
 /**
  * An operator's internal actor. Repeatedly polls inputs and once they're all available it performs the operator's body.
- * <p/>
+ * <p>
  * Iteratively waits for enough values from inputs.
  * Once all required inputs are available (received as messages), the operator's body is run.
+ * </p>
  *
  * @author Vaclav Pech
  */

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-2010, 2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,10 +23,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Prototype of self-regulated thread pooled scheduler
- * <p/>
- * Self regulation happened according to following rules
- * - worker thread, which had nothing to do 10 seconds dies
- * - if no tasks were taken for processing during last 0.5sec new worker starts
+ * <p>
+ * Self regulation happened according to following rules:
+ * </p>
+ * <ul>
+ *   <li>worker thread, which had nothing to do 10 seconds dies</li>
+ *   <li>if no tasks were taken for processing during last 0.5sec new worker starts</li>
+ * </ul>
  */
 public final class Scheduler implements Pool {
     private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
