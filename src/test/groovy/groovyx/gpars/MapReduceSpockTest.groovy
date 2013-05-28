@@ -17,19 +17,22 @@
 package groovyx.gpars
 
 import spock.lang.Specification
+import spock.lang.Unroll
+
 import static groovyx.gpars.GParsPool.withPool
 
 class MapReduceSpockTest extends Specification {
-    def "min"() {
+    @Unroll
+    def "min of #nums is #minValue"() {
         expect:
         withPool() {
-            nums.parallel.reduce {a, b -> Math.min(a, b)} == minValue
+            nums.parallel.reduce { a, b -> Math.min(a, b) } == minValue
         }
         where:
-        nums | minValue
-        [1, 2, 3, 4, 5] | 1
-        [4, 2, 3, 1, 5] | 1
-        [4, 5, 3, 2, 1] | 1
-        [2, 2, 3, 4, 5] | 2
+        nums             | minValue
+        [1, 2, 3, 4, 5] || 1
+        [4, 2, 3, 1, 5] || 1
+        [4, 5, 3, 2, 1] || 1
+        [2, 2, 3, 4, 5] || 2
     }
 }
