@@ -93,7 +93,7 @@ repositories {
     mavenCentral()
     maven {
         url 'http://download.java.net/maven/2'
-        url 'http://oss.sonatype.org/content/repositories/snapshots' // For Spock SNAPSHOT artefacts.
+        //url 'http://oss.sonatype.org/content/repositories/snapshots' // For Spock SNAPSHOT artefacts.
     }
 }
 
@@ -243,7 +243,7 @@ gradle.taskGraph.whenReady { taskGraph ->
 
 
 def titleForDocumentation = archivesBaseName + ' ' + version
-def copyrightString = 'Copyright &#169; 2008&#8211;2012  V&#225;clav Pech.  All Rights Reserved.'
+def copyrightString = 'Copyright &#169; 2008&#8211;2013  V&#225;clav Pech.  All Rights Reserved.'
 def packageTitle = group
 
 javadoc {
@@ -323,7 +323,7 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.5'
+    gradleVersion = '1.7-rc-1'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
