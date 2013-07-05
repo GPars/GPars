@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Vaclav Pech
  */
-public interface Promise<T> {
+public interface Promise<T> extends SelectableChannel<T> {
 
     /**
      * Retrieves the value of the variable, blocking until a value is available

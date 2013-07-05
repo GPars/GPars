@@ -18,7 +18,6 @@ package groovyx.gpars.dataflow;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
-import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.dataflow.impl.DataflowChannelEventListenerManager;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
@@ -33,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * @author Vaclav Pech
  *         Date: 21st Sep 2010
  */
-public interface DataflowReadChannel<T> {
+public interface DataflowReadChannel<T> extends SelectableChannel<T> {
 
     /**
      * Asynchronously retrieves the value from the channel. Sends the actual value of the channel as a message
@@ -156,20 +155,6 @@ public interface DataflowReadChannel<T> {
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     <V> Promise<V> then(final PGroup group, final Closure<V> closure);
-
-    /**
-     * Send all pieces of data bound in the future to the provided stream when it becomes available.     *
-     *
-     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
-     */
-    <V> void wheneverBound(final Closure<V> closure);
-
-    /**
-     * Send all pieces of data bound in the future to the provided stream when it becomes available.
-     *
-     * @param stream stream where to send result
-     */
-    void wheneverBound(final MessageStream stream);
 
     /**
      * Creates and attaches a new operator processing values from the channel
@@ -839,12 +824,4 @@ public interface DataflowReadChannel<T> {
      */
     int length();
 
-    /**
-     * Retrieves the value at the head of the buffer. Returns null, if no value is available.
-     *
-     * @return The value bound to the DFV at the head of the stream or null
-     * @throws InterruptedException If the current thread is interrupted
-     */
-    @SuppressWarnings({"ClassReferencesSubclass"})
-    DataflowExpression<T> poll() throws InterruptedException;
 }

@@ -63,7 +63,7 @@ public class Select<T> {
      * @param channels The input channels to select from
      */
     @SuppressWarnings({"OverloadedVarargsMethod"})
-    public Select(final PGroup pGroup, final DataflowReadChannel<? extends T>... channels) {
+    public Select(final PGroup pGroup, final SelectableChannel<? extends T>... channels) {
         selectBase = new SelectBase<T>(pGroup, Arrays.asList(channels));
     }
 
@@ -71,7 +71,7 @@ public class Select<T> {
      * @param pGroup   The group, the thread pool of which should be used for notification message handlers
      * @param channels The list of input channels to select from
      */
-    public Select(final PGroup pGroup, final List<DataflowReadChannel<? extends T>> channels) {
+    public Select(final PGroup pGroup, final List<SelectableChannel<? extends T>> channels) {
         //noinspection unchecked
         selectBase = new SelectBase<T>(pGroup, channels);
     }
