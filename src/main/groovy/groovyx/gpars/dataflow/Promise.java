@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A unifying future-like interface to dataflow variables, asynchronous functions and active objects.
+ * Represents the read end of DataflowVariables.
  *
  * @author Vaclav Pech
  */
