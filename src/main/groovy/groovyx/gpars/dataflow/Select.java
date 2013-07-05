@@ -23,6 +23,8 @@ import groovyx.gpars.group.PGroup;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -45,6 +47,16 @@ import java.util.concurrent.CountDownLatch;
 public class Select<T> {
 
     private final SelectBase<T> selectBase;
+
+    /**
+     * A shared timer to run timeouts for Selects
+     */
+    private static final Timer timer = new Timer("Select timeout timer", true);
+
+    /**
+     * A value that gets bound to timeout channels through the Select.createTimeout() method
+     */
+    public static final String TIMEOUT = "timeout";
 
     /**
      * @param pGroup   The group, the thread pool of which should be used for notification message handlers
@@ -84,6 +96,22 @@ public class Select<T> {
      */
     public SelectResult<T> select(final List<Boolean> mask) throws InterruptedException {
         return select(-1, mask);
+    }
+
+    /**
+     * Creates a timeout channel (DataflowVariable) that will bind a Select.TIMEOUT value after the specified timeout.
+     * @param timeout The delay in milliseconds to wait before the value gets bound
+     * @return A DataflowVariable instance that will have the Select.TIMEOUT value bound after the specified number of milliseconds elapse
+     */
+    public static DataflowReadChannel<String> createTimeout(final long timeout) {
+        final DataflowVariable<String> result = new DataflowVariable<String>();
+        final TimerTask task = new TimerTask() {
+            @Override public void run() {
+                result.bind(TIMEOUT);
+            }
+        };
+        timer.schedule(task, timeout);
+        return result;
     }
 
     /**

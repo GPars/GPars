@@ -77,7 +77,7 @@ public class FJPool implements Pool {
             @Override
             @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
             public void uncaughtException(final Thread t, final Throwable e) {
-                System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL + t.getName());
+                System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURRED_IN_GPARS_POOL + t.getName());
                 e.printStackTrace(System.err);
             }
         };
