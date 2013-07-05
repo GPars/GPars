@@ -287,4 +287,30 @@ class SelectTest extends Specification {
         selectGroup.shutdown()
         Dataflow.activeParallelGroup.remove()
     }
+
+    def "selecting with a timeout"() {
+        given:
+        def a = new DataflowVariable()
+        def b = new DataflowVariable()
+        def c = Select.createTimeout(100)
+        def select = Dataflow.select(a, b, c)
+        when:
+        //nothing happens
+        sleep 10
+        then:
+        select.select() == [2, Select.TIMEOUT] as SelectResult
+    }
+
+    def "selecting with a too long timeout"() {
+        given:
+        def a = new DataflowVariable()
+        def b = new DataflowVariable()
+        def c = Select.createTimeout(30000)
+        def select = Dataflow.select(a, b, c)
+        when:
+        b << 10
+        then:
+        select.select() == [1, 10] as SelectResult
+    }
+
 }
