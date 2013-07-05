@@ -22,6 +22,7 @@ h3. Actors
 h3. Dataflow
 
 * LazyDataflowVariable added to allow for lazy asynchronous values
+* Timeout channels on Selects
 
 h3. Agent
 

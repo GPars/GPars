@@ -169,3 +169,85 @@ println 'Starting to monitor our IT department'
 sleep 3000
 10.times {println "Received: ${select.prioritySelect().value}"}
 {code}
+
+h3. Timeouts
+
+The _Select.createTimeout()_ method will create a DataflowVariable that gets bound to a value after a given time period.
+This can be leveraged in _Selects_ so that they unblock after a desired delay, if none of the other channels delivers
+a value before that moment. Just pass the *timeout channel* as another input channel to the _Select_ .
+
+{code}
+import groovyx.gpars.dataflow.Promise
+import groovyx.gpars.dataflow.Select
+import groovyx.gpars.group.DefaultPGroup
+/**
+ * Demonstrates the use of dataflow tasks and selects to pick the fastest result of concurrently run calculations.
+ */
+
+final group = new DefaultPGroup()
+group.with {
+    Promise p1 = task {
+        sleep(1000)
+        10 * 10 + 1
+    }
+    Promise p2 = task {
+        sleep(1000)
+        5 * 20 + 2
+    }
+    Promise p3 = task {
+        sleep(1000)
+        1 * 100 + 3
+    }
+
+    final timeoutChannel = Select.createTimeout(500)
+
+    final alt = new Select(group, p1, p2, p3, timeoutChannel)
+    def result = alt.select()
+    println "Result: " + result
+}
+{code}
+
+h3. Cancellation
+
+In case you need to cancel the other tasks once a value has been calculated or a timeout expired, the best way is to
+set a flag that the tasks periodically monitor. There's intentionally no cancellation machinery built into
+_DataflowVariables_ or _Tasks_ .
+
+{code}
+import groovyx.gpars.dataflow.Promise
+import groovyx.gpars.dataflow.Select
+import groovyx.gpars.group.DefaultPGroup
+
+import java.util.concurrent.atomic.AtomicBoolean
+
+/**
+ * Demonstrates the use of dataflow tasks and selects to pick the fastest result of concurrently run calculations.
+ * It shows a waz to cancel the slower tasks once a result is known
+ */
+
+final group = new DefaultPGroup()
+final done = new AtomicBoolean()
+
+group.with {
+    Promise p1 = task {
+        sleep(1000)
+        if (done.get()) return
+        10 * 10 + 1
+    }
+    Promise p2 = task {
+        sleep(1000)
+        if (done.get()) return
+        5 * 20 + 2
+    }
+    Promise p3 = task {
+        sleep(1000)
+        if (done.get()) return
+        1 * 100 + 3
+    }
+
+    final alt = new Select(group, p1, p2, p3, Select.createTimeout(500))
+    def result = alt.select()
+    done.set(true)
+    println "Result: " + result
+}
+{code}
