@@ -25,10 +25,11 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A unifying future-like interface to dataflow variables, asynchronous functions and active objects.
+ * Represents the read end of DataflowVariables.
  *
  * @author Vaclav Pech
  */
-public interface Promise<T> {
+public interface Promise<T> extends SelectableChannel<T> {
 
     /**
      * Retrieves the value of the variable, blocking until a value is available

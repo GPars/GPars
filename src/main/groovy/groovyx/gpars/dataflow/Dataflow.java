@@ -301,7 +301,7 @@ public abstract class Dataflow {
      * @param channels Dataflow variables or streams to wait for values on
      * @return A new select instance
      */
-    public static Select<?> select(final DataflowReadChannel<?>... channels) {
+    public static Select<?> select(final SelectableChannel<?>... channels) {
         return retrieveCurrentDFPGroup().select(channels);
     }
 
@@ -312,7 +312,7 @@ public abstract class Dataflow {
      * @param channels Dataflow variables or streams to wait for values on
      * @return A new select instance
      */
-    public static Select<?> select(final List<DataflowReadChannel> channels) {
+    public static Select<?> select(final List<SelectableChannel> channels) {
         return retrieveCurrentDFPGroup().select(channels);
     }
 

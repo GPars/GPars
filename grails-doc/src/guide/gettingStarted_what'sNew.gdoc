@@ -1,4 +1,4 @@
-The new GPars 1.0.0 release introduces a lot of gradual enhancements and improvements on top of the previous release,
+The new GPars 1.1.0 release introduces several enhancements and improvements on top of the previous release,
 mainly in the dataflow area.
 
 Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=17007
@@ -23,6 +23,7 @@ h3. Dataflow
 
 * LazyDataflowVariable added to allow for lazy asynchronous values
 * Timeout channels on Selects
+* Minor API improvement affecting Promise and DataflowReadChannel
 
 h3. Agent
 
@@ -33,7 +34,7 @@ h3. Stm
 h3. Other
 
 * Migrated to Groovy 2.0
-* User @CompileStatic where appropriate
+* Used @CompileStatic where appropriate
 
 h3. Renaming hints
 
