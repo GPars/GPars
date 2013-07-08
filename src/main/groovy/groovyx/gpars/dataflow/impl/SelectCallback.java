@@ -17,7 +17,7 @@
 package groovyx.gpars.dataflow.impl;
 
 import groovy.lang.Closure;
-import groovyx.gpars.dataflow.DataflowReadChannel;
+import groovyx.gpars.dataflow.SelectableChannel;
 
 /**
  * A closure registered with all the input channels on the wheneverBound() event to inform the Select
@@ -29,14 +29,14 @@ import groovyx.gpars.dataflow.DataflowReadChannel;
 public final class SelectCallback<T> extends Closure {
     private static final long serialVersionUID = 5953873495199115151L;
     private final int index;
-    private final DataflowReadChannel<? extends T> channel;
+    private final SelectableChannel<? extends T> channel;
 
     /**
      * @param owner   The SelectBase instance to notify
      * @param index   The index of the channel this SelectCallback instance represents
      * @param channel The channel represented by this SelectCallback instance
      */
-    public SelectCallback(final Object owner, final int index, final DataflowReadChannel<? extends T> channel) {
+    public SelectCallback(final Object owner, final int index, final SelectableChannel<? extends T> channel) {
         super(owner);
         this.index = index;
         this.channel = channel;

@@ -38,7 +38,7 @@ group.with {
         1 * 100 + 3
     }
 
-    final alt = new Select(group, p1, p2, p3, Select.createTimeout(500))
+    final alt = select(p1, p2, p3, Select.createTimeout(500))
     def result = alt.select()
     println "Result: " + result
 }

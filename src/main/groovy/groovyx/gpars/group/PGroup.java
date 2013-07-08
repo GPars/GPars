@@ -18,25 +18,11 @@ package groovyx.gpars.group;
 
 import groovy.lang.Closure;
 import groovyx.gpars.MessagingRunnable;
-import groovyx.gpars.actor.Actor;
-import groovyx.gpars.actor.BlockingActor;
-import groovyx.gpars.actor.DefaultActor;
-import groovyx.gpars.actor.DynamicDispatchActor;
-import groovyx.gpars.actor.ReactiveActor;
-import groovyx.gpars.actor.StaticDispatchActor;
+import groovyx.gpars.actor.*;
 import groovyx.gpars.actor.impl.RunnableBackedBlockingActor;
 import groovyx.gpars.agent.Agent;
-import groovyx.gpars.dataflow.Dataflow;
-import groovyx.gpars.dataflow.DataflowReadChannel;
-import groovyx.gpars.dataflow.DataflowVariable;
-import groovyx.gpars.dataflow.DataflowWriteChannel;
-import groovyx.gpars.dataflow.Promise;
-import groovyx.gpars.dataflow.Select;
-import groovyx.gpars.dataflow.operator.DataflowOperator;
-import groovyx.gpars.dataflow.operator.DataflowPrioritySelector;
-import groovyx.gpars.dataflow.operator.DataflowProcessor;
-import groovyx.gpars.dataflow.operator.DataflowProcessorAtomicBoundAllClosure;
-import groovyx.gpars.dataflow.operator.DataflowSelector;
+import groovyx.gpars.dataflow.*;
+import groovyx.gpars.dataflow.operator.*;
 import groovyx.gpars.scheduler.Pool;
 
 import java.util.ArrayList;
@@ -567,7 +553,7 @@ public abstract class PGroup {
      *
      * @param channels Dataflow variables or streams to wait for values on
      */
-    public final Select select(final DataflowReadChannel... channels) {
+    public final Select select(final SelectableChannel... channels) {
         return new Select(this, channels);
     }
 
@@ -577,7 +563,7 @@ public abstract class PGroup {
      *
      * @param channels Dataflow variables or streams to wait for values on
      */
-    public final Select select(final List<DataflowReadChannel> channels) {
+    public final Select select(final List<SelectableChannel> channels) {
         return new Select(this, channels);
     }
 
