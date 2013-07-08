@@ -38,7 +38,7 @@ import java.util.concurrent.CountDownLatch;
  * Optionally, all methods allow the user to specify a boolean mask, assigning each select 's input channel a flag indicating,
  * whether it should be included in the select operation. This is useful when handling state to selectively block some inputs
  * in some states.
- *</p>
+ * </p>
  *
  * @author Vaclav Pech
  *         Date: 30th Sep 2010
@@ -100,13 +100,15 @@ public class Select<T> {
 
     /**
      * Creates a timeout channel (DataflowVariable) that will bind a Select.TIMEOUT value after the specified timeout.
+     *
      * @param timeout The delay in milliseconds to wait before the value gets bound
      * @return A DataflowVariable instance that will have the Select.TIMEOUT value bound after the specified number of milliseconds elapse
      */
     public static DataflowReadChannel<String> createTimeout(final long timeout) {
         final DataflowVariable<String> result = new DataflowVariable<String>();
         final TimerTask task = new TimerTask() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 result.bind(TIMEOUT);
             }
         };
@@ -135,6 +137,28 @@ public class Select<T> {
      */
     public void select(final MessageStream messageStream, final List<Boolean> mask) throws InterruptedException {
         select(messageStream, -1, mask);
+    }
+
+    /**
+     * Selects asynchronously a value from a single randomly chosen input channel, which has a value available for read.
+     * The returned Promise will eventually get bound to the selected value (wrapped inside s SelectResult instance)
+     *
+     * @throws InterruptedException If the current thread gets interrupted
+     */
+    public Promise<SelectResult<T>> selectToPromise() throws InterruptedException {
+        return selectToPromise(-1, null);
+    }
+
+    /**
+     * /**
+     * Selects asynchronously a value from a single randomly chosen input channel, which has a value available for read.
+     * The returned Promise will eventually get bound to the selected value (wrapped inside s SelectResult instance)
+     *
+     * @param mask A list of boolean values indicating, whether the input channel with the same position index should be included in the selection or not
+     * @throws InterruptedException If the current thread gets interrupted
+     */
+    public Promise<SelectResult<T>> selectToPromise(final List<Boolean> mask) throws InterruptedException {
+        return selectToPromise(-1, mask);
     }
 
     /**
@@ -183,6 +207,27 @@ public class Select<T> {
     }
 
     /**
+     * Selects asynchronously a value from a single input channel, which has a value available for read. Channels with lower position index are preferred.
+     * The returned Promise will eventually get bound to the selected value (wrapped inside s SelectResult instance)
+     *
+     * @throws InterruptedException If the current thread gets interrupted
+     */
+    public Promise<SelectResult<T>> prioritySelectToPromise() throws InterruptedException {
+        return selectToPromise(0, null);
+    }
+
+    /**
+     * Selects asynchronously a value from a single input channel, which has a value available for read. Channels with lower position index are preferred.
+     * The returned Promise will eventually get bound to the selected value (wrapped inside s SelectResult instance)
+     *
+     * @param mask A list of boolean values indicating, whether the input channel with the same position index should be included in the selection or not
+     * @throws InterruptedException If the current thread gets interrupted
+     */
+    public Promise<SelectResult<T>> prioritySelectToPromise(final List<Boolean> mask) throws InterruptedException {
+        return selectToPromise(0, mask);
+    }
+
+    /**
      * Selects a value from a single randomly chosen input channel, which has a value available for read.
      *
      * @return The read value. It will be of SelectResult type, holding the actual value as well as the channel index.
@@ -225,6 +270,20 @@ public class Select<T> {
      */
     public final void call(final MessageStream messageStream, final List<Boolean> mask) throws InterruptedException {
         select(messageStream, mask);
+    }
+
+    /**
+     * Invokes the internal select base with a SelectRequest instance ensuring a message is sent, once a value has been selected
+     */
+    private Promise<SelectResult<T>> selectToPromise(final int startIndex, final List<Boolean> mask) throws InterruptedException {
+        final DataflowVariable<SelectResult<T>> result = new DataflowVariable<SelectResult<T>>();
+        selectBase.doSelect(startIndex, new GuardedSelectRequest<T>(mask) {
+            @Override
+            public void valueFound(final int index, final T value) {
+                result.bind(new SelectResult<T>(index, value));
+            }
+        });
+        return result;
     }
 
     /**
