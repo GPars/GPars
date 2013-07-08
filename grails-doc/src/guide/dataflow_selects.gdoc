@@ -59,8 +59,19 @@ def result = sel.prioritySelect()                               //Priority selec
 def result = sel.prioritySelect([true, true, false, true])      //Priority selection with guards specifies
 {code}
 
-By default the _Select_ blocks the caller until a value to read is available. Alternatively, _Select_ allows to have the value sent
-to a provided _MessageStream_ (e.g. an actor) without blocking the caller.
+By default the _Select_ blocks the caller until a value to read is available. The alternative _selectToPromise()_ and _prioritySelectToPromise()_
+methods give you a way to obtain a promise for the value that will be selected some time in the future. Through the returned Promise
+you may register a callback to get invoked asynchronously whenever the next value is selected.
+
+{code}
+def sel = select(a, b, c, d)
+Promise result = sel.selectToPromise()                                       //Random selection
+Promise result = sel.selectToPromise([true, true, false, true])              //Random selection with guards specified
+Promise result = sel.prioritySelectToPromise()                               //Priority selection
+Promise result = sel.prioritySelectToPromise([true, true, false, true])      //Priority selection with guards specifies
+{code}
+
+Alternatively, _Select_ allows to have the value sent to a provided _MessageStream_ (e.g. an actor) without blocking the caller.
 
 {code}
 def handler = actor {...}
@@ -170,6 +181,43 @@ sleep 3000
 10.times {println "Received: ${select.prioritySelect().value}"}
 {code}
 
+h3. Collecting results of asynchronous computations
+
+Asynchronous activities, no matter whether they are *dataflow tasks* , *active objects' methods* or *asynchronous functions* , return _Promises_ .
+_Promises_ implement the _SelectableChannel_ interface and so can be passed in _selects_ for selection together with other _Promises_
+as well as _read channels_ .
+Similarly to Java's _CompletionService_ , GPars _Select_ enables you to obtain results of asynchronous activities as soon as each of them becomes available.
+Also, you may employ _Select_ to give you the first/fastest result of several computations running in parallel.
+
+{code}
+import groovyx.gpars.dataflow.Promise
+import groovyx.gpars.dataflow.Select
+import groovyx.gpars.group.DefaultPGroup
+/**
+ * Demonstrates the use of dataflow tasks and selects to pick the fastest result of concurrently run calculations.
+ */
+
+final group = new DefaultPGroup()
+group.with {
+    Promise p1 = task {
+        sleep(1000)
+        10 * 10 + 1
+    }
+    Promise p2 = task {
+        sleep(1000)
+        5 * 20 + 2
+    }
+    Promise p3 = task {
+        sleep(1000)
+        1 * 100 + 3
+    }
+
+    final alt = new Select(group, p1, p2, p3)
+    def result = alt.select()
+    println "Result: " + result
+}
+{code}
+
 h3. Timeouts
 
 The _Select.createTimeout()_ method will create a DataflowVariable that gets bound to a value after a given time period.
@@ -251,3 +299,4 @@ group.with {
     println "Result: " + result
 }
 {code}
+

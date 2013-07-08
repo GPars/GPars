@@ -23,6 +23,7 @@ h3. Dataflow
 
 * LazyDataflowVariable added to allow for lazy asynchronous values
 * Timeout channels on Selects
+* Added a Promise-based API for value selection through the Select class
 * Minor API improvement affecting Promise and DataflowReadChannel
 
 h3. Agent
