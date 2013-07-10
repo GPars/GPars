@@ -31,9 +31,9 @@ class SelectToPromiseTest extends Specification {
         def p2 = select.selectToPromise()
         when:
         b << 10
-        a << 30
         then:
         p1.get() == [1, 10] as SelectResult
+        a << 30
         p2.get() == [0, 30] as SelectResult
     }
 
@@ -48,10 +48,10 @@ class SelectToPromiseTest extends Specification {
         def p2 = select.selectToPromise()
         when:
         b << 10
-        a << 30
 
         then:
         p1.get() == [1, 10] as SelectResult
+        a << 30
         p2.get() == [0, 30] as SelectResult
     }
 
