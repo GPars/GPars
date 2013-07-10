@@ -18,11 +18,26 @@ package groovyx.gpars.group;
 
 import groovy.lang.Closure;
 import groovyx.gpars.MessagingRunnable;
-import groovyx.gpars.actor.*;
+import groovyx.gpars.actor.Actor;
+import groovyx.gpars.actor.BlockingActor;
+import groovyx.gpars.actor.DefaultActor;
+import groovyx.gpars.actor.DynamicDispatchActor;
+import groovyx.gpars.actor.ReactiveActor;
+import groovyx.gpars.actor.StaticDispatchActor;
 import groovyx.gpars.actor.impl.RunnableBackedBlockingActor;
 import groovyx.gpars.agent.Agent;
-import groovyx.gpars.dataflow.*;
-import groovyx.gpars.dataflow.operator.*;
+import groovyx.gpars.dataflow.Dataflow;
+import groovyx.gpars.dataflow.DataflowReadChannel;
+import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.DataflowWriteChannel;
+import groovyx.gpars.dataflow.Promise;
+import groovyx.gpars.dataflow.Select;
+import groovyx.gpars.dataflow.SelectableChannel;
+import groovyx.gpars.dataflow.operator.DataflowOperator;
+import groovyx.gpars.dataflow.operator.DataflowPrioritySelector;
+import groovyx.gpars.dataflow.operator.DataflowProcessor;
+import groovyx.gpars.dataflow.operator.DataflowProcessorAtomicBoundAllClosure;
+import groovyx.gpars.dataflow.operator.DataflowSelector;
 import groovyx.gpars.scheduler.Pool;
 
 import java.util.ArrayList;
@@ -286,13 +301,15 @@ public abstract class PGroup {
     public final <T> Promise<T> task(final Callable<T> callable) {
         final DataflowVariable result = new DataflowVariable();
         threadPool.execute(new Runnable() {
+            @SuppressWarnings("OverlyBroadCatchBlock")
             @Override
             public void run() {
                 Dataflow.activeParallelGroup.set(PGroup.this);
                 try {
+                    //noinspection OverlyBroadCatchBlock
                     try {
                         result.bind(callable.call());
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         result.bind(e);
                     }
                 } finally {
@@ -323,7 +340,7 @@ public abstract class PGroup {
                     try {
                         code.run();
                         result.bind(null);
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         result.bind(e);
                     }
                 } finally {
@@ -730,7 +747,7 @@ public abstract class PGroup {
                 } else {
                     result.leftShift(code.call(values.toArray()));
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 result.bindError(e);
             }
         } else promises.get(index).then(this, new MessagingRunnable<Object>() {
@@ -745,7 +762,7 @@ public abstract class PGroup {
                         if (errorHandler != null) {
                             try {
                                 result.leftShift(errorHandler.getMaximumNumberOfParameters() == 1 ? errorHandler.call(argument) : errorHandler.call());
-                            } catch (Exception e) {
+                            } catch (Throwable e) {
                                 result.bindError(e);
                             }
                         } else {

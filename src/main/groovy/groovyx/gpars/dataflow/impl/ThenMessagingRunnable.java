@@ -49,7 +49,7 @@ public class ThenMessagingRunnable<T, V> extends MessagingRunnable<T> {
             if (errorHandler != null && shallHandle(errorHandler, (Throwable) argument)) {
                 try {
                     result.leftShift(errorHandler.getMaximumNumberOfParameters() == 1 ? errorHandler.call(argument) : errorHandler.call());
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     result.bindError(e);
                 }
             } else {
@@ -58,7 +58,7 @@ public class ThenMessagingRunnable<T, V> extends MessagingRunnable<T> {
         } else {
             try {
                 result.leftShift(closure.getMaximumNumberOfParameters() == 1 ? closure.call(argument) : closure.call());
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 result.bindError(e);
             }
         }

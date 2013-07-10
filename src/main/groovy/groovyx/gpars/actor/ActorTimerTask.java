@@ -37,7 +37,7 @@ final class ActorTimerTask extends TimerTask {
     public void run() {
         try {
             actor.send(Actor.TIMEOUT_MESSAGE);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             actor.handleException(e);
         }
     }
