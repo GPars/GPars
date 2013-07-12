@@ -795,6 +795,17 @@ The listeners get notified in case of a failed attempt to bind a value (through 
             void onBindError(final Object oldValue, final Throwable failedError) {
                 println "Binding an error failed!"
             }
+
+            @Override
+            public void onBindError(final Throwable oldError, final Object failedValue, final boolean uniqueBind) {
+                println "Bind failed!"
+            }
+
+            @Override
+            public void onBindError(final Throwable oldError, final Throwable failedError) {
+                println "Binding an error failed!"
+            }
+
         })
 {code}
 
