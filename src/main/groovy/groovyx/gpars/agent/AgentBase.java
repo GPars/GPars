@@ -200,6 +200,9 @@ abstract class AgentBase<T> extends AgentCore {
      */
     @SuppressWarnings({"unchecked"})
     public final T sendAndWait(final Closure message) throws InterruptedException {
+        if (Thread.currentThread() == currentThread)
+            throw new IllegalStateException("Cannot submit messages to agents inside submitted commands");
+
         final DataflowVariable<Object> result = new DataflowVariable<Object>();
         this.send(new Closure(message.getOwner()) {
             private static final long serialVersionUID = -4637623342002266534L;

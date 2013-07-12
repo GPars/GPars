@@ -28,6 +28,8 @@ h3. Dataflow
 
 h3. Agent
 
+* Protecting agent's blocking methods from being called from within commands
+
 h3. Stm
 
 * Updated to the latest 0.7.0 GA version of Multiverse

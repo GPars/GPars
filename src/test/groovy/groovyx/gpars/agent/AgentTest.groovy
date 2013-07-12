@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.group.PGroupBuilder
+
 import java.util.concurrent.Executors
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.ThreadPoolExecutor
@@ -35,17 +36,17 @@ public class AgentTest extends GroovyTestCase {
     public void testList() {
         def jugMembers = new Agent<List>(['Me'])  //add Me
 
-        jugMembers.send {it.add 'James'}  //add James
+        jugMembers.send { it.add 'James' }  //add James
         jugMembers.await()
         assert new HashSet(['Me', 'James']) == new HashSet(jugMembers.instantVal)
 
         final Thread t1 = Thread.start {
-            jugMembers {it.add 'Joe'}  //add Joe
+            jugMembers { it.add 'Joe' }  //add Joe
         }
 
         final Thread t2 = Thread.start {
-            jugMembers {it.add 'Dave'}  //add Dave
-            jugMembers << {it.add 'Alice'}  //add Alice
+            jugMembers { it.add 'Dave' }  //add Dave
+            jugMembers << { it.add 'Alice' }  //add Alice
         }
 
         [t1, t2]*.join()
@@ -56,7 +57,7 @@ public class AgentTest extends GroovyTestCase {
         final NonDaemonPGroup group = new NonDaemonPGroup(1)
         def jugMembers = group.agent(['Me'])  //add Me
 
-        jugMembers.send {it.add 'James'}  //add James
+        jugMembers.send { it.add 'James' }  //add James
         jugMembers.await()
         assert new HashSet(['Me', 'James']) == new HashSet(jugMembers.instantVal)
 
@@ -72,7 +73,7 @@ public class AgentTest extends GroovyTestCase {
         final def group = PGroupBuilder.createFromPool(pool)
         jugMembers.attachToThreadPool group.threadPool
 
-        jugMembers.send {it.add 'James'}  //add James
+        jugMembers.send { it.add 'James' }  //add James
         jugMembers.await()
         assert new HashSet(['Me', 'James']) == new HashSet(jugMembers.instantVal)
 
@@ -88,7 +89,7 @@ public class AgentTest extends GroovyTestCase {
         def jugMembers = new Agent<List>(['Me'])  //add Me
         jugMembers.makeFair()
 
-        jugMembers {it.add 'James'}  //add James
+        jugMembers { it.add 'James' }  //add James
         jugMembers.await()
         assert new HashSet(['Me', 'James']) == new HashSet(jugMembers.instantVal)
     }
@@ -97,7 +98,7 @@ public class AgentTest extends GroovyTestCase {
         def jugMembers = Agent.agent(['Me'])  //add Me
         jugMembers.makeFair()
 
-        jugMembers.send {it.add 'James'}  //add James
+        jugMembers.send { it.add 'James' }  //add James
         jugMembers.await()
         assert new HashSet(['Me', 'James']) == new HashSet(jugMembers.instantVal)
     }
@@ -105,23 +106,23 @@ public class AgentTest extends GroovyTestCase {
     public void testFairAgentFactory() {
         def jugMembers = Agent.fairAgent(['Me'])  //add Me
 
-        jugMembers.send {it.add 'James'}  //add James
+        jugMembers.send { it.add 'James' }  //add James
         jugMembers.await()
         assert new HashSet(['Me', 'James']) == new HashSet(jugMembers.instantVal)
     }
 
     public void testListWithCloneCopyStrategy() {
-        def jugMembers = new Agent<List>(['Me'], {it?.clone()})  //add Me
+        def jugMembers = new Agent<List>(['Me'], { it?.clone() })  //add Me
 
-        jugMembers.send {updateValue it << 'James'}  //add James
+        jugMembers.send { updateValue it << 'James' }  //add James
 
         final Thread t1 = Thread.start {
-            jugMembers.send {updateValue it << 'Joe'}  //add Joe
+            jugMembers.send { updateValue it << 'Joe' }  //add Joe
         }
 
         final Thread t2 = Thread.start {
-            jugMembers << {updateValue it << 'Dave'}  //add Dave
-            jugMembers << {updateValue it << 'Alice'}  //add Alice
+            jugMembers << { updateValue it << 'Dave' }  //add Dave
+            jugMembers << { updateValue it << 'Alice' }  //add Alice
         }
 
         [t1, t2]*.join()
@@ -132,15 +133,15 @@ public class AgentTest extends GroovyTestCase {
         final Agent counter = new Agent<Long>(0L)
 
         final Thread t1 = Thread.start {
-            counter << {updateValue it + 1}
+            counter << { updateValue it + 1 }
         }
 
         final Thread t2 = Thread.start {
-            counter << {updateValue it + 6}
+            counter << { updateValue it + 6 }
         }
 
         final Thread t3 = Thread.start {
-            counter << {updateValue it - 2}
+            counter << { updateValue it - 2 }
         }
 
         [t1, t2, t3]*.join()
@@ -152,15 +153,15 @@ public class AgentTest extends GroovyTestCase {
         final Agent counter = new Agent<Long>(0L)
 
         final Thread t1 = Thread.start {
-            counter << {updateValue it + 1}
+            counter << { updateValue it + 1 }
         }
 
         final Thread t2 = Thread.start {
-            counter << {updateValue it + 6}
+            counter << { updateValue it + 6 }
         }
 
         final Thread t3 = Thread.start {
-            counter << {updateValue it - 2}
+            counter << { updateValue it - 2 }
         }
 
         [t1, t2, t3]*.join()
@@ -178,9 +179,9 @@ public class AgentTest extends GroovyTestCase {
 
         def result = new DataflowQueue()
         Actors.actor {
-            counter << {owner.send 'Explicit reply'; owner.send 10}
-            react {a ->
-                react {b ->
+            counter << { owner.send 'Explicit reply'; owner.send 10 }
+            react { a ->
+                react { b ->
                     result << a
                     result << b
                 }
@@ -203,7 +204,7 @@ public class AgentTest extends GroovyTestCase {
         counter << 20
         assert 20 == counter.val
 
-        counter << {updateValue(it + 10)}
+        counter << { updateValue(it + 10) }
         assert 30 == counter.val
 
     }
@@ -219,7 +220,7 @@ public class AgentTest extends GroovyTestCase {
         final Agent counter = new Agent<Long>()
 
         final def result = new DataflowVariable()
-        counter << {result << it}
+        counter << { result << it }
         assertNull result.val
     }
 
@@ -228,7 +229,7 @@ public class AgentTest extends GroovyTestCase {
 
         def result = new DataflowVariable()
         Actors.actor {
-            counter << {owner.send it}
+            counter << { owner.send it }
             react {
                 result << it
             }
@@ -237,7 +238,7 @@ public class AgentTest extends GroovyTestCase {
 
         result = new DataflowVariable()
         Actors.actor {
-            counter << {owner.send null}
+            counter << { owner.send null }
             react {
                 result << it
             }
@@ -297,8 +298,8 @@ public class AgentTest extends GroovyTestCase {
         assert jugMembers.errors.empty
         assert !jugMembers.hasErrors()
 
-        jugMembers.send {throw new IllegalStateException('test1')}
-        jugMembers.send {throw new IllegalArgumentException('test2')}
+        jugMembers.send { throw new IllegalStateException('test1') }
+        jugMembers.send { throw new IllegalArgumentException('test2') }
         jugMembers.await()
 
         assert jugMembers.hasErrors()
@@ -311,5 +312,33 @@ public class AgentTest extends GroovyTestCase {
 
         assert jugMembers.errors.empty
         assert !jugMembers.hasErrors()
+    }
+
+    public void testWaitWithinCommand() {
+        final result = new DataflowVariable()
+        def agent = new Agent(1)
+        agent.sendAndWait {
+            try {
+                agent.sendAndWait { result << 20 }
+                result.bind(10)
+            } catch (all) {
+                result.bind(all)
+            }
+        }
+        assert result.val instanceof IllegalStateException
+    }
+
+    public void testValWithinCommand() {
+        final result = new DataflowVariable()
+        def agent = new Agent(1)
+        agent.sendAndWait {
+            try {
+                println "Agent has value $agent.val"
+                result.bind(10)
+            } catch (all) {
+                result.bind(all)
+            }
+        }
+        assert result.val instanceof IllegalStateException
     }
 }
