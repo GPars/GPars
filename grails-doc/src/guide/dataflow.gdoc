@@ -777,6 +777,30 @@ println book.title.trim().contains(searchPhrase).val  //Synchronous waiting
 
 Please note that the result is still a DataflowVariable (DataflowExpression to be precise), which you can get the real value from both synchronously and asynchronously.
 
+h2. Bind error notification
+
+_DataflowVariables_ offer the ability to send notifications to the registered listeners whenever a bind operation fails. The _getBindErrorManager()_ method allows for listener to be added and removed.
+The listeners get notified in case of a failed attempt to bind a value (through bind(), bindSafely(), bindUnique() or leftShift()) or an error (through bindError()).
+
+{code}
+        final DataflowVariable variable = new DataflowVariable()
+
+        variable.getBindErrorManager().addBindErrorListener(new BindErrorListener() {
+            @Override
+            void onBindError(final Object oldValue, final Object failedValue, final boolean uniqueBind) {
+                println "Bind failed!"
+            }
+
+            @Override
+            void onBindError(final Object oldValue, final Throwable failedError) {
+                println "Binding an error failed!"
+            }
+        })
+{code}
+
+This allows you to customize reactions to attempts to binding of already bound dataflow variables. For example, using _bindSafely()_ you do not get bind exceptions fired to the caller,
+but instead a registered _BindErrorListener_ gets notified.
+
 h2. Further reading
 
 "Scala Dataflow library":http://github.com/jboner/scala-dataflow/tree/f9a38992f5abed4df0b12f6a5293f703aa04dc33/src by Jonas Bonér

@@ -14,18 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow;
+package groovyx.gpars.dataflow.impl;
+
+import groovyx.gpars.dataflow.BindErrorListener;
+
+import java.util.Collection;
 
 /**
- * Gets notified about state changes inside DataflowReadChannels
- *
  * @author Vaclav Pech
  */
-public interface DataflowChannelListener<T> {
-    /**
-     * Notifies about messages passed through the channel
-     *
-     * @param message The value just added to the channel
-     */
-    void onMessage(T message);
+public interface BindErrorListenerManager<T> {
+    void addBindErrorListener(BindErrorListener<T> listener);
+
+    void addAllBindErrorListeners(Collection<BindErrorListener<T>> listeners);
+
+    void removeBindErrorListener(BindErrorListener<T> listener);
+
+    Collection<BindErrorListener<T>> getBindErrorListeners();
 }

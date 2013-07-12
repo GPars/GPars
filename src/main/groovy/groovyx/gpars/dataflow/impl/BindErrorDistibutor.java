@@ -14,18 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow;
+package groovyx.gpars.dataflow.impl;
 
 /**
- * Gets notified about state changes inside DataflowReadChannels
+ * Fires requested events
  *
  * @author Vaclav Pech
  */
-public interface DataflowChannelListener<T> {
-    /**
-     * Notifies about messages passed through the channel
-     *
-     * @param message The value just added to the channel
-     */
-    void onMessage(T message);
+public interface BindErrorDistibutor<T> {
+    void fireBindError(T oldValue, T failedValue, boolean uniqueBind);
+
+    void fireBindError(T oldValue, Throwable failedError);
 }

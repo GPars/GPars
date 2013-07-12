@@ -30,6 +30,7 @@ import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.DataflowWriteChannel;
 import groovyx.gpars.dataflow.Promise;
+import groovyx.gpars.dataflow.impl.BindErrorListenerManager;
 import groovyx.gpars.dataflow.impl.DataflowChannelEventListenerManager;
 import groovyx.gpars.dataflow.impl.DataflowChannelEventOrchestrator;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
@@ -74,6 +75,8 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     private static final String RESULT = "result";
 
     private static final long serialVersionUID = 8961916630562820109L;
+    private static final String CANNOT_FIRE_BIND_ERRORS_THE_THREAD_HAS_BEEN_INTERRUPTED = "Cannot fire bind errors - the thread has been interrupted.";
+    private static final String A_DATAFLOW_VARIABLE_CAN_ONLY_BE_ASSIGNED_ONCE_ONLY_RE_ASSIGNMENTS_TO_AN_EQUAL_VALUE_ARE_ALLOWED = "A DataflowVariable can only be assigned once. Only re-assignments to an equal value are allowed.";
 
     /**
      * The current metaclass
@@ -327,6 +330,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      */
     public final void bindSafely(final T value) {
         if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING)) {
+            fireBindError(value, false);
             return;
         }
         doBind(value);
@@ -334,7 +338,8 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
 
     public final void bindError(final Throwable e) {
         if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING)) {
-            throw new IllegalStateException("A DataflowVariable can only be assigned once. Only re-assignments to an equal value are allowed.");
+            fireBindError(e);
+            throw new IllegalStateException(A_DATAFLOW_VARIABLE_CAN_ONLY_BE_ASSIGNED_ONCE_ONLY_RE_ASSIGNMENTS_TO_AN_EQUAL_VALUE_ARE_ALLOWED);
         }
         error = e;
         doBind(null);
@@ -349,14 +354,16 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     public final void bind(final T value) {
         if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING)) {
             try {
-                final Object boundValue = getVal();
+                final T boundValue = getVal();
                 if (value == null && boundValue == null) return;
                 if (value != null) {
                     if (value.equals(boundValue)) return;
                 }
             } catch (InterruptedException ignore) {
             }  //Can ignore since will throw an IllegalStateException below
-            throw new IllegalStateException("A DataflowVariable can only be assigned once. Only re-assignments to an equal value are allowed.");
+
+            fireBindError(value, false);
+            throw new IllegalStateException(A_DATAFLOW_VARIABLE_CAN_ONLY_BE_ASSIGNED_ONCE_ONLY_RE_ASSIGNMENTS_TO_AN_EQUAL_VALUE_ARE_ALLOWED);
         }
 
         doBind(value);
@@ -370,6 +377,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      */
     public final void bindUnique(final T value) {
         if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING)) {
+            fireBindError(value, true);
             throw new IllegalStateException("A DataflowVariable can only be assigned once. Use bind() to allow for equal values to be passed into already-bound variables.");
         }
 
@@ -1014,6 +1022,14 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
 
     @Override
     public synchronized DataflowChannelEventListenerManager<T> getEventManager() {
+        return createEventManager();
+    }
+
+    public synchronized BindErrorListenerManager<T> getBindErrorManager() {
+        return createEventManager();
+    }
+
+    private DataflowChannelEventOrchestrator<T> createEventManager() {
         if (eventManager != null) return eventManager;
         eventManager = new DataflowChannelEventOrchestrator<T>();
         return eventManager;
@@ -1024,6 +1040,27 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
             eventManager.fireOnMessage(value);
         }
     }
+
+    private void fireBindError(final T value, final boolean unique) {
+        if (eventManager != null) {
+            try {
+                eventManager.fireBindError(this.getVal(), value, unique);
+            } catch (InterruptedException ex) {
+                throw new IllegalStateException(CANNOT_FIRE_BIND_ERRORS_THE_THREAD_HAS_BEEN_INTERRUPTED, ex);
+            }
+        }
+    }
+
+    private void fireBindError(final Throwable e) {
+        if (eventManager != null) {
+            try {
+                eventManager.fireBindError(this.getVal(), e);
+            } catch (InterruptedException ex) {
+                throw new IllegalStateException(CANNOT_FIRE_BIND_ERRORS_THE_THREAD_HAS_BEEN_INTERRUPTED, ex);
+            }
+        }
+    }
+
 
     /**
      * Transforms values bound eventually to dataflow variables using the supplied closure.

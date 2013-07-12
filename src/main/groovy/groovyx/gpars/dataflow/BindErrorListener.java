@@ -17,15 +17,26 @@
 package groovyx.gpars.dataflow;
 
 /**
- * Gets notified about state changes inside DataflowReadChannels
+ * Gets notified about errors when binding values to DataflowVariables
  *
  * @author Vaclav Pech
  */
-public interface DataflowChannelListener<T> {
+public interface BindErrorListener<T> {
     /**
-     * Notifies about messages passed through the channel
+     * Notifies about failed bind operations
      *
-     * @param message The value just added to the channel
+     * @param oldValue    The already bound value
+     * @param failedValue The value attempted to be bound
+     * @param uniqueBind  Flag indicating bindUnique() method call
      */
-    void onMessage(T message);
+    void onBindError(T oldValue, T failedValue, boolean uniqueBind);
+
+
+    /**
+     * Notifies about failed bindError operations
+     *
+     * @param oldValue    The already bound value
+     * @param failedError The error attempted to be bound
+     */
+    void onBindError(T oldValue, Throwable failedError);
 }
