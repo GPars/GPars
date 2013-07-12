@@ -1044,7 +1044,10 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     private void fireBindError(final T value, final boolean unique) {
         if (eventManager != null) {
             try {
-                eventManager.fireBindError(this.getVal(), value, unique);
+                final T oldValue = this.getVal();
+                final Throwable error = this.error;
+                if (error == null) eventManager.fireBindError(oldValue, value, unique);
+                else eventManager.fireBindError(error, value, unique);
             } catch (InterruptedException ex) {
                 throw new IllegalStateException(CANNOT_FIRE_BIND_ERRORS_THE_THREAD_HAS_BEEN_INTERRUPTED, ex);
             }
@@ -1054,7 +1057,10 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     private void fireBindError(final Throwable e) {
         if (eventManager != null) {
             try {
-                eventManager.fireBindError(this.getVal(), e);
+                final T oldValue = this.getVal();
+                final Throwable error = this.error;
+                if (error == null) eventManager.fireBindError(oldValue, e);
+                else eventManager.fireBindError(error, e);
             } catch (InterruptedException ex) {
                 throw new IllegalStateException(CANNOT_FIRE_BIND_ERRORS_THE_THREAD_HAS_BEEN_INTERRUPTED, ex);
             }

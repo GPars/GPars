@@ -23,7 +23,7 @@ public class DataflowVariableBindErrorTest extends GroovyTestCase {
 
         final DataflowQueue result = new DataflowQueue()
 
-        variable.getBindErrorManager().addBindErrorListener(new BindErrorListener() {
+        variable.getBindErrorManager().addBindErrorListener(new BindErrorAdapter() {
             @Override
             void onBindError(final Object oldValue, final Object failedValue, final boolean uniqueBind) {
                 result.bind(oldValue)
@@ -55,7 +55,7 @@ public class DataflowVariableBindErrorTest extends GroovyTestCase {
 
         final DataflowQueue result = new DataflowQueue()
 
-        variable.getBindErrorManager().addBindErrorListener(new BindErrorListener() {
+        variable.getBindErrorManager().addBindErrorListener(new BindErrorAdapter() {
             @Override
             void onBindError(final Object oldValue, final Object failedValue, final boolean uniqueBind) {
                 result.bind(oldValue)
@@ -85,7 +85,7 @@ public class DataflowVariableBindErrorTest extends GroovyTestCase {
 
         final DataflowQueue result = new DataflowQueue()
 
-        variable.getBindErrorManager().addBindErrorListener(new BindErrorListener() {
+        variable.getBindErrorManager().addBindErrorListener(new BindErrorAdapter() {
             @Override
             void onBindError(final Object oldValue, final Object failedValue, final boolean uniqueBind) {
                 result.bind(oldValue)
@@ -117,10 +117,10 @@ public class DataflowVariableBindErrorTest extends GroovyTestCase {
 
         final DataflowQueue result = new DataflowQueue()
 
-        variable.getBindErrorManager().addBindErrorListener(new BindErrorListener() {
+        variable.getBindErrorManager().addBindErrorListener(new BindErrorAdapter() {
             @Override
-            void onBindError(final Object oldValue, final Object failedValue, final boolean uniqueBind) {
-                result.bind(oldValue)
+            void onBindError(final Throwable throwable, final Object failedValue, final boolean uniqueBind) {
+                result.bind(throwable)
                 result.bind(failedValue)
                 result.bind(uniqueBind)
             }
@@ -139,7 +139,7 @@ public class DataflowVariableBindErrorTest extends GroovyTestCase {
 
         assert null == variable.val
 
-        assert null == result.val
+        assert result.val instanceof IllegalStateException
         assert 20 == result.val
         assert false == result.val
     }
@@ -149,7 +149,7 @@ public class DataflowVariableBindErrorTest extends GroovyTestCase {
 
         final DataflowQueue result = new DataflowQueue()
 
-        variable.getBindErrorManager().addBindErrorListener(new BindErrorListener() {
+        variable.getBindErrorManager().addBindErrorListener(new BindErrorAdapter() {
             @Override
             void onBindError(final Object oldValue, final Object failedValue, final boolean uniqueBind) {
                 result.bind(0)  //Should be never invoked
@@ -179,15 +179,15 @@ public class DataflowVariableBindErrorTest extends GroovyTestCase {
 
         final DataflowQueue result = new DataflowQueue()
 
-        variable.getBindErrorManager().addBindErrorListener(new BindErrorListener() {
+        variable.getBindErrorManager().addBindErrorListener(new BindErrorAdapter() {
             @Override
             void onBindError(final Object oldValue, final Object failedValue, final boolean uniqueBind) {
                 result.bind(0)  //Should be never invoked
             }
 
             @Override
-            void onBindError(final Object oldValue, final Throwable failedError) {
-                result.bind(oldValue)
+            void onBindError(final Throwable throwable, final Throwable failedError) {
+                result.bind(throwable)
                 result.bind(failedError)
             }
         })
@@ -200,7 +200,7 @@ public class DataflowVariableBindErrorTest extends GroovyTestCase {
 
         assert null == variable.val
 
-        assert null == result.val
+        assert result.val instanceof IllegalStateException
         assert result.val instanceof RuntimeException
     }
 

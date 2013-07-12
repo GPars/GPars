@@ -25,4 +25,8 @@ public interface BindErrorDistibutor<T> {
     void fireBindError(T oldValue, T failedValue, boolean uniqueBind);
 
     void fireBindError(T oldValue, Throwable failedError);
+
+    void fireBindError(Throwable oldError, T failedValue, boolean uniqueBind);
+
+    void fireBindError(Throwable oldError, Throwable failedError);
 }

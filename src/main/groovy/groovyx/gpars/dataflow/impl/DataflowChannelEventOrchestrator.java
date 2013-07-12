@@ -106,4 +106,31 @@ public final class DataflowChannelEventOrchestrator<T> implements DataflowChanne
             listener.onBindError(oldValue, failedError);
         }
     }
+
+    /**
+     * Notifies all listeners about failed bind operations
+     *
+     * @param oldError    The already bound Throwable
+     * @param failedValue The value attempted to be bound
+     * @param uniqueBind  Flag indicating bindUnique() method call
+     */
+    @Override
+    public void fireBindError(final Throwable oldError, final T failedValue, final boolean uniqueBind) {
+        for (final BindErrorListener<T> listener : BindErrorListener) {
+            listener.onBindError(oldError, failedValue, uniqueBind);
+        }
+    }
+
+    /**
+     * Notifies all listeners about failed bindError operations
+     *
+     * @param oldError    The already bound Throwable
+     * @param failedError The error attempted to be bound
+     */
+    @Override
+    public void fireBindError(final Throwable oldError, final Throwable failedError) {
+        for (final BindErrorListener<T> listener : BindErrorListener) {
+            listener.onBindError(oldError, failedError);
+        }
+    }
 }

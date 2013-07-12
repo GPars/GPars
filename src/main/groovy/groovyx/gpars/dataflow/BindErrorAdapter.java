@@ -17,11 +17,11 @@
 package groovyx.gpars.dataflow;
 
 /**
- * Gets notified about errors when binding values to DataflowVariables
+ * An empty implementation of BindErrorListener
  *
- * @author Vaclav Pech
+ * @param <T> The type of the values bound to the DataflowVariable that is being listened to
  */
-public interface BindErrorListener<T> {
+public class BindErrorAdapter<T> implements BindErrorListener<T> {
     /**
      * Notifies about failed bind operations
      *
@@ -29,8 +29,9 @@ public interface BindErrorListener<T> {
      * @param failedValue The value attempted to be bound
      * @param uniqueBind  Flag indicating bindUnique() method call
      */
-    void onBindError(T oldValue, T failedValue, boolean uniqueBind);
-
+    @Override
+    public void onBindError(final T oldValue, final T failedValue, final boolean uniqueBind) {
+    }
 
     /**
      * Notifies about failed bindError operations
@@ -38,7 +39,9 @@ public interface BindErrorListener<T> {
      * @param oldValue    The already bound value
      * @param failedError The error attempted to be bound
      */
-    void onBindError(T oldValue, Throwable failedError);
+    @Override
+    public void onBindError(final T oldValue, final Throwable failedError) {
+    }
 
     /**
      * Notifies about failed bind operations
@@ -47,8 +50,9 @@ public interface BindErrorListener<T> {
      * @param failedValue The value attempted to be bound
      * @param uniqueBind  Flag indicating bindUnique() method call
      */
-    void onBindError(Throwable oldError, T failedValue, boolean uniqueBind);
-
+    @Override
+    public void onBindError(final Throwable oldError, final T failedValue, final boolean uniqueBind) {
+    }
 
     /**
      * Notifies about failed bindError operations
@@ -56,5 +60,7 @@ public interface BindErrorListener<T> {
      * @param oldError    The already bound Throwable
      * @param failedError The error attempted to be bound
      */
-    void onBindError(Throwable oldError, Throwable failedError);
+    @Override
+    public void onBindError(final Throwable oldError, final Throwable failedError) {
+    }
 }
