@@ -20,7 +20,7 @@ import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.group.DefaultPGroup
 
 /**
- * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow operator Pipeline DSL.
+ * Demonstrates a concurrent implementation of the Sieve of Eratosthenes using dataflow operator Pipeline DSL.
  * The Pipeline DSL allows for very compact code compared to the other Sieve of Eratosthenes implementations.
  * We're essentially chaining dataflow operators here, but without the need to create and touch the operators explicitly.
  *

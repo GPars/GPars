@@ -22,7 +22,7 @@ import static groovyx.gpars.dataflow.Dataflow.operator
 import static groovyx.gpars.dataflow.Dataflow.task as go
 
 /**
- * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow tasks mimicking closely the example
+ * Demonstrates a concurrent implementation of the Sieve of Eratosthenes using dataflow tasks mimicking closely the example
  * given in the Google's Go programming language, but overcoming the co-routine shortage on JVM.
  *
  * In principle, the algorithm consists of concurrently run chained filters,
