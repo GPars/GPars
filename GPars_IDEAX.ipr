@@ -212,6 +212,7 @@
       <option name="fileTypeOverride" value="1" />
     </LanguageOptions>
     <LanguageOptions name="__TEMPLATE__">
+      <option name="block" value="false" />
       <option name="prefixLines" value="false" />
     </LanguageOptions>
   </component>
