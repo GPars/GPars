@@ -20,7 +20,7 @@ import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.group.DefaultPGroup
 
 /**
- * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow tasks with asynchronous value retrieval
+ * Demonstrates a concurrent implementation of the Sieve of Eratosthenes using dataflow tasks with asynchronous value retrieval
  * Asynchronous value retrieval releases the current task's thread whenever waiting for a value to read from the DataflowQueue.
  *
  * In principle, the algorithm consists of concurrently run chained filters,

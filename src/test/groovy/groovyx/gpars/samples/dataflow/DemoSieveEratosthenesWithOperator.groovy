@@ -20,7 +20,7 @@ import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.group.DefaultPGroup
 
 /**
- * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow tasks and operators
+ * Demonstrates a concurrent implementation of the Sieve of Eratosthenes using dataflow tasks and operators
  *
  * In principle, the algorithm consists of concurrently run chained filters,
  * each of which detects whether the current number can be divided by a single prime number.
