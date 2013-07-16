@@ -1,5 +1,41 @@
 GPars - Groovy Parallel Systems
 
+1.1.0
+Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=17007
+
+h3. Project changes
+
+h3. Asynchronous functions
+
+h3. Parallel collections
+
+* Deprecated foldParallel, renamed to injectParallel
+
+h3. Fork / Join
+
+h3. Actors
+
+h3. Dataflow
+
+* LazyDataflowVariable added to allow for lazy asynchronous values
+* Timeout channels on Selects
+* Added a Promise-based API for value selection through the Select class
+* Enabled listening for bind errors on DataflowVariables
+* Minor API improvement affecting Promise and DataflowReadChannel
+
+h3. Agent
+
+* Protecting agent's blocking methods from being called from within commands
+
+h3. Stm
+
+* Updated to the latest 0.7.0 GA version of Multiverse
+
+h3. Other
+
+* Migrated to Groovy 2.0
+* Used @CompileStatic where appropriate
+
 1.0.0
 Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=17007
 
