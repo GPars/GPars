@@ -20,11 +20,11 @@ snapshots repositories.  The released versions are in the Maven and Codehaus mai
 the current development version (SNAPSHOT) is in the Codehaus snapshots repository.  To use from Gradle
 or Grapes use the specification:
 {code}
-"org.codehaus.gpars:gpars:1.0.0"
+"org.codehaus.gpars:gpars:1.1.0"
 {code}
 for the release version, and:
 {code}
-"org.codehaus.gpars:gpars:1.1-SNAPSHOT"
+"org.codehaus.gpars:gpars:1.2-SNAPSHOT"
 {code}
 for the development version.  You will likely need to add the Codehaus snapshots repository manually to the
 search list in this latter case.  Using Maven the dependency is:
@@ -32,10 +32,10 @@ search list in this latter case.  Using Maven the dependency is:
 <dependency>
     <groupId>org.codehaus.gpars</groupId>
     <artifactId>gpars</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 {code}
-or version 1.1-SNAPSHOT if using the latest snapshot.
+or version 1.2-SNAPSHOT if using the latest snapshot.
 
 h3. Transitive Dependencies
 
