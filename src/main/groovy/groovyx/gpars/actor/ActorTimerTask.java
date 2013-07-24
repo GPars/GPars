@@ -16,16 +16,15 @@
 
 package groovyx.gpars.actor;
 
-import java.util.TimerTask;
-
 /**
  * Represents an ongoing timeout
  *
  * @author Vaclav Pech
  */
-final class ActorTimerTask extends TimerTask {
+final class ActorTimerTask implements Runnable {
     private final AbstractLoopingActor actor;
     private final int id;
+    private volatile boolean cancelled = false;
 
     ActorTimerTask(final AbstractLoopingActor actor, final int id) {
         this.actor = actor;
@@ -36,10 +35,15 @@ final class ActorTimerTask extends TimerTask {
     @Override
     public void run() {
         try {
+            if (cancelled) return;
             actor.send(Actor.TIMEOUT_MESSAGE);
         } catch (Throwable e) {
             actor.handleException(e);
         }
+    }
+
+    public void cancel() {
+        cancelled = true;
     }
 
     public int getId() {
