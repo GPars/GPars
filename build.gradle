@@ -41,7 +41,7 @@ defaultTasks 'test'
 
 archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
-version = '1.1.0-rc1'
+version = '1.1.0'
 
 sourceCompatibility = 6
 targetCompatibility = 6
