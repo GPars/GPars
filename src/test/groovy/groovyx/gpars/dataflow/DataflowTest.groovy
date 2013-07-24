@@ -124,7 +124,36 @@ public class DataflowTest extends GroovyTestCase {
         Thread.start {
             promises.eachWithIndex { p, i -> sleep 100; p << i + 1 }
         }
-        assert result.val == 15
+        assert result.get() == 15
+    }
+
+    void testWhenAllBoundWithError() {
+        final promises = (1..5).collect { new DataflowVariable() }
+        final result = Dataflow.whenAllBound(promises, { a, b, c, d, e -> a + b + c + d + e }, { 10 })
+        Thread.start {
+            promises.eachWithIndex { p, i -> sleep 100; if (i == 4) p.bindError(new RuntimeException("test")); else p << i + 1 }
+        }
+        assert result.get() == 10
+    }
+
+    void testWhenAllBoundWithMatchingErrorHandler() {
+        final promises = (1..5).collect { new DataflowVariable() }
+        final result = Dataflow.whenAllBound(promises, { a, b, c, d, e -> a + b + c + d + e }, { RuntimeException e -> 10 })
+        Thread.start {
+            promises.eachWithIndex { p, i -> sleep 100; if (i == 4) p.bindError(new RuntimeException("test")); else p << i + 1 }
+        }
+        assert result.get() == 10
+    }
+
+    void testWhenAllBoundWithNotMatchingErrorHandler() {
+        final promises = (1..5).collect { new DataflowVariable() }
+        final result = Dataflow.whenAllBound(promises, { a, b, c, d, e -> a + b + c + d + e }, { IllegalArgumentException e -> 10 })
+        Thread.start {
+            promises.eachWithIndex { p, i -> sleep 100; if (i == 4) p.bindError(new RuntimeException("test")); else p << i + 1 }
+        }
+        shouldFail(RuntimeException) {
+            result.get()
+        }
     }
 
     public void testNestedWhenAllBoundChaining() {
