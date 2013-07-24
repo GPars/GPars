@@ -40,7 +40,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
@@ -103,7 +102,7 @@ public class GParsPoolUtil {
      */
     public static <T> Future<T> callTimeoutAsync(final Closure<T> cl, final long timeout, final Object... args) {
         final Future<T> f = callAsync(cl, args);
-        timer.schedule(new TimerTask() {
+        timer.schedule(new Runnable() {
             @Override
             public void run() {
                 f.cancel(true);
@@ -649,8 +648,8 @@ public class GParsPoolUtil {
      * Example:
      * <code>
      * GParsPool.withPool {
-     *     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -&gt; number &gt; 3}
-     *     assertEquals(new HashSet([4, 5]), result)
+     * def result = [1, 2, 3, 4, 5].findAllParallel {Number number -&gt; number &gt; 3}
+     * assertEquals(new HashSet([4, 5]), result)
      * }
      * </code>
      */

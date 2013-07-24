@@ -387,7 +387,7 @@ public abstract class Dataflow {
      *
      * @param promises     The promises to wait for
      * @param code         A closure to execute with concrete values for each of the supplied promises
-     * @param errorHandler A closure handling an exception (an instance of Throwable), if if it gets bound
+     * @param errorHandler A closure handling an exception (an instance of Throwable), if it gets bound
      * @param <T>          The type of the final result
      * @return A promise for the final result
      */
@@ -400,7 +400,7 @@ public abstract class Dataflow {
      *
      * @param promise1     The promises to wait for
      * @param code         A closure to execute with concrete values for each of the supplied promises
-     * @param errorHandler A closure handling an exception (an instance of Throwable), if if it gets bound
+     * @param errorHandler A closure handling an exception (an instance of Throwable), if it gets bound
      * @param <T>          The type of the final result
      * @return A promise for the final result
      */
@@ -414,7 +414,7 @@ public abstract class Dataflow {
      * @param promise1     The promises to wait for
      * @param promise2     The promises to wait for
      * @param code         A closure to execute with concrete values for each of the supplied promises
-     * @param errorHandler A closure handling an exception (an instance of Throwable), if if it gets bound
+     * @param errorHandler A closure handling an exception (an instance of Throwable), if it gets bound
      * @param <T>          The type of the final result
      * @return A promise for the final result
      */
@@ -429,7 +429,7 @@ public abstract class Dataflow {
      * @param promise2     The promises to wait for
      * @param promise3     The promises to wait for
      * @param code         A closure to execute with concrete values for each of the supplied promises
-     * @param errorHandler A closure handling an exception (an instance of Throwable), if if it gets bound
+     * @param errorHandler A closure handling an exception (an instance of Throwable), if it gets bound
      * @param <T>          The type of the final result
      * @return A promise for the final result
      */
@@ -445,7 +445,7 @@ public abstract class Dataflow {
      * @param promise3     The promises to wait for
      * @param promise4     The promises to wait for
      * @param code         A closure to execute with concrete values for each of the supplied promises
-     * @param errorHandler A closure handling an exception (an instance of Throwable), if if it gets bound
+     * @param errorHandler A closure handling an exception (an instance of Throwable), if it gets bound
      * @param <T>          The type of the final result
      * @return A promise for the final result
      */

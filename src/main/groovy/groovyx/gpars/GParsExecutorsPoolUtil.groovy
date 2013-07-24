@@ -84,7 +84,7 @@ public class GParsExecutorsPoolUtil {
      */
     public static Future callTimeoutAsync(final Closure cl, long timeout, final Object... args) {
         final Future f = callAsync(cl, args)
-        timer.schedule({ f.cancel(true) } as TimerTask, timeout)
+        timer.schedule({ f.cancel(true) } as Runnable, timeout)
         return f
     }
 

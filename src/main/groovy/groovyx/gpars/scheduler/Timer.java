@@ -14,11 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.util;
+package groovyx.gpars.scheduler;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 
 /**
- * Represents timers, either java.util.Timer or timers provided by the hosting environment, such as GAE
+ * A shared timer to run timeouts for various GPars services
  */
-public interface GeneralTimer {
-    void schedule(Runnable task, long timeout);
+public final class Timer {
+    /**
+     * The actual scheduler instance
+     */
+    public static final ScheduledExecutorService timer = Executors.newScheduledThreadPool(5, new ThreadFactory() {
+        @Override
+        public Thread newThread(final Runnable runnable) {
+            final Thread thread = new Thread(runnable, "GPars timer scheduler");
+            thread.setDaemon(true);
+            return thread;
+        }
+    });
+
 }

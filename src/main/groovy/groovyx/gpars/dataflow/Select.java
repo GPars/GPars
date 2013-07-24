@@ -20,12 +20,12 @@ import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.impl.GuardedSelectRequest;
 import groovyx.gpars.dataflow.impl.SelectBase;
 import groovyx.gpars.group.PGroup;
+import groovyx.gpars.scheduler.Timer;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A Select allows the user to select a value from multiple channels, which have a value available for read at the moment.
@@ -48,10 +48,6 @@ public class Select<T> {
 
     private final SelectBase<T> selectBase;
 
-    /**
-     * A shared timer to run timeouts for Selects
-     */
-    private static final Timer timer = new Timer("Select timeout timer", true);
 
     /**
      * A value that gets bound to timeout channels through the Select.createTimeout() method
@@ -106,13 +102,13 @@ public class Select<T> {
      */
     public static DataflowReadChannel<String> createTimeout(final long timeout) {
         final DataflowVariable<String> result = new DataflowVariable<String>();
-        final TimerTask task = new TimerTask() {
+        final Runnable task = new Runnable() {
             @Override
             public void run() {
                 result.bind(TIMEOUT);
             }
         };
-        timer.schedule(task, timeout);
+        Timer.timer.schedule(task, timeout, TimeUnit.MILLISECONDS);
         return result;
     }
 

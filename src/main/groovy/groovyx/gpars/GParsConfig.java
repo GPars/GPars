@@ -18,12 +18,12 @@ package groovyx.gpars;
 
 import groovyx.gpars.scheduler.Pool;
 import groovyx.gpars.scheduler.ResizeablePool;
+import groovyx.gpars.scheduler.Timer;
 import groovyx.gpars.util.GeneralTimer;
 import groovyx.gpars.util.PoolFactory;
 import groovyx.gpars.util.TimerFactory;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Enables to specify custom thread pools and timers to run GPars in hosted environments, such as GAE
@@ -78,11 +78,10 @@ public final class GParsConfig {
     public static GeneralTimer retrieveDefaultTimer(final String name, final boolean daemon) {
         if (timerFactory != null) return timerFactory.createTimer(name, daemon);
         return new GeneralTimer() {
-            private final Timer timer = new Timer(name, daemon);
 
             @Override
-            public void schedule(final TimerTask task, final long timeout) {
-                timer.schedule(task, timeout);
+            public void schedule(final Runnable task, final long timeout) {
+                Timer.timer.schedule(task, timeout, TimeUnit.MILLISECONDS);
             }
         };
     }

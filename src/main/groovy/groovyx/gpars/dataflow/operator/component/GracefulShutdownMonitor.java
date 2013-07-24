@@ -18,11 +18,11 @@ package groovyx.gpars.dataflow.operator.component;
 
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.Promise;
+import groovyx.gpars.scheduler.Timer;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -62,11 +62,6 @@ public final class GracefulShutdownMonitor implements OperatorStateMonitor {
     private final Collection<GracefulShutdownListener> listeners = new ArrayList<GracefulShutdownListener>();
 
     /**
-     * A times used to repeatedly poll the state of the network
-     */
-    private final Timer timer = new Timer(true);
-
-    /**
      * Uses the default timer delay
      */
     public GracefulShutdownMonitor() {
@@ -75,6 +70,7 @@ public final class GracefulShutdownMonitor implements OperatorStateMonitor {
 
     /**
      * Allows to use a customized delay
+     *
      * @param delay A timeout in milliseconds to wait between two subsequent polls on processors' state.
      *              Lower values will reduce the wait time for network shutdown,
      *              but maz have impact on the performance when the shutdown process gets initialized.
@@ -94,11 +90,13 @@ public final class GracefulShutdownMonitor implements OperatorStateMonitor {
     /**
      * Invoked by GracefulShutdownListeners, which listen on operators/selectors for lifecycle events, to get registered with the monitor.
      * The monitor will query these registered listeners about their respective operator/selector state when performing graceful shutdown.
+     *
      * @param listener The listener to register
      */
     @Override
     public synchronized void registerProcessorListener(final GracefulShutdownListener listener) {
-        if (shutdownFlag) throw new IllegalStateException("Cannot register processors while performing graceful shutdown.");
+        if (shutdownFlag)
+            throw new IllegalStateException("Cannot register processors while performing graceful shutdown.");
         listeners.add(listener);
     }
 
@@ -106,6 +104,7 @@ public final class GracefulShutdownMonitor implements OperatorStateMonitor {
      * Initializes the shutdown process.
      * New listeners cannot be registered after this point.
      * New messages should not enter the dataflow network from the outside, since this may prevent the network from terminating.
+     *
      * @return A Promise, which may be used to wait for or get notified about the shutdown success.
      */
     public synchronized Promise<Boolean> shutdownNetwork() {
@@ -155,10 +154,11 @@ public final class GracefulShutdownMonitor implements OperatorStateMonitor {
 
     /**
      * Checks the notification flag whether there has been some activity since last timer run.
+     *
      * @return True, if events have been registered since last time, false otherwise.
      */
     private boolean checkWhetherAnyEventsHaveArrived() {
-        if(notificationArrivedFlag.get()) {
+        if (notificationArrivedFlag.get()) {
             schedule();
             return true;
         }
@@ -171,11 +171,11 @@ public final class GracefulShutdownMonitor implements OperatorStateMonitor {
      */
     private void schedule() {
         notificationArrivedFlag.set(false);
-        timer.schedule(new TimerTask() {
+        Timer.timer.schedule(new Runnable() {
             @Override
             public void run() {
                 onTimer();
             }
-        }, delay);
+        }, delay, TimeUnit.MILLISECONDS);
     }
 }

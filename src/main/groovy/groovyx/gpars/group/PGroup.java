@@ -655,7 +655,7 @@ public abstract class PGroup {
      *
      * @param promises     The promises to wait for
      * @param code         A closure to execute with concrete values for each of the supplied promises
-     * @param errorHandler A closure handling an exception (an instance of Throwable), if if it gets bound
+     * @param errorHandler A closure handling an exception (an instance of Throwable), if it gets bound
      * @param <T>          The type of the final result
      * @return A promise for the final result
      */
@@ -759,7 +759,7 @@ public abstract class PGroup {
                 }, new MessagingRunnable() {
                     @Override
                     protected void doRun(final Object argument) {
-                        if (errorHandler != null) {
+                        if (errorHandler != null && shallHandle(errorHandler, (Throwable) argument)) {
                             try {
                                 result.leftShift(errorHandler.getMaximumNumberOfParameters() == 1 ? errorHandler.call(argument) : errorHandler.call());
                             } catch (Throwable e) {
@@ -772,6 +772,12 @@ public abstract class PGroup {
                     }
                 }
         );
+    }
+
+    private <T> boolean shallHandle(final Closure<T> errorHandler, final Throwable e) {
+        final Class[] types = errorHandler.getParameterTypes();
+        if (types.length == 0) return true;
+        return types[0].isAssignableFrom(e.getClass());
     }
 
     private static <T> boolean isListAccepting(final Closure<T> code) {
