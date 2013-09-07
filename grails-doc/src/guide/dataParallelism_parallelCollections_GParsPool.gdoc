@@ -235,3 +235,13 @@ def thumbnails = []
 images.eachParallel {thumbnails << it.thumbnail}  //Concurrently accessing a not-thread-safe collection of thumbnails, don't do this!
 {code}
 At least, you've been warned.
+
+{note}
+Because _GParsPool_ uses a *Fork/Join* pool (with work stealing), threads may
+not be applied to a waiting processing task even though they may appear
+idle. With a work-stealing algorithm, worker threads that run out of things
+to do can steal tasks from other threads that are still busy.
+
+if you use _GParsExecutorsPool_ , which doesn't use *Fork/Join*, you get the
+thread allocation behavior that you would naively expect.
+{note}
