@@ -295,4 +295,14 @@ public class DataflowQueueTest extends GroovyTestCase {
         stream << null
         assert null == stream.getVal(10, TimeUnit.MILLISECONDS)
     }
+
+    public void testChainWithParams() {
+
+        final DataflowQueue queue = new DataflowQueue()
+        def params = new HashMap();
+        def result = queue.chainWith(params) { it }
+        queue << 1
+        assert result.val == 1
+
+    }
 }
