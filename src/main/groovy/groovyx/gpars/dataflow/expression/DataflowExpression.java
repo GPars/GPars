@@ -945,7 +945,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     public void binaryChoice(final PGroup group, final Map<String, Object> params, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code) {
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(trueBranch, falseBranch)));
+        parameters.put("outputs", asList(trueBranch, falseBranch));
 
         group.operator(parameters, new BinaryChoiceClosure(code));
     }
@@ -979,7 +979,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     public void choice(final PGroup group, final Map<String, Object> params, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code) {
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(outputs)));
+        parameters.put("outputs", asList(outputs));
 
         group.operator(parameters, new ChoiceClosure(code));
     }
@@ -1013,7 +1013,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     public void separate(final PGroup group, final Map<String, Object> params, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(outputs)));
+        parameters.put("outputs", asList(outputs));
 
         group.operator(parameters, new SeparationClosure(code));
     }
