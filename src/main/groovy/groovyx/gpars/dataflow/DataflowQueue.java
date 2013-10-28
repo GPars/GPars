@@ -16,6 +16,20 @@
 
 package groovyx.gpars.dataflow;
 
+import static java.util.Arrays.asList;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
@@ -31,20 +45,6 @@ import groovyx.gpars.dataflow.operator.SeparationClosure;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-
-import static java.util.Arrays.asList;
 
 /**
  * Represents a thread-safe data flow stream. Values or DataflowVariables are added using the '&lt;&lt;' operator
@@ -401,7 +401,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
         final DataflowQueue<V> result = new DataflowQueue<V>();
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(result)));
+        parameters.put("outputs", asList(result));
 
         group.operator(parameters, new ChainWithClosure<V>(closure));
         return result;
