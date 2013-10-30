@@ -263,7 +263,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
         final DataflowQueue<V> result = new DataflowQueue<V>();
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(result)));
+        parameters.put("outputs", asList(result));
 
         group.operator(parameters, new ChainWithClosure<V>(closure));
         return result;
@@ -333,7 +333,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     public void into(final PGroup group, final Map<String, Object> params, final DataflowWriteChannel<T> target) {
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(target)));
+        parameters.put("outputs", asList(target));
         group.operator(parameters, new ChainWithClosure(new CopyChannelsClosure()));
     }
 
@@ -401,7 +401,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     public void split(final PGroup group, final Map<String, Object> params, final List<DataflowWriteChannel<T>> targets) {
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(targets)));
+        parameters.put("outputs", asList(targets));
 
         group.operator(parameters, new ChainWithClosure(new CopyChannelsClosure()));
     }
@@ -438,7 +438,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
         final DataflowQueue<T> result = new DataflowQueue<T>();
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(result, target)));
+        parameters.put("outputs", asList(result, target));
 
         group.operator(parameters, new ChainWithClosure(new CopyChannelsClosure()));
         return result;
@@ -546,7 +546,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     public void binaryChoice(final PGroup group, final Map<String, Object> params, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code) {
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(trueBranch, falseBranch)));
+        parameters.put("outputs", asList(trueBranch, falseBranch));
 
         group.operator(parameters, new BinaryChoiceClosure(code));
     }
@@ -580,7 +580,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     public void choice(final PGroup group, final Map<String, Object> params, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code) {
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(outputs)));
+        parameters.put("outputs", asList(outputs));
 
         group.operator(parameters, new ChoiceClosure(code));
     }
@@ -614,7 +614,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     public void separate(final PGroup group, final Map<String, Object> params, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(outputs)));
+        parameters.put("outputs", asList(outputs));
 
         group.operator(parameters, new SeparationClosure(code));
     }
