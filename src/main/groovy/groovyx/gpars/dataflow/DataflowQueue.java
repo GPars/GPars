@@ -16,6 +16,20 @@
 
 package groovyx.gpars.dataflow;
 
+import static java.util.Arrays.asList;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
@@ -31,20 +45,6 @@ import groovyx.gpars.dataflow.operator.SeparationClosure;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-
-import static java.util.Arrays.asList;
 
 /**
  * Represents a thread-safe data flow stream. Values or DataflowVariables are added using the '&lt;&lt;' operator
@@ -401,7 +401,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
         final DataflowQueue<V> result = new DataflowQueue<V>();
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(result)));
+        parameters.put("outputs", asList(result));
 
         group.operator(parameters, new ChainWithClosure<V>(closure));
         return result;
@@ -471,7 +471,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     public void into(final PGroup group, final Map<String, Object> params, final DataflowWriteChannel<T> target) {
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(target)));
+        parameters.put("outputs", asList(target));
         group.operator(parameters, new ChainWithClosure(new CopyChannelsClosure()));
     }
 
@@ -539,7 +539,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     public void split(final PGroup group, final Map<String, Object> params, final List<DataflowWriteChannel<T>> targets) {
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(targets)));
+        parameters.put("outputs", asList(targets));
 
         group.operator(parameters, new ChainWithClosure(new CopyChannelsClosure()));
     }
@@ -576,7 +576,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
         final DataflowQueue<T> result = new DataflowQueue<T>();
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(result, target)));
+        parameters.put("outputs", asList(result, target));
 
         group.operator(parameters, new ChainWithClosure(new CopyChannelsClosure()));
         return result;
@@ -684,7 +684,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     public void binaryChoice(final PGroup group, final Map<String, Object> params, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code) {
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(trueBranch, falseBranch)));
+        parameters.put("outputs", asList(trueBranch, falseBranch));
 
         group.operator(parameters, new BinaryChoiceClosure(code));
     }
@@ -718,7 +718,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     public void choice(final PGroup group, final Map<String, Object> params, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code) {
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(outputs)));
+        parameters.put("outputs", asList(outputs));
 
         group.operator(parameters, new ChoiceClosure(code));
     }
@@ -752,7 +752,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     public void separate(final PGroup group, final Map<String, Object> params, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
-        parameters.put("outputs", asList(asList(outputs)));
+        parameters.put("outputs", asList(outputs));
 
         group.operator(parameters, new SeparationClosure(code));
     }
