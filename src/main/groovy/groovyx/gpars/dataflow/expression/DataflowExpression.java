@@ -20,6 +20,7 @@ import groovy.lang.Closure;
 import groovy.lang.GroovyObject;
 import groovy.lang.MetaClass;
 import groovy.lang.MetaProperty;
+import groovyx.gpars.DataflowMessagingRunnable;
 import groovyx.gpars.MessagingRunnable;
 import groovyx.gpars.actor.Actors;
 import groovyx.gpars.actor.impl.MessageStream;
@@ -50,6 +51,7 @@ import groovyx.gpars.serial.WithSerialId;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -587,6 +589,78 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     public final <V> Promise<V> then(final PGroup group, final Closure<V> closure) {
         final DataflowVariable<V> result = new DataflowVariable<V>();
         whenBound(group, new ThenMessagingRunnable<T, V>(result, closure));
+        return result;
+    }
+
+    /**
+     * Schedule a set of closures to be executed after data became available on the current promise.
+     * It is important to notice that even if the expression is already bound the execution of closures
+     * will not happen immediately, but will be scheduled.
+     * The returned Promise will hold a list of results of the individual closures, ordered in the same order.
+     * In case of an exception being thrown from any of the closures, the first exception gets propagated into the promise returned from the method.
+     *
+     * @param closures closure to execute when data becomes available. The closure should take at most one argument.
+     * @return A promise for the results of the supplied closures. This allows for chaining of then() method calls.
+     */
+    @SuppressWarnings({"rawtypes", "ClassReferencesSubclass"})
+    public final Promise<List> thenForkAndJoin(final Closure<? extends Object>... closures) {
+        return doThenForkAndJoin(Dataflow.DATA_FLOW_GROUP, Dataflow.DATA_FLOW_GROUP.getThreadPool(), closures);
+    }
+
+    /**
+     * Schedule a set of closures to be executed after data became available on the current promise.
+     * It is important to notice that even if the expression is already bound the execution of closures
+     * will not happen immediately, but will be scheduled.
+     * The returned Promise will hold a list of results of the individual closures, ordered in the same order.
+     * In case of an exception being thrown from any of the closures, the first exception gets propagated into the promise returned from the method.
+     *
+     * @param pool     The thread pool to use for task scheduling for asynchronous message delivery
+     * @param closures closure to execute when data becomes available. The closure should take at most one argument.
+     * @return A promise for the results of the supplied closures. This allows for chaining of then() method calls.
+     */
+    @SuppressWarnings({"rawtypes", "ClassReferencesSubclass"})
+    public final Promise<List> thenForkAndJoin(final Pool pool, final Closure<? extends Object>... closures) {
+        return doThenForkAndJoin(Dataflow.DATA_FLOW_GROUP, pool, closures);
+    }
+
+    /**
+     * Schedule a set of closures to be executed after data became available on the current promise.
+     * It is important to notice that even if the expression is already bound the execution of closures
+     * will not happen immediately, but will be scheduled.
+     * The returned Promise will hold a list of results of the individual closures, ordered in the same order.
+     * In case of an exception being thrown from any of the closures, the first exception gets propagated into the promise returned from the method.
+     *
+     * @param group    The PGroup to use for task scheduling for asynchronous message delivery
+     * @param closures closure to execute when data becomes available. The closure should take at most one argument.
+     * @return A promise for the results of the supplied closures. This allows for chaining of then() method calls.
+     */
+    @SuppressWarnings({"rawtypes", "ClassReferencesSubclass"})
+    public final Promise<List> thenForkAndJoin(final PGroup group, final Closure<? extends Object>... closures) {
+        return doThenForkAndJoin(group, group.getThreadPool(), closures);
+    }
+
+    private Promise<List> doThenForkAndJoin(final PGroup group, final Pool pool, final Closure<? extends Object>[] closures) {
+        final DataflowVariable<List> result = new DataflowVariable<List>();
+        final List<Promise> partialResults = new ArrayList<Promise>(closures.length);
+        for (final Closure<? extends Object> closure : closures) {
+            final DataflowVariable<? extends Object> partialResult = new DataflowVariable<Object>();
+            whenBound(pool, new ThenMessagingRunnable(partialResult, closure));
+            partialResults.add(partialResult);
+        }
+        group.whenAllBound(partialResults,
+                new DataflowMessagingRunnable(partialResults.size()) {
+                    @Override
+                    protected void doRun(final Object... arguments) {
+                        result.bind(Arrays.asList(arguments));
+                    }
+                },
+                new DataflowMessagingRunnable(1) {
+                    @Override
+                    protected void doRun(final Object... arguments) {
+                        result.bindError((Throwable) arguments[0]);
+                    }
+                }
+        );
         return result;
     }
 

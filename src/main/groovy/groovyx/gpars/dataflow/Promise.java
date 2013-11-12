@@ -21,6 +21,7 @@ import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -221,6 +222,44 @@ public interface Promise<T> extends SelectableChannel<T> {
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     <V> Promise<V> then(final PGroup group, final Closure<V> closure, final Closure<V> errorHandler);
+
+    /**
+     * Schedule a set of closures to be executed after data became available on the current promise.
+     * It is important to notice that even if the expression is already bound the execution of closures
+     * will not happen immediately, but will be scheduled.
+     * The returned Promise will hold a list of results of the individual closures, ordered in the same order.
+     * In case of an exception being thrown from any of the closures, the first exception gets propagated into the promise returned from the method.
+     *
+     * @param closures closure to execute when data becomes available. The closure should take at most one argument.
+     * @return A promise for the results of the supplied closures. This allows for chaining of then() method calls.
+     */
+    Promise<List> thenForkAndJoin(final Closure<? extends Object>... closures);
+
+    /**
+     * Schedule a set of closures to be executed after data became available on the current promise.
+     * It is important to notice that even if the expression is already bound the execution of closures
+     * will not happen immediately, but will be scheduled.
+     * The returned Promise will hold a list of results of the individual closures, ordered in the same order.
+     * In case of an exception being thrown from any of the closures, the first exception gets propagated into the promise returned from the method.
+     *
+     * @param pool     The thread pool to use for task scheduling for asynchronous message delivery
+     * @param closures closure to execute when data becomes available. The closure should take at most one argument.
+     * @return A promise for the results of the supplied closures. This allows for chaining of then() method calls.
+     */
+    Promise<List> thenForkAndJoin(final Pool pool, final Closure<? extends Object>... closures);
+
+    /**
+     * Schedule a set of closures to be executed after data became available on the current promise.
+     * It is important to notice that even if the expression is already bound the execution of closures
+     * will not happen immediately, but will be scheduled.
+     * The returned Promise will hold a list of results of the individual closures, ordered in the same order.
+     * In case of an exception being thrown from any of the closures, the first exception gets propagated into the promise returned from the method.
+     *
+     * @param group    The PGroup to use for task scheduling for asynchronous message delivery
+     * @param closures closure to execute when data becomes available. The closure should take at most one argument.
+     * @return A promise for the results of the supplied closures. This allows for chaining of then() method calls.
+     */
+    Promise<List> thenForkAndJoin(final PGroup group, final Closure<? extends Object>... closures);
 
     /**
      * Check if value has been set already for this expression

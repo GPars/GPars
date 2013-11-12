@@ -19,6 +19,8 @@ h3. Actors
 
 h3. Dataflow
 
+* A thenForkAndJoin() method added to Promises to ease the creation of a fork/join algorithm with promises
+
 h3. Agent
 
 h3. Stm

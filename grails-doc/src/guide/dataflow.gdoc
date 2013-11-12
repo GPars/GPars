@@ -629,6 +629,30 @@ Notice that only the initial action (function) needs to be asynchronous. The fun
 asynchronously by the promise even if the are synchronous.
 {note}
 
+h3. Implementing the fork/join pattern with Promises
+
+Promises are very flexible and can be used as an implementation vehicle for a lot of different scenarios:.
+Here's one additional handy capability od Promises. The _thenForkAndJoin() method triggers multiple activities once the current promise is bound
+and returns a promise that get bound only after all the activities finish. Let's see how it fits into the picture:
+
+* _then()_ - allows for chaining of activities, so that one is performed after another
+* _whenAllBound()_ - allows for joining multiple activities, so that a new activity is started only after they all finish
+* _task()_ - allows to create (fork) multiple asynchronous activities
+* _thenForkAndJoin()_ - a short-hand for forking several activities and joining on them
+
+So with _thenForkAndJoin()_ you simply create multiple activities that should be triggered by a shared (triggering) promise.
+{code}
+promise.thenForkAndJoin(task1, task2, task3).then{...}
+{code}
+
+Once all the activities return a result, they get collected into a list and bound into the promise returned by _thenForkAndJoin()_ .
+
+{code}
+task {
+    2
+}.thenForkAndJoin({ it ** 2 }, { it**3 }, { it**4 }, { it**5 }).then({ println it}).join()
+{code}
+
 h2. Lazy dataflow variables
 
 Sometimes you may like to combine the qualities of dataflow variables with their lazy initialization.
