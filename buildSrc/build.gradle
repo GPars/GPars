@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008–2012  The original author or authors
+// Copyright © 2008–2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,16 +25,16 @@ apply plugin: 'groovy'
 apply from: '../gradle/docsDependencies.gradle'
 
 repositories {
-	mavenCentral()
-    mavenRepo name: 'SpringSource', url: 'http://repository.springsource.com/maven/bundles/release'
-    mavenRepo name: 'JavaNet', url: 'http://download.java.net/maven/2/'
+  mavenCentral()
+  //mavenRepo name: 'SpringSource', url: 'http://repository.springsource.com/maven/bundles/release'
+  //mavenRepo name: 'JavaNet', url: 'http://download.java.net/maven/2/'
 }
 
 dependencies {
-	groovy localGroovy()
-    compile gradleApi()
-    compile(ext.grailsDocs) { transitive = false }
-    compile(ext.xhtmlRenderer) { transitive = false }
-    compile(ext.lowagieItext) { transitive = false }
-    compile(ext.radeox) { transitive = false }
+	compile localGroovy()
+  compile gradleApi()
+  compile(ext.grailsDocs) { transitive = false }
+  compile(ext.xhtmlRenderer) { transitive = false }
+  compile(ext.lowagieItext) { transitive = false }
+  compile(ext.radeox) { transitive = false }
 }
