@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.Promise
+
 import static groovyx.gpars.GParsPool.withPool
 
 /**
@@ -36,11 +37,11 @@ import static groovyx.gpars.GParsPool.withPool
 //notice also the use of gmemoize() to speed-up the calculation by remembering all calculated values - a nice example of function composability
 
 withPool {
-    def sum = {a, b -> a + b}.asyncFun()
+    def sum = { a, b -> a + b }.asyncFun()
     def fib
-    fib = {n ->
+    fib = { n ->
         n <= 2 ? 1 : sum(fib(n - 2), fib(n - 1))
-    }.gmemoizeAtMost(30).asyncFun()
+    }.memoizeAtMost(30).asyncFun()
 
     println "Starting the calculation"
     final Promise<Integer> result = fib(40)

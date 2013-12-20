@@ -23,6 +23,7 @@ package groovyx.gpars.memoize;
  * @author Vaclav Pech
  *         Date: Jun 22, 2010
  */
+@Deprecated
 public final class NullValue {
 
     @Override
