@@ -19,9 +19,10 @@ package groovyx.gpars.benchmark
 import groovy.time.TimeCategory
 import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.ParallelEnhancer
-import jsr166y.ForkJoinPool
 import groovyx.gpars.extra166y.Ops.Reducer
 import groovyx.gpars.extra166y.ParallelArray
+import jsr166y.ForkJoinPool
+
 import static groovyx.gpars.GParsPool.withExistingPool
 import static groovyx.gpars.GParsPool.withPool
 
@@ -37,7 +38,7 @@ class MyNumber {
     }
 }
 //def nums = (1L..10000000L)
-List nums = (1L..10000000L).collect {it}
+List nums = (1L..10000000L).collect { it }
 //Long[] nums = (1L..10000000L).collect{it}
 println nums.class
 //def nums = (1L..10000000L).collect {new TimeDuration(1, 2, it as int, it as int)}
@@ -55,7 +56,7 @@ withExistingPool(pool) {
     println GParsPoolUtil.sumParallel(nums)
     println GParsPoolUtil.getParallel(nums).sum()
     println GParsPoolUtil.getParallel(nums).sum()
-    println ParallelArray.createFromCopy(nums.toArray(new Long[nums.size()]), pool).reduce({a, b -> a + b} as Reducer, null)
+    println ParallelArray.createFromCopy(nums.toArray(new Long[nums.size()]), pool).reduce({ a, b -> a + b } as Reducer, null)
 //    println ParallelArray.createFromCopy(nums, pool).reduce({a, b -> a + b} as Reducer, null)
 }
 
@@ -87,7 +88,7 @@ println "time: ${System.currentTimeMillis() - start}ms"
 withExistingPool(pool) {
     sleep 2000
     println ""
-    println "paralell summing numbers inside a withPool"
+    println "parallel summing numbers inside a withPool"
     start = System.currentTimeMillis()
     println GParsPoolUtil.sumParallel(nums)
     println "time: ${System.currentTimeMillis() - start}ms"
@@ -97,7 +98,7 @@ withPool {
     sleep 2000
     println ""
     println GParsPoolUtil.getParallel(nums).sum()
-    println "paralell summing numbers inside a withPool using PA"
+    println "parallel summing numbers inside a withPool using PA"
     start = System.currentTimeMillis()
     println GParsPoolUtil.getParallel(nums).sum()
     println "time: ${System.currentTimeMillis() - start}ms"
@@ -106,7 +107,7 @@ withPool {
 withPool {
     sleep 2000
     println ""
-    println "paralell summing numbers inside a withPool using PA ignoring PA build time"
+    println "parallel summing numbers inside a withPool using PA ignoring PA build time"
     final def pnums = GParsPoolUtil.getParallel(nums)
     start = System.currentTimeMillis()
     println pnums.sum()
@@ -115,16 +116,16 @@ withPool {
 
 println ""
 sleep 2000
-println "paralell summing numbers inside a withPool using PA directly"
+println "parallel summing numbers inside a withPool using PA directly"
 start = System.currentTimeMillis()
 def pnums = ParallelArray.createFromCopy(nums.toArray(new Long[nums.size()]), pool)
 //def pnums = ParallelArray.createFromCopy(nums, pool)
-println pnums.reduce({a, b -> a + b} as Reducer, null)
+println pnums.reduce({ a, b -> a + b } as Reducer, null)
 println "time: ${System.currentTimeMillis() - start}ms"
 
 sleep 2000
 println ""
-println "paralell summing numbers using an enhancer"
+println "parallel summing numbers using an enhancer"
 start = System.currentTimeMillis()
 ParallelEnhancer.enhanceInstance(nums)
 println nums.sumParallel()

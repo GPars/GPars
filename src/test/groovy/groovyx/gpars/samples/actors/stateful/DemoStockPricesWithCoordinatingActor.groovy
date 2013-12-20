@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,13 +30,14 @@ def getYearEndClosing(String symbol, int year) {
     }
 }
 
+//noinspection SpellCheckingInspection
 def symbols = ['AAPL', 'GOOG', 'IBM', 'MSFT']
 
 def observer = actor {
     def start = System.nanoTime()
-    symbols.each {stock ->
+    symbols.each { stock ->
         actor {
-            react {receivedStock -> reply getYearEndClosing(receivedStock, 2008)}
+            react { receivedStock -> reply getYearEndClosing(receivedStock, 2008) }
         } << stock
     }
 
@@ -45,7 +46,7 @@ def observer = actor {
     loop {
         quoteNum += 1
         if (quoteNum <= symbols.size()) {
-            react {quote ->
+            react { quote ->
                 println "Received a quote for ${quote.symbol} priced ${quote.price}"
                 if (quote.price > top.price) top = quote
             }

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import java.util.concurrent.CyclicBarrier
  * Date: Oct 30, 2009
  */
 
+@SuppressWarnings("SpellCheckingInspection")
 class MakeTransparentCornerCaseTest extends GroovyTestCase {
 
     public void testUsingNonTransparentEachInTransparentContext() {

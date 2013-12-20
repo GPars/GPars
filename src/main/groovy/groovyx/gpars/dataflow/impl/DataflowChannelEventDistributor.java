@@ -19,6 +19,6 @@ package groovyx.gpars.dataflow.impl;
 /**
  * @author Vaclav Pech
  */
-public interface DataflowChannelEventDistibutor<T> {
+public interface DataflowChannelEventDistributor<T> {
     void fireOnMessage(T message);
 }

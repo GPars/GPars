@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap
  * Date: Oct 30, 2009
  */
 
+@SuppressWarnings("SpellCheckingInspection")
 class MakeTransparentMethodEnhancerTest extends GroovyTestCase {
 
     public void testTransparentEach() {
@@ -41,7 +42,7 @@ class MakeTransparentMethodEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeConcurrent().eachWithIndex {e, i ->
+        items.makeConcurrent().eachWithIndex { e, i ->
             Thread.sleep 100
             map[Thread.currentThread()] = ''
         }

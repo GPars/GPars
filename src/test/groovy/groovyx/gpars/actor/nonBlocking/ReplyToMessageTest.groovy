@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actor
+
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
+
 import static groovyx.gpars.actor.Actors.actor
 
 public class ReplyToMessageTest extends GroovyTestCase {
@@ -170,7 +172,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        actor.send 'messsage'
+        actor.send 'message'
         barrier.await()
 
         assert flag.get()
@@ -187,7 +189,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         }
 
         actor {
-            receiver.send 'messsage'
+            receiver.send 'message'
             react {
                 flag.set(true)
                 barrier.await()
@@ -211,7 +213,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        actor.send 'messsage'
+        actor.send 'message'
         barrier.await()
 
         assert flag.get()
@@ -238,7 +240,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
                 }
             }
 
-            replier.send 'messsage'
+            replier.send 'message'
         }
 
         latch.await()
@@ -255,9 +257,9 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
         final def maxFinder = actor {
             barrier.await()
-            react {message1 ->
+            react { message1 ->
                 def sender1 = sender
-                react {message2 ->
+                react { message2 ->
                     def max = Math.max(message1, message2)
                     sender1.send max
                     sender.send max

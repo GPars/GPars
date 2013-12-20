@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,16 +16,15 @@
 
 package groovyx.gpars.samples.forkjoin
 
-import java.awt.BorderLayout as BL
-
 import groovy.swing.SwingBuilder
-import java.awt.Color
-import javax.swing.BorderFactory
-import javax.swing.JFrame
-import javax.swing.JPanel
-import javax.swing.SwingUtilities
+
+import javax.swing.*
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
+import java.awt.*
+import java.awt.BorderLayout as BL
+import java.util.List
+
 import static groovyx.gpars.GParsPool.runForkJoin
 import static groovyx.gpars.GParsPool.withPool
 
@@ -75,14 +74,14 @@ problemSize.addChangeListener(new ChangeListener() {
 speed = swing.slider(minimum: 0, maximum: 1000, value: 700, border: BorderFactory.createTitledBorder("Speed"))
 
 //Creates Start Button
-startButton = swing.button(text: 'Start', actionPerformed: {event ->
+startButton = swing.button(text: 'Start', actionPerformed: { event ->
     numThreads.enabled = false
     problemSize.enabled = false
     def ps = problemSize.value
     event.source.enabled = false;
     panel.preferredSize = [ps * COL_WIDTH, 7 * ROW_HEIGHT]
     panel.removeAll();
-    Thread.start {runDemo()}
+    Thread.start { runDemo() }
 })
 //Creates frame
 swing.edt {
@@ -97,18 +96,18 @@ swing.edt {
                         label("<html>\
 					 	<ol>\
 							 <li>Thread takes a task from the queue. If the tasks is too big (longer than two elements) it is split to two smaller tasks</li>\
-							 <li>Subtasks are placed to queue to be processed</li>\
-						 	 <li>While the task waits for its subtasks to finish the thread goes to 1.</li>\
-						     <li>When the subtasks are finished their results are merged.</li>\
+							 <li>Sub-tasks are placed to queue to be processed</li>\
+						 	 <li>While the task waits for its sub-tasks to finish the thread goes to 1.</li>\
+						     <li>When the sub-tasks are finished their results are merged.</li>\
 						 </ol>\
 					 </html>")
                     }
             panel()
                     {
                         label(text: "Waiting in queue", background: COLOR_SCHEDULED, opaque: true, border: emptyBorder(3, 3, 3, 3));
-                        label(text: "Waiting for subtasks", background: COLOR_WAIT, opaque: true, border: emptyBorder(3, 3, 3, 3));
+                        label(text: "Waiting for sub-tasks", background: COLOR_WAIT, opaque: true, border: emptyBorder(3, 3, 3, 3));
                         label(text: "Finished", background: COLOR_FINISHED, opaque: true, border: emptyBorder(3, 3, 3, 3));
-                        threadColors.eachWithIndex {color, idx ->
+                        threadColors.eachWithIndex { color, idx ->
                             label(text: "Thread ${idx + 1}", background: color, opaque: true, border: emptyBorder(3, 3, 3, 3));
                         }
                     }
@@ -157,7 +156,7 @@ def createLabel(row, col, nums) {
  * @return
  */
 def setLabelColor(label, color) {
-    threadSafe {label.setBackground(color)}
+    threadSafe { label.setBackground(color) }
 }
 
 /**
@@ -218,10 +217,10 @@ def runDemo() {
     final def numbers = new ArrayList(problemSize.value..1)
     withPool(numThreads.value) {  //feel free to experiment with the number of fork/join threads in the pool
         def topLabel = createLabel(0, 0, numbers)
-        def sorted = runForkJoin(numbers, 0, 0, topLabel) {nums, row, column, label ->
+        def sorted = runForkJoin(numbers, 0, 0, topLabel) { nums, row, column, label ->
             println "Thread ${Thread.currentThread().name[-1]}: Sorting $nums"
             def colorIndex =
-            setLabelColor(label, threadColor())
+                    setLabelColor(label, threadColor())
             switch (nums.size()) {
                 case 0..1:
                     return finishTask(label, nums)                                   //store own result
@@ -229,8 +228,7 @@ def runDemo() {
 
                     if (nums[0] <= nums[1]) {
                         return finishTask(label, nums)     //store own result
-                    }
-                    else {
+                    } else {
                         return finishTask(label, nums[-1..0])   //store own result
                     }
                 default:

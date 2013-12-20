@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package groovyx.gpars.samples.dataflow.operators
 
 import groovyx.gpars.dataflow.DataflowQueue
+
 import static groovyx.gpars.dataflow.Dataflow.operator
 import static groovyx.gpars.dataflow.Dataflow.prioritySelector
 import static groovyx.gpars.dataflow.Dataflow.splitter
@@ -63,9 +64,10 @@ def downloader = operator(inputs: [urls], outputs: [downloadedPages, contentForC
     bindAllOutputsAtomically it
 }
 
+//noinspection SpellCheckingInspection
 def cache = ['http://www.jetbrains.com': 'groovy scala kfjhskfhsk']
 
-def speculator = prioritySelector(inputs: [urlsForSpeculation, contentForCache], outputs: [speculativePages]) {msg, index ->
+def speculator = prioritySelector(inputs: [urlsForSpeculation, contentForCache], outputs: [speculativePages]) { msg, index ->
     if (index == 0) {
         def content = cache[msg.url]
         if (content) bindAllOutputs([id: msg.id, url: msg.url, speculation: true, content: content])
@@ -77,7 +79,7 @@ def speculator = prioritySelector(inputs: [urlsForSpeculation, contentForCache],
 def unconfirmedSpeculations = [:]
 def processedIds = new HashSet()
 
-def evaluator = prioritySelector(inputs: [downloadedPages, speculativePages], outputs: [pages, approvals]) {msg, index ->
+def evaluator = prioritySelector(inputs: [downloadedPages, speculativePages], outputs: [pages, approvals]) { msg, index ->
     if (msg.id in processedIds) return  //ignore all messages for finished ids
     if (index == 0) {
         processedIds << msg.id
@@ -110,11 +112,11 @@ def scalaScanner = operator(pagesForScala, resultsFromScala) {
     bindOutput([id: it.id, url: it.url, foundWord: foundWord, speculation: it.speculation])
 }
 
-def reporter = operator(inputs: [groovyScanner.output, scalaScanner.output], outputs: [unconfirmedReports], maxForks: 4) {g, s ->
+def reporter = operator(inputs: [groovyScanner.output, scalaScanner.output], outputs: [unconfirmedReports], maxForks: 4) { g, s ->
     assert g.url == s.url
     assert g.id == s.id
     assert g.speculation == s.speculation
-    def words = [g.foundWord, s.foundWord].findAll {it}
+    def words = [g.foundWord, s.foundWord].findAll { it }
     def result
     switch (words.size()) {
         case 2:
@@ -132,7 +134,7 @@ def reporter = operator(inputs: [groovyScanner.output, scalaScanner.output], out
 def unconfirmedSpeculativeReports = [:]
 def deliveredConfirmations = [:]
 
-def confirm = prioritySelector(inputs: [approvals, unconfirmedReports], outputs: [reports]) {msg, index ->
+def confirm = prioritySelector(inputs: [approvals, unconfirmedReports], outputs: [reports]) { msg, index ->
     if (index == 1) {
         if (msg.speculation) {
             if (deliveredConfirmations[msg.id]) {
@@ -141,8 +143,7 @@ def confirm = prioritySelector(inputs: [approvals, unconfirmedReports], outputs:
             } else {
                 unconfirmedSpeculativeReports[msg.id] = msg
             }
-        }
-        else {
+        } else {
             bindOutput msg.result
             unconfirmedSpeculativeReports.remove(msg.id)
             deliveredConfirmations.remove(msg.id)
@@ -164,7 +165,7 @@ private boolean compareSpeculationWithRealContent(content1, content2) {
 
 task {
     final Object incomingReports = confirm.output
-    for (;;) {
+    for (; ;) {
         println incomingReports.val
     }
 }

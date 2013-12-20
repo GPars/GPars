@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package groovyx.gpars.samples.actors.stateful
 
 import groovyx.gpars.actor.Actor
+
 import static groovyx.gpars.actor.Actors.actor
 
 /**
@@ -29,11 +30,11 @@ def fasterTypist = null
 
 def judge = actor {
     def messages = []
-    react {message1 ->
+    react { message1 ->
         messages << [message1, sender]
-        react {message2 ->
+        react { message2 ->
             messages << [message2, sender]
-            final Object winningMessage = messages.max {it[0].size()}
+            final Object winningMessage = messages.max { it[0].size() }
             Actor winner = winningMessage[1]
             println "The winner is: $winner"
             fasterTypist = winner
@@ -42,7 +43,7 @@ def judge = actor {
 }
 
 def typist1 = actor {
-    judge.send 'This is how much I can type in 10 secon'
+    judge.send 'This is how much I can type in 10 seconds'
 }
 
 def typist2 = actor {

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,9 +20,11 @@ import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
+
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
+
 import static groovyx.gpars.actor.Actors.blockingActor
 
 /**
@@ -96,11 +98,15 @@ public class ReplyTest extends GroovyTestCase {
         def replies2 = []
 
         final def incrementor = group.blockingActor {
-            while (true) { receive { reply it + 1 }}
+            while (true) {
+                receive { reply it + 1 }
+            }
         }
 
         final def decrementor = group.blockingActor {
-            while (true) { receive { reply it - 1 }}
+            while (true) {
+                receive { reply it - 1 }
+            }
         }
 
         group.blockingActor {
@@ -174,7 +180,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        actor.send 'messsage'
+        actor.send 'message'
         barrier.await()
 
         actor.stop()
@@ -193,7 +199,7 @@ public class ReplyTest extends GroovyTestCase {
         }
 
         blockingActor {
-            receiver.send 'messsage'
+            receiver.send 'message'
             receive {
                 flag.set(true)
                 barrier.await()
@@ -217,7 +223,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        actor.send 'messsage'
+        actor.send 'message'
         barrier.await()
 
         assert flag.get()
@@ -244,7 +250,7 @@ public class ReplyTest extends GroovyTestCase {
                 }
             }
 
-            replier.send 'messsage'
+            replier.send 'message'
         }
 
         latch.await()
@@ -262,7 +268,7 @@ public class ReplyTest extends GroovyTestCase {
             receive {
                 reply 'Message2'
                 reply 'Message3'
-                receive {a ->
+                receive { a ->
                     reply 'Message6'
                     receive { b ->
                         reply 'Message6'
@@ -278,8 +284,8 @@ public class ReplyTest extends GroovyTestCase {
                 reply 'Message4'
                 receive {
                     reply 'Message5'
-                    receive {a ->
-                        receive {b ->
+                    receive { a ->
+                        receive { b ->
                             result = a + b
                             latch.countDown()
                         }
@@ -299,7 +305,7 @@ public class ReplyTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor = Actors.blockingActor {
-            receive {->
+            receive { ->
                 reply 'Message2'
             }
         }
@@ -325,11 +331,11 @@ public class ReplyTest extends GroovyTestCase {
         final DataflowVariable originator4 = new DataflowVariable()
 
         final def bouncer = blockingActor {
-            receive {msg1 ->
+            receive { msg1 ->
                 originator1 << sender
-                receive {msg2 ->
+                receive { msg2 ->
                     originator2 << sender
-                    receive {msg3 ->
+                    receive { msg3 ->
                         originator3 << sender
                     }
                     def msg4 = receive()

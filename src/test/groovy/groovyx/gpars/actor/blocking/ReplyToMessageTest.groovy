@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package groovyx.gpars.actor.blocking
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.group.PGroupBuilder
 import groovyx.gpars.scheduler.DefaultPool
+
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
@@ -100,11 +101,15 @@ public class ReplyToMessageTest extends GroovyTestCase {
         def replies2 = []
 
         final def incrementor = group.blockingActor {
-            while (true) { receive { reply it + 1 }}
+            while (true) {
+                receive { reply it + 1 }
+            }
         }
 
         final def decrementor = group.blockingActor {
-            while (true) { receive { reply it - 1 }}
+            while (true) {
+                receive { reply it - 1 }
+            }
         }
 
         group.blockingActor {
@@ -177,7 +182,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        actor.send 'messsage'
+        actor.send 'message'
         barrier.await()
         actor.stop()
 
@@ -195,7 +200,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         }
 
         group.blockingActor {
-            receiver.send 'messsage'
+            receiver.send 'message'
             receive {
                 flag.set(true)
                 barrier.await()
@@ -219,7 +224,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        actor.send 'messsage'
+        actor.send 'message'
         barrier.await()
 
         assert flag.get()
@@ -246,7 +251,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
                 }
             }
 
-            replier.send 'messsage'
+            replier.send 'message'
         }
 
         latch.await()

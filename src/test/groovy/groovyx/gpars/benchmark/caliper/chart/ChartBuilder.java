@@ -221,7 +221,7 @@ final class ChartBuilder implements ResultProcessor {
                 final String[] tempList1 = o1.getName().split("\\.");
                 final String[] tempList2 = o2.getName().split("\\.");
                 Date date1 = null, date2 = null;
-                final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ssZ");
+                @SuppressWarnings("SpellCheckingInspection") final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ssZ");
                 try {
                     date1 = simpleDateFormat.parse(tempList1[tempList1.length - 2]);
                     date2 = simpleDateFormat.parse(tempList2[tempList2.length - 2]);

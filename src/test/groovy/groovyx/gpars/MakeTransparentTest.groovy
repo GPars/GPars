@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.util.concurrent.CyclicBarrier
  * Author: Vaclav Pech
  * Date: Oct 30, 2009
  */
+@SuppressWarnings("SpellCheckingInspection")
 class MakeTransparentTest extends GroovyTestCase {
 
     public void testMakeTransparentAvailability() {
@@ -122,7 +123,7 @@ class MakeTransparentTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeConcurrent().collect {it * 2}.findAll {it > 1}.each {
+            items.makeConcurrent().collect { it * 2 }.findAll { it > 1 }.each {
                 barrier.await()
                 map[Thread.currentThread()] = ''
             }
@@ -134,7 +135,7 @@ class MakeTransparentTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
-            items.makeConcurrent().groupBy {it % 2}.each {
+            items.makeConcurrent().groupBy { it % 2 }.each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
             }
@@ -147,7 +148,7 @@ class MakeTransparentTest extends GroovyTestCase {
         final Map map = new ConcurrentHashMap()
 
         GParsPool.withPool(5) {
-            items.makeConcurrent().collect {it * 2}.findAll {it.size() > 1}.each {
+            items.makeConcurrent().collect { it * 2 }.findAll { it.size() > 1 }.each {
                 sleep 500
                 map[Thread.currentThread()] = ''
             }
@@ -161,7 +162,7 @@ class MakeTransparentTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeConcurrent().collect {it * 2}.findAll {it > 1}.each {
+            items.makeConcurrent().collect { it * 2 }.findAll { it > 1 }.each {
                 barrier.await()
                 map[Thread.currentThread()] = ''
             }
@@ -183,7 +184,7 @@ class MakeTransparentTest extends GroovyTestCase {
         final Map map = new ConcurrentHashMap()
         final CyclicBarrier barrier = new CyclicBarrier(count)
 
-        c.collect {it * 2}.findAll {it > 1}.each {
+        c.collect { it * 2 }.findAll { it > 1 }.each {
             barrier.await()
             map[Thread.currentThread()] = ''
         }

@@ -18,10 +18,8 @@ package groovyx.gpars.samples.collections
 
 import groovy.swing.SwingBuilder
 import groovyx.gpars.GParsPool
-import javax.swing.JFrame
-import javax.swing.JSlider
-import javax.swing.SwingConstants
-import javax.swing.SwingUtilities
+
+import javax.swing.*
 
 /**
  * @author Vaclav Pech
@@ -38,9 +36,9 @@ class FileProcessor {
         final int wordCount = random.nextInt(MAX_WORDS)
         for (counter in (1..wordCount)) {
             if (counter % 100 == 0) {
-                SwingUtilities.invokeLater {(slider.value = (int) (counter / 100))}
+                SwingUtilities.invokeLater { (slider.value = (int) (counter / 100)) }
 //                Thread.sleep 100
-                1.upto(5000) {new Random().nextInt(30)}
+                1.upto(5000) { new Random().nextInt(30) }
             }
         }
     }
@@ -55,10 +53,12 @@ final JFrame frame = new SwingBuilder().frame(title: 'GParsPool Demo', defaultCl
     vbox() {
         panel {
             vbox() {
-                processors.each {processor ->
+                processors.each { processor ->
                     panel {
                         hbox {
-                            label(text: bind(source: processor.slider, sourceProperty: 'value', converter: {"Current value: $it"}))
+                            label(text: bind(source: processor.slider, sourceProperty: 'value', converter: {
+                                "Current value: $it"
+                            }))
                             def currentPanel = panel()
                             currentPanel.add processor.slider
                         }
@@ -72,7 +72,7 @@ final JFrame frame = new SwingBuilder().frame(title: 'GParsPool Demo', defaultCl
                     hbox {
                         buttonGroup().with {
                             add radioButton(text: 'Single threaded', id: 'singleThreaded', selected: true)
-                            add radioButton(text: 'Multithreaded threaded', id: 'mutliThreaded')
+                            add radioButton(text: 'Multi threaded', id: 'multiThreaded')
                         }
                     }
                 }
@@ -94,7 +94,7 @@ final JFrame frame = new SwingBuilder().frame(title: 'GParsPool Demo', defaultCl
                             }
                         })
                         button(text: 'Clear', actionPerformed: {
-                            processors.each {it.slider.value = 0}
+                            processors.each { it.slider.value = 0 }
                         })
                     }
                 }

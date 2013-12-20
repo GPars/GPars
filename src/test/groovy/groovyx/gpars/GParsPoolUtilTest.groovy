@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicReference
  * @author Vaclav Pech
  * Date: Oct 23, 2008
  */
+@SuppressWarnings("SpellCheckingInspection")
 public class GParsPoolUtilTest extends GroovyTestCase {
 
     public void testEach() {
@@ -57,7 +58,7 @@ public class GParsPoolUtilTest extends GroovyTestCase {
     public void testCollectMany() {
         groovyx.gpars.GParsPool.withPool(5) {
             def squaresAndCubesOfOdds = [1, 2, 3, 4, 5].collectManyParallel { Number number ->
-                number % 2 ? [number ** 2, number ** 3] : []
+                number % 2 ? [number**2, number**3] : []
             }
             assert squaresAndCubesOfOdds == [1, 1, 9, 27, 25, 125]
         }
@@ -346,7 +347,7 @@ public class GParsPoolUtilTest extends GroovyTestCase {
         groovyx.gpars.GParsPool.withPool(5) {
             assert 15 == [1, 2, 3, 4, 5].injectParallel() { a, b -> a + b }
             assert 'abc' == 'abc'.injectParallel { a, b -> a + b }
-            assert 55 == [1, 2, 3, 4, 5].collectParallel { it ** 2 }.injectParallel { a, b -> a + b }
+            assert 55 == [1, 2, 3, 4, 5].collectParallel { it**2 }.injectParallel { a, b -> a + b }
         }
     }
 
@@ -382,7 +383,9 @@ public class GParsPoolUtilTest extends GroovyTestCase {
         def x = [1, 2, 3]
         groovyx.gpars.GParsPool.withPool {
             methods.each { method, expected ->
-                assert expected == x."${method}Parallel"({ it % 2 }): "Surprise when processing parallel version of $method"
+                assert expected == x."${method}Parallel"({
+                    it % 2
+                }): "Surprise when processing parallel version of $method"
             }
         }
     }

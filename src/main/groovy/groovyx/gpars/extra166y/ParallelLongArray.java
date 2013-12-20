@@ -1,8 +1,8 @@
-/*
- * Written by Doug Lea with assistance from members of JCP JSR-166
- * Expert Group and released to the public domain, as explained at
- * http://creativecommons.org/publicdomain/zero/1.0/
- */
+// extra-166y ParallelArray library
+//
+// Written by Doug Lea with assistance from members of JCP JSR-166
+// Expert Group and released to the public domain, as explained at
+// http://creativecommons.org/publicdomain/zero/1.0
 
 package groovyx.gpars.extra166y;
 
@@ -87,6 +87,7 @@ import static groovyx.gpars.extra166y.Ops.LongToObject;
  * }
  * </pre>
  */
+@SuppressWarnings("SpellCheckingInspection")
 public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     // Same internals as ParallelArray, but specialized for longs
     AsList listView;

@@ -21,7 +21,7 @@ package groovyx.gpars.dataflow.impl;
  *
  * @author Vaclav Pech
  */
-public interface BindErrorDistibutor<T> {
+public interface BindErrorDistributor<T> {
     void fireBindError(T oldValue, T failedValue, boolean uniqueBind);
 
     void fireBindError(T oldValue, Throwable failedError);

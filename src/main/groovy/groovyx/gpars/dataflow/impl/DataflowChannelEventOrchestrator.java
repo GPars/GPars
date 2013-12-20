@@ -27,7 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author Vaclav Pech
  */
-public final class DataflowChannelEventOrchestrator<T> implements DataflowChannelEventListenerManager<T>, BindErrorListenerManager<T>, DataflowChannelEventDistibutor<T>, BindErrorDistibutor<T> {
+public final class DataflowChannelEventOrchestrator<T> implements DataflowChannelEventListenerManager<T>, BindErrorListenerManager<T>, DataflowChannelEventDistributor<T>, BindErrorDistributor<T> {
     private final Collection<DataflowChannelListener<T>> listeners = new CopyOnWriteArrayList<DataflowChannelListener<T>>();
     private final Collection<BindErrorListener<T>> BindErrorListener = new CopyOnWriteArrayList<BindErrorListener<T>>();
 
