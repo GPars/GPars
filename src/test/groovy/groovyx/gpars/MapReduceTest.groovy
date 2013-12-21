@@ -23,15 +23,18 @@ import java.util.concurrent.ConcurrentHashMap
  * Date: Nov 6, 2009
  */
 
+@SuppressWarnings("SpellCheckingInspection")
 public class MapReduceTest extends GroovyTestCase {
 
     public void testReduce() {
         GParsPool.withPool(5) {
             assert 15 == [1, 2, 3, 4, 5].parallel.map { it }.reduce { a, b -> a + b }
             assert 'abc' == 'abc'.parallel.map { it }.reduce { a, b -> a + b }
-            assert 55 == [1, 2, 3, 4, 5].parallel.map { it ** 2 }.reduce { a, b -> a + b }
+            assert 55 == [1, 2, 3, 4, 5].parallel.map { it**2 }.reduce { a, b -> a + b }
             assert 'aa:bb:cc:dd:ee' == 'abcde'.parallel.map { it * 2 }.reduce { a, b -> "$a:$b" }
-            assert 'aa-bb-dd' == 'abcde'.parallel.filter { it != 'e' }.map { it * 2 }.filter { it != 'cc' }.reduce { a, b -> "$a-$b" }
+            assert 'aa-bb-dd' == 'abcde'.parallel.filter { it != 'e' }.map { it * 2 }.filter {
+                it != 'cc'
+            }.reduce { a, b -> "$a-$b" }
         }
     }
 
@@ -147,9 +150,17 @@ public class MapReduceTest extends GroovyTestCase {
     public void testCombine() {
         def words = """The xxxParallel() methods have to follow the contract of their non-parallel peers. So a collectParallel() method must return a legal collection of items, which you can again treat as a Groovy collection. Internally the parallel collect method builds an efficient parallel structure, called parallel array, performs the required operation concurrently and before returning destroys the Parallel Array building the collection of results to return to you. A potential call to let say findAllParallel() on the resulting collection would repeat the whole process of construction and destruction of a Parallel Array instance under the covers. With Map/Reduce you turn your collection into a Parallel Array and back only once. The Map/Reduce family of methods do not return Groovy collections, but are free to pass along the internal Parallel Arrays directly. Invoking the parallel property on a collection will build a Parallel Array for the collection and return a thin wrapper around the Parallel Array instance. Then you can chain all required methods like:""".tokenize()
         groovyx.gpars.GParsPool.withPool(5) {
-            def result1 = words.parallel.map { [it, 1] }.combine(0, { a, b -> a + b }).getParallel().sort { -it.value }.collection
-            def result2 = words.parallel.map { [it, 1] }.combine({ 0 }, { a, b -> a + b }).getParallel().sort { -it.value }.collection
-            def result3 = words.parallel.map { [it, 1] }.combine([], { list, value -> list << value }).getParallel().map { it.value = it.value.size(); it }.sort { -it.value }.collection
+            def result1 = words.parallel.map { [it, 1] }.combine(0, { a, b -> a + b }).getParallel().sort {
+                -it.value
+            }.collection
+            def result2 = words.parallel.map { [it, 1] }.combine({ 0 }, { a, b -> a + b }).getParallel().sort {
+                -it.value
+            }.collection
+            def result3 = words.parallel.map {
+                [it, 1]
+            }.combine([], { list, value -> list << value }).getParallel().map { it.value = it.value.size(); it }.sort {
+                -it.value
+            }.collection
 
             assert [result1, result2, result3]*.size() == [101, 101, 101]
             assert result1 == result2

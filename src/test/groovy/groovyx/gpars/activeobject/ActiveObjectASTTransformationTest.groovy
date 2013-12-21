@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.dataflow.Promise
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
+@SuppressWarnings("SpellCheckingInspection")
 public class ActiveObjectASTTransformationTest extends GroovyTestCase {
     public void testActorIsActive() {
         final actor = new MyWrapper().internalActiveObjectActor
@@ -610,6 +611,7 @@ ActiveObjectRegistry.instance.register('Custom', g)
     }
 
 }
+
 @ActiveObject
 class MyWrapper {
     def result = new DataflowVariable()

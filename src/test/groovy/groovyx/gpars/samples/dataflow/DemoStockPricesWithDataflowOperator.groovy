@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,12 +35,13 @@ final PGroup group = new NonDaemonPGroup(1)
 final DataflowQueue stocksStream = new DataflowQueue()
 final DataflowQueue pricedStocks = new DataflowQueue()
 
+//noinspection SpellCheckingInspection
 ['AAPL', 'GOOG', 'IBM', 'JAVA', 'MSFT'].each {
     stocksStream << it
 }
 
 1.upto(3) {
-    group.operator(inputs: [stocksStream], outputs: [pricedStocks]) {stock ->
+    group.operator(inputs: [stocksStream], outputs: [pricedStocks]) { stock ->
         def price = getYearEndClosing(stock, 2008)
         bindOutput(0, [stock: stock, price: price])
     }
@@ -48,7 +49,7 @@ final DataflowQueue pricedStocks = new DataflowQueue()
 
 def top = [stock: 'None', price: 0.0]
 
-group.operator(inputs: [pricedStocks], outputs: []) {pricedStock ->
+group.operator(inputs: [pricedStocks], outputs: []) { pricedStock ->
     println "Received stock ${pricedStock.stock} priced to ${pricedStock.price}"
     if (top.price < pricedStock.price) {
         top = pricedStock
@@ -58,6 +59,7 @@ group.operator(inputs: [pricedStocks], outputs: []) {pricedStock ->
 
 Thread.sleep 5000
 
+//noinspection SpellCheckingInspection
 ['AAPL', 'IBM'].each {
     stocksStream << it
 }

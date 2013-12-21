@@ -16,14 +16,15 @@
 
 package groovyx.gpars.samples.forkjoin
 
+import groovyx.gpars.forkjoin.AbstractForkJoinWorker
+
 /**
  *
  * @author Vaclav Pech
  * Date: Feb 19, 2010
  */
-
-import groovyx.gpars.forkjoin.AbstractForkJoinWorker
 import java.util.concurrent.ExecutionException
+
 import static groovyx.gpars.GParsPool.withPool
 import static groovyx.gpars.forkjoin.ForkJoinUtils.runForkJoin
 
@@ -50,7 +51,7 @@ class ForkJoinFib extends AbstractForkJoinWorker {
     }
 }
 
-withPool(2) {pool ->
+withPool(2) { pool ->
 
     final long t1 = System.currentTimeMillis()
     try {
@@ -61,7 +62,7 @@ withPool(2) {pool ->
         try {
             runForkJoin(pool, new ForkJoinFib(number: -1))
         } catch (ExecutionException ignore) {
-            println "We've correctly received an exception. That's what we deserve for calculating a negative Fibbonacci number."
+            println "We've correctly received an exception. That's what we deserve for calculating a negative Fibonacci number."
         }
     } catch (Throwable e) {
         e.printStackTrace()

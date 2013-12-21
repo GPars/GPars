@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package groovyx.gpars.dataflow.stream
 
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.dataflow.Dataflows
+
 import static groovyx.gpars.dataflow.Dataflow.task
 
+@SuppressWarnings("SpellCheckingInspection")
 class SyncDataflowStreamDefaultTest extends GroovyTestCase {
 
     def stream = new SyncDataflowStream(0)
@@ -97,39 +99,39 @@ class SyncDataflowStreamDefaultTest extends GroovyTestCase {
     }
 
     void testGenerator() {
-        stream.generate(1, {it + 1}, {it < 3})
-        assert stream == new SyncDataflowStream(0, {it << 1 << 2 << it.eos()})
+        stream.generate(1, { it + 1 }, { it < 3 })
+        assert stream == new SyncDataflowStream(0, { it << 1 << 2 << it.eos() })
     }
 
     void testGeneratorAsync() {
-        def generator = {value ->
-            task {value + 1}
+        def generator = { value ->
+            task { value + 1 }
         }
-        stream.generate(1, generator, {it < 3})
-        assert stream == new SyncDataflowStream(0, {it << 1 << 2 << it.eos()})
+        stream.generate(1, generator, { it < 3 })
+        assert stream == new SyncDataflowStream(0, { it << 1 << 2 << it.eos() })
     }
 
     void testApplyAsync() {
         task {
-            stream.apply {it << 1 << 2 << it.eos()}
+            stream.apply { it << 1 << 2 << it.eos() }
         }
-        assert stream == new SyncDataflowStream(0, {it << 1 << 2 << it.eos()})
+        assert stream == new SyncDataflowStream(0, { it << 1 << 2 << it.eos() })
     }
 
     void testMapWithIdentity() {
         task {
             stream << "a" << "b" << SyncDataflowStream.eos()
         }
-        def mappedStream = stream.map {it}
-        assert mappedStream == new SyncDataflowStream(0, {it << "a" << "b" << it.eos()})
+        def mappedStream = stream.map { it }
+        assert mappedStream == new SyncDataflowStream(0, { it << "a" << "b" << it.eos() })
     }
 
     void testMapWithTransformation() {
         task {
             stream << "a" << "b" << SyncDataflowStream.eos()
         }
-        def mappedStream = stream.map {it * 2}
-        assert mappedStream == new SyncDataflowStream(0, {it << "aa" << "bb" << it.eos()})
+        def mappedStream = stream.map { it * 2 }
+        assert mappedStream == new SyncDataflowStream(0, { it << "aa" << "bb" << it.eos() })
     }
 
     void testMapAsynchronously() {
@@ -141,7 +143,7 @@ class SyncDataflowStreamDefaultTest extends GroovyTestCase {
                 value * 2
             }
         }
-        assert mappedStream == new SyncDataflowStream(0, {it << "aa" << "bb" << it.eos()})
+        assert mappedStream == new SyncDataflowStream(0, { it << "aa" << "bb" << it.eos() })
     }
 
     void testFilterNothing() {
@@ -149,7 +151,7 @@ class SyncDataflowStreamDefaultTest extends GroovyTestCase {
             stream << 1 << 2 << 3 << 4 << SyncDataflowStream.eos()
         }
         def filteredStream = stream.filter { true }
-        assert filteredStream == new SyncDataflowStream(0, {it << 1 << 2 << 3 << 4 << it.eos()})
+        assert filteredStream == new SyncDataflowStream(0, { it << 1 << 2 << 3 << 4 << it.eos() })
     }
 
     void testFilterEverything() {
@@ -165,7 +167,7 @@ class SyncDataflowStreamDefaultTest extends GroovyTestCase {
             stream << 1 << 2 << 3 << 4 << SyncDataflowStream.eos()
         }
         def filteredStream = stream.filter { it % 2 == 0 }
-        assert filteredStream == new SyncDataflowStream(0, {it << 2 << 4 << it.eos()})
+        assert filteredStream == new SyncDataflowStream(0, { it << 2 << 4 << it.eos() })
     }
 
     void testFilterAsynchronously() {
@@ -173,30 +175,30 @@ class SyncDataflowStreamDefaultTest extends GroovyTestCase {
             stream << 1 << 2 << 3 << 4 << SyncDataflowStream.eos()
         }
         def filteredStream = stream.filter { value ->
-            task {value % 2 == 0}
+            task { value % 2 == 0 }
         }
-        assert filteredStream == new SyncDataflowStream(0, {it << 2 << 4 << it.eos()})
+        assert filteredStream == new SyncDataflowStream(0, { it << 2 << 4 << it.eos() })
     }
 
     void testReduceEmptyStream() {
         task {
             stream << SyncDataflowStream.eos()
         }
-        assert stream.reduce() {value, element -> value + element} == null
-        assert stream.reduce(5) {value, element -> value + element} == 5
+        assert stream.reduce() { value, element -> value + element } == null
+        assert stream.reduce(5) { value, element -> value + element } == 5
     }
 
     void testReduceNonEmptyStream() {
         task {
             stream << 1 << 2 << 3 << SyncDataflowStream.eos()
         }
-        assert stream.reduce() {value, element -> value + element} == 6
-        assert stream.reduce(5) {value, element -> value + element} == 11
+        assert stream.reduce() { value, element -> value + element } == 6
+        assert stream.reduce(5) { value, element -> value + element } == 11
     }
 
     void testReduceAsynchronously() {
         task {
-            stream.apply {s ->
+            stream.apply { s ->
                 def i = 0
                 while (i < 1000) {
                     s = s << i++
@@ -204,7 +206,7 @@ class SyncDataflowStreamDefaultTest extends GroovyTestCase {
                 s << s.eos()
             }
         }
-        def sum = stream.reduce() {value, element ->
+        def sum = stream.reduce() { value, element ->
             task {
                 value + element
             }
@@ -217,24 +219,24 @@ class SyncDataflowStreamDefaultTest extends GroovyTestCase {
         //int n = 1000 // works with tail recursion
         def expectedSum = (n * (n - 1)) / 2
 
-        stream.generate(1, {it + 1}, {it < n})
+        stream.generate(1, { it + 1 }, { it < n })
 
         int sumFromIteration = 0
         for (a in stream)
             sumFromIteration += a
         assert sumFromIteration == expectedSum
 
-        def sumFromReduce = stream.reduce() {value, element ->
+        def sumFromReduce = stream.reduce() { value, element ->
             task {
                 value + element
             }
         }
         assert sumFromReduce == expectedSum
 
-        def streamPlusOne = stream.map {value -> value + 1}
+        def streamPlusOne = stream.map { value -> value + 1 }
         assert streamPlusOne.first == 2
 
-        def streamOnlyOdd = stream.filter {value -> (value % 2) == 1}
+        def streamOnlyOdd = stream.filter { value -> (value % 2) == 1 }
         assert streamOnlyOdd.rest.first == 3
     }
 

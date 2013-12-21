@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,9 +19,11 @@ package groovyx.gpars.actor.nonBlocking
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataflowVariable
+
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
+
 import static groovyx.gpars.actor.Actors.actor
 
 /**
@@ -177,7 +179,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        actor.send 'messsage'
+        actor.send 'message'
         barrier.await()
 
         assert flag.get()
@@ -194,7 +196,7 @@ public class ReplyTest extends GroovyTestCase {
         }
 
         actor {
-            receiver.send 'messsage'
+            receiver.send 'message'
             react {
                 flag.set(true)
                 barrier.await()
@@ -218,7 +220,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        actor.send 'messsage'
+        actor.send 'message'
         barrier.await()
 
         assert flag.get()
@@ -245,7 +247,7 @@ public class ReplyTest extends GroovyTestCase {
                 }
             }
 
-            replier.send 'messsage'
+            replier.send 'message'
         }
 
         latch.await()
@@ -263,9 +265,9 @@ public class ReplyTest extends GroovyTestCase {
             react {
                 reply 'Message2'
                 sender.send 'Message3'
-                react {a ->
+                react { a ->
                     def senders = [sender]
-                    react {b ->
+                    react { b ->
                         senders << sender
                         senders*.send 'Message6'
                         latch.await()
@@ -280,8 +282,8 @@ public class ReplyTest extends GroovyTestCase {
                 reply 'Message4'
                 react {
                     reply 'Message5'
-                    react {a ->
-                        react {b ->
+                    react { a ->
+                        react { b ->
                             result = a + b
                             latch.countDown()
                         }
@@ -326,25 +328,25 @@ public class ReplyTest extends GroovyTestCase {
         final def bouncer = actor {
             latches[0].await()
             def senders = []
-            react {a ->
+            react { a ->
                 senders << sender
-                react {b ->
+                react { b ->
                     senders << sender
-                    react {c ->
+                    react { c ->
                         senders << sender
-                        senders.findAll {it?.isActive()}*.send 4
+                        senders.findAll { it?.isActive() }*.send 4
                         latches[1].countDown()
 
                         latches[2].await()
                         senders = []
-                        react {x ->
+                        react { x ->
                             senders << sender
-                            react {y ->
+                            react { y ->
                                 senders << sender
-                                react {z ->
+                                react { z ->
                                     senders << sender
                                     try {
-                                        senders.each {currentSender ->
+                                        senders.each { currentSender ->
                                             try {
                                                 currentSender?.send 8
                                                 if (currentSender == null) issues << new IllegalStateException('Sender is not known')
@@ -407,11 +409,11 @@ public class ReplyTest extends GroovyTestCase {
         final DataflowVariable originator3 = new DataflowVariable()
 
         final def bouncer = actor {
-            react {msg1 ->
+            react { msg1 ->
                 originator1 << sender
-                react {msg2 ->
+                react { msg2 ->
                     originator2 << sender
-                    react {msg3 ->
+                    react { msg3 ->
                         originator3 << sender
                     }
                 }

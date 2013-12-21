@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap
  * Date: Oct 30, 2009
  */
 
+@SuppressWarnings("SpellCheckingInspection")
 class MakeTransparentEnhancerTest extends GroovyTestCase {
 
     public void testIsTransparent() {

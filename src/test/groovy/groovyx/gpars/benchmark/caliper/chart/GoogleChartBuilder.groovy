@@ -16,6 +16,7 @@
 
 package groovyx.gpars.benchmark.caliper.chart
 
+@SuppressWarnings("SpellCheckingInspection")
 class GoogleChartBuilder extends BuilderSupport {
     def result = 'http://chart.apis.google.com/chart?' << ''
     def static AMP = '&'
@@ -67,15 +68,15 @@ class GoogleChartBuilder extends BuilderSupport {
     def translators = ['s': simpleTranslator, 'e': extendedTranslator, 't': textTranslator]
     def encodingTranslator
 
-    def size = {args ->
+    def size = { args ->
         'chs=' << args.w << 'x' << args.h
     }
 
-    def type = {args ->
+    def type = { args ->
         'cht=' << args
     }
 
-    def barType = {args ->
+    def barType = { args ->
         def style = 'b' << ''
         args.each {
             style << it[FIRST_CHAR]
@@ -111,7 +112,7 @@ class GoogleChartBuilder extends BuilderSupport {
 
     def color = getCounter(0, ',').curry(colorClosure)
 
-    def data = {args ->
+    def data = { args ->
         encodingKey = args.encoding[FIRST_CHAR].toLowerCase()
         encodingTranslator = translators[encodingKey]
         'chd=' << encodingKey << args.numLines << COLON
@@ -121,12 +122,14 @@ class GoogleChartBuilder extends BuilderSupport {
     def title = { colorSizeMap ->
         def t = '' << ''
         if (colorSizeMap) {
+            //noinspection SpellCheckingInspection
             t << 'chts=' << colorSizeMap.color << ',' << colorSizeMap.size << AMP
         }
+        //noinspection SpellCheckingInspection
         t << 'chtt='
     }
 
-    def axis = {labelMap ->
+    def axis = { labelMap ->
         def output = axisTypeString(labelMap)
         def labels = extractLabelsFrom(labelMap)
         output << axisLabelString(labels)
@@ -138,9 +141,9 @@ class GoogleChartBuilder extends BuilderSupport {
         removeLastPipe(output)
     }
 
-    def axis_optionClosure = {type, mapOfPoints ->
+    def axis_optionClosure = { type, mapOfPoints ->
         def s = '' << ''
-        mapOfPoints.each {index, listOfPoints ->
+        mapOfPoints.each { index, listOfPoints ->
             s << index << ',' << listToString(listOfPoints) << PIPE
         }
         return removeLastPipe(s)
@@ -166,7 +169,7 @@ class GoogleChartBuilder extends BuilderSupport {
     def markerTypes = ['ar': 'a', 'cr': 'c', 'di': 'd', 'ci': 'o', 'sq': 's', 'vp': 'v', 'vt': 'V', 'ho': 'h', 'xs': 'x']
 
 
-    def shapeClosure = {map ->
+    def shapeClosure = { map ->
         def output = '' << ''
         map.type ? output << markerTypes[map.type[0..1].toLowerCase()] << ',' : output
         map.color ? output << map.color << ',' : output
@@ -210,7 +213,7 @@ class GoogleChartBuilder extends BuilderSupport {
 
     def solid = getCounter(0).curry(solidClosure)
 
-    def gradientClosure = {map ->
+    def gradientClosure = { map ->
         def output = 'lg' << ''
         map.angle >= 0 ? output << ',' << map.angle : output << ',0'
         map.start ? output << ',' << map.start << ',0' : output << ',ffffff,0'
@@ -244,7 +247,7 @@ class GoogleChartBuilder extends BuilderSupport {
         'c,'
     }
 
-    def barSize = {args ->
+    def barSize = { args ->
         def output = 'chbh='
         output << listToString(args.values())
     }
@@ -253,7 +256,7 @@ class GoogleChartBuilder extends BuilderSupport {
         def translate = ['right': 'r', 'bottom': 'x', 'bottom2': 'x', 'top': 't', 'left': 'y', 'left2': 'y']
         def output = 'chxt=' << ''
         def tempList = []
-        map.each {k, v ->
+        map.each { k, v ->
             tempList << translate[k]
         }
         output << listToString(tempList)
@@ -262,7 +265,9 @@ class GoogleChartBuilder extends BuilderSupport {
     def extractLabelsFrom(labelMap) {
         def tempMap = [:]
         labelMap.eachWithIndex { entry, i ->
-            if (entry.value) { tempMap[i] = entry.value }
+            if (entry.value) {
+                tempMap[i] = entry.value
+            }
         }
         tempMap
     }
@@ -271,7 +276,7 @@ class GoogleChartBuilder extends BuilderSupport {
         def output = '' << ""
         if (mapHasAnyLists(labels)) {
             output << AMP << "chxl="
-            labels.each {k, v ->
+            labels.each { k, v ->
                 output << k << ':' << toAxisLabelList.call(v)
             }
         }
@@ -320,7 +325,9 @@ class GoogleChartBuilder extends BuilderSupport {
     }
 
     def createNode(name, value) {
-        if (name == 'set') {name = "${encodingKey}Set" }
+        if (name == 'set') {
+            name = "${encodingKey}Set"
+        }
         return check(closureDictionary[name] ? closureDictionary[name].call(value) : name)
     }
 
@@ -348,7 +355,7 @@ class GoogleChartBuilder extends BuilderSupport {
     }
 
     def replaceSpaces(replacement, string) {
-        string.replaceAll(/\s/) {replacement}
+        string.replaceAll(/\s/) { replacement }
     }
 
     def getCounter(count, delimiter = PIPE) {
@@ -360,7 +367,7 @@ class GoogleChartBuilder extends BuilderSupport {
     }
 
     def getAxisCounter(count) {
-        return {closure, type, map ->
+        return { closure, type, map ->
             count > 0 ? separator = PIPE : (separator = "&${type}=")
             count++
             closure(type, map).toString()

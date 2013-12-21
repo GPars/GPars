@@ -42,7 +42,7 @@ op3.join()
 {code}
 
 {note}
-Shutting down the whole JVM through _System.exit()_ will also obvisouly shutdown the dataflow network, however, no lifecycle listeners will be invoked in such cases.
+Shutting down the whole JVM through _System.exit()_ will also obviously shutdown the dataflow network, however, no lifecycle listeners will be invoked in such cases.
 {note}
 
 h4. Stopping operators gently

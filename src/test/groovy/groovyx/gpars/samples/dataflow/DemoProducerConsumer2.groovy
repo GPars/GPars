@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.DataflowVariable
+
 import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
@@ -40,7 +41,7 @@ task {
         try {
             site << url.toURL().text
         } catch (all) {
-            site << 'Error donwloading page'
+            site << 'Error downloading page'
         }
     }
 }

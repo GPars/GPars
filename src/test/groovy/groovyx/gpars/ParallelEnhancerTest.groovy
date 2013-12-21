@@ -18,6 +18,7 @@ package groovyx.gpars
 
 import java.util.concurrent.ConcurrentHashMap
 
+@SuppressWarnings("SpellCheckingInspection")
 public class ParallelEnhancerTest extends GroovyTestCase {
     public void testInstanceEnhancement() {
         final List list = [1, 2, 3, 4, 5]
@@ -30,7 +31,7 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         list.eachParallel { result << 2 * it }
         assert new HashSet([2, 4, 6, 8, 10]) == result
         def squaresAndCubesOfOdds = list.collectManyParallel { Number number ->
-            number % 2 ? [number ** 2, number ** 3] : []
+            number % 2 ? [number**2, number**3] : []
         }
         assert squaresAndCubesOfOdds == [1, 1, 9, 27, 25, 125]
     }
@@ -86,12 +87,24 @@ public class ParallelEnhancerTest extends GroovyTestCase {
     }
 
     private String performExceptionCheck(List list) {
-        shouldFail(IllegalArgumentException) { list.anyParallel { if (it > 4) throw new IllegalArgumentException('test') else false } }
-        shouldFail(IllegalArgumentException) { list.everyParallel { if (it > 4) throw new IllegalArgumentException('test') else true } }
-        shouldFail(IllegalArgumentException) { list.findParallel { if (it > 4) throw new IllegalArgumentException('test') else false } }
-        shouldFail(IllegalArgumentException) { list.findAllParallel { if (it > 4) throw new IllegalArgumentException('test') else true } }
-        shouldFail(IllegalArgumentException) { list.collectParallel { if (it > 4) throw new IllegalArgumentException('test') else 1 } }
-        shouldFail(IllegalArgumentException) { list.eachParallel { if (it > 4) throw new IllegalArgumentException('test') } }
+        shouldFail(IllegalArgumentException) {
+            list.anyParallel { if (it > 4) throw new IllegalArgumentException('test') else false }
+        }
+        shouldFail(IllegalArgumentException) {
+            list.everyParallel { if (it > 4) throw new IllegalArgumentException('test') else true }
+        }
+        shouldFail(IllegalArgumentException) {
+            list.findParallel { if (it > 4) throw new IllegalArgumentException('test') else false }
+        }
+        shouldFail(IllegalArgumentException) {
+            list.findAllParallel { if (it > 4) throw new IllegalArgumentException('test') else true }
+        }
+        shouldFail(IllegalArgumentException) {
+            list.collectParallel { if (it > 4) throw new IllegalArgumentException('test') else 1 }
+        }
+        shouldFail(IllegalArgumentException) {
+            list.eachParallel { if (it > 4) throw new IllegalArgumentException('test') }
+        }
     }
 
     public void testEnhancementPropagationToResults() {
@@ -140,7 +153,9 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         assert 5 == groovyx.gpars.ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel(3)
         assert 0 == groovyx.gpars.ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel(6)
         assert 0 == groovyx.gpars.ParallelEnhancer.enhanceInstance([]).countParallel(6)
-        assert 2 == groovyx.gpars.ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel { it % 2 == 0 }
+        assert 2 == groovyx.gpars.ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel {
+            it % 2 == 0
+        }
         assert 1 == groovyx.gpars.ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel { it < 3 }
         assert 6 == groovyx.gpars.ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel { it <= 3 }
         assert 1 == groovyx.gpars.ParallelEnhancer.enhanceInstance('abc3').countParallel('a')
@@ -181,7 +196,7 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         ParallelEnhancer.enhanceInstance list
 
         assert 15 == list.injectParallel() { a, b -> a + b }
-        assert 55 == list.collectParallel { it ** 2 }.injectParallel { a, b -> a + b }
+        assert 55 == list.collectParallel { it**2 }.injectParallel { a, b -> a + b }
     }
 
     public void testSeededReduce() {

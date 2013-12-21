@@ -92,8 +92,8 @@ repositories {
     }
     mavenCentral()
     //maven {
-        //url 'http://download.java.net/maven/2'
-        //url 'http://oss.sonatype.org/content/repositories/snapshots' // For Spock SNAPSHOT artefacts.
+    //url 'http://download.java.net/maven/2'
+    //url 'http://oss.sonatype.org/content/repositories/snapshots' // For Spock SNAPSHOT artefacts.
     //}
 }
 
@@ -401,12 +401,14 @@ idea {
                 vcsConfig.mapping[0].'@vcs' = 'Git'
 
                 //Copy the inspection profiles as well as the spell-checker's dictionaries from the default project file
-                def inspectionConfig = provider.asNode().component.find { it.'@name' == 'InspectionProjectProfileManager' }
+                def inspectionConfig = provider.asNode().component.find {
+                    it.'@name' == 'InspectionProjectProfileManager'
+                }
                 if (inspectionConfig) node.remove(inspectionConfig)
                 def dictionaryConfig = provider.asNode().component.find { it.'@name' == 'ProjectDictionaryState' }
                 if (dictionaryConfig) node.remove(dictionaryConfig)
 
-                new File('GPars_IDEAX.ipr').withReader { reader ->
+                new File('GPars_CI_only.ipr').withReader { reader ->
                     def project = new XmlParser().parse(reader)
                     def inspections = project.component.find { it.'@name' == 'InspectionProjectProfileManager' }
                     node.append(inspections)

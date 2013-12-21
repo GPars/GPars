@@ -1,8 +1,8 @@
-/*
- * Written by Doug Lea with assistance from members of JCP JSR-166
- * Expert Group and released to the public domain, as explained at
- * http://creativecommons.org/publicdomain/zero/1.0/
- */
+// extra-166y ParallelArray library
+//
+// Written by Doug Lea with assistance from members of JCP JSR-166
+// Expert Group and released to the public domain, as explained at
+// http://creativecommons.org/publicdomain/zero/1.0
 
 package groovyx.gpars.extra166y;
 
@@ -24,6 +24,7 @@ import static groovyx.gpars.extra166y.Ops.LongPredicate;
  * this class may be constructed only via prefix methods of
  * ParallelLongArray or its other prefix classes.
  */
+@SuppressWarnings("SpellCheckingInspection")
 public abstract class ParallelLongArrayWithFilter extends ParallelLongArrayWithLongMapping {
     ParallelLongArrayWithFilter
         (ForkJoinPool ex, int origin, int fence, long[] array) {

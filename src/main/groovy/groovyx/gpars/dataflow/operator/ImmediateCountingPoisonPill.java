@@ -60,7 +60,8 @@ public final class ImmediateCountingPoisonPill extends PoisonPill {
 
     /**
      * Retrieves the promise for termination
-     * @return A Promise instance that will be bound when all the requested dataflow pocessors have been terminated
+     *
+     * @return A Promise instance that will be bound when all the requested dataflow processors have been terminated
      */
     public Promise<Boolean> getTermination() {
         return poisonTrackCounter.getTermination();

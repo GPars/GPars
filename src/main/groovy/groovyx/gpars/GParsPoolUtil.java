@@ -189,6 +189,7 @@ public class GParsPoolUtil {
      *
      * @return A new function forwarding to the original one while caching the results
      */
+    @Deprecated
     public static <T> Closure<T> gmemoize(final Closure<T> cl) {
         return GParsPoolUtilHelper.buildMemoizeFunction(new ConcurrentHashMap(), cl);
     }
@@ -210,6 +211,7 @@ public class GParsPoolUtil {
      * @param maxCacheSize The maximum size the cache can grow to
      * @return A new function forwarding to the original one while caching the results
      */
+    @Deprecated
     public static <T> Closure<T> gmemoizeAtMost(final Closure<T> cl, final int maxCacheSize) {
         if (maxCacheSize < 0)
             throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for gmemoizeAtMost.");
@@ -237,6 +239,7 @@ public class GParsPoolUtil {
      * The cache gets garbage-collected together with the memoized closure.
      * </p>
      */
+    @Deprecated
     public static <T> Closure<T> gmemoizeAtLeast(final Closure<T> cl, final int protectedCacheSize) {
         if (protectedCacheSize < 0)
             throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for gmemoizeAtLeast.");
@@ -266,6 +269,7 @@ public class GParsPoolUtil {
      * The cache gets garbage-collected together with the memoized closure.
      * </p>
      */
+    @Deprecated
     public static <T> Closure<T> gmemoizeBetween(final Closure<T> cl, final int protectedCacheSize, final int maxCacheSize) {
         if (protectedCacheSize < 0)
             throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for gmemoizeBetween.");

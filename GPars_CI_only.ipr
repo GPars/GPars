@@ -9247,12 +9247,14 @@
     </dictionary>
     <dictionary name="vaclav">
       <words>
+        <w>&amp;amp</w>
         <w>accessors</w>
         <w>adaptee</w>
         <w>addr</w>
         <w>analisi</w>
         <w>aplicad</w>
         <w>aplicada</w>
+        <w>appengine</w>
         <w>arcy</w>
         <w>args</w>
         <w>async</w>
@@ -9262,10 +9264,15 @@
         <w>bonér</w>
         <w>bugfixing</w>
         <w>certifier</w>
+        <w>ceyene</w>
+        <w>childs</w>
         <w>classloader</w>
+        <w>clav</w>
         <w>clojure</w>
         <w>codehaus</w>
+        <w>comparables</w>
         <w>computors</w>
+        <w>cpus</w>
         <w>cygpath</w>
         <w>cygpattern</w>
         <w>cygwin</w>
@@ -9285,6 +9292,7 @@
         <w>downloader</w>
         <w>dzone</w>
         <w>endlocal</w>
+        <w>erlang</w>
         <w>errorlevel</w>
         <w>esac</w>
         <w>eval</w>
@@ -9295,15 +9303,23 @@
         <w>fixpath</w>
         <w>frob</w>
         <w>func</w>
+        <w>gaelyk</w>
+        <w>gdsl</w>
         <w>google</w>
         <w>google's</w>
         <w>gpars</w>
+        <w>gparsexecutorspool</w>
+        <w>gparspool</w>
         <w>gradle</w>
         <w>griffon</w>
+        <w>gson</w>
         <w>guice</w>
         <w>hamcrest</w>
         <w>harder's</w>
+        <w>hiragana</w>
+        <w>hyuk</w>
         <w>idempotence</w>
+        <w>iframe</w>
         <w>inbox</w>
         <w>incrementor</w>
         <w>interministic</w>
@@ -9312,13 +9328,19 @@
         <w>javac</w>
         <w>javacmd</w>
         <w>javadocs</w>
+        <w>jetta</w>
         <w>jira</w>
         <w>jordi</w>
         <w>jroller</w>
+        <w>jserver</w>
         <w>jugel</w>
+        <w>jxms</w>
+        <w>jxmx</w>
+        <w>katakana</w>
         <w>klazz</w>
         <w>koenig</w>
         <w>koenig's</w>
+        <w>kwon</w>
         <w>könig</w>
         <w>lellarap</w>
         <w>lgpl</w>
@@ -9350,6 +9372,7 @@
         <w>ncpu</w>
         <w>noninfringement</w>
         <w>nums</w>
+        <w>osgi</w>
         <w>ourcygpattern</w>
         <w>parallelize</w>
         <w>parallelizer</w>
@@ -9366,10 +9389,12 @@
         <w>progname</w>
         <w>qsort</w>
         <w>quicksort</w>
+        <w>radeox</w>
         <w>readlink</w>
         <w>redistributions</w>
         <w>reentrant</w>
         <w>remoted</w>
+        <w>removeheaders</w>
         <w>repo</w>
         <w>resize</w>
         <w>resizeable</w>
@@ -9377,22 +9402,27 @@
         <w>rethrow</w>
         <w>rootdirs</w>
         <w>rootdirsraw</w>
+        <w>rsalogo</w>
+        <w>rulesets</w>
         <w>scala</w>
         <w>sequetial</w>
         <w>setlocal</w>
         <w>shortfilename</w>
+        <w>snakeyaml</w>
         <w>solaris</w>
         <w>stacktrace</w>
         <w>startup</w>
         <w>sublicense</w>
         <w>superclass</w>
         <w>tahoma</w>
+        <w>teardown</w>
         <w>theserverside</w>
         <w>throwable</w>
         <w>tkachman</w>
         <w>tuple</w>
         <w>tuples</w>
         <w>uname</w>
+        <w>uniquifier</w>
         <w>universita</w>
         <w>universitat</w>
         <w>unpark</w>
@@ -9403,11 +9433,15 @@
         <w>vermeersch</w>
         <w>václav</w>
         <w>warmup</w>
+        <w>waypoint</w>
         <w>weblog</w>
         <w>wiki</w>
         <w>windowz</w>
         <w>xdock</w>
+        <w>xhtmlrenderer</w>
+        <w>xlint</w>
         <w>xnio</w>
+        <w>yaml</w>
         <w>yoyodyne</w>
         <w>yvoor</w>
         <w>yyyy</w>
@@ -9467,7 +9501,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/GPars_IDEAX.iml" filepath="$PROJECT_DIR$/GPars_IDEAX.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GPars_CI_only.iml" filepath="$PROJECT_DIR$/GPars_CI_only.iml" />
       <module fileurl="file://$PROJECT_DIR$/buildSrc/buildSrc.iml" filepath="$PROJECT_DIR$/buildSrc/buildSrc.iml" />
       <module fileurl="file://$PROJECT_DIR$/java-demo/gpars-java-demo.iml" filepath="$PROJECT_DIR$/java-demo/gpars-java-demo.iml" />
     </modules>
@@ -9486,7 +9520,7 @@
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <module name="GPars_IDEAX" />
+      <module name="GPars_CI_only" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
       <option name="PACKAGE_NAME" value="groovyx.gpars" />
