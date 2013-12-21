@@ -9500,7 +9500,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/GPars_IDEAX.iml" filepath="$PROJECT_DIR$/GPars_IDEAX.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GPars_CI_only.iml" filepath="$PROJECT_DIR$/GPars_CI_only.iml" />
       <module fileurl="file://$PROJECT_DIR$/buildSrc/buildSrc.iml" filepath="$PROJECT_DIR$/buildSrc/buildSrc.iml" />
       <module fileurl="file://$PROJECT_DIR$/java-demo/gpars-java-demo.iml" filepath="$PROJECT_DIR$/java-demo/gpars-java-demo.iml" />
     </modules>
@@ -9519,7 +9519,7 @@
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <module name="GPars_IDEAX" />
+      <module name="GPars_CI_only" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
       <option name="PACKAGE_NAME" value="groovyx.gpars" />
