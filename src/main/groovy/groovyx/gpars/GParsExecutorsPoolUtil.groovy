@@ -34,9 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
 import static groovyx.gpars.util.PAGroovyUtils.createCollection
-import static groovyx.gpars.util.PAUtils.buildClosureForMaps
-import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex
-import static groovyx.gpars.util.PAUtils.buildResultMap
+import static groovyx.gpars.util.PAUtils.*
 
 /**
  * This class forms the core of the DSL initialized by <i>GParsExecutorsPool</i>. The static methods of <i>GParsExecutorsPoolUtil</i>
@@ -113,7 +111,10 @@ public class GParsExecutorsPoolUtil {
      * Creates an asynchronous variant of the supplied closure, which, when invoked returns a future for the potential return value
      */
     public static Closure async(Closure cl) {
-        return { Object... args -> callAsync(cl, * args) }
+        return { Object... args ->
+            if (args != null && args.size() == 0) callParallel(cl)
+            else callParallel({ -> cl(* args) })
+        }
     }
 
     /**
