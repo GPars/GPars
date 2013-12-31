@@ -34,7 +34,9 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
 import static groovyx.gpars.util.PAGroovyUtils.createCollection
-import static groovyx.gpars.util.PAUtils.*
+import static groovyx.gpars.util.PAUtils.buildClosureForMaps
+import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex
+import static groovyx.gpars.util.PAUtils.buildResultMap
 
 /**
  * This class forms the core of the DSL initialized by <i>GParsExecutorsPool</i>. The static methods of <i>GParsExecutorsPoolUtil</i>
