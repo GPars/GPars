@@ -17,8 +17,11 @@
 package groovyx.gpars.dataflow;
 
 import groovy.lang.Closure;
+import groovy.lang.DelegatesTo;
 import groovyx.gpars.GParsConfig;
+import groovyx.gpars.dataflow.operator.DataflowOperator;
 import groovyx.gpars.dataflow.operator.DataflowProcessor;
+import groovyx.gpars.dataflow.operator.DataflowSelector;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 
@@ -123,7 +126,7 @@ public abstract class Dataflow {
      * @param code     The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public static DataflowProcessor operator(final Map channels, final Closure code) {
+    public static DataflowProcessor operator(final Map channels, @DelegatesTo(DataflowOperator.class) final Closure code) {
         return retrieveCurrentDFPGroup().operator(channels, code);
     }
 
@@ -135,7 +138,7 @@ public abstract class Dataflow {
      * @param code           The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public static DataflowProcessor operator(final List inputChannels, final List outputChannels, final Closure code) {
+    public static DataflowProcessor operator(final List inputChannels, final List outputChannels, @DelegatesTo(DataflowOperator.class) final Closure code) {
         return retrieveCurrentDFPGroup().operator(inputChannels, outputChannels, code);
     }
 
@@ -148,7 +151,7 @@ public abstract class Dataflow {
      * @param code           The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public static DataflowProcessor operator(final List inputChannels, final List outputChannels, final int maxForks, final Closure code) {
+    public static DataflowProcessor operator(final List inputChannels, final List outputChannels, final int maxForks, @DelegatesTo(DataflowOperator.class) final Closure code) {
         return retrieveCurrentDFPGroup().operator(inputChannels, outputChannels, maxForks, code);
     }
 
@@ -160,7 +163,7 @@ public abstract class Dataflow {
      * @param code   The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public static DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, final Closure code) {
+    public static DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, @DelegatesTo(DataflowOperator.class) final Closure code) {
         return retrieveCurrentDFPGroup().operator(input, output, code);
     }
 
@@ -173,7 +176,7 @@ public abstract class Dataflow {
      * @param code     The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public static DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, final int maxForks, final Closure code) {
+    public static DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, final int maxForks, @DelegatesTo(DataflowOperator.class) final Closure code) {
         return retrieveCurrentDFPGroup().operator(input, output, maxForks, code);
     }
 
@@ -184,7 +187,7 @@ public abstract class Dataflow {
      * @param code     The selector's body to run each time a value is available in any of the inputs channels
      * @return A new active selector instance
      */
-    public static DataflowProcessor selector(final Map channels, final Closure code) {
+    public static DataflowProcessor selector(final Map channels, @DelegatesTo(DataflowSelector.class) final Closure code) {
         return retrieveCurrentDFPGroup().selector(channels, code);
     }
 
@@ -196,7 +199,7 @@ public abstract class Dataflow {
      * @param code           The selector's body to run each time a value is available in any of the inputs channels
      * @return A new active selector instance
      */
-    public static DataflowProcessor selector(final List inputChannels, final List outputChannels, final Closure code) {
+    public static DataflowProcessor selector(final List inputChannels, final List outputChannels, @DelegatesTo(DataflowSelector.class) final Closure code) {
         return retrieveCurrentDFPGroup().selector(inputChannels, outputChannels, code);
     }
 
@@ -229,7 +232,7 @@ public abstract class Dataflow {
      * @param code     The selector's body to run each time a value is available in any of the inputs channels
      * @return A new active selector instance
      */
-    public static DataflowProcessor prioritySelector(final Map channels, final Closure code) {
+    public static DataflowProcessor prioritySelector(final Map channels, @DelegatesTo(DataflowSelector.class) final Closure code) {
         return retrieveCurrentDFPGroup().prioritySelector(channels, code);
     }
 
@@ -242,7 +245,7 @@ public abstract class Dataflow {
      * @param code           The selector's body to run each time a value is available in any of the inputs channels
      * @return A new active selector instance
      */
-    public static DataflowProcessor prioritySelector(final List inputChannels, final List outputChannels, final Closure code) {
+    public static DataflowProcessor prioritySelector(final List inputChannels, final List outputChannels, @DelegatesTo(DataflowSelector.class) final Closure code) {
         return retrieveCurrentDFPGroup().prioritySelector(inputChannels, outputChannels, code);
     }
 

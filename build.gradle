@@ -112,7 +112,7 @@ configurations {
 // symbol look up works correctly without qualification.
 
 dependencies {
-    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.0.8'
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.1.9'
     compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
     compile('org.multiverse:multiverse-core:0.7.0') { transitive = false }
     compile group: 'org.jboss.netty', name: 'netty', version: project.hasProperty('gpars_nettyVersion') ? gpars_nettyVersion : '3.2.9.Final'
@@ -371,6 +371,8 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'DemoSwingLifeWithActors',                    //Interacts with the user
             'DemoSwingLifeWithActiveObjects',             //Interacts with the user
             'DemoSwingLifeWithAsyncFunctions',            //Interacts with the user
+            'DemoReplyCompileStatic',                     //Weird compile static issue
+            'DemoFibonacciWithSingleOperatorCompileStatic',                     //Weird compile static issue
     ]
 
     classpath = sourceSets.main.runtimeClasspath

@@ -50,7 +50,10 @@ class GParsPoolUtilHelper {
     }
 
     public static Closure async(Closure cl) {
-        return { Object... args -> callAsync(cl, * args) }
+        return { Object... args ->
+            if (args != null && args.size() == 0) GParsPoolUtil.callParallel(cl)
+            else GParsPoolUtil.callParallel({ -> cl(* args) })
+        }
     }
 
     public static <T> Future<T> callAsync(final Closure<T> cl, final Object... args) {

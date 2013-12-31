@@ -17,6 +17,7 @@
 package groovyx.gpars.actor;
 
 import groovy.lang.Closure;
+import groovy.lang.DelegatesTo;
 import groovyx.gpars.GParsConfig;
 import groovyx.gpars.group.DefaultPGroup;
 
@@ -62,7 +63,7 @@ public abstract class Actors {
      * @param handler The body of the newly created actor's act method.
      * @return A newly created instance of the DefaultActor class
      */
-    public static DefaultActor actor(final Runnable handler) {
+    public static DefaultActor actor(@DelegatesTo(DefaultActor.class) final Runnable handler) {
         return defaultActorPGroup.actor(handler);
     }
 
@@ -73,7 +74,7 @@ public abstract class Actors {
      * @param handler The body of the newly created actor's act method.
      * @return A newly created instance of the BlockingActor class
      */
-    public static BlockingActor blockingActor(final Runnable handler) {
+    public static BlockingActor blockingActor(@DelegatesTo(BlockingActor.class) final Runnable handler) {
         return defaultActorPGroup.blockingActor(handler);
     }
 
@@ -85,7 +86,7 @@ public abstract class Actors {
      * @param handler The body of the newly created actor's act method.
      * @return A newly created instance of the DefaultActor class
      */
-    public static DefaultActor fairActor(final Runnable handler) {
+    public static DefaultActor fairActor(@DelegatesTo(DefaultActor.class) final Runnable handler) {
         return defaultActorPGroup.fairActor(handler);
     }
 
@@ -98,7 +99,7 @@ public abstract class Actors {
      * @param code The code to invoke for each received message
      * @return A new instance of ReactiveEventBasedThread
      */
-    public static Actor reactor(final Closure code) {
+    public static Actor reactor(@DelegatesTo(Actor.class) final Closure code) {
         return defaultActorPGroup.reactor(code);
     }
 
@@ -111,7 +112,7 @@ public abstract class Actors {
      * @param code The code to invoke for each received message
      * @return A new instance of ReactiveEventBasedThread
      */
-    public static Actor fairReactor(final Closure code) {
+    public static Actor fairReactor(@DelegatesTo(Actor.class) final Closure code) {
         return defaultActorPGroup.fairReactor(code);
     }
 
@@ -121,7 +122,7 @@ public abstract class Actors {
      * @param code The closure specifying individual message handlers.
      * @return A new started instance of a DynamicDispatchActor
      */
-    public static Actor messageHandler(final Closure code) {
+    public static Actor messageHandler(@DelegatesTo(Actor.class) final Closure code) {
         return defaultActorPGroup.messageHandler(code);
     }
 
@@ -131,7 +132,7 @@ public abstract class Actors {
      * @param code The closure specifying individual message handlers.
      * @return A new started instance of a fair DynamicDispatchActor
      */
-    public static Actor fairMessageHandler(final Closure code) {
+    public static Actor fairMessageHandler(@DelegatesTo(Actor.class) final Closure code) {
         return defaultActorPGroup.fairMessageHandler(code);
     }
 
@@ -141,7 +142,7 @@ public abstract class Actors {
      * @param code The closure specifying the only statically dispatched message handler.
      * @return A new started instance of a StaticDispatchActor
      */
-    public static Actor staticMessageHandler(final Closure code) {
+    public static Actor staticMessageHandler(@DelegatesTo(Actor.class) final Closure code) {
         return defaultActorPGroup.staticMessageHandler(code);
     }
 
@@ -151,7 +152,7 @@ public abstract class Actors {
      * @param code The closure specifying the only statically dispatched message handler.
      * @return A new started instance of a fair StaticDispatchActor
      */
-    public static Actor fairStaticMessageHandler(final Closure code) {
+    public static Actor fairStaticMessageHandler(@DelegatesTo(Actor.class) final Closure code) {
         return defaultActorPGroup.fairStaticMessageHandler(code);
     }
 }

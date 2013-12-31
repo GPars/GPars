@@ -17,6 +17,7 @@
 package groovyx.gpars.actor;
 
 import groovy.lang.Closure;
+import groovy.lang.DelegatesTo;
 import groovy.time.Duration;
 
 import java.util.concurrent.Callable;
@@ -114,7 +115,7 @@ public class DefaultActor extends AbstractLoopingActor {
      *
      * @param code The closure to invoke repeatedly
      */
-    public final void loop(final Runnable code) {
+    public final void loop(@DelegatesTo(DefaultActor.class) final Runnable code) {
         doLoop(null, null, code);
     }
 
@@ -125,7 +126,7 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param numberOfLoops The loop will only be run the given number of times
      * @param code          The closure to invoke repeatedly
      */
-    protected final void loop(final int numberOfLoops, final Runnable code) {
+    protected final void loop(final int numberOfLoops, @DelegatesTo(DefaultActor.class) final Runnable code) {
         loop(numberOfLoops, null, code);
     }
 
@@ -137,7 +138,7 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param afterLoopCode Code to run after the main actor's loop finishes
      * @param code          The closure to invoke repeatedly
      */
-    protected final void loop(final int numberOfLoops, final Closure afterLoopCode, final Runnable code) {
+    protected final void loop(final int numberOfLoops, @DelegatesTo(DefaultActor.class) final Closure afterLoopCode, @DelegatesTo(DefaultActor.class) final Runnable code) {
         doLoop(new Callable<Boolean>() {
             private int counter = 0;
 
@@ -157,7 +158,7 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param condition A condition to evaluate before each iteration starts. If the condition returns false, the loop exits.
      * @param code      The closure to invoke repeatedly
      */
-    protected final void loop(final Closure condition, final Runnable code) {
+    protected final void loop(final Closure condition, @DelegatesTo(DefaultActor.class) final Runnable code) {
         loop(condition, null, code);
 
     }
@@ -170,7 +171,7 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param afterLoopCode Code to run after the main actor's loop finishes
      * @param code          The closure to invoke repeatedly
      */
-    protected final void loop(final Closure condition, final Closure afterLoopCode, final Runnable code) {
+    protected final void loop(final Closure condition, @DelegatesTo(DefaultActor.class) final Closure afterLoopCode, @DelegatesTo(DefaultActor.class) final Runnable code) {
         doLoop(new Callable<Boolean>() {
             @Override
             public Boolean call() {
@@ -245,7 +246,7 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param code The code to handle the next message. The reply() and replyIfExists() methods are available inside
      *             the closure to send a reply back to the actor, which sent the original message.
      */
-    public final void react(final Closure code) {
+    public final void react(@DelegatesTo(DefaultActor.class) final Closure code) {
         react(-1L, code);
     }
 
@@ -258,7 +259,7 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param code     The code to handle the next message. The reply() and replyIfExists() methods are available inside
      *                 the closure to send a reply back to the actor, which sent the original message.
      */
-    protected final void react(final Duration duration, final Closure code) {
+    protected final void react(final Duration duration, @DelegatesTo(DefaultActor.class) final Closure code) {
         react(duration.toMilliseconds(), code);
     }
 
@@ -271,7 +272,7 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param code     The code to handle the next message. The reply() and replyIfExists() methods are available inside
      *                 the closure to send a reply back to the actor, which sent the original message.
      */
-    protected final void react(final long timeout, final TimeUnit timeUnit, final Closure code) {
+    protected final void react(final long timeout, final TimeUnit timeUnit, @DelegatesTo(DefaultActor.class) final Closure code) {
         react(timeUnit.toMillis(timeout), code);
     }
 
@@ -287,7 +288,7 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param code    The code to handle the next message. The reply() and replyIfExists() methods are available inside
      *                the closure to send a reply back to the actor, which sent the original message.
      */
-    protected final void react(final long timeout, final Closure code) {
+    protected final void react(final long timeout, @DelegatesTo(DefaultActor.class) final Closure code) {
         if (!isActorThread()) {
             throw new IllegalStateException("Cannot call react from a thread which is not owned by the actor");
         }

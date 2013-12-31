@@ -17,6 +17,7 @@
 package groovyx.gpars.group;
 
 import groovy.lang.Closure;
+import groovy.lang.DelegatesTo;
 import groovyx.gpars.MessagingRunnable;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.BlockingActor;
@@ -84,7 +85,7 @@ public abstract class PGroup {
      * @param handler The body of the newly created actor's act method.
      * @return A newly created instance of the DefaultActor class
      */
-    public final DefaultActor actor(final Runnable handler) {
+    public final DefaultActor actor(@DelegatesTo(DefaultActor.class) final Runnable handler) {
         final DefaultActor actor = new DefaultActor(handler);
         actor.setParallelGroup(this);
         actor.start();
@@ -98,7 +99,7 @@ public abstract class PGroup {
      * @param handler The body of the newly created actor's act method.
      * @return A newly created instance of the BlockingActor class
      */
-    public final BlockingActor blockingActor(final Runnable handler) {
+    public final BlockingActor blockingActor(@DelegatesTo(BlockingActor.class) final Runnable handler) {
         final BlockingActor actor = new RunnableBackedBlockingActor(handler);
         actor.setParallelGroup(this);
         actor.start();
@@ -113,7 +114,7 @@ public abstract class PGroup {
      * @param handler The body of the newly created actor's act method.
      * @return A newly created instance of the DefaultActor class
      */
-    public final DefaultActor fairActor(final Runnable handler) {
+    public final DefaultActor fairActor(@DelegatesTo(DefaultActor.class) final Runnable handler) {
         final DefaultActor actor = new DefaultActor(handler);
         actor.setParallelGroup(this);
         actor.makeFair();
@@ -129,7 +130,7 @@ public abstract class PGroup {
      * @param code The code to invoke for each received message
      * @return A new instance of ReactiveEventBasedThread
      */
-    public final Actor reactor(final Closure code) {
+    public final Actor reactor(@DelegatesTo(Actor.class) final Closure code) {
         final Actor actor = new ReactiveActor(code);
         actor.setParallelGroup(this);
         actor.start();
@@ -144,7 +145,7 @@ public abstract class PGroup {
      * @param code The code to invoke for each received message
      * @return A new instance of ReactiveEventBasedThread
      */
-    public final Actor fairReactor(final Closure code) {
+    public final Actor fairReactor(@DelegatesTo(Actor.class) final Closure code) {
         final ReactiveActor actor = new ReactiveActor(code);
         actor.setParallelGroup(this);
         actor.makeFair();
@@ -158,7 +159,7 @@ public abstract class PGroup {
      * @param code The closure specifying individual message handlers.
      * @return The new started actor
      */
-    public final Actor messageHandler(final Closure code) {
+    public final Actor messageHandler(@DelegatesTo(Actor.class) final Closure code) {
         final DynamicDispatchActor actor = new DynamicDispatchActor().become(code);
         actor.setParallelGroup(this);
         actor.start();
@@ -171,7 +172,7 @@ public abstract class PGroup {
      * @param code The closure specifying individual message handlers.
      * @return The new started actor
      */
-    public final Actor fairMessageHandler(final Closure code) {
+    public final Actor fairMessageHandler(@DelegatesTo(Actor.class) final Closure code) {
         final DynamicDispatchActor actor = new DynamicDispatchActor().become(code);
         actor.setParallelGroup(this);
         actor.makeFair();
@@ -185,7 +186,7 @@ public abstract class PGroup {
      * @param code The closure specifying the only statically dispatched message handler.
      * @return The new started actor
      */
-    public final Actor staticMessageHandler(final Closure code) {
+    public final Actor staticMessageHandler(@DelegatesTo(Actor.class) final Closure code) {
         final StaticDispatchActor<Object> actor = new StaticDispatchActor<Object>() {
             @Override
             public void onMessage(final Object message) {
@@ -205,7 +206,7 @@ public abstract class PGroup {
      * @param code The closure specifying the only statically dispatched message handler.
      * @return The new started actor
      */
-    public final Actor fairStaticMessageHandler(final Closure code) {
+    public final Actor fairStaticMessageHandler(@DelegatesTo(Actor.class) final Closure code) {
         final StaticDispatchActor<Object> actor = new StaticDispatchActor<Object>() {
             @Override
             public void onMessage(final Object message) {
@@ -358,7 +359,7 @@ public abstract class PGroup {
      * @param code     The operator's body to run each time all inputs have a value to read
      * @return A new started operator instance with all the channels set
      */
-    public final DataflowProcessor operator(final Map channels, final Closure code) {
+    public final DataflowProcessor operator(final Map channels, @DelegatesTo(DataflowOperator.class) final Closure code) {
         return new DataflowOperator(this, channels, code).start();
     }
 
@@ -370,7 +371,7 @@ public abstract class PGroup {
      * @param code           The operator's body to run each time all inputs have a value to read
      * @return A new started operator instance with all the channels set
      */
-    public final DataflowProcessor operator(final List inputChannels, final List outputChannels, final Closure code) {
+    public final DataflowProcessor operator(final List inputChannels, final List outputChannels, @DelegatesTo(DataflowOperator.class) final Closure code) {
         final HashMap<String, List> params = new HashMap<String, List>(5);
         params.put(DataflowProcessor.INPUTS, inputChannels);
         params.put(DataflowProcessor.OUTPUTS, outputChannels);
@@ -386,7 +387,7 @@ public abstract class PGroup {
      * @param code           The operator's body to run each time all inputs have a value to read
      * @return A new started operator instance with all the channels set
      */
-    public final DataflowProcessor operator(final List inputChannels, final List outputChannels, final int maxForks, final Closure code) {
+    public final DataflowProcessor operator(final List inputChannels, final List outputChannels, final int maxForks, @DelegatesTo(DataflowOperator.class) final Closure code) {
         final HashMap<String, Object> params = new HashMap<String, Object>(5);
         params.put(DataflowProcessor.INPUTS, inputChannels);
         params.put(DataflowProcessor.OUTPUTS, outputChannels);
@@ -402,7 +403,7 @@ public abstract class PGroup {
      * @param code   The operator's body to run each time all inputs have a value to read
      * @return A new started operator instance with all the channels set
      */
-    public final DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, final Closure code) {
+    public final DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, @DelegatesTo(DataflowOperator.class) final Closure code) {
         final HashMap<String, List> params = new HashMap<String, List>(5);
         params.put(DataflowProcessor.INPUTS, asList(input));
         params.put(DataflowProcessor.OUTPUTS, asList(output));
@@ -418,7 +419,7 @@ public abstract class PGroup {
      * @param code     The operator's body to run each time all inputs have a value to read
      * @return A new started operator instance with all the channels set
      */
-    public final DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, final int maxForks, final Closure code) {
+    public final DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, final int maxForks, @DelegatesTo(DataflowOperator.class) final Closure code) {
         final HashMap<String, Object> params = new HashMap<String, Object>(5);
         params.put(DataflowProcessor.INPUTS, asList(input));
         params.put(DataflowProcessor.OUTPUTS, asList(output));
@@ -433,7 +434,7 @@ public abstract class PGroup {
      * @param code     The selector's body to run each time a value is available in any of the inputs channels
      * @return A new started selector instance with all the channels set
      */
-    public final DataflowProcessor selector(final Map channels, final Closure code) {
+    public final DataflowProcessor selector(final Map channels, @DelegatesTo(DataflowSelector.class) final Closure code) {
         return new DataflowSelector(this, channels, code).start();
     }
 
@@ -445,7 +446,7 @@ public abstract class PGroup {
      * @param code           The selector's body to run each time a value is available in any of the inputs channels
      * @return A new started selector instance with all the channels set
      */
-    public final DataflowProcessor selector(final List inputChannels, final List outputChannels, final Closure code) {
+    public final DataflowProcessor selector(final List inputChannels, final List outputChannels, @DelegatesTo(DataflowSelector.class) final Closure code) {
         final HashMap<String, List> params = new HashMap<String, List>(5);
         params.put(DataflowProcessor.INPUTS, inputChannels);
         params.put(DataflowProcessor.OUTPUTS, outputChannels);
@@ -484,7 +485,7 @@ public abstract class PGroup {
      * @param code     The selector's body to run each time a value is available in any of the inputs channels
      * @return A new started selector instance with all the channels set
      */
-    public final DataflowProcessor prioritySelector(final Map channels, final Closure code) {
+    public final DataflowProcessor prioritySelector(final Map channels, @DelegatesTo(DataflowSelector.class) final Closure code) {
         return new DataflowPrioritySelector(this, channels, code).start();
     }
 
@@ -497,7 +498,7 @@ public abstract class PGroup {
      * @param code           The selector's body to run each time a value is available in any of the inputs channels
      * @return A new started selector instance with all the channels set
      */
-    public final DataflowProcessor prioritySelector(final List inputChannels, final List outputChannels, final Closure code) {
+    public final DataflowProcessor prioritySelector(final List inputChannels, final List outputChannels, @DelegatesTo(DataflowSelector.class) final Closure code) {
         final HashMap<String, Object> params = new HashMap<String, Object>(5);
         params.put(DataflowProcessor.INPUTS, inputChannels);
         params.put(DataflowProcessor.OUTPUTS, outputChannels);

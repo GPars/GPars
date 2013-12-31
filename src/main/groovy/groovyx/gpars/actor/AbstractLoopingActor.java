@@ -252,10 +252,9 @@ public abstract class AbstractLoopingActor extends Actor {
      * Retrieves the sender actor of the currently processed message.
      *
      * @return The sender of the currently processed message or null, if the message was not sent by an actor
-     * @throws groovyx.gpars.actor.impl.ActorReplyException
-     *          If some of the replies failed to be sent.
+     * @throws groovyx.gpars.actor.impl.ActorReplyException If some of the replies failed to be sent.
      */
-    protected final MessageStream getSender() {
+    public final MessageStream getSender() {
         return currentSender;
     }
 
@@ -264,10 +263,9 @@ public abstract class AbstractLoopingActor extends Actor {
      * have not been sent by an actor. For such cases use replyIfExists().
      *
      * @param message reply message
-     * @throws groovyx.gpars.actor.impl.ActorReplyException
-     *          If some of the replies failed to be sent.
+     * @throws groovyx.gpars.actor.impl.ActorReplyException If some of the replies failed to be sent.
      */
-    protected final void reply(final Object message) {
+    public final void reply(final Object message) {
         if (currentSender == null) {
             throw new ActorReplyException(CANNOT_SEND_REPLIES_NO_SENDER_HAS_BEEN_REGISTERED);
         } else {
@@ -281,7 +279,7 @@ public abstract class AbstractLoopingActor extends Actor {
      *
      * @param message reply message
      */
-    protected final void replyIfExists(final Object message) {
+    public final void replyIfExists(final Object message) {
         if (currentSender == null) return;
         try {
             currentSender.send(message);

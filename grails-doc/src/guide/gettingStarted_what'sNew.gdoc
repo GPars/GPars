@@ -17,9 +17,12 @@ h3. Fork / Join
 
 h3. Actors
 
+* Annotated actor and actor factory methods with @DelegatesTo to enable use of actors inside statically compiled Groovy code
+
 h3. Dataflow
 
 * A thenForkAndJoin() method added to Promises to ease the creation of a fork/join algorithm with promises
+* Annotated operator factory methods with @DelegatesTo to enable use of dataflow operators and selectors inside statically compiled Groovy code
 
 h3. Agent
 
