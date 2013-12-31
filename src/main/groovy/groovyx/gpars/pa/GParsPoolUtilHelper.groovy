@@ -52,7 +52,7 @@ class GParsPoolUtilHelper {
     public static Closure async(Closure cl) {
         return { Object... args ->
             if (args != null && args.size() == 0) GParsPoolUtil.callParallel(cl)
-            else GParsPoolUtil.callParallel(cl.curry(args))
+            else GParsPoolUtil.callParallel({ -> cl(* args) })
         }
     }
 
