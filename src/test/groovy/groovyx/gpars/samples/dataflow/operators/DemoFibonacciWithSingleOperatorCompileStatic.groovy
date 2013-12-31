@@ -16,31 +16,38 @@
 
 package groovyx.gpars.samples.dataflow.operators
 
+import groovyx.gpars.dataflow.DataflowQueue
+
+import static groovyx.gpars.dataflow.Dataflow.operator
+
 /**
+ * Illustrates the use of @CompileStatic with operators
+ *
  * Calculates Fibonacci numbers using dataflow a operator.
  * The output of the operator is wired back to its input and one of the channels has a one-off delay.
  *
  * @author Vaclav Pech
  */
+@groovy.transform.CompileStatic
+def perform() {
+    final DataflowQueue ch1 = new DataflowQueue()
+    final DataflowQueue ch2 = new DataflowQueue()
+    final DataflowQueue ch3 = new DataflowQueue()
 
-import groovyx.gpars.dataflow.DataflowQueue
-import static groovyx.gpars.dataflow.Dataflow.operator
+    ch1 << 1
+    ch2 << 0
+    ch2 << 0
 
-final DataflowQueue ch1 = new DataflowQueue()
-final DataflowQueue ch2 = new DataflowQueue()
-final DataflowQueue ch3 = new DataflowQueue()
+    final op = operator([ch1, ch2], [ch3, ch1, ch2]) { int a, int b ->
+        bindAllOutputs a + b
+    }
 
-ch1 << 1
-ch2 << 0
-ch2 << 0
 
-final op = operator([ch1, ch2], [ch3, ch1, ch2]) {a, b ->
-    bindAllOutputs a + b
+    30.times {
+        println ch3.val
+    }
+
+    op.terminateAfterNextRun()
 }
 
-
-30.times {
-    println ch3.val
-}
-
-op.terminateAfterNextRun()
+perform()
