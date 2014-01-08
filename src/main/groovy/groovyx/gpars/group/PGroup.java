@@ -31,6 +31,7 @@ import groovyx.gpars.dataflow.Dataflow;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.DataflowWriteChannel;
+import groovyx.gpars.dataflow.LazyDataflowVariable;
 import groovyx.gpars.dataflow.Promise;
 import groovyx.gpars.dataflow.Select;
 import groovyx.gpars.dataflow.SelectableChannel;
@@ -350,6 +351,48 @@ public abstract class PGroup {
             }
         });
         return result;
+    }
+
+    /**
+     * Creates a new task assigned to a thread from the current parallel group.
+     * The task is lazy, since it only gets executed if the returned Promise instance is read or a then-callback is registered on it.
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
+     * but can only exchange data using explicit DataflowVariables and Streams.
+     * Registers itself with Dataflow for nested 'whenBound' handlers to use the same group.
+     *
+     * @param code The task body to run
+     * @return A LazyDataflowVariable, which gets assigned the value returned from the supplied code
+     */
+    public final <T> Promise<T> lazyTask(final Closure<T> code) {
+        final Closure<T> clonedCode = (Closure<T>) code.clone();
+        return new LazyDataflowVariable<T>(this, clonedCode);
+    }
+
+    /**
+     * Creates a new task assigned to a thread from the current parallel group.
+     * The task is lazy, since it only gets executed if the returned Promise instance is read or a then-callback is registered on it.
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
+     * but can only exchange data using explicit DataflowVariables and Streams.
+     * Registers itself with Dataflow for nested 'whenBound' handlers to use the same group.
+     *
+     * @param callable The task body to run
+     * @return A LazyDataflowVariable, which gets assigned the value returned from the supplied code
+     */
+    public final <T> Promise<T> lazyTask(final Callable<T> callable) {
+        if (callable instanceof Closure) return lazyTask((Closure<T>) callable);
+        return new LazyDataflowVariable<T>(this, new Closure<T>(this) {
+            @Override public int getMaximumNumberOfParameters() {
+                return 0;
+            }
+
+            @Override public T call() {
+                try {
+                    return callable.call();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     /**
