@@ -32,14 +32,14 @@ import static groovyx.gpars.dataflow.Dataflow.whenAllBound
  * once both B and C have been loaded.
  */
 
-def moduleA = lazyTask { ->
+def moduleA = lazyTask {
     println "Loading moduleA into memory"
     sleep 3000
     println "Loaded moduleA into memory"
     return "moduleA"
 }
 
-def moduleB = lazyTask { ->
+def moduleB = lazyTask {
     moduleA.then {
         println "->Loading moduleB into memory, since moduleA is ready"
         sleep 3000
@@ -48,7 +48,7 @@ def moduleB = lazyTask { ->
     }
 }
 
-def moduleC = lazyTask { ->
+def moduleC = lazyTask {
     moduleA.then {
         println "->Loading moduleC into memory, since moduleA is ready"
         sleep 3000
@@ -57,7 +57,7 @@ def moduleC = lazyTask { ->
     }
 }
 
-def moduleD = lazyTask { ->
+def moduleD = lazyTask {
     whenAllBound(moduleB, moduleC) { b, c ->
         println "-->Loading moduleD into memory, since moduleB and moduleC are ready"
         sleep 3000
