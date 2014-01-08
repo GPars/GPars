@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.Javadoc
+
 // GPars - Groovy Parallel Systems
 //
 // Copyright © 2008–2013 The original author or authors
@@ -260,6 +262,17 @@ javadoc {
     doFirst {
         javadoc.title = titleForDocumentation
         javadoc.options.docTitle = javadoc.title
+    }
+}
+
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        //noinspection SpellCheckingInspection
+        tasks.withType(Javadoc) {
+            // disable the crazy super-strict doclint tool in Java 8
+            //noinspection SpellCheckingInspection
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
     }
 }
 
