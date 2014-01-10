@@ -653,7 +653,7 @@ task {
 }.thenForkAndJoin({ it ** 2 }, { it**3 }, { it**4 }, { it**5 }).then({ println it}).join()
 {code}
 
-h2. Lazy dataflow variables
+h2. Lazy dataflow tasks and variables
 
 Sometimes you may like to combine the qualities of dataflow variables with their lazy initialization.
 {code}
@@ -727,6 +727,28 @@ println "==================================================================="
 println "Load module: " + moduleD.get()
 println "==================================================================="
 println "All requested modules loaded"
+{code}
+
+h3. Making tasks lazy
+
+The _lazyTask()_ method is available alongside the _task()_ method to give the users a task-oriented abstraction for delayed activities.
+A *Lazy Task* returns an instance of _LazyDataflowVariable_ (a _Promise_ ) with the initializer set to the provided closure.
+As soon as someone asks for the value, the task will start asynchronously and eventually deliver a value into the _LazyDataflowVariable_ .
+
+{code}
+import groovyx.gpars.dataflow.Dataflow
+
+def pageContent = Dataflow.lazyTask {
+        println "Downloading"
+        "http://gpars.codehaus.org".toURL().text
+    }
+
+println "No-one has asked for the value just yet. Bound = ${pageContent.bound}"
+sleep 1000
+println "Now going to ask for a value"
+println pageContent.get().size()
+println "Repetitive requests will receive the already calculated value. No additional downloading."
+println pageContent.get().size()
 {code}
 
 h2. Dataflow Expressions

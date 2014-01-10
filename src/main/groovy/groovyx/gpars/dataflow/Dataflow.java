@@ -120,6 +120,34 @@ public abstract class Dataflow {
     }
 
     /**
+     * Creates a new task assigned to a thread from the default dataflow parallel group.
+     * The task is lazy, since it only gets executed if the returned Promise instance is read or a then-callback is registered on it.
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
+     * but can only exchange data using explicit DataflowVariables and Streams.
+     *
+     * @param code The task body to run
+     * @return A LazyDataflowVariable, which gets assigned the value returned from the supplied code
+     */
+    public static <T> Promise<T> lazyTask(final Closure<T> code) {
+        final PGroup group = retrieveCurrentDFPGroup();
+        return group.lazyTask(code);
+    }
+
+    /**
+     * Creates a new task assigned to a thread from the current parallel group.
+     * The task is lazy, since it only gets executed if the returned Promise instance is read or a then-callback is registered on it.
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
+     * but can only exchange data using explicit DataflowVariables and Streams.
+     * Registers itself with Dataflow for nested 'whenBound' handlers to use the same group.
+     *
+     * @param callable The task body to run
+     * @return A LazyDataflowVariable, which gets assigned the value returned from the supplied code
+     */
+    public static <T> Promise<T> lazyTask(final Callable<T> callable) {
+        return retrieveCurrentDFPGroup().lazyTask(callable);
+    }
+
+    /**
      * Creates an operator using the default dataflow parallel group
      *
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
