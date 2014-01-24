@@ -1,8 +1,8 @@
-// extra-166y ParallelArray library
-//
-// Written by Doug Lea with assistance from members of JCP JSR-166
-// Expert Group and released to the public domain, as explained at
-// http://creativecommons.org/publicdomain/zero/1.0
+/*
+ * Written by Doug Lea with assistance from members of JCP JSR-166
+ * Expert Group and released to the public domain, as explained at
+ * http://creativecommons.org/publicdomain/zero/1.0/
+ */
 
 package groovyx.gpars.extra166y;
 
@@ -123,7 +123,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * @param <K> the type of keys maintained by this map
  * @param <V> the type of mapped values
  */
-@SuppressWarnings("SpellCheckingInspection")
 public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
         implements ConcurrentMap<K, V>, Serializable {
     private static final long serialVersionUID = 7249069246764182397L;
@@ -1673,7 +1672,6 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * set is serializable; however, serializing a set that uses soft
      * or weak references can give unpredictable results.
      */
-    @SuppressWarnings("SpellCheckingInspection")
     public static class KeySet<K> extends AbstractSet<K>
             implements Set<K>, Serializable {
 

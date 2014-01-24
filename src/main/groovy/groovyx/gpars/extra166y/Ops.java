@@ -1,8 +1,8 @@
-// extra-166y ParallelArray library
-//
-// Written by Doug Lea with assistance from members of JCP JSR-166
-// Expert Group and released to the public domain, as explained at
-// http://creativecommons.org/publicdomain/zero/1.0
+/*
+ * Written by Doug Lea with assistance from members of JCP JSR-166
+ * Expert Group and released to the public domain, as explained at
+ * http://creativecommons.org/publicdomain/zero/1.0/
+ */
 
 package groovyx.gpars.extra166y;
 
@@ -328,7 +328,6 @@ import java.util.Comparator;
  * <p/>
  * <p>This class is normally best used via {@code import static}.
  */
-@SuppressWarnings("SpellCheckingInspection")
 public class Ops {
     private Ops() {
     } // disable construction

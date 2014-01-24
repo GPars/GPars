@@ -1,8 +1,8 @@
-// extra-166y ParallelArray library
-//
-// Written by Doug Lea with assistance from members of JCP JSR-166
-// Expert Group and released to the public domain, as explained at
-// http://creativecommons.org/publicdomain/zero/1.0
+/*
+ * Written by Doug Lea with assistance from members of JCP JSR-166
+ * Expert Group and released to the public domain, as explained at
+ * http://creativecommons.org/publicdomain/zero/1.0/
+ */
 
 package groovyx.gpars.extra166y;
 
@@ -45,7 +45,6 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * Shared internal execution support for ParallelArray and
  * specializations.
  */
-@SuppressWarnings("SpellCheckingInspection")
 class PAS {
     private PAS() {
     } // all-static, non-instantiable
