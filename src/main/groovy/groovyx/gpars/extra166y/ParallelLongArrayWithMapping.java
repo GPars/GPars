@@ -1,8 +1,8 @@
-// extra-166y ParallelArray library
-//
-// Written by Doug Lea with assistance from members of JCP JSR-166
-// Expert Group and released to the public domain, as explained at
-// http://creativecommons.org/publicdomain/zero/1.0
+/*
+ * Written by Doug Lea with assistance from members of JCP JSR-166
+ * Expert Group and released to the public domain, as explained at
+ * http://creativecommons.org/publicdomain/zero/1.0/
+ */
 
 package groovyx.gpars.extra166y;
 
@@ -165,7 +165,7 @@ public abstract class ParallelLongArrayWithMapping<U> extends AbstractParallelAn
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op
-     * applied to current operator's results.
+     * applied to current op's results.
      *
      * @param op the op
      * @return operation prefix
@@ -176,7 +176,7 @@ public abstract class ParallelLongArrayWithMapping<U> extends AbstractParallelAn
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op
-     * applied to current operator's results.
+     * applied to current op's results.
      *
      * @param op the op
      * @return operation prefix
@@ -187,7 +187,7 @@ public abstract class ParallelLongArrayWithMapping<U> extends AbstractParallelAn
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op
-     * applied to current operator's results.
+     * applied to current op's results.
      *
      * @param op the op
      * @return operation prefix
