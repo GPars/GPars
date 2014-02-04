@@ -408,7 +408,7 @@ idea {
     }
     project {
         jdkName '1.7'
-        languageLevel 'JDK_1_6'
+        languageLevel 'JDK_1_7'
         ipr {
             withXml { provider ->
                 def node = provider.asNode()
