@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008–2012, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,9 +20,11 @@ import groovyx.gpars.GParsPool
 import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.TransparentParallel
 import groovyx.gpars.dataflow.DataflowVariable
-import groovyx.gpars.extra166y.Ops
-import groovyx.gpars.extra166y.ParallelArray
-import groovyx.gpars.extra166y.ParallelArrayWithMapping
+// TODO: delete
+//import groovyx.gpars.extra166y.Ops
+//import groovyx.gpars.extra166y.ParallelArray
+//import groovyx.gpars.extra166y.ParallelArrayWithMapping
+// TODO: deal with deprecation
 import groovyx.gpars.memoize.LRUProtectionStorage
 import groovyx.gpars.memoize.NullProtectionStorage
 import groovyx.gpars.memoize.NullValue

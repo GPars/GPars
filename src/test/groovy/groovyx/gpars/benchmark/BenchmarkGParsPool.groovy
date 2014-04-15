@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008--2011  The original author or authors
+// Copyright © 2008--2011, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,8 +21,9 @@ import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.ParallelEnhancer
 import java.util.concurrent.ForkJoinPool
 
-import groovyx.gpars.extra166y.Ops.Reducer
-import groovyx.gpars.extra166y.ParallelArray
+// TODO: delete
+//import groovyx.gpars.extra166y.Ops.Reducer
+//import groovyx.gpars.extra166y.ParallelArray
 
 import static groovyx.gpars.GParsPool.withExistingPool
 import static groovyx.gpars.GParsPool.withPool
