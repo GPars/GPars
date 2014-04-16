@@ -69,11 +69,11 @@ final class TransparentParallel {
 
     public def final sum() { if (concurrencyActive) this.sumParallel(); else (mixedIn[Object] as Object).sum() }
 
-    @Deprecated
-    public def final fold(Closure yield) { if (concurrencyActive) this.foldParallel(yield); else throw new UnsupportedOperationException('The inject() operation is not supported by collections in sequential mode') }
-
-    @Deprecated
-    public def final fold(seed, Closure yield) { if (concurrencyActive) this.foldParallel(seed, yield); else throw new UnsupportedOperationException('The inject() operation is not supported by collections in sequential mode') }
+//    @Deprecated
+//    public def final fold(Closure yield) { if (concurrencyActive) this.foldParallel(yield); else throw new UnsupportedOperationException('The inject() operation is not supported by collections in sequential mode') }
+//
+//    @Deprecated
+//    public def final fold(seed, Closure yield) { if (concurrencyActive) this.foldParallel(seed, yield); else throw new UnsupportedOperationException('The inject() operation is not supported by collections in sequential mode') }
 
     public def final inject(Closure yield) { if (concurrencyActive) this.injectParallel(yield); else throw new UnsupportedOperationException('The inject() operation is not supported by collections in sequential mode') }
 
