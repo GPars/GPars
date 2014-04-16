@@ -14,26 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.pa
+// package groovyx.gpars.pa
 
-// TODO: delete
-//import groovyx.gpars.extra166y.ParallelArrayWithMapping
+// // TODO: delete
+// //import groovyx.gpars.extra166y.ParallelArrayWithMapping
 
-/**
- * The ParallelArray wrapper used after the map() operation
- */
-final class MappedPAWrapper<T> extends AbstractPAWrapper {
+// /**
+//  * The ParallelArray wrapper used after the map() operation
+//  */
+// final class MappedPAWrapper<T> extends AbstractPAWrapper {
 
-    def MappedPAWrapper(final ParallelArrayWithMapping pa) {
-        super(pa)
-    }
+//     def MappedPAWrapper(final ParallelArrayWithMapping pa) {
+//         super(pa)
+//     }
 
-    /**
-     * Filters concurrently elements in the collection based on the outcome of the supplied function on each of the elements.
-     * @param A closure indicating whether to propagate the given element into the filtered collection
-     * @return A collection holding the allowed values
-     */
-    public final AbstractPAWrapper filter(final Closure cl) {
-        new PAWrapper(pa.all().withFilter(new ClosurePredicate(new CallClosure(cl))))
-    }
-}
+//     /**
+//      * Filters concurrently elements in the collection based on the outcome of the supplied function on each of the elements.
+//      * @param A closure indicating whether to propagate the given element into the filtered collection
+//      * @return A collection holding the allowed values
+//      */
+//     public final AbstractPAWrapper filter(final Closure cl) {
+//         new PAWrapper(pa.all().withFilter(new ClosurePredicate(new CallClosure(cl))))
+//     }
+// }

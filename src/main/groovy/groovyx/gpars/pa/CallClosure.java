@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008–2011, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,42 +14,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.pa;
+// package groovyx.gpars.pa;
 
-import groovy.lang.Closure;
+// import groovy.lang.Closure;
 
-/**
- * A call-forwarding closure
- *
- * @author Vaclav Pech
- */
-public final class CallClosure<V> extends Closure<V> {
-    private final Closure<V> target;
-    private static final long serialVersionUID = 209099114666842715L;
+// /**
+//  * A call-forwarding closure
+//  *
+//  * @author Vaclav Pech
+//  */
+// public final class CallClosure<V> extends Closure<V> {
+//     private final Closure<V> target;
+//     private static final long serialVersionUID = 209099114666842715L;
 
-    public CallClosure(final Closure<V> target) {
-        super(target.getOwner());
-        this.target = target;
-    }
+//     public CallClosure(final Closure<V> target) {
+//         super(target.getOwner());
+//         this.target = target;
+//     }
 
-    @Override
-    public V call(final Object[] args) {
-        return target.call(args);
-    }
+//     @Override
+//     public V call(final Object[] args) {
+//         return target.call(args);
+//     }
 
-    @Override
-    public V call() {
-        return target.call();
-    }
+//     @Override
+//     public V call() {
+//         return target.call();
+//     }
 
-    @Override
-    public V call(final Object arguments) {
-        return target.call(arguments);
-    }
+//     @Override
+//     public V call(final Object arguments) {
+//         return target.call(arguments);
+//     }
 
-    @SuppressWarnings({"EmptyMethod"})
-    @Override
-    public Object clone() {
-        return super.clone();
-    }
-}
+//     @SuppressWarnings({"EmptyMethod"})
+//     @Override
+//     public Object clone() {
+//         return super.clone();
+//     }
+// }

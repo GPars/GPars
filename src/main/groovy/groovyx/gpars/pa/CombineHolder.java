@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008–2011, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,47 +14,47 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.pa;
+// package groovyx.gpars.pa;
 
-import groovy.lang.Closure;
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
+// import groovy.lang.Closure;
+// import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 
-import java.util.Iterator;
-import java.util.Map;
+// import java.util.Iterator;
+// import java.util.Map;
 
-/**
- * Holds a temporary reduce result for groupBy
- */
-@SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter", "ReturnOfCollectionOrArrayField"})
-final class CombineHolder {
+// /**
+//  * Holds a temporary reduce result for groupBy
+//  */
+// @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter", "ReturnOfCollectionOrArrayField"})
+// final class CombineHolder {
 
-    private final Map<Object, Object> content;
+//     private final Map<Object, Object> content;
 
-    CombineHolder(final Map<Object, Object> content) {
-        this.content = content;
-    }
+//     CombineHolder(final Map<Object, Object> content) {
+//         this.content = content;
+//     }
 
-    public Map<Object, Object> getContent() {
-        return content;
-    }
+//     public Map<Object, Object> getContent() {
+//         return content;
+//     }
 
-    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
-    CombineHolder merge(final CombineHolder other, final Closure<?> accumulation, final Closure<?> initialValue) {
-        for (final Map.Entry<Object, Object> item : other.content.entrySet()) {
-            final Iterator<?> valuesToIterateOver = DefaultGroovyMethods.iterator(item.getValue());
-            while (valuesToIterateOver.hasNext()) {
-                final Object next = valuesToIterateOver.next();
-                addToMap(item.getKey(), next, accumulation, initialValue);
-            }
-        }
-        return this;
-    }
+//     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
+//     CombineHolder merge(final CombineHolder other, final Closure<?> accumulation, final Closure<?> initialValue) {
+//         for (final Map.Entry<Object, Object> item : other.content.entrySet()) {
+//             final Iterator<?> valuesToIterateOver = DefaultGroovyMethods.iterator(item.getValue());
+//             while (valuesToIterateOver.hasNext()) {
+//                 final Object next = valuesToIterateOver.next();
+//                 addToMap(item.getKey(), next, accumulation, initialValue);
+//             }
+//         }
+//         return this;
+//     }
 
-    CombineHolder addToMap(final Object key, final Object item, final Closure<?> accumulation, final Closure<?> initialValue) {
-        final Object v = content.get(key);
-        final Object currentValue = v != null ? v : initialValue.call();
-        final Object newValue = accumulation.call(currentValue, item);
-        content.put(key, newValue);
-        return this;
-    }
-}
+//     CombineHolder addToMap(final Object key, final Object item, final Closure<?> accumulation, final Closure<?> initialValue) {
+//         final Object v = content.get(key);
+//         final Object currentValue = v != null ? v : initialValue.call();
+//         final Object newValue = accumulation.call(currentValue, item);
+//         content.put(key, newValue);
+//         return this;
+//     }
+// }

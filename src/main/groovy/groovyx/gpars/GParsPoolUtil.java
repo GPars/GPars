@@ -22,18 +22,20 @@ import groovy.time.Duration;
 //import groovyx.gpars.extra166y.Ops;
 //import groovyx.gpars.extra166y.ParallelArray;
 import groovyx.gpars.memoize.LRUProtectionStorage;
-import groovyx.gpars.pa.CallAsyncTask;
-import groovyx.gpars.pa.CallClosure;
-import groovyx.gpars.pa.ClosureMapper;
-import groovyx.gpars.pa.ClosureNegationPredicate;
-import groovyx.gpars.pa.ClosurePredicate;
-import groovyx.gpars.pa.ClosureReducer;
-import groovyx.gpars.pa.GParsPoolUtilHelper;
-import groovyx.gpars.pa.PAWrapper;
-import groovyx.gpars.pa.SumClosure;
+// TODO: delete
+//import groovyx.gpars.pa.CallAsyncTask;
+//import groovyx.gpars.pa.CallClosure;
+//import groovyx.gpars.pa.ClosureMapper;
+//import groovyx.gpars.pa.ClosureNegationPredicate;
+//import groovyx.gpars.pa.ClosurePredicate;
+//import groovyx.gpars.pa.ClosureReducer;
+//import groovyx.gpars.pa.GParsPoolUtilHelper;
+//import groovyx.gpars.pa.PAWrapper;
+//import groovyx.gpars.pa.SumClosure;
 import groovyx.gpars.scheduler.FJPool;
 import groovyx.gpars.util.GeneralTimer;
-import groovyx.gpars.util.PAUtils;
+// TODO: delete
+//import groovyx.gpars.util.PAUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,12 +48,13 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.RecursiveTask;
 
-import static groovyx.gpars.util.PAGroovyUtils.createCollection;
-import static groovyx.gpars.util.PAUtils.buildClosureForMaps;
-import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex;
-import static groovyx.gpars.util.PAUtils.buildResultMap;
-import static groovyx.gpars.util.PAUtils.createComparator;
-import static groovyx.gpars.util.PAUtils.createGroupByClosure;
+// TODO: delete
+//import static groovyx.gpars.util.PAGroovyUtils.createCollection;
+//import static groovyx.gpars.util.PAUtils.buildClosureForMaps;
+//import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex;
+//import static groovyx.gpars.util.PAUtils.buildResultMap;
+//import static groovyx.gpars.util.PAUtils.createComparator;
+//import static groovyx.gpars.util.PAUtils.createGroupByClosure;
 import static java.util.Arrays.asList;
 
 /**
@@ -175,116 +178,116 @@ public class GParsPoolUtil {
         return GParsPoolUtilHelper.asyncFun(original, blocking, pool);
     }
 
-    /**
-     * Creates a caching variant of the supplied closure.
-     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
-     * making subsequent calls with the same arguments fast.
-     * This variant will keep all values forever, i.e. till the closure gets garbage-collected.
-     * The returned function can be safely used concurrently from multiple threads, however, the implementation
-     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
-     * may not necessarily be able to benefit from each other's cached return value. With this having been mentioned,
-     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
-     * <p>
-     * The cache gets garbage-collected together with the memoized closure.
-     * </p>
-     *
-     * @return A new function forwarding to the original one while caching the results
-     */
-    @Deprecated
-    public static <T> Closure<T> gmemoize(final Closure<T> cl) {
-        return GParsPoolUtilHelper.buildMemoizeFunction(new ConcurrentHashMap(), cl);
-    }
+//    /**
+//     * Creates a caching variant of the supplied closure.
+//     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
+//     * making subsequent calls with the same arguments fast.
+//     * This variant will keep all values forever, i.e. till the closure gets garbage-collected.
+//     * The returned function can be safely used concurrently from multiple threads, however, the implementation
+//     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
+//     * may not necessarily be able to benefit from each other's cached return value. With this having been mentioned,
+//     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
+//     * <p>
+//     * The cache gets garbage-collected together with the memoized closure.
+//     * </p>
+//     *
+//     * @return A new function forwarding to the original one while caching the results
+//     */
+//    @Deprecated
+//    public static <T> Closure<T> gmemoize(final Closure<T> cl) {
+//        return GParsPoolUtilHelper.buildMemoizeFunction(new ConcurrentHashMap(), cl);
+//    }
 
-    /**
-     * Creates a caching variant of the supplied closure with upper limit on the cache size.
-     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
-     * making subsequent calls with the same arguments fast.
-     * This variant will keep all values until the upper size limit is reached. Then the values in the cache start rotating
-     * using the LRU (Last Recently Used) strategy.
-     * The returned function can be safely used concurrently from multiple threads, however, the implementation
-     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
-     * may not necessarily be able to benefit from each other's cached return value. With this having been mentioned,
-     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
-     * <p>
-     * The cache gets garbage-collected together with the memoized closure.
-     * </p>
-     *
-     * @param maxCacheSize The maximum size the cache can grow to
-     * @return A new function forwarding to the original one while caching the results
-     */
-    @Deprecated
-    public static <T> Closure<T> gmemoizeAtMost(final Closure<T> cl, final int maxCacheSize) {
-        if (maxCacheSize < 0)
-            throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for gmemoizeAtMost.");
+//    /**
+//     * Creates a caching variant of the supplied closure with upper limit on the cache size.
+//     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
+//     * making subsequent calls with the same arguments fast.
+//     * This variant will keep all values until the upper size limit is reached. Then the values in the cache start rotating
+//     * using the LRU (Last Recently Used) strategy.
+//     * The returned function can be safely used concurrently from multiple threads, however, the implementation
+//     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
+//     * may not necessarily be able to benefit from each other's cached return value. With this having been mentioned,
+//     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
+//     * <p>
+//     * The cache gets garbage-collected together with the memoized closure.
+//     * </p>
+//     *
+//     * @param maxCacheSize The maximum size the cache can grow to
+//     * @return A new function forwarding to the original one while caching the results
+//     */
+//    @Deprecated
+//    public static <T> Closure<T> gmemoizeAtMost(final Closure<T> cl, final int maxCacheSize) {
+//        if (maxCacheSize < 0)
+//            throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for gmemoizeAtMost.");
+//
+//        return GParsPoolUtilHelper.buildMemoizeFunction(Collections.synchronizedMap(new LRUProtectionStorage(maxCacheSize)), cl);
+//    }
 
-        return GParsPoolUtilHelper.buildMemoizeFunction(Collections.synchronizedMap(new LRUProtectionStorage(maxCacheSize)), cl);
-    }
+//    /**
+//     * Creates a caching variant of the supplied closure with automatic cache size adjustment and lower limit
+//     * on the cache size.
+//     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
+//     * making subsequent calls with the same arguments fast.
+//     * This variant allows the garbage collector to release entries from the cache and at the same time allows
+//     * the user to specify how many entries should be protected from the eventual gc-initiated eviction.
+//     * Cached entries exceeding the specified preservation threshold are made available for eviction based on
+//     * the LRU (Last Recently Used) strategy.
+//     * Given the non-deterministic nature of garbage collector, the actual cache size may grow well beyond the limits
+//     * set by the user if memory is plentiful.
+//     * The returned function can be safely used concurrently from multiple threads, however, the implementation
+//     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
+//     * may not necessarily be able to benefit from each other's cached return value. Also the protectedCacheSize parameter
+//     * might not be respected accurately in such scenarios for some periods of time. With this having been mentioned,
+//     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
+//     * <p>
+//     * The cache gets garbage-collected together with the memoized closure.
+//     * </p>
+//     */
+//    @Deprecated
+//    public static <T> Closure<T> gmemoizeAtLeast(final Closure<T> cl, final int protectedCacheSize) {
+//        if (protectedCacheSize < 0)
+//            throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for gmemoizeAtLeast.");
+//
+//        return GParsPoolUtilHelper.buildSoftReferenceMemoizeFunction(protectedCacheSize, new ConcurrentHashMap(), cl);
+//    }
 
-    /**
-     * Creates a caching variant of the supplied closure with automatic cache size adjustment and lower limit
-     * on the cache size.
-     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
-     * making subsequent calls with the same arguments fast.
-     * This variant allows the garbage collector to release entries from the cache and at the same time allows
-     * the user to specify how many entries should be protected from the eventual gc-initiated eviction.
-     * Cached entries exceeding the specified preservation threshold are made available for eviction based on
-     * the LRU (Last Recently Used) strategy.
-     * Given the non-deterministic nature of garbage collector, the actual cache size may grow well beyond the limits
-     * set by the user if memory is plentiful.
-     * The returned function can be safely used concurrently from multiple threads, however, the implementation
-     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
-     * may not necessarily be able to benefit from each other's cached return value. Also the protectedCacheSize parameter
-     * might not be respected accurately in such scenarios for some periods of time. With this having been mentioned,
-     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
-     * <p>
-     * The cache gets garbage-collected together with the memoized closure.
-     * </p>
-     */
-    @Deprecated
-    public static <T> Closure<T> gmemoizeAtLeast(final Closure<T> cl, final int protectedCacheSize) {
-        if (protectedCacheSize < 0)
-            throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for gmemoizeAtLeast.");
+//    /**
+//     * Creates a caching variant of the supplied closure with automatic cache size adjustment and lower and upper limits
+//     * on the cache size.
+//     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
+//     * making subsequent calls with the same arguments fast.
+//     * This variant allows the garbage collector to release entries from the cache and at the same time allows
+//     * the user to specify how many entries should be protected from the eventual gc-initiated eviction.
+//     * Cached entries exceeding the specified preservation threshold are made available for eviction based on
+//     * the LRU (Last Recently Used) strategy.
+//     * Given the non-deterministic nature of garbage collector, the actual cache size may grow well beyond the protected
+//     * size limits set by the user, if memory is plentiful.
+//     * Also, this variant will never exceed in size the upper size limit. Once the upper size limit has been reached,
+//     * the values in the cache start rotating using the LRU (Last Recently Used) strategy.
+//     * The returned function can be safely used concurrently from multiple threads, however, the implementation
+//     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
+//     * may not necessarily be able to benefit from each other's cached return value. Also the protectedCacheSize parameter
+//     * might not be respected accurately in such scenarios for some periods of time. With this having been mentioned,
+//     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
+//     * <p>
+//     * The cache gets garbage-collected together with the memoized closure.
+//     * </p>
+//     */
+//    @Deprecated
+//    public static <T> Closure<T> gmemoizeBetween(final Closure<T> cl, final int protectedCacheSize, final int maxCacheSize) {
+//        if (protectedCacheSize < 0)
+//            throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for gmemoizeBetween.");
+//        if (maxCacheSize < 0)
+//            throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for gmemoizeBetween.");
+//        if (protectedCacheSize > maxCacheSize)
+//            throw new IllegalArgumentException("The maxCacheSize parameter to gmemoizeBetween is required to be greater or equal to the protectedCacheSize parameter.");
+//
+//        return GParsPoolUtilHelper.buildSoftReferenceMemoizeFunction(protectedCacheSize, Collections.synchronizedMap(new LRUProtectionStorage(maxCacheSize)), cl);
+//    }
 
-        return GParsPoolUtilHelper.buildSoftReferenceMemoizeFunction(protectedCacheSize, new ConcurrentHashMap(), cl);
-    }
-
-    /**
-     * Creates a caching variant of the supplied closure with automatic cache size adjustment and lower and upper limits
-     * on the cache size.
-     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
-     * making subsequent calls with the same arguments fast.
-     * This variant allows the garbage collector to release entries from the cache and at the same time allows
-     * the user to specify how many entries should be protected from the eventual gc-initiated eviction.
-     * Cached entries exceeding the specified preservation threshold are made available for eviction based on
-     * the LRU (Last Recently Used) strategy.
-     * Given the non-deterministic nature of garbage collector, the actual cache size may grow well beyond the protected
-     * size limits set by the user, if memory is plentiful.
-     * Also, this variant will never exceed in size the upper size limit. Once the upper size limit has been reached,
-     * the values in the cache start rotating using the LRU (Last Recently Used) strategy.
-     * The returned function can be safely used concurrently from multiple threads, however, the implementation
-     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
-     * may not necessarily be able to benefit from each other's cached return value. Also the protectedCacheSize parameter
-     * might not be respected accurately in such scenarios for some periods of time. With this having been mentioned,
-     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
-     * <p>
-     * The cache gets garbage-collected together with the memoized closure.
-     * </p>
-     */
-    @Deprecated
-    public static <T> Closure<T> gmemoizeBetween(final Closure<T> cl, final int protectedCacheSize, final int maxCacheSize) {
-        if (protectedCacheSize < 0)
-            throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for gmemoizeBetween.");
-        if (maxCacheSize < 0)
-            throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for gmemoizeBetween.");
-        if (protectedCacheSize > maxCacheSize)
-            throw new IllegalArgumentException("The maxCacheSize parameter to gmemoizeBetween is required to be greater or equal to the protectedCacheSize parameter.");
-
-        return GParsPoolUtilHelper.buildSoftReferenceMemoizeFunction(protectedCacheSize, Collections.synchronizedMap(new LRUProtectionStorage(maxCacheSize)), cl);
-    }
-
-    private static <K, V> ParallelArray<Map.Entry<K, V>> createPA(final Map<K, V> collection, final ForkJoinPool pool) {
-        return GParsPoolUtilHelper.createPAFromArray(PAUtils.createArray(collection), pool);
-    }
+//    private static <K, V> ParallelArray<Map.Entry<K, V>> createPA(final Map<K, V> collection, final ForkJoinPool pool) {
+//        return GParsPoolUtilHelper.createPAFromArray(PAUtils.createArray(collection), pool);
+//    }
 
     /**
      * Overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
@@ -1155,12 +1158,12 @@ public class GParsPoolUtil {
         return groupByParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), cl);
     }
 
-    private static <K, T> Map<K, List<T>> groupByParallelPA(final ParallelArray<T> pa, final Closure<K> cl) {
-        final ConcurrentHashMap<K, List<T>> map = new ConcurrentHashMap<K, List<T>>();
-        GParsPoolUtilHelper.eachParallelPA(pa, createGroupByClosure(cl, map));
-        return map;
-
-    }
+//    private static <K, T> Map<K, List<T>> groupByParallelPA(final ParallelArray<T> pa, final Closure<K> cl) {
+//        final ConcurrentHashMap<K, List<T>> map = new ConcurrentHashMap<K, List<T>>();
+//        GParsPoolUtilHelper.eachParallelPA(pa, createGroupByClosure(cl, map));
+//        return map;
+//
+//    }
 
     /**
      * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the supplied
@@ -1420,36 +1423,36 @@ public class GParsPoolUtil {
         return GParsPoolUtilHelper.foldParallel(collection, seed, cl);
     }
 
-    /**
-     * Creates a PAWrapper around a ParallelArray wrapping the elements of the original collection.
-     * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
-     * ParallelArray implementation.
-     */
-    public static <T> PAWrapper<T> getParallel(final Collection<T> collection) {
-        return new PAWrapper(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()));
-    }
-
-    /**
-     * Creates a PAWrapper around a ParallelArray wrapping the elements of the original collection.
-     * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
-     * ParallelArray implementation.
-     */
-    public static PAWrapper getParallel(final Object collection) {
-        return new PAWrapper(GParsPoolUtilHelper.createPA(collection, retrievePool()));
-    }
-
-    /**
-     * Creates a ParallelArray wrapping the elements of the original collection.
-     */
-    @SuppressWarnings("GroovyAssignabilityCheck")
-    public static <T> ParallelArray<T> getParallelArray(final Collection<T> collection) {
-        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool());
-    }
-
-    /**
-     * Creates a ParallelArray wrapping the elements of the original collection.
-     */
-    public static ParallelArray getParallelArray(final Object collection) {
-        return GParsPoolUtilHelper.createPA(collection, retrievePool());
-    }
+//    /**
+//     * Creates a PAWrapper around a ParallelArray wrapping the elements of the original collection.
+//     * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
+//     * ParallelArray implementation.
+//     */
+//    public static <T> PAWrapper<T> getParallel(final Collection<T> collection) {
+//        return new PAWrapper(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()));
+//    }
+//
+//    /**
+//     * Creates a PAWrapper around a ParallelArray wrapping the elements of the original collection.
+//     * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
+//     * ParallelArray implementation.
+//     */
+//    public static PAWrapper getParallel(final Object collection) {
+//        return new PAWrapper(GParsPoolUtilHelper.createPA(collection, retrievePool()));
+//    }
+//
+//    /**
+//     * Creates a ParallelArray wrapping the elements of the original collection.
+//     */
+//    @SuppressWarnings("GroovyAssignabilityCheck")
+//    public static <T> ParallelArray<T> getParallelArray(final Collection<T> collection) {
+//        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool());
+//    }
+//
+//    /**
+//     * Creates a ParallelArray wrapping the elements of the original collection.
+//     */
+//    public static ParallelArray getParallelArray(final Object collection) {
+//        return GParsPoolUtilHelper.createPA(collection, retrievePool());
+//    }
 }

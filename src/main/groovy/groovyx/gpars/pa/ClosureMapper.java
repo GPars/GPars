@@ -14,26 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.pa;
+// package groovyx.gpars.pa;
 
-// TODO: delete
-//import groovyx.gpars.extra166y.Ops;
-import groovy.lang.Closure;
+// // TODO: delete
+// //import groovyx.gpars.extra166y.Ops;
+// import groovy.lang.Closure;
 
-/**
- * A PA mapper built around a closure
- *
- * @author Vaclav Pech
- */
-public final class ClosureMapper<V> implements Ops.Op<Object, V> {
-    private final Closure<V> code;
+// /**
+//  * A PA mapper built around a closure
+//  *
+//  * @author Vaclav Pech
+//  */
+// public final class ClosureMapper<V> implements Ops.Op<Object, V> {
+//     private final Closure<V> code;
 
-    public ClosureMapper(final Closure<V> code) {
-        this.code = code;
-    }
+//     public ClosureMapper(final Closure<V> code) {
+//         this.code = code;
+//     }
 
-    @Override
-    public V op(final Object o) {
-        return code.call(o);
-    }
-}
+//     @Override
+//     public V op(final Object o) {
+//         return code.call(o);
+//     }
+// }

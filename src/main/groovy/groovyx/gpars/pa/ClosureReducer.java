@@ -14,27 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.pa;
+// package groovyx.gpars.pa;
 
-// TODO: delete
-//import groovyx.gpars.extra166y.Ops;
-import groovy.lang.Closure;
+// // TODO: delete
+// //import groovyx.gpars.extra166y.Ops;
+// import groovy.lang.Closure;
 
-/**
- * A PA reducer built around a closure
- *
- * @author Vaclav Pech
- */
-public final class ClosureReducer<T> implements Ops.Reducer<T> {
-    private final Closure code;
+// /**
+//  * A PA reducer built around a closure
+//  *
+//  * @author Vaclav Pech
+//  */
+// public final class ClosureReducer<T> implements Ops.Reducer<T> {
+//     private final Closure code;
 
-    public ClosureReducer(final Closure code) {
-        this.code = code;
-    }
+//     public ClosureReducer(final Closure code) {
+//         this.code = code;
+//     }
 
-    @Override
-    public T op(final Object o, final Object o1) {
-        final Object[] args = {o, o1};
-        return (T) code.call(args);
-    }
-}
+//     @Override
+//     public T op(final Object o, final Object o1) {
+//         final Object[] args = {o, o1};
+//         return (T) code.call(args);
+//     }
+// }
