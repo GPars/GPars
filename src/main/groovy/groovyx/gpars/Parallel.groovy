@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008–2012, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 package groovyx.gpars
 
-import groovyx.gpars.pa.PAWrapper
+// TODO: delete
+//import groovyx.gpars.pa.PAWrapper
 
 /**
  * The Parallel interface holds methods that ParallelEnhancer adds to classes or instances when they get enhanced.
@@ -342,16 +343,16 @@ final class Parallel {
         }
     }
 
-    /**
-     * Creates a PAWrapper around a ParallelArray wrapping te elements of the original collection.
-     * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
-     * ParallelArray implementation.
-     */
-    public PAWrapper getParallel() {
-        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.getParallel(getRealSelf())
-        }
-    }
+//    /**
+//     * Creates a PAWrapper around a ParallelArray wrapping te elements of the original collection.
+//     * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
+//     * ParallelArray implementation.
+//     */
+//    public PAWrapper getParallel() {
+//        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+//            GParsPoolUtil.getParallel(getRealSelf())
+//        }
+//    }
 
     /**
      * Indicates, whether the iterative methods like each() or collect() have been made parallel.
