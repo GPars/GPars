@@ -46,7 +46,7 @@ import static groovyx.gpars.extra166y.Ops.LongToObject;
  * provides methods supporting the same operations as {@link
  * ParallelArray}, but specialized for scalar longs. It additionally
  * provides a few methods specific to numerical values.
- * <p/>
+ *
  * <p><b>Sample usages</b>.
  * Here is a complete (although naive) prime filter program:
  * <pre>
@@ -95,7 +95,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Returns a common default executor for use in ParallelArrays.
      * This executor arranges enough parallelism to use most, but not
      * necessarily all, of the available processors on this system.
-     *
      * @return the executor
      */
     public static ForkJoinPool defaultExecutor() {
@@ -110,10 +109,9 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * subclassing. To create a ParallelLongArray, use {@link #create},
      * {@link #createEmpty}, {@link #createUsingHandoff} or {@link
      * #createFromCopy}.
-     *
      * @param executor the executor
-     * @param array    the array
-     * @param limit    the upper bound limit
+     * @param array the array
+     * @param limit the upper bound limit
      */
     protected ParallelLongArray(ForkJoinPool executor, long[] array,
                                 int limit) {
@@ -134,12 +132,11 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Creates a new ParallelLongArray using the given executor and
      * an array of the given size.
-     *
-     * @param size     the array size
+     * @param size the array size
      * @param executor the executor
      */
     public static ParallelLongArray create
-    (int size, ForkJoinPool executor) {
+        (int size, ForkJoinPool executor) {
         long[] array = new long[size];
         return new ParallelLongArray(executor, array, size);
     }
@@ -150,12 +147,11 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * for other purposes once constructing this ParallelLongArray.  The
      * given array may be internally replaced by another array in the
      * course of methods that add or remove elements.
-     *
-     * @param handoff  the array
+     * @param handoff the array
      * @param executor the executor
      */
     public static ParallelLongArray createUsingHandoff
-    (long[] handoff, ForkJoinPool executor) {
+        (long[] handoff, ForkJoinPool executor) {
         return new ParallelLongArray(executor, handoff, handoff.length);
     }
 
@@ -163,12 +159,11 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Creates a new ParallelLongArray using the given executor and
      * initially holding copies of the given
      * source elements.
-     *
-     * @param source   the source of initial elements
+     * @param source the source of initial elements
      * @param executor the executor
      */
     public static ParallelLongArray createFromCopy
-    (long[] source, ForkJoinPool executor) {
+        (long[] source, ForkJoinPool executor) {
         // For now, avoid copyOf so people can compile with Java5
         int size = source.length;
         long[] array = new long[size];
@@ -180,17 +175,16 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Creates a new ParallelLongArray using an array of the given size,
      * initially holding copies of the given source truncated or
      * padded with zeros to obtain the specified length.
-     *
-     * @param source   the source of initial elements
-     * @param size     the array size
+     * @param source the source of initial elements
+     * @param size the array size
      * @param executor the executor
      */
     public static ParallelLongArray createFromCopy
-    (int size, long[] source, ForkJoinPool executor) {
+        (int size, long[] source, ForkJoinPool executor) {
         // For now, avoid copyOf so people can compile with Java5
         long[] array = new long[size];
         System.arraycopy(source, 0, array, 0,
-                Math.min(source.length, size));
+                         Math.min(source.length, size));
         return new ParallelLongArray(executor, array, size);
     }
 
@@ -199,12 +193,11 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * an array of the given size, but with an initial effective size
      * of zero, enabling incremental insertion via {@link
      * ParallelLongArray#asList} operations.
-     *
-     * @param size     the array size
+     * @param size the array size
      * @param executor the executor
      */
     public static ParallelLongArray createEmpty
-    (int size, ForkJoinPool executor) {
+        (int size, ForkJoinPool executor) {
         long[] array = new long[size];
         return new ParallelLongArray(executor, array, 0);
     }
@@ -214,54 +207,30 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * mapped ParallelLongArray.
      */
     public static interface SummaryStatistics {
-        /**
-         * Returns the number of elements
-         */
+        /** Returns the number of elements */
         public int size();
-
-        /**
-         * Returns the minimum element, or Long.MAX_VALUE if empty
-         */
+        /** Returns the minimum element, or Long.MAX_VALUE if empty */
         public long min();
-
-        /**
-         * Returns the maximum element, or Long.MIN_VALUE if empty
-         */
+        /** Returns the maximum element, or Long.MIN_VALUE if empty */
         public long max();
-
-        /**
-         * Returns the index of the minimum element, or -1 if empty
-         */
+        /** Returns the index of the minimum element, or -1 if empty */
         public int indexOfMin();
-
-        /**
-         * Returns the index of the maximum element, or -1 if empty
-         */
+        /** Returns the index of the maximum element, or -1 if empty */
         public int indexOfMax();
-
-        /**
-         * Returns the sum of all elements
-         */
+        /** Returns the sum of all elements */
         public long sum();
-
-        /**
-         * Returns the arithmetic average of all elements
-         */
+        /** Returns the arithmetic average of all elements */
         public double average();
     }
 
     /**
      * Returns the executor used for computations.
-     *
      * @return the executor
      */
-    public ForkJoinPool getExecutor() {
-        return ex;
-    }
+    public ForkJoinPool getExecutor() { return ex; }
 
     /**
      * Applies the given procedure to elements.
-     *
      * @param procedure the procedure
      */
     public void apply(LongProcedure procedure) {
@@ -270,9 +239,8 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Returns reduction of elements.
-     *
      * @param reducer the reducer
-     * @param base    the result for an empty array
+     * @param base the result for an empty array
      * @return reduction
      */
     public long reduce(LongReducer reducer, long base) {
@@ -281,7 +249,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Returns a new ParallelLongArray holding all elements.
-     *
      * @return a new ParallelLongArray holding all elements
      */
     public ParallelLongArray all() {
@@ -291,7 +258,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Replaces elements with the results of applying the given op
      * to their current values.
-     *
      * @param op the op
      * @return this (to simplify use in expressions)
      */
@@ -303,7 +269,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Replaces elements with the results of applying the given
      * op to their indices.
-     *
      * @param op the op
      * @return this (to simplify use in expressions)
      */
@@ -315,7 +280,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Replaces elements with the results of applying the given
      * mapping to each index and current element value.
-     *
      * @param op the op
      * @return this (to simplify use in expressions)
      */
@@ -329,18 +293,16 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * generator. For example, to fill the array with uniform random
      * values, use
      * {@code replaceWithGeneratedValue(Ops.longRandom())}.
-     *
      * @param generator the generator
      * @return this (to simplify use in expressions)
      */
-    public ParallelLongArray replaceWithGeneratedValue(LongGenerator generator) {
+    public ParallelLongArray replaceWithGeneratedValue(LongGenerator generator){
         super.replaceWithGeneratedValue(generator);
         return this;
     }
 
     /**
      * Replaces elements with the given value.
-     *
      * @param value the value
      * @return this (to simplify use in expressions)
      */
@@ -352,14 +314,13 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Replaces elements with results of applying
      * {@code op(thisElement, otherElement)}.
-     *
-     * @param other    the other array
+     * @param other the other array
      * @param combiner the combiner
      * @return this (to simplify use in expressions)
      */
     public ParallelLongArray replaceWithMapping
-    (BinaryLongOp combiner,
-     ParallelLongArrayWithLongMapping other) {
+        (BinaryLongOp combiner,
+         ParallelLongArrayWithLongMapping other) {
         super.replaceWithMapping(combiner, other);
         return this;
     }
@@ -367,12 +328,11 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Replaces elements with results of applying
      * {@code op(thisElement, otherElement)}.
-     *
-     * @param other    the other array
+     * @param other the other array
      * @param combiner the combiner
      * @return this (to simplify use in expressions)
      * @throws ArrayIndexOutOfBoundsException if other array has
-     *                                        fewer elements than this array
+     * fewer elements than this array
      */
     public ParallelLongArray replaceWithMapping(BinaryLongOp combiner,
                                                 long[] other) {
@@ -383,7 +343,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Returns the index of some element equal to given target, or -1
      * if not present.
-     *
      * @param target the element to search for
      * @return the index or -1 if not present
      */
@@ -395,7 +354,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Assuming this array is sorted, returns the index of an element
      * equal to given target, or -1 if not present. If the array
      * is not sorted, the results are undefined.
-     *
      * @param target the element to search for
      * @return the index or -1 if not present
      */
@@ -408,8 +366,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * comparator, returns the index of an element equal to given
      * target, or -1 if not present. If the array is not sorted, the
      * results are undefined.
-     *
-     * @param target     the element to search for
+     * @param target the element to search for
      * @param comparator the comparator
      * @return the index or -1 if not present
      */
@@ -420,19 +377,17 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Returns summary statistics, using the given comparator
      * to locate minimum and maximum elements.
-     *
      * @param comparator the comparator to use for
-     *                   locating minimum and maximum elements
+     * locating minimum and maximum elements
      * @return the summary
      */
     public ParallelLongArray.SummaryStatistics summary
-    (LongComparator comparator) {
+        (LongComparator comparator) {
         return super.summary(comparator);
     }
 
     /**
      * Returns summary statistics, using natural comparator.
-     *
      * @return the summary
      */
     public ParallelLongArray.SummaryStatistics summary() {
@@ -441,7 +396,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Returns the minimum element, or Long.MAX_VALUE if empty.
-     *
      * @param comparator the comparator
      * @return minimum element, or Long.MAX_VALUE if empty
      */
@@ -451,7 +405,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Returns the minimum element, or Long.MAX_VALUE if empty.
-     *
      * @return minimum element, or Long.MAX_VALUE if empty
      */
     public long min() {
@@ -460,7 +413,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Returns the maximum element, or Long.MIN_VALUE if empty.
-     *
      * @param comparator the comparator
      * @return maximum element, or Long.MIN_VALUE if empty
      */
@@ -470,7 +422,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Returns the maximum element, or Long.MIN_VALUE if empty.
-     *
      * @return maximum element, or Long.MIN_VALUE if empty
      */
     public long max() {
@@ -483,9 +434,8 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * {@code 1, 2, 3}, and the reducer operation adds numbers, then
      * after invocation of this method, the contents would be {@code 1,
      * 3, 6} (that is, {@code 1, 1+2, 1+2+3}).
-     *
      * @param reducer the reducer
-     * @param base    the result for an empty array
+     * @param base the result for an empty array
      * @return this (to simplify use in expressions)
      */
     public ParallelLongArray cumulate(LongReducer reducer, long base) {
@@ -501,9 +451,8 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * invocation of this method, the contents would be {@code 0, 1,
      * 3} (that is, {@code 0, 0+1, 0+1+2}, and the return value
      * would be 6 (that is, {@code 1+2+3}).
-     *
      * @param reducer the reducer
-     * @param base    the result for an empty array
+     * @param base the result for an empty array
      * @return the total reduction
      */
     public long precumulate(LongReducer reducer, long base) {
@@ -514,7 +463,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Sorts the array. Unlike Arrays.sort, this sort does
      * not guarantee that elements with equal keys maintain their
      * relative position in the array.
-     *
      * @param comparator the comparator to use
      * @return this (to simplify use in expressions)
      */
@@ -527,7 +475,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Sorts the array, assuming all elements are Comparable. Unlike
      * Arrays.sort, this sort does not guarantee that elements
      * with equal keys maintain their relative position in the array.
-     *
      * @return this (to simplify use in expressions)
      * @throws ClassCastException if any element is not Comparable
      */
@@ -541,7 +488,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * shifting others leftward, and possibly decreasing size.  This
      * method may be used after sorting to ensure that this
      * ParallelLongArray contains a set of unique elements.
-     *
      * @return this (to simplify use in expressions)
      */
     public ParallelLongArray removeConsecutiveDuplicates() {
@@ -564,7 +510,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Equivalent to {@code asList().addAll} but specialized for array
      * arguments and likely to be more efficient.
-     *
      * @param other the elements to add
      * @return this (to simplify use in expressions)
      */
@@ -580,7 +525,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Appends all (possibly bounded, filtered, or mapped) elements of
      * the given ParallelDoubleArray, resizing and/or reallocating this
      * array if necessary.
-     *
      * @param other the elements to add
      * @return this (to simplify use in expressions)
      */
@@ -588,16 +532,17 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
         int end = fence;
         if (other.hasFilter()) {
             PAS.FJLAppendAllDriver r = new PAS.FJLAppendAllDriver
-                    (other, end, array);
+                (other, end, array);
             ex.invoke(r);
             array = r.results;
             fence = end + r.resultSize;
-        } else {
+        }
+        else {
             int csize = other.size();
             insertSlotsAt(end, csize);
             if (other.hasMap())
                 ex.invoke(new PAS.FJLMap(other, other.origin, other.fence,
-                        null, array, end - other.origin));
+                                         null, array, end - other.origin));
             else
                 System.arraycopy(other.array, 0, array, end, csize);
         }
@@ -607,7 +552,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Returns a new ParallelLongArray containing only the unique
      * elements of this array (that is, without any duplicates).
-     *
      * @return the new ParallelLongArray
      */
     public ParallelLongArray allUniqueElements() {
@@ -617,7 +561,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Removes from the array all elements for which the given
      * selector holds.
-     *
      * @param selector the selector
      * @return this (to simplify use in expressions)
      */
@@ -632,7 +575,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Returns true if all elements at the same relative positions
      * of this and other array are equal.
-     *
      * @param other the other array
      */
     public boolean hasAllEqualElements(ParallelLongArrayWithLongMapping other) {
@@ -641,7 +583,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Returns the sum of elements.
-     *
      * @return the sum of elements
      */
     public long sum() {
@@ -650,7 +591,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Replaces each element with the running sum.
-     *
      * @return this (to simplify use in expressions)
      */
     public ParallelLongArray cumulateSum() {
@@ -660,7 +600,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
 
     /**
      * Replaces each element with its prefix sum.
-     *
      * @return the total sum
      */
     public long precumulateSum() {
@@ -671,7 +610,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Returns an operation prefix that causes a method to
      * operate only on the elements of the array between
      * firstIndex (inclusive) and upperBound (exclusive).
-     *
      * @param firstIndex the lower bound (inclusive)
      * @param upperBound the upper bound (exclusive)
      * @return operation prefix
@@ -685,7 +623,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Returns an operation prefix that causes a method to operate
      * only on the elements of the array for which the given selector
      * returns true.
-     *
      * @param selector the selector
      * @return operation prefix
      */
@@ -697,13 +634,12 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Returns an operation prefix that causes a method to operate
      * only on elements for which the given binary selector returns
      * true.
-     *
      * @param selector the selector
      * @return operation prefix
      */
     public ParallelLongArrayWithFilter withFilter
-    (BinaryLongPredicate selector,
-     ParallelLongArrayWithLongMapping other) {
+        (BinaryLongPredicate selector,
+         ParallelLongArrayWithLongMapping other) {
         return super.withFilter(selector, other);
     }
 
@@ -711,12 +647,11 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Returns an operation prefix that causes a method to operate
      * only on elements for which the given indexed selector returns
      * true.
-     *
      * @param selector the selector
      * @return operation prefix
      */
     public ParallelLongArrayWithFilter withIndexedFilter
-    (IntAndLongPredicate selector) {
+        (IntAndLongPredicate selector) {
         return super.withIndexedFilter(selector);
     }
 
@@ -724,19 +659,17 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op.
-     *
      * @param op the op
      * @return operation prefix
      */
     public <U> ParallelLongArrayWithMapping<U> withMapping
-    (LongToObject<? extends U> op) {
+        (LongToObject<? extends U> op) {
         return super.withMapping(op);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op.
-     *
      * @param op the op
      * @return operation prefix
      */
@@ -747,7 +680,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op.
-     *
      * @param op the op
      * @return operation prefix
      */
@@ -758,144 +690,135 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
-    public <V, W, X> ParallelLongArrayWithMapping<W> withMapping
-    (LongAndObjectToObject<? super V, ? extends W> combiner,
-     ParallelArrayWithMapping<X, V> other) {
+    public <V,W,X> ParallelLongArrayWithMapping<W> withMapping
+        (LongAndObjectToObject<? super V, ? extends W> combiner,
+         ParallelArrayWithMapping<X,V> other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
     public <V> ParallelLongArrayWithMapping<V> withMapping
-    (LongAndDoubleToObject<? extends V> combiner,
-     ParallelDoubleArrayWithDoubleMapping other) {
+        (LongAndDoubleToObject<? extends V> combiner,
+         ParallelDoubleArrayWithDoubleMapping other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
     public <V> ParallelLongArrayWithMapping<V> withMapping
-    (LongAndLongToObject<? extends V> combiner,
-     ParallelLongArrayWithLongMapping other) {
+        (LongAndLongToObject<? extends V> combiner,
+         ParallelLongArrayWithLongMapping other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
-    public <V, W> ParallelLongArrayWithDoubleMapping withMapping
-    (LongAndObjectToDouble<? super V> combiner,
-     ParallelArrayWithMapping<W, V> other) {
+    public <V,W> ParallelLongArrayWithDoubleMapping withMapping
+        (LongAndObjectToDouble<? super V> combiner,
+         ParallelArrayWithMapping<W,V> other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelLongArrayWithDoubleMapping withMapping
-    (LongAndDoubleToDouble combiner,
-     ParallelDoubleArrayWithDoubleMapping other) {
+        (LongAndDoubleToDouble combiner,
+         ParallelDoubleArrayWithDoubleMapping other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelLongArrayWithDoubleMapping withMapping
-    (LongAndLongToDouble combiner,
-     ParallelLongArrayWithLongMapping other) {
+        (LongAndLongToDouble combiner,
+         ParallelLongArrayWithLongMapping other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
-    public <V, W> ParallelLongArrayWithLongMapping withMapping
-    (LongAndObjectToLong<? super V> combiner,
-     ParallelArrayWithMapping<W, V> other) {
+    public <V,W> ParallelLongArrayWithLongMapping withMapping
+        (LongAndObjectToLong<? super V> combiner,
+         ParallelArrayWithMapping<W,V> other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelLongArrayWithLongMapping withMapping
-    (LongAndDoubleToLong combiner,
-     ParallelDoubleArrayWithDoubleMapping other) {
+        (LongAndDoubleToLong combiner,
+         ParallelDoubleArrayWithDoubleMapping other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelLongArrayWithLongMapping withMapping
-    (BinaryLongOp combiner,
-     ParallelLongArrayWithLongMapping other) {
+        (BinaryLongOp combiner,
+         ParallelLongArrayWithLongMapping other) {
         return super.withMapping(combiner, other);
     }
 
@@ -904,12 +827,11 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * mappings of this array using the given mapper that accepts as
      * arguments an element's current index and value, and produces a
      * new value.
-     *
      * @param mapper the mapper
      * @return operation prefix
      */
     public <U> ParallelLongArrayWithMapping<U> withIndexedMapping
-    (IntAndLongToObject<? extends U> mapper) {
+        (IntAndLongToObject<? extends U> mapper) {
         return super.withIndexedMapping(mapper);
     }
 
@@ -918,12 +840,11 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * mappings of this array using the given mapper that accepts as
      * arguments an element's current index and value, and produces a
      * new value.
-     *
      * @param mapper the mapper
      * @return operation prefix
      */
     public ParallelLongArrayWithDoubleMapping withIndexedMapping
-    (IntAndLongToDouble mapper) {
+        (IntAndLongToDouble mapper) {
         return super.withIndexedMapping(mapper);
     }
 
@@ -932,12 +853,11 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * mappings of this array using the given mapper that accepts as
      * arguments an element's current index and value, and produces a
      * new value.
-     *
      * @param mapper the mapper
      * @return operation prefix
      */
     public ParallelLongArrayWithLongMapping withIndexedMapping
-    (IntAndLongToLong mapper) {
+        (IntAndLongToLong mapper) {
         return super.withIndexedMapping(mapper);
     }
 
@@ -947,7 +867,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * support the remove operation. However, a full
      * {@code ListIterator} supporting add, remove, and set
      * operations is available via {@link #asList}.
-     *
      * @return an iterator stepping through each element
      */
     public Iterator<Long> iterator() {
@@ -958,22 +877,13 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
         int cursor;
         final long[] arr;
         final int hi;
-
-        ParallelLongArrayIterator(long[] a, int limit) {
-            arr = a;
-            hi = limit;
-        }
-
-        public boolean hasNext() {
-            return cursor < hi;
-        }
-
+        ParallelLongArrayIterator(long[] a, int limit) { arr = a; hi = limit; }
+        public boolean hasNext() { return cursor < hi; }
         public Long next() {
             if (cursor >= hi)
                 throw new NoSuchElementException();
             return Long.valueOf(arr[cursor++]);
         }
-
         public void remove() {
             throw new UnsupportedOperationException();
         }
@@ -991,7 +901,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * itself thread-safe.  In particular, performing list updates
      * while other parallel operations are in progress has undefined
      * (and surely undesired) effects.
-     *
      * @return a list view
      */
     public List<Long> asList() {
@@ -1005,45 +914,32 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * Returns the effective size of the underlying array. The
      * effective size is the current limit, if used (see {@link
      * #setLimit}), or the length of the array otherwise.
-     *
      * @return the effective size of array
      */
-    public int size() {
-        return fence;
-    }
+    public int size() { return fence; }
 
     /**
      * Returns the underlying array used for computations.
-     *
      * @return the array
      */
-    public long[] getArray() {
-        return array;
-    }
+    public long[] getArray() { return array; }
 
     /**
      * Returns the element of the array at the given index.
-     *
      * @param i the index
      * @return the element of the array at the given index
      */
-    public long get(int i) {
-        return array[i];
-    }
+    public long get(int i) { return array[i]; }
 
     /**
      * Sets the element of the array at the given index to the given value.
-     *
      * @param i the index
      * @param x the value
      */
-    public void set(int i, long x) {
-        array[i] = x;
-    }
+    public void set(int i, long x) { array[i] = x; }
 
     /**
      * Equivalent to {@code asList().toString()}.
-     *
      * @return a string representation
      */
     public String toString() {
@@ -1056,7 +952,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
      * array to expand if necessary. Or, if the given limit is less
      * than the length of the underlying array, causes computations to
      * ignore elements past the given limit.
-     *
      * @param newLimit the new upper bound
      * @throws IllegalArgumentException if newLimit less than zero
      */
@@ -1086,16 +981,16 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     final void insertElementAt(int index, long e) {
         int hi = fence++;
         if (hi >= array.length)
-            resizeArray((hi * 3) / 2 + 1);
+            resizeArray((hi * 3)/2 + 1);
         if (hi > index)
-            System.arraycopy(array, index, array, index + 1, hi - index);
+            System.arraycopy(array, index, array, index+1, hi - index);
         array[index] = e;
     }
 
     final void appendElement(long e) {
         int hi = fence++;
         if (hi >= array.length)
-            resizeArray((hi * 3) / 2 + 1);
+            resizeArray((hi * 3)/2 + 1);
         array[hi] = e;
     }
 
@@ -1108,7 +1003,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
         int cap = array.length;
         int newSize = fence + len;
         if (cap < newSize) {
-            cap = (cap * 3) / 2 + 1;
+            cap = (cap * 3)/2 + 1;
             if (cap < newSize)
                 cap = newSize;
             resizeArray(cap);
@@ -1154,7 +1049,6 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
         int lastRet;
         long[] arr; // cache array and bound
         int hi;
-
         ListIter(int lo) {
             this.cursor = lo;
             this.lastRet = -1;
@@ -1306,7 +1200,7 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
         public boolean remove(Object o) {
             if (!(o instanceof Long))
                 return false;
-            int idx = seqIndexOf(((Long) o).longValue());
+            int idx = seqIndexOf(((Long)o).longValue());
             if (idx < 0)
                 return false;
             removeSlotAt(idx);
@@ -1326,19 +1220,19 @@ public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
         public boolean contains(Object o) {
             if (!(o instanceof Long))
                 return false;
-            return seqIndexOf(((Long) o).longValue()) >= 0;
+            return seqIndexOf(((Long)o).longValue()) >= 0;
         }
 
         public int indexOf(Object o) {
             if (!(o instanceof Long))
                 return -1;
-            return seqIndexOf(((Long) o).longValue());
+            return seqIndexOf(((Long)o).longValue());
         }
 
         public int lastIndexOf(Object o) {
             if (!(o instanceof Long))
                 return -1;
-            return seqLastIndexOf(((Long) o).longValue());
+            return seqLastIndexOf(((Long)o).longValue());
         }
     }
 

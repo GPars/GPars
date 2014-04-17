@@ -25,117 +25,109 @@ import static groovyx.gpars.extra166y.Ops.IntToDouble;
  */
 public abstract class ParallelDoubleArrayWithFilter extends ParallelDoubleArrayWithDoubleMapping {
     ParallelDoubleArrayWithFilter
-            (ForkJoinPool ex, int origin, int fence, double[] array) {
+        (ForkJoinPool ex, int origin, int fence, double[] array) {
         super(ex, origin, fence, array);
     }
 
     /**
      * Replaces elements with the results of applying the given
      * op to their current values.
-     *
      * @param op the op
      * @return this (to simplify use in expressions)
      */
     public ParallelDoubleArrayWithFilter replaceWithMapping(DoubleOp op) {
         ex.invoke(new PAS.FJDTransform(this, origin,
-                fence, null, op));
+                                       fence, null, op));
         return this;
     }
 
     /**
      * Replaces elements with the results of applying the given
      * op to their indices.
-     *
      * @param op the op
      * @return this (to simplify use in expressions)
      */
     public ParallelDoubleArrayWithFilter replaceWithMappedIndex(IntToDouble op) {
         ex.invoke(new PAS.FJDIndexMap(this, origin, fence,
-                null, op));
+                                      null, op));
         return this;
     }
 
     /**
      * Replaces elements with the results of applying the given
      * mapping to each index and current element value.
-     *
      * @param op the op
      * @return this (to simplify use in expressions)
      */
     public ParallelDoubleArrayWithFilter replaceWithMappedIndex(IntAndDoubleToDouble op) {
         ex.invoke(new PAS.FJDBinaryIndexMap
-                (this, origin, fence, null, op));
+                  (this, origin, fence, null, op));
         return this;
     }
 
     /**
      * Replaces elements with results of applying the given generator.
-     *
      * @param generator the generator
      * @return this (to simplify use in expressions)
      */
     public ParallelDoubleArrayWithFilter replaceWithGeneratedValue(DoubleGenerator generator) {
         ex.invoke(new PAS.FJDGenerate
-                (this, origin, fence, null, generator));
+                  (this, origin, fence, null, generator));
         return this;
     }
 
     /**
      * Replaces elements with the given value.
-     *
      * @param value the value
      * @return this (to simplify use in expressions)
      */
     public ParallelDoubleArrayWithFilter replaceWithValue(double value) {
         ex.invoke(new PAS.FJDFill(this, origin, fence,
-                null, value));
+                                  null, value));
         return this;
     }
 
     /**
      * Replaces elements with results of applying
      * {@code op(thisElement, otherElement)}.
-     *
-     * @param other    the other array
+     * @param other the other array
      * @param combiner the combiner
      * @return this (to simplify use in expressions)
      */
     public ParallelDoubleArrayWithFilter replaceWithMapping(BinaryDoubleOp combiner,
-                                                            ParallelDoubleArrayWithDoubleMapping other) {
+                                   ParallelDoubleArrayWithDoubleMapping other) {
         ex.invoke(new PAS.FJDPACombineInPlace
-                (this, origin, fence, null,
-                        other, other.origin - origin, combiner));
+                  (this, origin, fence, null,
+                   other, other.origin - origin, combiner));
         return this;
     }
 
     /**
      * Replaces elements with results of applying
      * {@code op(thisElement, otherElement)}.
-     *
-     * @param other    the other array
+     * @param other the other array
      * @param combiner the combiner
      * @return this (to simplify use in expressions)
      */
     public ParallelDoubleArrayWithFilter replaceWithMapping
-    (BinaryDoubleOp combiner,
-     double[] other) {
+        (BinaryDoubleOp combiner,
+         double[] other) {
         ex.invoke(new PAS.FJDCombineInPlace
-                (this, origin, fence, null, other,
-                        -origin, combiner));
+                  (this, origin, fence, null, other,
+                   -origin, combiner));
         return this;
     }
 
     /**
      * Returns a new ParallelDoubleArray containing only unique
      * elements (that is, without any duplicates).
-     *
      * @return the new ParallelDoubleArray
      */
     public ParallelDoubleArray allUniqueElements() {
         PAS.UniquifierTable tab = new PAS.UniquifierTable
-                (fence - origin, this, false);
+            (fence - origin, this, false);
         PAS.FJDUniquifier f = new PAS.FJDUniquifier
-                (this, origin, fence, null, tab);
+            (this, origin, fence, null, tab);
         ex.invoke(f);
         double[] res = tab.uniqueDoubles(f.count);
         return new ParallelDoubleArray(ex, res);
@@ -146,24 +138,22 @@ public abstract class ParallelDoubleArrayWithFilter extends ParallelDoubleArrayW
      * Returns an operation prefix that causes a method to operate
      * only on elements for which the current selector (if
      * present) and the given selector returns true.
-     *
      * @param selector the selector
      * @return operation prefix
      */
     public abstract ParallelDoubleArrayWithFilter withFilter
-    (DoublePredicate selector);
+        (DoublePredicate selector);
 
     /**
      * Returns an operation prefix that causes a method to operate
      * only on elements for which the current selector (if
      * present) and the given binary selector returns true.
-     *
      * @param selector the selector
      * @return operation prefix
      */
     public ParallelDoubleArrayWithFilter withFilter
-    (BinaryDoublePredicate selector,
-     ParallelDoubleArrayWithDoubleMapping other) {
+        (BinaryDoublePredicate selector,
+         ParallelDoubleArrayWithDoubleMapping other) {
         return withIndexedFilter(AbstractParallelAnyArray.indexedSelector(selector, other, origin));
     }
 
@@ -171,24 +161,22 @@ public abstract class ParallelDoubleArrayWithFilter extends ParallelDoubleArrayW
      * Returns an operation prefix that causes a method to operate
      * only on elements for which the current selector (if
      * present) and the given indexed selector returns true.
-     *
      * @param selector the selector
      * @return operation prefix
      */
     public abstract ParallelDoubleArrayWithFilter withIndexedFilter
-    (IntAndDoublePredicate selector);
+        (IntAndDoublePredicate selector);
 
     /**
      * Returns true if all elements at the same relative positions
      * of this and other array are equal.
-     *
      * @param other the other array
      * @return true if equal
      */
     public boolean hasAllEqualElements
-    (ParallelDoubleArrayWithDoubleMapping other) {
+        (ParallelDoubleArrayWithDoubleMapping other) {
         return withFilter(CommonOps.doubleInequalityPredicate(),
-                other).anyIndex() < 0;
+                          other).anyIndex() < 0;
     }
 
     final void leafTransfer(int lo, int hi, double[] dest, int offset) {
@@ -204,8 +192,6 @@ public abstract class ParallelDoubleArrayWithFilter extends ParallelDoubleArrayW
             dest[offset++] = (a[indices[i]]);
     }
 
-    final double dget(int i) {
-        return this.array[i];
-    }
+    final double dget(int i) { return this.array[i]; }
 
 }
