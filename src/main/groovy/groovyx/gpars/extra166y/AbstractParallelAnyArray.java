@@ -73,14 +73,13 @@ public abstract class AbstractParallelAnyArray {
      * Returns the number of elements selected using bound or
      * filter restrictions. Note that this method must evaluate
      * all selectors to return its result.
-     *
      * @return the number of elements
      */
     public int size() {
         if (!hasFilter())
             return fence - origin;
         PAS.FJCountSelected f = new PAS.FJCountSelected
-                (this, origin, fence, null);
+            (this, origin, fence, null);
         ex.invoke(f);
         return f.count;
     }
@@ -88,7 +87,6 @@ public abstract class AbstractParallelAnyArray {
     /**
      * Returns the index of some element matching bound and filter
      * constraints, or -1 if none.
-     *
      * @return index of matching element, or -1 if none
      */
     public int anyIndex() {
@@ -96,14 +94,13 @@ public abstract class AbstractParallelAnyArray {
             return (origin < fence) ? origin : -1;
         AtomicInteger result = new AtomicInteger(-1);
         PAS.FJSelectAny f = new PAS.FJSelectAny
-                (this, origin, fence, null, result);
+            (this, origin, fence, null, result);
         ex.invoke(f);
         return result.get();
     }
 
     /**
      * Returns true if there are no elements.
-     *
      * @return true if there are no elements
      */
     public boolean isEmpty() {
@@ -138,35 +135,15 @@ public abstract class AbstractParallelAnyArray {
      * aspects of control, as well as to provide a simple default
      * mechanism for extensions.
      */
-    Object[] ogetArray() {
-        return null;
-    }
-
-    double[] dgetArray() {
-        return null;
-    }
-
-    long[] lgetArray() {
-        return null;
-    }
-
+    Object[] ogetArray() { return null; }
+    double[] dgetArray() { return null; }
+    long[]   lgetArray() { return null; }
     abstract Object oget(int index);
-
     abstract double dget(int index);
-
     abstract long lget(int index);
-
-    boolean hasMap() {
-        return false;
-    }
-
-    boolean hasFilter() {
-        return false;
-    }
-
-    boolean isSelected(int index) {
-        return true;
-    }
+    boolean hasMap() { return false; }
+    boolean hasFilter() { return false; }
+    boolean isSelected(int index) { return true; }
 
     /*
      * Leaf methods for FJ tasks. Default versions use isSelected,
@@ -201,7 +178,8 @@ public abstract class AbstractParallelAnyArray {
                 if (!gotFirst) {
                     gotFirst = true;
                     r = x;
-                } else
+                }
+                else
                     r = reducer.op(r, x);
             }
         }
@@ -217,7 +195,8 @@ public abstract class AbstractParallelAnyArray {
                 if (!gotFirst) {
                     gotFirst = true;
                     r = x;
-                } else
+                }
+                else
                     r = reducer.op(r, x);
             }
         }
@@ -233,7 +212,8 @@ public abstract class AbstractParallelAnyArray {
                 if (!gotFirst) {
                     gotFirst = true;
                     r = x;
-                } else
+                }
+                else
                     r = reducer.op(r, x);
             }
         }
@@ -311,24 +291,26 @@ public abstract class AbstractParallelAnyArray {
                     elementType = Object.class;
             }
             PAS.FJOSelectAllDriver r = new PAS.FJOSelectAllDriver
-                    (this, elementType);
+                (this, elementType);
             ex.invoke(r);
             return r.results;
-        } else {
+        }
+        else {
             int n = fence - origin;
             Object[] dest;
             if (hasMap()) {
                 if (elementType == null)
                     dest = new Object[n];
                 else
-                    dest = (Object[]) Array.newInstance(elementType, n);
+                    dest = (Object[])Array.newInstance(elementType, n);
                 ex.invoke(new PAS.FJOMap(this, origin, fence,
-                        null, dest, -origin));
-            } else {
+                                         null, dest, -origin));
+            }
+            else {
                 Object[] array = ogetArray();
                 if (elementType == null)
                     elementType = array.getClass().getComponentType();
-                dest = (Object[]) Array.newInstance(elementType, n);
+                dest = (Object[])Array.newInstance(elementType, n);
                 System.arraycopy(array, origin, dest, 0, n);
             }
             return dest;
@@ -340,13 +322,15 @@ public abstract class AbstractParallelAnyArray {
             PAS.FJDSelectAllDriver r = new PAS.FJDSelectAllDriver(this);
             ex.invoke(r);
             return r.results;
-        } else {
+        }
+        else {
             int n = fence - origin;
             double[] dest = new double[n];
             if (hasMap()) {
                 ex.invoke(new PAS.FJDMap(this, origin, fence,
-                        null, dest, -origin));
-            } else {
+                                         null, dest, -origin));
+            }
+            else {
                 double[] array = dgetArray();
                 System.arraycopy(array, origin, dest, 0, n);
             }
@@ -359,13 +343,15 @@ public abstract class AbstractParallelAnyArray {
             PAS.FJLSelectAllDriver r = new PAS.FJLSelectAllDriver(this);
             ex.invoke(r);
             return r.results;
-        } else {
+        }
+        else {
             int n = fence - origin;
             long[] dest = new long[n];
             if (hasMap()) {
                 ex.invoke(new PAS.FJLMap(this, origin, fence,
-                        null, dest, -origin));
-            } else {
+                                         null, dest, -origin));
+            }
+            else {
                 long[] array = lgetArray();
                 System.arraycopy(array, origin, dest, 0, n);
             }
@@ -390,97 +376,49 @@ public abstract class AbstractParallelAnyArray {
      * overridden only where applicable.
      */
 
-    void leafTransform(int l, int h, Op op) {
-    }
-
-    void leafIndexMap(int l, int h, IntToObject op) {
-    }
-
-    void leafBinaryIndexMap(int l, int h, IntAndObjectToObject op) {
-    }
-
-    void leafGenerate(int l, int h, Generator generator) {
-    }
-
-    void leafFill(int l, int h, Object value) {
-    }
-
+    void leafTransform(int l, int h, Op op) {}
+    void leafIndexMap(int l, int h, IntToObject op) {}
+    void leafBinaryIndexMap(int l, int h, IntAndObjectToObject op) {}
+    void leafGenerate(int l, int h, Generator generator) {}
+    void leafFill(int l, int h, Object value) {}
     void leafCombineInPlace(int lo, int hi, Object[] other,
-                            int otherOffset, BinaryOp combiner) {
-    }
-
+                            int otherOffset, BinaryOp combiner) {}
     void leafCombineInPlace(int lo, int hi, ParallelArrayWithMapping other,
-                            int otherOffset, BinaryOp combiner) {
-    }
+                            int otherOffset, BinaryOp combiner) {}
 
-    void leafTransform(int l, int h, DoubleOp op) {
-    }
-
-    void leafIndexMap(int l, int h, IntToDouble array) {
-    }
-
-    void leafBinaryIndexMap(int l, int h, IntAndDoubleToDouble op) {
-    }
-
-    void leafGenerate(int l, int h, DoubleGenerator generator) {
-    }
-
-    void leafFill(int l, int h, double value) {
-    }
-
+    void leafTransform(int l, int h, DoubleOp op) {}
+    void leafIndexMap(int l, int h, IntToDouble array) {}
+    void leafBinaryIndexMap(int l, int h, IntAndDoubleToDouble op) {}
+    void leafGenerate(int l, int h, DoubleGenerator generator) {}
+    void leafFill(int l, int h, double value) {}
     void leafCombineInPlace(int lo, int hi, double[] other,
-                            int otherOffset, BinaryDoubleOp combiner) {
-    }
-
+                            int otherOffset, BinaryDoubleOp combiner) {}
     void leafCombineInPlace(int lo, int hi,
                             ParallelDoubleArrayWithDoubleMapping other,
-                            int otherOffset, BinaryDoubleOp combiner) {
-    }
+                            int otherOffset, BinaryDoubleOp combiner) {}
 
-    void leafTransform(int l, int h, LongOp op) {
-    }
-
-    void leafIndexMap(int l, int h, IntToLong array) {
-    }
-
-    void leafBinaryIndexMap(int l, int h, IntAndLongToLong op) {
-    }
-
-    void leafGenerate(int l, int h, LongGenerator generator) {
-    }
-
-    void leafFill(int l, int h, long value) {
-    }
-
+    void leafTransform(int l, int h, LongOp op) {}
+    void leafIndexMap(int l, int h, IntToLong array) {}
+    void leafBinaryIndexMap(int l, int h, IntAndLongToLong op) {}
+    void leafGenerate(int l, int h, LongGenerator generator) {}
+    void leafFill(int l, int h, long value) {}
     void leafCombineInPlace(int lo, int hi, long[] other,
-                            int otherOffset, BinaryLongOp combiner) {
-    }
-
+                            int otherOffset, BinaryLongOp combiner) {}
     void leafCombineInPlace(int lo, int hi,
                             ParallelLongArrayWithLongMapping other,
-                            int otherOffset, BinaryLongOp combiner) {
-    }
+                            int otherOffset, BinaryLongOp combiner) {}
 
     // Base of object ref array classes
     abstract static class OPap<T> extends AbstractParallelAnyArray {
         T[] array;
-
         OPap(ForkJoinPool ex, int origin, int fence, T[] array) {
             super(ex, origin, fence);
             this.array = array;
         }
 
-        final Object[] ogetArray() {
-            return this.array;
-        }
-
-        double dget(int i) {
-            return ((Number) oget(i)).doubleValue();
-        }
-
-        long lget(int i) {
-            return ((Number) oget(i)).longValue();
-        }
+        final Object[] ogetArray() { return this.array; }
+        double dget(int i) { return ((Number)oget(i)).doubleValue(); }
+        long lget(int i) { return ((Number)oget(i)).longValue(); }
 
         final void leafMoveByIndex(int[] indices, int loIdx,
                                    int hiIdx, int offset) {
@@ -503,23 +441,14 @@ public abstract class AbstractParallelAnyArray {
     // Base of double array classes
     abstract static class DPap extends AbstractParallelAnyArray {
         double[] array;
-
         DPap(ForkJoinPool ex, int origin, int fence, double[] array) {
             super(ex, origin, fence);
             this.array = array;
         }
 
-        final double[] dgetArray() {
-            return this.array;
-        }
-
-        Object oget(int i) {
-            return Double.valueOf(dget(i));
-        }
-
-        long lget(int i) {
-            return (long) (dget(i));
-        }
+        final double[] dgetArray() { return this.array; }
+        Object oget(int i) { return Double.valueOf(dget(i)); }
+        long lget(int i) { return (long)(dget(i)); }
 
         final void leafMoveByIndex(int[] indices, int loIdx,
                                    int hiIdx, int offset) {
@@ -542,23 +471,14 @@ public abstract class AbstractParallelAnyArray {
     // Base of long array classes
     abstract static class LPap extends AbstractParallelAnyArray {
         long[] array;
-
         LPap(ForkJoinPool ex, int origin, int fence, long[] array) {
             super(ex, origin, fence);
             this.array = array;
         }
 
-        final long[] lgetArray() {
-            return this.array;
-        }
-
-        Object oget(int i) {
-            return Long.valueOf(lget(i));
-        }
-
-        double dget(int i) {
-            return (double) (lget(i));
-        }
+        final long[] lgetArray() { return this.array; }
+        Object oget(int i) { return Long.valueOf(lget(i)); }
+        double dget(int i) { return (double)(lget(i)); }
 
         final void leafMoveByIndex(int[] indices, int loIdx,
                                    int hiIdx, int offset) {
@@ -590,49 +510,49 @@ public abstract class AbstractParallelAnyArray {
         }
 
         public ParallelArrayWithFilter<T> withFilter
-                (Predicate<? super T> selector) {
+            (Predicate<? super T> selector) {
             return new OFPap<T>(ex, origin, fence, array, selector);
         }
 
         public ParallelArrayWithFilter<T> withIndexedFilter
-                (IntAndObjectPredicate<? super T> selector) {
+            (IntAndObjectPredicate<? super T> selector) {
             return new ORPap<T>(ex, origin, fence, array, selector);
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (Op<? super T, ? extends U> op) {
-            return new OUOMPap<T, U>(ex, origin, fence, array, op);
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (Op<? super T, ? extends U> op) {
+            return new OUOMPap<T,U>(ex, origin, fence, array, op);
         }
 
         public ParallelArrayWithDoubleMapping<T> withMapping
-                (ObjectToDouble<? super T> op) {
+            (ObjectToDouble<? super T> op) {
             return new OUDMPap<T>(ex, origin, fence, array, op);
         }
 
         public ParallelArrayWithLongMapping<T> withMapping
-                (ObjectToLong<? super T> op) {
+            (ObjectToLong<? super T> op) {
             return new OULMPap<T>(ex, origin, fence, array, op);
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndObjectToObject<? super T, ? extends V> mapper) {
-            return new OUOCPap<T, V>(ex, origin, fence, array, mapper);
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndObjectToObject<? super T, ? extends V> mapper) {
+            return new OUOCPap<T,V>(ex, origin, fence, array, mapper);
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndObjectToDouble<? super T> mapper) {
+            (IntAndObjectToDouble<? super T> mapper) {
             return new OUDCPap<T>(ex, origin, fence, array, mapper);
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndObjectToLong<? super T> mapper) {
+            (IntAndObjectToLong<? super T> mapper) {
             return new OULCPap<T>(ex, origin, fence, array, mapper);
         }
 
         public int indexOf(T target) {
             AtomicInteger result = new AtomicInteger(-1);
             PAS.FJOIndexOf f = new PAS.FJOIndexOf
-                    (this, origin, fence, null, result, target);
+                (this, origin, fence, null, result, target);
             ex.invoke(f);
             return result.get();
         }
@@ -643,7 +563,7 @@ public abstract class AbstractParallelAnyArray {
             int hi = fence - 1;
             while (lo <= hi) {
                 int mid = (lo + hi) >>> 1;
-                int c = ((Comparable) target).compareTo((Comparable) a[mid]);
+                int c = ((Comparable)target).compareTo((Comparable)a[mid]);
                 if (c == 0)
                     return mid;
                 else if (c < 0)
@@ -681,20 +601,20 @@ public abstract class AbstractParallelAnyArray {
 
         public T precumulate(Reducer<T> reducer, T base) {
             PAS.FJOPrecumulateOp op = new PAS.FJOPrecumulateOp
-                    (this, reducer, base);
+                (this, reducer, base);
             PAS.FJOScan r = new PAS.FJOScan(null, op, origin, fence);
             ex.invoke(r);
-            return (T) (r.out);
+            return (T)(r.out);
         }
 
         public ParallelArrayWithBounds<T> sort
-                (Comparator<? super T> cmp) {
+            (Comparator<? super T> cmp) {
             final Object[] a = this.array;
             Class tc = array.getClass().getComponentType();
-            T[] ws = (T[]) Array.newInstance(tc, fence);
+            T[] ws = (T[])Array.newInstance(tc, fence);
             ex.invoke(new PAS.FJOSorter
-                    (cmp, array, ws, origin,
-                            fence - origin, getThreshold()));
+                      (cmp, array, ws, origin,
+                       fence - origin, getThreshold()));
             return this;
         }
 
@@ -703,12 +623,13 @@ public abstract class AbstractParallelAnyArray {
             Class tc = array.getClass().getComponentType();
             if (!Comparable.class.isAssignableFrom(tc)) {
                 sort(CommonOps.castedComparator());
-            } else {
-                Comparable[] ca = (Comparable[]) array;
-                Comparable[] ws = (Comparable[]) Array.newInstance(tc, fence);
+            }
+            else {
+                Comparable[] ca = (Comparable[])array;
+                Comparable[] ws = (Comparable[])Array.newInstance(tc, fence);
                 ex.invoke(new PAS.FJOCSorter
-                        (ca, ws, origin,
-                                fence - origin, getThreshold()));
+                          (ca, ws, origin,
+                           fence - origin, getThreshold()));
             }
             return this;
         }
@@ -724,7 +645,7 @@ public abstract class AbstractParallelAnyArray {
                 return base;
             final Object[] a = this.array;
             Object r = a[lo];
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, a[i]);
             return r;
         }
@@ -778,10 +699,12 @@ public abstract class AbstractParallelAnyArray {
                         a[i] = combiner.op(a[i], other.oget(k));
                     k++;
                 }
-            } else if (other.hasMap()) {
+            }
+            else if (other.hasMap()) {
                 for (int i = l; i < h; ++i)
                     a[i] = combiner.op(a[i], other.oget(k++));
-            } else {
+            }
+            else {
                 Object[] b = other.array;
                 for (int i = l; i < h; ++i)
                     a[i] = combiner.op(a[i], b[k++]);
@@ -804,12 +727,12 @@ public abstract class AbstractParallelAnyArray {
         }
 
         public ParallelDoubleArrayWithFilter withIndexedFilter
-                (IntAndDoublePredicate selector) {
+            (IntAndDoublePredicate selector) {
             return new DRPap(ex, origin, fence, array, selector);
         }
 
         public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+            (DoubleToObject<? extends U> op) {
             return new DUOMPap<U>(ex, origin, fence, array, op);
         }
 
@@ -822,24 +745,24 @@ public abstract class AbstractParallelAnyArray {
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new DUOCPap<V>(ex, origin, fence, array, mapper);
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new DUDCPap(ex, origin, fence, array, mapper);
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new DULCPap(ex, origin, fence, array, mapper);
         }
 
         public int indexOf(double target) {
             AtomicInteger result = new AtomicInteger(-1);
             PAS.FJDIndexOf f = new PAS.FJDIndexOf
-                    (this, origin, fence, null, result, target);
+                (this, origin, fence, null, result, target);
             ex.invoke(f);
             return result.get();
         }
@@ -909,15 +832,15 @@ public abstract class AbstractParallelAnyArray {
 
         public ParallelDoubleArrayWithBounds sort(DoubleComparator cmp) {
             ex.invoke(new PAS.FJDSorter
-                    (cmp, this.array, new double[fence],
-                            origin, fence - origin, getThreshold()));
+                      (cmp, this.array, new double[fence],
+                       origin, fence - origin, getThreshold()));
             return this;
         }
 
         public ParallelDoubleArrayWithBounds sort() {
             ex.invoke(new PAS.FJDCSorter
-                    (this.array, new double[fence],
-                            origin, fence - origin, getThreshold()));
+                      (this.array, new double[fence],
+                       origin, fence - origin, getThreshold()));
             return this;
         }
 
@@ -933,7 +856,7 @@ public abstract class AbstractParallelAnyArray {
                 return base;
             final double[] a = this.array;
             double r = a[lo];
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, a[i]);
             return r;
         }
@@ -969,8 +892,8 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h, double[] other,
-                 int otherOffset, BinaryDoubleOp combiner) {
+            (int l, int h, double[] other,
+             int otherOffset, BinaryDoubleOp combiner) {
             final double[] a = this.array;
             int k = l + otherOffset;
             for (int i = l; i < h; ++i)
@@ -978,9 +901,9 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h,
-                 ParallelDoubleArrayWithDoubleMapping other,
-                 int otherOffset, BinaryDoubleOp combiner) {
+            (int l, int h,
+             ParallelDoubleArrayWithDoubleMapping other,
+             int otherOffset, BinaryDoubleOp combiner) {
             final double[] a = this.array;
             int k = l + otherOffset;
             if (other.hasFilter()) {
@@ -989,10 +912,12 @@ public abstract class AbstractParallelAnyArray {
                         a[i] = combiner.op(a[i], other.dget(k));
                     k++;
                 }
-            } else if (other.hasMap()) {
+            }
+            else if (other.hasMap()) {
                 for (int i = l; i < h; ++i)
                     a[i] = combiner.op(a[i], other.dget(k++));
-            } else {
+            }
+            else {
                 double[] b = other.array;
                 for (int i = l; i < h; ++i)
                     a[i] = combiner.op(a[i], b[k++]);
@@ -1017,12 +942,12 @@ public abstract class AbstractParallelAnyArray {
         }
 
         public ParallelLongArrayWithFilter withIndexedFilter
-                (IntAndLongPredicate selector) {
+            (IntAndLongPredicate selector) {
             return new LRPap(ex, origin, fence, array, selector);
         }
 
         public <U> ParallelLongArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+            (LongToObject<? extends U> op) {
             return new LUOMPap<U>(ex, origin, fence, array, op);
         }
 
@@ -1035,24 +960,24 @@ public abstract class AbstractParallelAnyArray {
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new LUOCPap<V>(ex, origin, fence, array, mapper);
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new LUDCPap(ex, origin, fence, array, mapper);
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new LULCPap(ex, origin, fence, array, mapper);
         }
 
         public int indexOf(long target) {
             AtomicInteger result = new AtomicInteger(-1);
             PAS.FJLIndexOf f = new PAS.FJLIndexOf
-                    (this, origin, fence, null, result, target);
+                (this, origin, fence, null, result, target);
             ex.invoke(f);
             return result.get();
         }
@@ -1107,7 +1032,7 @@ public abstract class AbstractParallelAnyArray {
 
         public long precumulate(LongReducer reducer, long base) {
             PAS.FJLPrecumulateOp op = new PAS.FJLPrecumulateOp
-                    (this, reducer, base);
+                (this, reducer, base);
             PAS.FJLScan r = new PAS.FJLScan(null, op, origin, fence);
             ex.invoke(r);
             return r.out;
@@ -1122,15 +1047,15 @@ public abstract class AbstractParallelAnyArray {
 
         public ParallelLongArrayWithBounds sort(LongComparator cmp) {
             ex.invoke(new PAS.FJLSorter
-                    (cmp, this.array, new long[fence],
-                            origin, fence - origin, getThreshold()));
+                      (cmp, this.array, new long[fence],
+                       origin, fence - origin, getThreshold()));
             return this;
         }
 
         public ParallelLongArrayWithBounds sort() {
             ex.invoke(new PAS.FJLCSorter
-                    (this.array, new long[fence],
-                            origin, fence - origin, getThreshold()));
+                      (this.array, new long[fence],
+                       origin, fence - origin, getThreshold()));
             return this;
         }
 
@@ -1145,7 +1070,7 @@ public abstract class AbstractParallelAnyArray {
                 return base;
             final long[] a = this.array;
             long r = a[lo];
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, a[i]);
             return r;
         }
@@ -1181,8 +1106,8 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h, long[] other,
-                 int otherOffset, BinaryLongOp combiner) {
+            (int l, int h, long[] other,
+             int otherOffset, BinaryLongOp combiner) {
             final long[] a = this.array;
             int k = l + otherOffset;
             for (int i = l; i < h; ++i)
@@ -1190,9 +1115,9 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h,
-                 ParallelLongArrayWithLongMapping other,
-                 int otherOffset, BinaryLongOp combiner) {
+            (int l, int h,
+             ParallelLongArrayWithLongMapping other,
+             int otherOffset, BinaryLongOp combiner) {
             final long[] a = this.array;
             int k = l + otherOffset;
             if (other.hasFilter()) {
@@ -1201,10 +1126,12 @@ public abstract class AbstractParallelAnyArray {
                         a[i] = combiner.op(a[i], other.lget(k));
                     k++;
                 }
-            } else if (other.hasMap()) {
+            }
+            else if (other.hasMap()) {
                 for (int i = l; i < h; ++i)
                     a[i] = combiner.op(a[i], other.lget(k++));
-            } else {
+            }
+            else {
                 long[] b = other.array;
                 for (int i = l; i < h; ++i)
                     a[i] = combiner.op(a[i], b[k++]);
@@ -1215,22 +1142,16 @@ public abstract class AbstractParallelAnyArray {
     static final class AndPredicate<T> implements Predicate<T> {
         final Predicate<? super T> first;
         final Predicate<? super T> second;
-
         AndPredicate(Predicate<? super T> first,
                      Predicate<? super T> second) {
-            this.first = first;
-            this.second = second;
+            this.first = first; this.second = second;
         }
-
-        public final boolean op(T x) {
-            return first.op(x) && second.op(x);
-        }
+        public final boolean op(T x) { return first.op(x) && second.op(x); }
     }
 
     // Filtered (but unmapped) classes
     static final class OFPap<T> extends ParallelArrayWithFilter<T> {
         final Predicate<? super T> selector;
-
         OFPap(ForkJoinPool ex, int origin, int fence,
               T[] array,
               Predicate<? super T> selector) {
@@ -1238,54 +1159,49 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelArrayWithFilter<T> withFilter
-                (Predicate<? super T> selector) {
+            (Predicate<? super T> selector) {
             return new OFPap<T>(ex, origin, fence, array,
-                    new AndPredicate(this.selector, selector));
+                                new AndPredicate(this.selector, selector));
         }
 
         public ParallelArrayWithFilter<T> withIndexedFilter
-                (IntAndObjectPredicate<? super T> selector) {
+            (IntAndObjectPredicate<? super T> selector) {
             return new ORPap<T>
-                    (ex, origin, fence, array,
-                            compoundIndexedSelector(this.selector, selector));
+                (ex, origin, fence, array,
+                 compoundIndexedSelector(this.selector, selector));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (Op<? super T, ? extends U> op) {
-            return new OFOMPap<T, U>(ex, origin, fence, array, selector, op);
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (Op<? super T, ? extends U> op) {
+            return new OFOMPap<T,U>(ex, origin, fence, array, selector, op);
         }
 
         public ParallelArrayWithDoubleMapping<T> withMapping
-                (ObjectToDouble<? super T> op) {
+            (ObjectToDouble<? super T> op) {
             return new OFDMPap<T>(ex, origin, fence, array, selector, op);
         }
 
         public ParallelArrayWithLongMapping<T> withMapping
-                (ObjectToLong<? super T> op) {
+            (ObjectToLong<? super T> op) {
             return new OFLMPap<T>(ex, origin, fence, array, selector, op);
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndObjectToObject<? super T, ? extends V> mapper) {
-            return new OFOCPap<T, V>(ex, origin, fence, array, selector, mapper);
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndObjectToObject<? super T, ? extends V> mapper) {
+            return new OFOCPap<T,V>(ex, origin, fence, array, selector, mapper);
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndObjectToDouble<? super T> mapper) {
+            (IntAndObjectToDouble<? super T> mapper) {
             return new OFDCPap<T>(ex, origin, fence, array, selector, mapper);
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndObjectToLong<? super T> mapper) {
+            (IntAndObjectToLong<? super T> mapper) {
             return new OFLCPap<T>(ex, origin, fence, array, selector, mapper);
         }
 
@@ -1310,7 +1226,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = x;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, x);
                 }
             }
@@ -1366,8 +1283,8 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h, Object[] other,
-                 int otherOffset, BinaryOp combiner) {
+            (int l, int h, Object[] other,
+             int otherOffset, BinaryOp combiner) {
             final Object[] a = this.array;
             final Predicate s = selector;
             int k = l + otherOffset;
@@ -1380,9 +1297,9 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h,
-                 ParallelArrayWithMapping other,
-                 int otherOffset, BinaryOp combiner) {
+            (int l, int h,
+             ParallelArrayWithMapping other,
+             int otherOffset, BinaryOp combiner) {
             final Object[] a = this.array;
             final Predicate s = selector;
             int k = l + otherOffset;
@@ -1393,14 +1310,16 @@ public abstract class AbstractParallelAnyArray {
                         a[i] = combiner.op(x, other.oget(k));
                     k++;
                 }
-            } else if (other.hasMap()) {
+            }
+            else if (other.hasMap()) {
                 for (int i = l; i < h; ++i) {
                     Object x = a[i];
                     if (s.op(x))
                         a[i] = combiner.op(x, other.oget(k));
                     k++;
                 }
-            } else {
+            }
+            else {
                 Object[] b = other.array;
                 for (int i = l; i < h; ++i) {
                     Object x = a[i];
@@ -1414,7 +1333,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class DFPap extends ParallelDoubleArrayWithFilter {
         final DoublePredicate selector;
-
         DFPap(ForkJoinPool ex, int origin, int fence,
               double[] array,
               DoublePredicate selector) {
@@ -1422,28 +1340,23 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelDoubleArrayWithFilter withFilter(DoublePredicate selector) {
             return new DFPap(ex, origin, fence, array,
-                    CommonOps.andPredicate(this.selector, selector));
+                             CommonOps.andPredicate(this.selector, selector));
         }
 
         public ParallelDoubleArrayWithFilter withIndexedFilter
-                (IntAndDoublePredicate selector) {
+            (IntAndDoublePredicate selector) {
             return new DRPap
-                    (ex, origin, fence, array,
-                            compoundIndexedSelector(this.selector, selector));
+                (ex, origin, fence, array,
+                 compoundIndexedSelector(this.selector, selector));
         }
 
         public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+            (DoubleToObject<? extends U> op) {
             return new DFOMPap<U>(ex, origin, fence, array, selector, op);
         }
 
@@ -1456,17 +1369,17 @@ public abstract class AbstractParallelAnyArray {
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new DFOCPap<V>(ex, origin, fence, array, selector, mapper);
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new DFDCPap(ex, origin, fence, array, selector, mapper);
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new DFLCPap(ex, origin, fence, array, selector, mapper);
         }
 
@@ -1491,7 +1404,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = x;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, x);
                 }
             }
@@ -1547,8 +1461,8 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h, double[] other,
-                 int otherOffset, BinaryDoubleOp combiner) {
+            (int l, int h, double[] other,
+             int otherOffset, BinaryDoubleOp combiner) {
             final double[] a = this.array;
             final DoublePredicate s = selector;
             int k = l + otherOffset;
@@ -1561,9 +1475,9 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h,
-                 ParallelDoubleArrayWithDoubleMapping other,
-                 int otherOffset, BinaryDoubleOp combiner) {
+            (int l, int h,
+             ParallelDoubleArrayWithDoubleMapping other,
+             int otherOffset, BinaryDoubleOp combiner) {
             final double[] a = this.array;
             final DoublePredicate s = selector;
             int k = l + otherOffset;
@@ -1574,14 +1488,16 @@ public abstract class AbstractParallelAnyArray {
                         a[i] = combiner.op(x, other.dget(k));
                     k++;
                 }
-            } else if (other.hasMap()) {
+            }
+            else if (other.hasMap()) {
                 for (int i = l; i < h; ++i) {
                     double x = a[i];
                     if (s.op(x))
                         a[i] = combiner.op(x, other.dget(k));
                     k++;
                 }
-            } else {
+            }
+            else {
                 double[] b = other.array;
                 for (int i = l; i < h; ++i) {
                     double x = a[i];
@@ -1595,7 +1511,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class LFPap extends ParallelLongArrayWithFilter {
         final LongPredicate selector;
-
         LFPap(ForkJoinPool ex, int origin, int fence,
               long[] array,
               LongPredicate selector) {
@@ -1603,53 +1518,48 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelLongArrayWithFilter withFilter(LongPredicate selector) {
             return new LFPap(ex, origin, fence, array,
-                    CommonOps.andPredicate(this.selector, selector));
+                             CommonOps.andPredicate(this.selector, selector));
         }
 
         public ParallelLongArrayWithFilter withIndexedFilter
-                (IntAndLongPredicate selector) {
+            (IntAndLongPredicate selector) {
             return new LRPap
-                    (ex, origin, fence, array,
-                            compoundIndexedSelector(this.selector, selector));
+                (ex, origin, fence, array,
+                 compoundIndexedSelector(this.selector, selector));
         }
 
         public <U> ParallelLongArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+            (LongToObject<? extends U> op) {
             return new LFOMPap<U>(ex, origin, fence, array, selector, op);
         }
 
         public ParallelLongArrayWithLongMapping withMapping
-                (LongOp op) {
+            (LongOp op) {
             return new LFLMPap(ex, origin, fence, array, selector, op);
         }
 
         public ParallelLongArrayWithDoubleMapping withMapping
-                (LongToDouble op) {
+            (LongToDouble op) {
             return new LFDMPap(ex, origin, fence, array, selector, op);
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new LFOCPap<V>(ex, origin, fence, array, selector, mapper);
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new LFDCPap(ex, origin, fence, array, selector, mapper);
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new LFLCPap(ex, origin, fence, array, selector, mapper);
         }
 
@@ -1674,7 +1584,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = x;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, x);
                 }
             }
@@ -1730,8 +1641,8 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h, long[] other,
-                 int otherOffset, BinaryLongOp combiner) {
+            (int l, int h, long[] other,
+             int otherOffset, BinaryLongOp combiner) {
             final long[] a = this.array;
             final LongPredicate s = selector;
             int k = l + otherOffset;
@@ -1744,9 +1655,9 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h,
-                 ParallelLongArrayWithLongMapping other,
-                 int otherOffset, BinaryLongOp combiner) {
+            (int l, int h,
+             ParallelLongArrayWithLongMapping other,
+             int otherOffset, BinaryLongOp combiner) {
             final long[] a = this.array;
             final LongPredicate s = selector;
             int k = l + otherOffset;
@@ -1757,14 +1668,16 @@ public abstract class AbstractParallelAnyArray {
                         a[i] = combiner.op(x, other.lget(k));
                     k++;
                 }
-            } else if (other.hasMap()) {
+            }
+            else if (other.hasMap()) {
                 for (int i = l; i < h; ++i) {
                     long x = a[i];
                     if (s.op(x))
                         a[i] = combiner.op(x, other.lget(k));
                     k++;
                 }
-            } else {
+            }
+            else {
                 long[] b = other.array;
                 for (int i = l; i < h; ++i) {
                     long x = a[i];
@@ -1779,7 +1692,6 @@ public abstract class AbstractParallelAnyArray {
     // Relationally Filtered (but unmapped) classes
     static final class ORPap<T> extends ParallelArrayWithFilter<T> {
         final IntAndObjectPredicate<? super T> selector;
-
         ORPap(ForkJoinPool ex, int origin, int fence,
               T[] array,
               IntAndObjectPredicate<? super T> selector) {
@@ -1787,55 +1699,50 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelArrayWithFilter<T> withFilter
-                (Predicate<? super T> selector) {
+            (Predicate<? super T> selector) {
             return new ORPap<T>
-                    (ex, origin, fence, array,
-                            compoundIndexedSelector(this.selector, selector));
+                (ex, origin, fence, array,
+                 compoundIndexedSelector(this.selector, selector));
         }
 
         public ParallelArrayWithFilter<T> withIndexedFilter
-                (IntAndObjectPredicate<? super T> selector) {
+            (IntAndObjectPredicate<? super T> selector) {
             return new ORPap<T>
-                    (ex, origin, fence, array,
-                            compoundIndexedSelector(this.selector, selector));
+                (ex, origin, fence, array,
+                 compoundIndexedSelector(this.selector, selector));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (Op<? super T, ? extends U> op) {
-            return new OROMPap<T, U>(ex, origin, fence, array, selector, op);
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (Op<? super T, ? extends U> op) {
+            return new OROMPap<T,U>(ex, origin, fence, array, selector, op);
         }
 
         public ParallelArrayWithDoubleMapping<T> withMapping
-                (ObjectToDouble<? super T> op) {
+            (ObjectToDouble<? super T> op) {
             return new ORDMPap<T>(ex, origin, fence, array, selector, op);
         }
 
         public ParallelArrayWithLongMapping<T> withMapping
-                (ObjectToLong<? super T> op) {
+            (ObjectToLong<? super T> op) {
             return new ORLMPap<T>(ex, origin, fence, array, selector, op);
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndObjectToObject<? super T, ? extends V> mapper) {
-            return new OROCPap<T, V>(ex, origin, fence, array, selector, mapper);
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndObjectToObject<? super T, ? extends V> mapper) {
+            return new OROCPap<T,V>(ex, origin, fence, array, selector, mapper);
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndObjectToDouble<? super T> mapper) {
+            (IntAndObjectToDouble<? super T> mapper) {
             return new ORDCPap<T>(ex, origin, fence, array, selector, mapper);
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndObjectToLong<? super T> mapper) {
+            (IntAndObjectToLong<? super T> mapper) {
             return new ORLCPap<T>(ex, origin, fence, array, selector, mapper);
         }
 
@@ -1860,7 +1767,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = x;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, x);
                 }
             }
@@ -1916,8 +1824,8 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h, Object[] other,
-                 int otherOffset, BinaryOp combiner) {
+            (int l, int h, Object[] other,
+             int otherOffset, BinaryOp combiner) {
             final Object[] a = this.array;
             final IntAndObjectPredicate s = selector;
             int k = l + otherOffset;
@@ -1930,9 +1838,9 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h,
-                 ParallelArrayWithMapping other,
-                 int otherOffset, BinaryOp combiner) {
+            (int l, int h,
+             ParallelArrayWithMapping other,
+             int otherOffset, BinaryOp combiner) {
             final Object[] a = this.array;
             final IntAndObjectPredicate s = selector;
             int k = l + otherOffset;
@@ -1943,14 +1851,16 @@ public abstract class AbstractParallelAnyArray {
                         a[i] = combiner.op(x, other.oget(k));
                     k++;
                 }
-            } else if (other.hasMap()) {
+            }
+            else if (other.hasMap()) {
                 for (int i = l; i < h; ++i) {
                     Object x = a[i];
                     if (s.op(i, x))
                         a[i] = combiner.op(x, other.oget(k));
                     k++;
                 }
-            } else {
+            }
+            else {
                 Object[] b = other.array;
                 for (int i = l; i < h; ++i) {
                     Object x = a[i];
@@ -1964,7 +1874,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class DRPap extends ParallelDoubleArrayWithFilter {
         final IntAndDoublePredicate selector;
-
         DRPap(ForkJoinPool ex, int origin, int fence,
               double[] array,
               IntAndDoublePredicate selector) {
@@ -1972,30 +1881,25 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelDoubleArrayWithFilter withFilter
-                (DoublePredicate selector) {
+            (DoublePredicate selector) {
             return new DRPap
-                    (ex, origin, fence, array,
-                            compoundIndexedSelector(this.selector, selector));
+                (ex, origin, fence, array,
+                 compoundIndexedSelector(this.selector, selector));
         }
 
         public ParallelDoubleArrayWithFilter withIndexedFilter
-                (IntAndDoublePredicate selector) {
+            (IntAndDoublePredicate selector) {
             return new DRPap
-                    (ex, origin, fence, array,
-                            compoundIndexedSelector(this.selector, selector));
+                (ex, origin, fence, array,
+                 compoundIndexedSelector(this.selector, selector));
         }
 
         public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+            (DoubleToObject<? extends U> op) {
             return new DROMPap<U>(ex, origin, fence, array, selector, op);
         }
 
@@ -2008,17 +1912,17 @@ public abstract class AbstractParallelAnyArray {
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new DROCPap<V>(ex, origin, fence, array, selector, mapper);
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new DRDCPap(ex, origin, fence, array, selector, mapper);
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new DRLCPap(ex, origin, fence, array, selector, mapper);
         }
 
@@ -2043,7 +1947,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = x;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, x);
                 }
             }
@@ -2099,8 +2004,8 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h, double[] other,
-                 int otherOffset, BinaryDoubleOp combiner) {
+            (int l, int h, double[] other,
+             int otherOffset, BinaryDoubleOp combiner) {
             final double[] a = this.array;
             final IntAndDoublePredicate s = selector;
             int k = l + otherOffset;
@@ -2113,9 +2018,9 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h,
-                 ParallelDoubleArrayWithDoubleMapping other,
-                 int otherOffset, BinaryDoubleOp combiner) {
+            (int l, int h,
+             ParallelDoubleArrayWithDoubleMapping other,
+             int otherOffset, BinaryDoubleOp combiner) {
             final double[] a = this.array;
             final IntAndDoublePredicate s = selector;
             int k = l + otherOffset;
@@ -2126,14 +2031,16 @@ public abstract class AbstractParallelAnyArray {
                         a[i] = combiner.op(x, other.dget(k));
                     k++;
                 }
-            } else if (other.hasMap()) {
+            }
+            else if (other.hasMap()) {
                 for (int i = l; i < h; ++i) {
                     double x = a[i];
                     if (s.op(i, x))
                         a[i] = combiner.op(x, other.dget(k));
                     k++;
                 }
-            } else {
+            }
+            else {
                 double[] b = other.array;
                 for (int i = l; i < h; ++i) {
                     double x = a[i];
@@ -2147,7 +2054,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class LRPap extends ParallelLongArrayWithFilter {
         final IntAndLongPredicate selector;
-
         LRPap(ForkJoinPool ex, int origin, int fence,
               long[] array,
               IntAndLongPredicate selector) {
@@ -2155,53 +2061,48 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelLongArrayWithFilter withFilter(LongPredicate selector) {
             return new LRPap(ex, origin, fence, array,
-                    compoundIndexedSelector(this.selector, selector));
+                             compoundIndexedSelector(this.selector, selector));
         }
 
         public ParallelLongArrayWithFilter withIndexedFilter
-                (IntAndLongPredicate selector) {
+            (IntAndLongPredicate selector) {
             return new LRPap
-                    (ex, origin, fence, array,
-                            compoundIndexedSelector(this.selector, selector));
+                (ex, origin, fence, array,
+                 compoundIndexedSelector(this.selector, selector));
         }
 
         public <U> ParallelLongArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+            (LongToObject<? extends U> op) {
             return new LROMPap<U>(ex, origin, fence, array, selector, op);
         }
 
         public ParallelLongArrayWithLongMapping withMapping
-                (LongOp op) {
+            (LongOp op) {
             return new LRLMPap(ex, origin, fence, array, selector, op);
         }
 
         public ParallelLongArrayWithDoubleMapping withMapping
-                (LongToDouble op) {
+            (LongToDouble op) {
             return new LRDMPap(ex, origin, fence, array, selector, op);
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new LROCPap<V>(ex, origin, fence, array, selector, mapper);
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new LRDCPap(ex, origin, fence, array, selector, mapper);
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new LRLCPap(ex, origin, fence, array, selector, mapper);
         }
 
@@ -2226,7 +2127,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = x;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, x);
                 }
             }
@@ -2282,8 +2184,8 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h, long[] other,
-                 int otherOffset, BinaryLongOp combiner) {
+            (int l, int h, long[] other,
+             int otherOffset, BinaryLongOp combiner) {
             final long[] a = this.array;
             final IntAndLongPredicate s = selector;
             int k = l + otherOffset;
@@ -2296,9 +2198,9 @@ public abstract class AbstractParallelAnyArray {
         }
 
         final void leafCombineInPlace
-                (int l, int h,
-                 ParallelLongArrayWithLongMapping other,
-                 int otherOffset, BinaryLongOp combiner) {
+            (int l, int h,
+             ParallelLongArrayWithLongMapping other,
+             int otherOffset, BinaryLongOp combiner) {
             final long[] a = this.array;
             final IntAndLongPredicate s = selector;
             int k = l + otherOffset;
@@ -2309,14 +2211,16 @@ public abstract class AbstractParallelAnyArray {
                         a[i] = combiner.op(x, other.lget(k));
                     k++;
                 }
-            } else if (other.hasMap()) {
+            }
+            else if (other.hasMap()) {
                 for (int i = l; i < h; ++i) {
                     long x = a[i];
                     if (s.op(i, x))
                         a[i] = combiner.op(x, other.lget(k));
                     k++;
                 }
-            } else {
+            }
+            else {
                 long[] b = other.array;
                 for (int i = l; i < h; ++i) {
                     long x = a[i];
@@ -2330,9 +2234,8 @@ public abstract class AbstractParallelAnyArray {
 
     // Object-mapped
 
-    abstract static class OOMPap<T, U> extends ParallelArrayWithMapping<T, U> {
+    abstract static class OOMPap<T,U> extends ParallelArrayWithMapping<T,U> {
         final Op<? super T, ? extends U> op;
-
         OOMPap(ForkJoinPool ex, int origin, int fence,
                T[] array,
                Op<? super T, ? extends U> op) {
@@ -2340,21 +2243,10 @@ public abstract class AbstractParallelAnyArray {
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final Object oget(int i) {
-            return op.op(this.array[i]);
-        }
-
-        final double dget(int i) {
-            return ((Number) oget(i)).doubleValue();
-        }
-
-        final long lget(int i) {
-            return ((Number) oget(i)).longValue();
-        }
+        final boolean hasMap() { return true; }
+        final Object oget(int i) { return op.op(this.array[i]); }
+        final double dget(int i) { return ((Number)oget(i)).doubleValue(); }
+        final long lget(int i) { return ((Number)oget(i)).longValue(); }
 
         final void leafTransfer(int lo, int hi, Object[] dest, int offset) {
             final Op f = op;
@@ -2374,28 +2266,16 @@ public abstract class AbstractParallelAnyArray {
 
     abstract static class DOMPap<U> extends ParallelDoubleArrayWithMapping<U> {
         final DoubleToObject<? extends U> op;
-
         DOMPap(ForkJoinPool ex, int origin, int fence,
                double[] array, DoubleToObject<? extends U> op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final Object oget(int i) {
-            return op.op(this.array[i]);
-        }
-
-        final double dget(int i) {
-            return ((Number) oget(i)).doubleValue();
-        }
-
-        final long lget(int i) {
-            return ((Number) oget(i)).longValue();
-        }
+        final boolean hasMap() { return true; }
+        final Object oget(int i) { return op.op(this.array[i]); }
+        final double dget(int i) { return ((Number)oget(i)).doubleValue(); }
+        final long lget(int i) { return ((Number)oget(i)).longValue(); }
 
         final void leafTransfer(int lo, int hi, Object[] dest, int offset) {
             final double[] a = this.array;
@@ -2415,28 +2295,16 @@ public abstract class AbstractParallelAnyArray {
 
     abstract static class LOMPap<U> extends ParallelLongArrayWithMapping<U> {
         final LongToObject<? extends U> op;
-
         LOMPap(ForkJoinPool ex, int origin, int fence,
                long[] array, LongToObject<? extends U> op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final Object oget(int i) {
-            return op.op(this.array[i]);
-        }
-
-        final double dget(int i) {
-            return ((Number) oget(i)).doubleValue();
-        }
-
-        final long lget(int i) {
-            return ((Number) oget(i)).longValue();
-        }
+        final boolean hasMap() { return true; }
+        final Object oget(int i) { return op.op(this.array[i]); }
+        final double dget(int i) { return ((Number)oget(i)).doubleValue(); }
+        final long lget(int i) { return ((Number)oget(i)).longValue(); }
 
         final void leafTransfer(int lo, int hi, Object[] dest, int offset) {
             final long[] a = this.array;
@@ -2456,46 +2324,46 @@ public abstract class AbstractParallelAnyArray {
 
     // Object mapped, unfiltered
 
-    static final class OUOMPap<T, U> extends OOMPap<T, U> {
+    static final class OUOMPap<T,U> extends OOMPap<T,U> {
         OUOMPap(ForkJoinPool ex, int origin, int fence,
                 T[] array, Op<? super T, ? extends U> op) {
             super(ex, origin, fence, array, op);
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withMapping
-                (Op<? super U, ? extends V> op) {
-            return new OUOMPap<T, V>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+        public <V> ParallelArrayWithMapping<T,V> withMapping
+            (Op<? super U, ? extends V> op) {
+            return new OUOMPap<T,V>(ex, origin, fence, array,
+                                    CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelArrayWithDoubleMapping<T> withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new OUDMPap<T>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new OULMPap<T>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
-            return new OUOCPap<T, V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            return new OUOCPap<T,V>(ex, origin, fence, array,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new OUDCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new OULCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -2511,7 +2379,7 @@ public abstract class AbstractParallelAnyArray {
             final Object[] a = this.array;
             final Op f = op;
             Object r = f.op(a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(a[i]));
             return r;
         }
@@ -2525,39 +2393,39 @@ public abstract class AbstractParallelAnyArray {
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withMapping
-                (Op<? super U, ? extends V> op) {
+            (Op<? super U, ? extends V> op) {
             return new DUOMPap<V>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new DUDMPap(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new DULMPap(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
             return new DUOCPap<V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new DUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new DULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -2573,7 +2441,7 @@ public abstract class AbstractParallelAnyArray {
             final double[] a = this.array;
             final DoubleToObject f = op;
             Object r = f.op(a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(a[i]));
             return r;
         }
@@ -2587,39 +2455,39 @@ public abstract class AbstractParallelAnyArray {
         }
 
         public <V> ParallelLongArrayWithMapping<V> withMapping
-                (Op<? super U, ? extends V> op) {
+            (Op<? super U, ? extends V> op) {
             return new LUOMPap<V>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelLongArrayWithLongMapping withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new LULMPap(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelLongArrayWithDoubleMapping withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new LUDMPap(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
             return new LUOCPap<V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new LUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new LULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -2635,7 +2503,7 @@ public abstract class AbstractParallelAnyArray {
             final long[] a = this.array;
             final LongToObject f = op;
             Object r = f.op(a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(a[i]));
             return r;
         }
@@ -2643,7 +2511,7 @@ public abstract class AbstractParallelAnyArray {
     }
 
     // Object-mapped, filtered
-    static final class OFOMPap<T, U> extends OOMPap<T, U> {
+    static final class OFOMPap<T,U> extends OOMPap<T,U> {
         final Predicate<? super T> selector;
 
         OFOMPap(ForkJoinPool ex, int origin, int fence,
@@ -2653,49 +2521,44 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
-
-        public <V> ParallelArrayWithMapping<T, V> withMapping
-                (Op<? super U, ? extends V> op) {
-            return new OFOMPap<T, V>
-                    (ex, origin, fence, array, selector,
-                            CommonOps.compoundOp(this.op, op));
+        public <V> ParallelArrayWithMapping<T,V> withMapping
+            (Op<? super U, ? extends V> op) {
+            return new OFOMPap<T,V>
+                (ex, origin, fence, array, selector,
+                 CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelArrayWithDoubleMapping<T> withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new OFDMPap<T>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new OFLMPap<T>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
-            return new OFOCPap<T, V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            return new OFOCPap<T,V>(ex, origin, fence, array, selector,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new OFDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new OFLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -2708,7 +2571,6 @@ public abstract class AbstractParallelAnyArray {
                     procedure.op(f.op(x));
             }
         }
-
         Object leafReduce(int lo, int hi, Reducer reducer, Object base) {
             final Predicate s = selector;
             final Object[] a = this.array;
@@ -2722,7 +2584,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -2733,7 +2596,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class DFOMPap<U> extends DOMPap<U> {
         final DoublePredicate selector;
-
         DFOMPap(ForkJoinPool ex, int origin, int fence,
                 double[] array, DoublePredicate selector,
                 DoubleToObject<? extends U> op) {
@@ -2741,55 +2603,50 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelArray<U> all(Class<? super U> elementType) {
             PAS.FJOSelectAllDriver r = new PAS.FJOSelectAllDriver
-                    (this, elementType);
+                (this, elementType);
             ex.invoke(r);
-            return new ParallelArray<U>(ex, (U[]) (r.results));
+            return new ParallelArray<U>(ex, (U[])(r.results));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withMapping
-                (Op<? super U, ? extends V> op) {
+            (Op<? super U, ? extends V> op) {
             return new DFOMPap<V>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new DFDMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new DFLMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
             return new DFOCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new DFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new DFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -2816,7 +2673,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -2827,7 +2685,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class LFOMPap<U> extends LOMPap<U> {
         final LongPredicate selector;
-
         LFOMPap(ForkJoinPool ex, int origin, int fence,
                 long[] array, LongPredicate selector,
                 LongToObject<? extends U> op) {
@@ -2835,48 +2692,43 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public <V> ParallelLongArrayWithMapping<V> withMapping
-                (Op<? super U, ? extends V> op) {
+            (Op<? super U, ? extends V> op) {
             return new LFOMPap<V>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelLongArrayWithLongMapping withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new LFLMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelLongArrayWithDoubleMapping withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new LFDMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
             return new LFOCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new LFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new LFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -2903,7 +2755,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -2913,7 +2766,7 @@ public abstract class AbstractParallelAnyArray {
     }
 
     // Object-mapped, relational
-    static final class OROMPap<T, U> extends OOMPap<T, U> {
+    static final class OROMPap<T,U> extends OOMPap<T,U> {
         final IntAndObjectPredicate<? super T> selector;
 
         OROMPap(ForkJoinPool ex, int origin, int fence,
@@ -2923,47 +2776,42 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
-
-        public <V> ParallelArrayWithMapping<T, V> withMapping
-                (Op<? super U, ? extends V> op) {
-            return new OROMPap<T, V>
-                    (ex, origin, fence, array, selector,
-                            CommonOps.compoundOp(this.op, op));
+        public <V> ParallelArrayWithMapping<T,V> withMapping
+            (Op<? super U, ? extends V> op) {
+            return new OROMPap<T,V>
+                (ex, origin, fence, array, selector,
+                 CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelArrayWithDoubleMapping<T> withMapping(ObjectToDouble<? super U> op) {
             return new ORDMPap<T>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping(ObjectToLong<? super U> op) {
             return new ORLMPap<T>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
-            return new OROCPap<T, V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            return new OROCPap<T,V>(ex, origin, fence, array, selector,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new ORDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new ORLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -2976,7 +2824,6 @@ public abstract class AbstractParallelAnyArray {
                     procedure.op(f.op(x));
             }
         }
-
         Object leafReduce(int lo, int hi, Reducer reducer, Object base) {
             final IntAndObjectPredicate s = selector;
             final Object[] a = this.array;
@@ -2990,7 +2837,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -3001,7 +2849,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class DROMPap<U> extends DOMPap<U> {
         final IntAndDoublePredicate selector;
-
         DROMPap(ForkJoinPool ex, int origin, int fence,
                 double[] array, IntAndDoublePredicate selector,
                 DoubleToObject<? extends U> op) {
@@ -3009,55 +2856,50 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelArray<U> all(Class<? super U> elementType) {
             PAS.FJOSelectAllDriver r = new PAS.FJOSelectAllDriver
-                    (this, elementType);
+                (this, elementType);
             ex.invoke(r);
-            return new ParallelArray<U>(ex, (U[]) (r.results));
+            return new ParallelArray<U>(ex, (U[])(r.results));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withMapping
-                (Op<? super U, ? extends V> op) {
+            (Op<? super U, ? extends V> op) {
             return new DROMPap<V>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new DRDMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new DRLMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
             return new DROCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new DRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new DRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -3084,7 +2926,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -3095,7 +2938,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class LROMPap<U> extends LOMPap<U> {
         final IntAndLongPredicate selector;
-
         LROMPap(ForkJoinPool ex, int origin, int fence,
                 long[] array, IntAndLongPredicate selector,
                 LongToObject<? extends U> op) {
@@ -3103,48 +2945,43 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public <V> ParallelLongArrayWithMapping<V> withMapping
-                (Op<? super U, ? extends V> op) {
+            (Op<? super U, ? extends V> op) {
             return new LROMPap<V>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelLongArrayWithLongMapping withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new LRLMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelLongArrayWithDoubleMapping withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new LRDMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
             return new LROCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new LRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new LRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -3171,7 +3008,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -3181,9 +3019,8 @@ public abstract class AbstractParallelAnyArray {
 
     // Object-combined
 
-    abstract static class OOCPap<T, U> extends ParallelArrayWithMapping<T, U> {
+    abstract static class OOCPap<T,U> extends ParallelArrayWithMapping<T,U> {
         final IntAndObjectToObject<? super T, ? extends U> op;
-
         OOCPap(ForkJoinPool ex, int origin, int fence,
                T[] array,
                IntAndObjectToObject<? super T, ? extends U> op) {
@@ -3191,21 +3028,10 @@ public abstract class AbstractParallelAnyArray {
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final Object oget(int i) {
-            return op.op(i, this.array[i]);
-        }
-
-        final double dget(int i) {
-            return ((Number) oget(i)).doubleValue();
-        }
-
-        final long lget(int i) {
-            return ((Number) oget(i)).longValue();
-        }
+        final boolean hasMap() { return true; }
+        final Object oget(int i) { return op.op(i, this.array[i]); }
+        final double dget(int i) { return ((Number)oget(i)).doubleValue(); }
+        final long lget(int i) { return ((Number)oget(i)).longValue(); }
 
         final void leafTransfer(int lo, int hi, Object[] dest, int offset) {
             final IntAndObjectToObject f = op;
@@ -3227,28 +3053,16 @@ public abstract class AbstractParallelAnyArray {
 
     abstract static class DOCPap<U> extends ParallelDoubleArrayWithMapping<U> {
         final IntAndDoubleToObject<? extends U> op;
-
         DOCPap(ForkJoinPool ex, int origin, int fence,
                double[] array, IntAndDoubleToObject<? extends U> op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final Object oget(int i) {
-            return op.op(i, this.array[i]);
-        }
-
-        final double dget(int i) {
-            return ((Number) oget(i)).doubleValue();
-        }
-
-        final long lget(int i) {
-            return ((Number) oget(i)).longValue();
-        }
+        final boolean hasMap() { return true; }
+        final Object oget(int i) { return op.op(i, this.array[i]); }
+        final double dget(int i) { return ((Number)oget(i)).doubleValue(); }
+        final long lget(int i) { return ((Number)oget(i)).longValue(); }
 
         final void leafTransfer(int lo, int hi, Object[] dest, int offset) {
             final IntAndDoubleToObject f = op;
@@ -3270,28 +3084,16 @@ public abstract class AbstractParallelAnyArray {
 
     abstract static class LOCPap<U> extends ParallelLongArrayWithMapping<U> {
         final IntAndLongToObject<? extends U> op;
-
         LOCPap(ForkJoinPool ex, int origin, int fence,
                long[] array, IntAndLongToObject<? extends U> op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final Object oget(int i) {
-            return op.op(i, this.array[i]);
-        }
-
-        final double dget(int i) {
-            return ((Number) oget(i)).doubleValue();
-        }
-
-        final long lget(int i) {
-            return ((Number) oget(i)).longValue();
-        }
+        final boolean hasMap() { return true; }
+        final Object oget(int i) { return op.op(i, this.array[i]); }
+        final double dget(int i) { return ((Number)oget(i)).doubleValue(); }
+        final long lget(int i) { return ((Number)oget(i)).longValue(); }
 
         final void leafTransfer(int lo, int hi, Object[] dest, int offset) {
             final IntAndLongToObject f = op;
@@ -3313,46 +3115,46 @@ public abstract class AbstractParallelAnyArray {
 
     // Object-combined, unfiltered
 
-    static final class OUOCPap<T, U> extends OOCPap<T, U> {
+    static final class OUOCPap<T,U> extends OOCPap<T,U> {
         OUOCPap(ForkJoinPool ex, int origin, int fence,
                 T[] array, IntAndObjectToObject<? super T, ? extends U> op) {
             super(ex, origin, fence, array, op);
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withMapping
-                (Op<? super U, ? extends V> op) {
-            return new OUOCPap<T, V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+        public <V> ParallelArrayWithMapping<T,V> withMapping
+            (Op<? super U, ? extends V> op) {
+            return new OUOCPap<T,V>(ex, origin, fence, array,
+                                    compoundIndexedOp(this.op, op));
         }
 
         public ParallelArrayWithDoubleMapping<T> withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new OUDCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new OULCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
-            return new OUOCPap<T, V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            return new OUOCPap<T,V>(ex, origin, fence, array,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new OUDCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new OULCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -3368,7 +3170,7 @@ public abstract class AbstractParallelAnyArray {
             final Object[] a = this.array;
             final IntAndObjectToObject f = op;
             Object r = f.op(lo, a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(i, a[i]));
             return r;
         }
@@ -3381,40 +3183,40 @@ public abstract class AbstractParallelAnyArray {
             super(ex, origin, fence, array, op);
         }
 
-        public <V> ParallelDoubleArrayWithMapping<V> withMapping
-                (Op<? super U, ? extends V> op) {
+        public <V> ParallelDoubleArrayWithMapping< V> withMapping
+            (Op<? super U, ? extends V> op) {
             return new DUOCPap<V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new DUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new DULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
             return new DUOCPap<V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new DUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new DULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -3430,7 +3232,7 @@ public abstract class AbstractParallelAnyArray {
             final double[] a = this.array;
             final IntAndDoubleToObject f = op;
             Object r = f.op(lo, a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(i, a[i]));
             return r;
         }
@@ -3443,40 +3245,40 @@ public abstract class AbstractParallelAnyArray {
             super(ex, origin, fence, array, op);
         }
 
-        public <V> ParallelLongArrayWithMapping<V> withMapping
-                (Op<? super U, ? extends V> op) {
+        public <V> ParallelLongArrayWithMapping< V> withMapping
+            (Op<? super U, ? extends V> op) {
             return new LUOCPap<V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public ParallelLongArrayWithDoubleMapping withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new LUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelLongArrayWithLongMapping withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new LULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
             return new LUOCPap<V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new LUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new LULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -3492,7 +3294,7 @@ public abstract class AbstractParallelAnyArray {
             final long[] a = this.array;
             final IntAndLongToObject f = op;
             Object r = f.op(lo, a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(i, a[i]));
             return r;
         }
@@ -3501,9 +3303,8 @@ public abstract class AbstractParallelAnyArray {
 
     // object-combined filtered
 
-    static final class OFOCPap<T, U> extends OOCPap<T, U> {
+    static final class OFOCPap<T,U> extends OOCPap<T,U> {
         final Predicate<? super T> selector;
-
         OFOCPap(ForkJoinPool ex, int origin, int fence,
                 T[] array, Predicate<? super T> selector,
                 IntAndObjectToObject<? super T, ? extends U> op) {
@@ -3511,50 +3312,45 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
-
-        public <V> ParallelArrayWithMapping<T, V> withMapping
-                (Op<? super U, ? extends V> op) {
-            return new OFOCPap<T, V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+        public <V> ParallelArrayWithMapping<T,V> withMapping
+            (Op<? super U, ? extends V> op) {
+            return new OFOCPap<T,V>(ex, origin, fence, array, selector,
+                                    compoundIndexedOp(this.op, op));
         }
 
         public ParallelArrayWithDoubleMapping<T> withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new OFDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new OFLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
-            return new OFOCPap<T, V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            return new OFOCPap<T,V>(ex, origin, fence, array, selector,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new OFDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new OFLCPap<T>
-                    (ex, origin, fence, array, selector,
-                            compoundIndexedOp
-                                    (this.op, mapper));
+                (ex, origin, fence, array, selector,
+                 compoundIndexedOp
+                 (this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -3567,7 +3363,6 @@ public abstract class AbstractParallelAnyArray {
                     procedure.op(f.op(i, x));
             }
         }
-
         Object leafReduce(int lo, int hi, Reducer reducer, Object base) {
             final Predicate s = selector;
             final Object[] a = this.array;
@@ -3581,7 +3376,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -3591,7 +3387,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class DFOCPap<U> extends DOCPap<U> {
         final DoublePredicate selector;
-
         DFOCPap(ForkJoinPool ex, int origin, int fence,
                 double[] array, DoublePredicate selector,
                 IntAndDoubleToObject<? extends U> op) {
@@ -3599,48 +3394,43 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
-
-        public <V> ParallelDoubleArrayWithMapping<V> withMapping
-                (Op<? super U, ? extends V> op) {
+        public <V> ParallelDoubleArrayWithMapping< V> withMapping
+            (Op<? super U, ? extends V> op) {
             return new DFOCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new DFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new DFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
             return new DFOCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new DFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new DFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -3653,7 +3443,6 @@ public abstract class AbstractParallelAnyArray {
                     procedure.op(f.op(i, x));
             }
         }
-
         Object leafReduce(int lo, int hi, Reducer reducer, Object base) {
             final DoublePredicate s = selector;
             final double[] a = this.array;
@@ -3667,7 +3456,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -3677,7 +3467,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class LFOCPap<U> extends LOCPap<U> {
         final LongPredicate selector;
-
         LFOCPap(ForkJoinPool ex, int origin, int fence,
                 long[] array, LongPredicate selector,
                 IntAndLongToObject<? extends U> op) {
@@ -3685,48 +3474,43 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
-
-        public <V> ParallelLongArrayWithMapping<V> withMapping
-                (Op<? super U, ? extends V> op) {
+        public <V> ParallelLongArrayWithMapping< V> withMapping
+            (Op<? super U, ? extends V> op) {
             return new LFOCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public ParallelLongArrayWithDoubleMapping withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new LFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelLongArrayWithLongMapping withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new LFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
             return new LFOCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new LFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new LFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -3739,7 +3523,6 @@ public abstract class AbstractParallelAnyArray {
                     procedure.op(f.op(i, x));
             }
         }
-
         Object leafReduce(int lo, int hi, Reducer reducer, Object base) {
             final LongPredicate s = selector;
             final long[] a = this.array;
@@ -3753,7 +3536,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -3762,9 +3546,8 @@ public abstract class AbstractParallelAnyArray {
     }
 
     // Object-combined, relational
-    static final class OROCPap<T, U> extends OOCPap<T, U> {
+    static final class OROCPap<T,U> extends OOCPap<T,U> {
         final IntAndObjectPredicate<? super T> selector;
-
         OROCPap(ForkJoinPool ex, int origin, int fence,
                 T[] array, IntAndObjectPredicate<? super T> selector,
                 IntAndObjectToObject<? super T, ? extends U> op) {
@@ -3772,50 +3555,45 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
-
-        public <V> ParallelArrayWithMapping<T, V> withMapping
-                (Op<? super U, ? extends V> op) {
-            return new OROCPap<T, V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+        public <V> ParallelArrayWithMapping<T,V> withMapping
+            (Op<? super U, ? extends V> op) {
+            return new OROCPap<T,V>(ex, origin, fence, array, selector,
+                                    compoundIndexedOp(this.op, op));
         }
 
         public ParallelArrayWithDoubleMapping<T> withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new ORDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new ORLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
-            return new OROCPap<T, V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            return new OROCPap<T,V>(ex, origin, fence, array, selector,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new ORDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new ORLCPap<T>
-                    (ex, origin, fence, array, selector,
-                            compoundIndexedOp
-                                    (this.op, mapper));
+                (ex, origin, fence, array, selector,
+                 compoundIndexedOp
+                 (this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -3828,7 +3606,6 @@ public abstract class AbstractParallelAnyArray {
                     procedure.op(f.op(i, x));
             }
         }
-
         Object leafReduce(int lo, int hi, Reducer reducer, Object base) {
             final IntAndObjectPredicate s = selector;
             final Object[] a = this.array;
@@ -3842,7 +3619,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -3852,7 +3630,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class DROCPap<U> extends DOCPap<U> {
         final IntAndDoublePredicate selector;
-
         DROCPap(ForkJoinPool ex, int origin, int fence,
                 double[] array, IntAndDoublePredicate selector,
                 IntAndDoubleToObject<? extends U> op) {
@@ -3860,48 +3637,43 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
-
-        public <V> ParallelDoubleArrayWithMapping<V> withMapping
-                (Op<? super U, ? extends V> op) {
+        public <V> ParallelDoubleArrayWithMapping< V> withMapping
+            (Op<? super U, ? extends V> op) {
             return new DROCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new DRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new DRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
             return new DROCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new DRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new DRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -3914,7 +3686,6 @@ public abstract class AbstractParallelAnyArray {
                     procedure.op(f.op(i, x));
             }
         }
-
         Object leafReduce(int lo, int hi, Reducer reducer, Object base) {
             final IntAndDoublePredicate s = selector;
             final double[] a = this.array;
@@ -3928,7 +3699,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -3938,7 +3710,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class LROCPap<U> extends LOCPap<U> {
         final IntAndLongPredicate selector;
-
         LROCPap(ForkJoinPool ex, int origin, int fence,
                 long[] array, IntAndLongPredicate selector,
                 IntAndLongToObject<? extends U> op) {
@@ -3946,48 +3717,43 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
-
-        public <V> ParallelLongArrayWithMapping<V> withMapping
-                (Op<? super U, ? extends V> op) {
+        public <V> ParallelLongArrayWithMapping< V> withMapping
+            (Op<? super U, ? extends V> op) {
             return new LROCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public ParallelLongArrayWithDoubleMapping withMapping
-                (ObjectToDouble<? super U> op) {
+            (ObjectToDouble<? super U> op) {
             return new LRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelLongArrayWithLongMapping withMapping
-                (ObjectToLong<? super U> op) {
+            (ObjectToLong<? super U> op) {
             return new LRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndObjectToObject<? super U, ? extends V> mapper) {
+            (IntAndObjectToObject<? super U, ? extends V> mapper) {
             return new LROCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndObjectToDouble<? super U> mapper) {
+            (IntAndObjectToDouble<? super U> mapper) {
             return new LRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndObjectToLong<? super U> mapper) {
+            (IntAndObjectToLong<? super U> mapper) {
             return new LRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, Procedure procedure) {
@@ -4000,7 +3766,6 @@ public abstract class AbstractParallelAnyArray {
                     procedure.op(f.op(i, x));
             }
         }
-
         Object leafReduce(int lo, int hi, Reducer reducer, Object base) {
             final IntAndLongPredicate s = selector;
             final long[] a = this.array;
@@ -4014,7 +3779,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -4026,28 +3792,16 @@ public abstract class AbstractParallelAnyArray {
 
     abstract static class ODMPap<T> extends ParallelArrayWithDoubleMapping<T> {
         final ObjectToDouble<? super T> op;
-
         ODMPap(ForkJoinPool ex, int origin, int fence,
                T[] array, ObjectToDouble<? super T> op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final double dget(int i) {
-            return op.op(this.array[i]);
-        }
-
-        final Object oget(int i) {
-            return Double.valueOf(dget(i));
-        }
-
-        final long lget(int i) {
-            return (long) (dget(i));
-        }
+        final boolean hasMap() { return true; }
+        final double dget(int i) { return op.op(this.array[i]); }
+        final Object oget(int i) { return Double.valueOf(dget(i)); }
+        final long lget(int i) { return (long)(dget(i)); }
 
         final void leafTransfer(int lo, int hi, double[] dest, int offset) {
             final ObjectToDouble f = op;
@@ -4068,29 +3822,17 @@ public abstract class AbstractParallelAnyArray {
 
     abstract static class DDMPap extends ParallelDoubleArrayWithDoubleMapping {
         final DoubleOp op;
-
         DDMPap
-                (ForkJoinPool ex, int origin, int fence,
-                 double[] array, DoubleOp op) {
+            (ForkJoinPool ex, int origin, int fence,
+             double[] array, DoubleOp op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final double dget(int i) {
-            return op.op(this.array[i]);
-        }
-
-        final Object oget(int i) {
-            return Double.valueOf(dget(i));
-        }
-
-        final long lget(int i) {
-            return (long) (dget(i));
-        }
+        final boolean hasMap() { return true; }
+        final double dget(int i) { return op.op(this.array[i]); }
+        final Object oget(int i) { return Double.valueOf(dget(i)); }
+        final long lget(int i) { return (long)(dget(i)); }
 
         final void leafTransfer(int lo, int hi, double[] dest, int offset) {
             final double[] a = this.array;
@@ -4110,28 +3852,16 @@ public abstract class AbstractParallelAnyArray {
 
     abstract static class LDMPap extends ParallelLongArrayWithDoubleMapping {
         final LongToDouble op;
-
         LDMPap(ForkJoinPool ex, int origin, int fence,
                long[] array, LongToDouble op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final double dget(int i) {
-            return op.op(this.array[i]);
-        }
-
-        final Object oget(int i) {
-            return Double.valueOf(dget(i));
-        }
-
-        final long lget(int i) {
-            return (long) (dget(i));
-        }
+        final boolean hasMap() { return true; }
+        final double dget(int i) { return op.op(this.array[i]); }
+        final Object oget(int i) { return Double.valueOf(dget(i)); }
+        final long lget(int i) { return (long)(dget(i)); }
 
         final void leafTransfer(int lo, int hi, double[] dest, int offset) {
             final long[] a = this.array;
@@ -4160,36 +3890,36 @@ public abstract class AbstractParallelAnyArray {
 
         public ParallelArrayWithDoubleMapping<T> withMapping(DoubleOp op) {
             return new OUDMPap<T>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping(DoubleToLong op) {
             return new OULMPap<T>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (DoubleToObject<? extends U> op) {
-            return new OUOMPap<T, U>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (DoubleToObject<? extends U> op) {
+            return new OUOMPap<T,U>(ex, origin, fence, array,
+                                    CommonOps.compoundOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
-            return new OUOCPap<T, V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndDoubleToObject<? extends V> mapper) {
+            return new OUOCPap<T,V>(ex, origin, fence, array,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new OUDCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new OULCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -4205,7 +3935,7 @@ public abstract class AbstractParallelAnyArray {
             final Object[] a = this.array;
             final ObjectToDouble f = op;
             double r = f.op(a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(a[i]));
             return r;
         }
@@ -4220,36 +3950,36 @@ public abstract class AbstractParallelAnyArray {
 
         public ParallelDoubleArrayWithDoubleMapping withMapping(DoubleOp op) {
             return new DUDMPap(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping(DoubleToLong op) {
             return new DULMPap(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+            (DoubleToObject<? extends U> op) {
             return new DUOMPap<U>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new DUOCPap<V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new DUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new DULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -4265,7 +3995,7 @@ public abstract class AbstractParallelAnyArray {
             final double[] a = this.array;
             final DoubleOp f = op;
             double r = f.op(a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(a[i]));
             return r;
         }
@@ -4280,36 +4010,36 @@ public abstract class AbstractParallelAnyArray {
 
         public ParallelLongArrayWithLongMapping withMapping(DoubleToLong op) {
             return new LULMPap(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelLongArrayWithDoubleMapping withMapping(DoubleOp op) {
             return new LUDMPap(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <U> ParallelLongArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+            (DoubleToObject<? extends U> op) {
             return new LUOMPap<U>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new LUOCPap<V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new LUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new LULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -4325,7 +4055,7 @@ public abstract class AbstractParallelAnyArray {
             final long[] a = this.array;
             final LongToDouble f = op;
             double r = f.op(a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(a[i]));
             return r;
         }
@@ -4336,7 +4066,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class OFDMPap<T> extends ODMPap<T> {
         final Predicate<? super T> selector;
-
         OFDMPap(ForkJoinPool ex, int origin, int fence,
                 T[] array, Predicate<? super T> selector,
                 ObjectToDouble<? super T> op) {
@@ -4344,46 +4073,41 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelArrayWithDoubleMapping<T> withMapping(DoubleOp op) {
             return new OFDMPap<T>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping(DoubleToLong op) {
             return new OFLMPap<T>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (DoubleToObject<? extends U> op) {
-            return new OFOMPap<T, U>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (DoubleToObject<? extends U> op) {
+            return new OFOMPap<T,U>(ex, origin, fence, array, selector,
+                                    CommonOps.compoundOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
-            return new OFOCPap<T, V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndDoubleToObject<? extends V> mapper) {
+            return new OFOCPap<T,V>(ex, origin, fence, array, selector,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new OFDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new OFLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -4410,7 +4134,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -4420,53 +4145,47 @@ public abstract class AbstractParallelAnyArray {
 
     static final class DFDMPap extends DDMPap {
         final DoublePredicate selector;
-
         DFDMPap(ForkJoinPool ex, int origin, int fence,
                 double[] array, DoublePredicate selector, DoubleOp op) {
             super(ex, origin, fence, array, op);
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping(DoubleOp op) {
             return new DFDMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping(DoubleToLong op) {
             return new DFLMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+            (DoubleToObject<? extends U> op) {
             return new DFOMPap<U>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new DFOCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new DFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new DFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -4493,7 +4212,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -4503,53 +4223,47 @@ public abstract class AbstractParallelAnyArray {
 
     static final class LFDMPap extends LDMPap {
         final LongPredicate selector;
-
         LFDMPap(ForkJoinPool ex, int origin, int fence,
                 long[] array, LongPredicate selector, LongToDouble op) {
             super(ex, origin, fence, array, op);
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelLongArrayWithLongMapping withMapping(DoubleToLong op) {
             return new LFLMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelLongArrayWithDoubleMapping withMapping(DoubleOp op) {
             return new LFDMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <U> ParallelLongArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+            (DoubleToObject<? extends U> op) {
             return new LFOMPap<U>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new LFOCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new LFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new LFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -4576,7 +4290,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -4587,7 +4302,6 @@ public abstract class AbstractParallelAnyArray {
     // double-mapped, relational
     static final class ORDMPap<T> extends ODMPap<T> {
         final IntAndObjectPredicate<? super T> selector;
-
         ORDMPap(ForkJoinPool ex, int origin, int fence,
                 T[] array, IntAndObjectPredicate<? super T> selector,
                 ObjectToDouble<? super T> op) {
@@ -4595,46 +4309,41 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelArrayWithDoubleMapping<T> withMapping(DoubleOp op) {
             return new ORDMPap<T>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping(DoubleToLong op) {
             return new ORLMPap<T>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (DoubleToObject<? extends U> op) {
-            return new OROMPap<T, U>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (DoubleToObject<? extends U> op) {
+            return new OROMPap<T,U>(ex, origin, fence, array, selector,
+                                    CommonOps.compoundOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
-            return new OROCPap<T, V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndDoubleToObject<? extends V> mapper) {
+            return new OROCPap<T,V>(ex, origin, fence, array, selector,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new ORDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new ORLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -4661,7 +4370,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -4671,53 +4381,47 @@ public abstract class AbstractParallelAnyArray {
 
     static final class DRDMPap extends DDMPap {
         final IntAndDoublePredicate selector;
-
         DRDMPap(ForkJoinPool ex, int origin, int fence,
                 double[] array, IntAndDoublePredicate selector, DoubleOp op) {
             super(ex, origin, fence, array, op);
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping(DoubleOp op) {
             return new DRDMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping(DoubleToLong op) {
             return new DRLMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+            (DoubleToObject<? extends U> op) {
             return new DROMPap<U>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new DROCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new DRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new DRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -4744,7 +4448,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -4754,53 +4459,47 @@ public abstract class AbstractParallelAnyArray {
 
     static final class LRDMPap extends LDMPap {
         final IntAndLongPredicate selector;
-
         LRDMPap(ForkJoinPool ex, int origin, int fence,
                 long[] array, IntAndLongPredicate selector, LongToDouble op) {
             super(ex, origin, fence, array, op);
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelLongArrayWithLongMapping withMapping(DoubleToLong op) {
             return new LRLMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelLongArrayWithDoubleMapping withMapping(DoubleOp op) {
             return new LRDMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <U> ParallelLongArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+            (DoubleToObject<? extends U> op) {
             return new LROMPap<U>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new LROCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new LRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new LRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -4827,7 +4526,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -4838,28 +4538,16 @@ public abstract class AbstractParallelAnyArray {
     // double-combined
     abstract static class ODCPap<T> extends ParallelArrayWithDoubleMapping<T> {
         final IntAndObjectToDouble<? super T> op;
-
         ODCPap(ForkJoinPool ex, int origin, int fence,
                T[] array, IntAndObjectToDouble<? super T> op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final double dget(int i) {
-            return op.op(i, this.array[i]);
-        }
-
-        final Object oget(int i) {
-            return Double.valueOf(dget(i));
-        }
-
-        final long lget(int i) {
-            return (long) (dget(i));
-        }
+        final boolean hasMap() { return true; }
+        final double dget(int i) { return op.op(i, this.array[i]); }
+        final Object oget(int i) { return Double.valueOf(dget(i)); }
+        final long lget(int i) { return (long)(dget(i)); }
 
         final void leafTransfer(int lo, int hi, double[] dest, int offset) {
             final IntAndObjectToDouble f = op;
@@ -4882,28 +4570,16 @@ public abstract class AbstractParallelAnyArray {
 
     abstract static class DDCPap extends ParallelDoubleArrayWithDoubleMapping {
         final IntAndDoubleToDouble op;
-
         DDCPap(ForkJoinPool ex, int origin, int fence,
                double[] array, IntAndDoubleToDouble op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final double dget(int i) {
-            return op.op(i, this.array[i]);
-        }
-
-        final Object oget(int i) {
-            return Double.valueOf(dget(i));
-        }
-
-        final long lget(int i) {
-            return (long) (dget(i));
-        }
+        final boolean hasMap() { return true; }
+        final double dget(int i) { return op.op(i, this.array[i]); }
+        final Object oget(int i) { return Double.valueOf(dget(i)); }
+        final long lget(int i) { return (long)(dget(i)); }
 
         final void leafTransfer(int lo, int hi, double[] dest, int offset) {
             final IntAndDoubleToDouble f = op;
@@ -4925,28 +4601,16 @@ public abstract class AbstractParallelAnyArray {
 
     abstract static class LDCPap extends ParallelLongArrayWithDoubleMapping {
         final IntAndLongToDouble op;
-
         LDCPap(ForkJoinPool ex, int origin, int fence,
                long[] array, IntAndLongToDouble op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final double dget(int i) {
-            return op.op(i, this.array[i]);
-        }
-
-        final Object oget(int i) {
-            return Double.valueOf(dget(i));
-        }
-
-        final long lget(int i) {
-            return (long) (dget(i));
-        }
+        final boolean hasMap() { return true; }
+        final double dget(int i) { return op.op(i, this.array[i]); }
+        final Object oget(int i) { return Double.valueOf(dget(i)); }
+        final long lget(int i) { return (long)(dget(i)); }
 
         final void leafTransfer(int lo, int hi, double[] dest, int offset) {
             final IntAndLongToDouble f = op;
@@ -4975,36 +4639,36 @@ public abstract class AbstractParallelAnyArray {
 
         public ParallelArrayWithDoubleMapping<T> withMapping(DoubleOp op) {
             return new OUDCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping(DoubleToLong op) {
             return new OULCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (DoubleToObject<? extends U> op) {
-            return new OUOCPap<T, U>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (DoubleToObject<? extends U> op) {
+            return new OUOCPap<T,U>(ex, origin, fence, array,
+                                    compoundIndexedOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
-            return new OUOCPap<T, V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndDoubleToObject<? extends V> mapper) {
+            return new OUOCPap<T,V>(ex, origin, fence, array,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new OUDCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new OULCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -5020,7 +4684,7 @@ public abstract class AbstractParallelAnyArray {
             final Object[] a = this.array;
             final IntAndObjectToDouble f = op;
             double r = f.op(lo, a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(i, a[i]));
             return r;
         }
@@ -5035,36 +4699,36 @@ public abstract class AbstractParallelAnyArray {
 
         public ParallelDoubleArrayWithDoubleMapping withMapping(DoubleOp op) {
             return new DUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping(DoubleToLong op) {
             return new DULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+        public <U> ParallelDoubleArrayWithMapping< U> withMapping
+            (DoubleToObject<? extends U> op) {
             return new DUOCPap<U>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new DUOCPap<V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new DUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new DULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -5080,7 +4744,7 @@ public abstract class AbstractParallelAnyArray {
             final double[] a = this.array;
             final IntAndDoubleToDouble f = op;
             double r = f.op(lo, a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(i, a[i]));
             return r;
         }
@@ -5094,36 +4758,36 @@ public abstract class AbstractParallelAnyArray {
 
         public ParallelLongArrayWithDoubleMapping withMapping(DoubleOp op) {
             return new LUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelLongArrayWithLongMapping withMapping(DoubleToLong op) {
             return new LULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelLongArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+        public <U> ParallelLongArrayWithMapping< U> withMapping
+            (DoubleToObject<? extends U> op) {
             return new LUOCPap<U>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new LUOCPap<V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new LUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new LULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -5139,7 +4803,7 @@ public abstract class AbstractParallelAnyArray {
             final long[] a = this.array;
             final IntAndLongToDouble f = op;
             double r = f.op(lo, a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(i, a[i]));
             return r;
         }
@@ -5149,7 +4813,6 @@ public abstract class AbstractParallelAnyArray {
     // double-combined, filtered
     static final class OFDCPap<T> extends ODCPap<T> {
         final Predicate<? super T> selector;
-
         OFDCPap(ForkJoinPool ex, int origin, int fence,
                 T[] array, Predicate<? super T> selector,
                 IntAndObjectToDouble<? super T> op) {
@@ -5157,47 +4820,42 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelArrayWithDoubleMapping<T> withMapping(DoubleOp op) {
             return new OFDCPap<T>
-                    (ex, origin, fence, array, selector,
-                            compoundIndexedOp(this.op, op));
+                (ex, origin, fence, array, selector,
+                 compoundIndexedOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping(DoubleToLong op) {
             return new OFLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (DoubleToObject<? extends U> op) {
-            return new OFOCPap<T, U>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (DoubleToObject<? extends U> op) {
+            return new OFOCPap<T,U>(ex, origin, fence, array, selector,
+                                    compoundIndexedOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
-            return new OFOCPap<T, V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndDoubleToObject<? extends V> mapper) {
+            return new OFOCPap<T,V>(ex, origin, fence, array, selector,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new OFDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new OFLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -5224,7 +4882,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -5234,7 +4893,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class DFDCPap extends DDCPap {
         final DoublePredicate selector;
-
         DFDCPap(ForkJoinPool ex, int origin, int fence,
                 double[] array, DoublePredicate selector,
                 IntAndDoubleToDouble op) {
@@ -5242,46 +4900,41 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping(DoubleOp op) {
             return new DFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping(DoubleToLong op) {
             return new DFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+        public <U> ParallelDoubleArrayWithMapping< U> withMapping
+            (DoubleToObject<? extends U> op) {
             return new DFOCPap<U>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new DFOCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new DFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new DFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -5308,7 +4961,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -5318,53 +4972,47 @@ public abstract class AbstractParallelAnyArray {
 
     static final class LFDCPap extends LDCPap {
         final LongPredicate selector;
-
         LFDCPap(ForkJoinPool ex, int origin, int fence,
                 long[] array, LongPredicate selector, IntAndLongToDouble op) {
             super(ex, origin, fence, array, op);
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelLongArrayWithDoubleMapping withMapping(DoubleOp op) {
             return new LFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelLongArrayWithLongMapping withMapping(DoubleToLong op) {
             return new LFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelLongArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+        public <U> ParallelLongArrayWithMapping< U> withMapping
+            (DoubleToObject<? extends U> op) {
             return new LFOCPap<U>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new LFOCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new LFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new LFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -5391,7 +5039,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -5402,7 +5051,6 @@ public abstract class AbstractParallelAnyArray {
     // double-combined, relational
     static final class ORDCPap<T> extends ODCPap<T> {
         final IntAndObjectPredicate<? super T> selector;
-
         ORDCPap(ForkJoinPool ex, int origin, int fence,
                 T[] array, IntAndObjectPredicate<? super T> selector,
                 IntAndObjectToDouble<? super T> op) {
@@ -5410,47 +5058,42 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelArrayWithDoubleMapping<T> withMapping(DoubleOp op) {
             return new ORDCPap<T>
-                    (ex, origin, fence, array, selector,
-                            compoundIndexedOp(this.op, op));
+                (ex, origin, fence, array, selector,
+                 compoundIndexedOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping(DoubleToLong op) {
             return new ORLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (DoubleToObject<? extends U> op) {
-            return new OROCPap<T, U>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (DoubleToObject<? extends U> op) {
+            return new OROCPap<T,U>(ex, origin, fence, array, selector,
+                                    compoundIndexedOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
-            return new OROCPap<T, V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndDoubleToObject<? extends V> mapper) {
+            return new OROCPap<T,V>(ex, origin, fence, array, selector,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new ORDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new ORLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -5477,7 +5120,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -5487,7 +5131,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class DRDCPap extends DDCPap {
         final IntAndDoublePredicate selector;
-
         DRDCPap(ForkJoinPool ex, int origin, int fence,
                 double[] array, IntAndDoublePredicate selector,
                 IntAndDoubleToDouble op) {
@@ -5495,46 +5138,41 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping(DoubleOp op) {
             return new DRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping(DoubleToLong op) {
             return new DRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+        public <U> ParallelDoubleArrayWithMapping< U> withMapping
+            (DoubleToObject<? extends U> op) {
             return new DROCPap<U>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new DROCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new DRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new DRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -5561,7 +5199,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -5571,53 +5210,47 @@ public abstract class AbstractParallelAnyArray {
 
     static final class LRDCPap extends LDCPap {
         final IntAndLongPredicate selector;
-
         LRDCPap(ForkJoinPool ex, int origin, int fence,
                 long[] array, IntAndLongPredicate selector, IntAndLongToDouble op) {
             super(ex, origin, fence, array, op);
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelLongArrayWithDoubleMapping withMapping(DoubleOp op) {
             return new LRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelLongArrayWithLongMapping withMapping(DoubleToLong op) {
             return new LRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelLongArrayWithMapping<U> withMapping
-                (DoubleToObject<? extends U> op) {
+        public <U> ParallelLongArrayWithMapping< U> withMapping
+            (DoubleToObject<? extends U> op) {
             return new LROCPap<U>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndDoubleToObject<? extends V> mapper) {
+            (IntAndDoubleToObject<? extends V> mapper) {
             return new LROCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndDoubleToDouble mapper) {
+            (IntAndDoubleToDouble mapper) {
             return new LRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndDoubleToLong mapper) {
+            (IntAndDoubleToLong mapper) {
             return new LRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, DoubleProcedure procedure) {
@@ -5644,7 +5277,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -5655,28 +5289,16 @@ public abstract class AbstractParallelAnyArray {
     // long-combined
     abstract static class OLMPap<T> extends ParallelArrayWithLongMapping<T> {
         final ObjectToLong<? super T> op;
-
         OLMPap(ForkJoinPool ex, int origin, int fence,
                T[] array, final ObjectToLong<? super T> op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final long lget(int i) {
-            return op.op(this.array[i]);
-        }
-
-        final Object oget(int i) {
-            return Long.valueOf(lget(i));
-        }
-
-        final double dget(int i) {
-            return (double) (lget(i));
-        }
+        final boolean hasMap() { return true; }
+        final long lget(int i) { return op.op(this.array[i]); }
+        final Object oget(int i) { return Long.valueOf(lget(i)); }
+        final double dget(int i) { return (double)(lget(i)); }
 
         final void leafTransfer(int lo, int hi, long[] dest, int offset) {
             final ObjectToLong f = op;
@@ -5696,28 +5318,16 @@ public abstract class AbstractParallelAnyArray {
 
     abstract static class DLMPap extends ParallelDoubleArrayWithLongMapping {
         final DoubleToLong op;
-
         DLMPap(ForkJoinPool ex, int origin, int fence,
                double[] array, DoubleToLong op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final long lget(int i) {
-            return op.op(this.array[i]);
-        }
-
-        final Object oget(int i) {
-            return Long.valueOf(lget(i));
-        }
-
-        final double dget(int i) {
-            return (double) (lget(i));
-        }
+        final boolean hasMap() { return true; }
+        final long lget(int i) { return op.op(this.array[i]); }
+        final Object oget(int i) { return Long.valueOf(lget(i)); }
+        final double dget(int i) { return (double)(lget(i)); }
 
         final void leafTransfer(int lo, int hi, long[] dest, int offset) {
             final double[] a = this.array;
@@ -5738,28 +5348,16 @@ public abstract class AbstractParallelAnyArray {
 
     abstract static class LLMPap extends ParallelLongArrayWithLongMapping {
         final LongOp op;
-
         LLMPap(ForkJoinPool ex, int origin, int fence,
                long[] array, LongOp op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final long lget(int i) {
-            return op.op(this.array[i]);
-        }
-
-        final Object oget(int i) {
-            return Long.valueOf(lget(i));
-        }
-
-        final double dget(int i) {
-            return (double) (lget(i));
-        }
+        final boolean hasMap() { return true; }
+        final long lget(int i) { return op.op(this.array[i]); }
+        final Object oget(int i) { return Long.valueOf(lget(i)); }
+        final double dget(int i) { return (double)(lget(i)); }
 
         final void leafTransfer(int lo, int hi, long[] dest, int offset) {
             final long[] a = this.array;
@@ -5787,36 +5385,36 @@ public abstract class AbstractParallelAnyArray {
 
         public ParallelArrayWithDoubleMapping<T> withMapping(LongToDouble op) {
             return new OUDMPap<T>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping(LongOp op) {
             return new OULMPap<T>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (LongToObject<? extends U> op) {
-            return new OUOMPap<T, U>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (LongToObject<? extends U> op) {
+            return new OUOMPap<T,U>(ex, origin, fence, array,
+                                    CommonOps.compoundOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
-            return new OUOCPap<T, V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndLongToObject<? extends V> mapper) {
+            return new OUOCPap<T,V>(ex, origin, fence, array,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new OUDCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new OULCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -5832,7 +5430,7 @@ public abstract class AbstractParallelAnyArray {
             final Object[] a = this.array;
             final ObjectToLong f = op;
             long r = f.op(a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(a[i]));
             return r;
         }
@@ -5845,39 +5443,39 @@ public abstract class AbstractParallelAnyArray {
         }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping
-                (LongToDouble op) {
+            (LongToDouble op) {
             return new DUDMPap(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping
-                (LongOp op) {
+            (LongOp op) {
             return new DULMPap(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+            (LongToObject<? extends U> op) {
             return new DUOMPap<U>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new DUOCPap<V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new DUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new DULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -5893,7 +5491,7 @@ public abstract class AbstractParallelAnyArray {
             final double[] a = this.array;
             final DoubleToLong f = op;
             long r = f.op(a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(a[i]));
             return r;
         }
@@ -5908,36 +5506,36 @@ public abstract class AbstractParallelAnyArray {
 
         public ParallelLongArrayWithLongMapping withMapping(LongOp op) {
             return new LULMPap(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelLongArrayWithDoubleMapping withMapping(LongToDouble op) {
             return new LUDMPap(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <U> ParallelLongArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+            (LongToObject<? extends U> op) {
             return new LUOMPap<U>(ex, origin, fence, array,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new LUOCPap<V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new LUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new LULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -5953,7 +5551,7 @@ public abstract class AbstractParallelAnyArray {
             final long[] a = this.array;
             final LongOp f = op;
             long r = f.op(a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(a[i]));
             return r;
         }
@@ -5962,7 +5560,6 @@ public abstract class AbstractParallelAnyArray {
     // long-combined, filtered
     static final class OFLMPap<T> extends OLMPap<T> {
         final Predicate<? super T> selector;
-
         OFLMPap(ForkJoinPool ex, int origin, int fence,
                 T[] array, Predicate<? super T> selector,
                 ObjectToLong<? super T> op) {
@@ -5970,48 +5567,43 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelArrayWithDoubleMapping<T> withMapping
-                (LongToDouble op) {
+            (LongToDouble op) {
             return new OFDMPap<T>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping
-                (LongOp op) {
+            (LongOp op) {
             return new OFLMPap<T>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (LongToObject<? extends U> op) {
-            return new OFOMPap<T, U>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (LongToObject<? extends U> op) {
+            return new OFOMPap<T,U>(ex, origin, fence, array, selector,
+                                    CommonOps.compoundOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
-            return new OFOCPap<T, V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndLongToObject<? extends V> mapper) {
+            return new OFOCPap<T,V>(ex, origin, fence, array, selector,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new OFDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new OFLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -6038,7 +5630,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -6048,55 +5641,49 @@ public abstract class AbstractParallelAnyArray {
 
     static final class DFLMPap extends DLMPap {
         final DoublePredicate selector;
-
         DFLMPap(ForkJoinPool ex, int origin, int fence,
                 double[] array, DoublePredicate selector, DoubleToLong op) {
             super(ex, origin, fence, array, op);
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping
-                (LongToDouble op) {
+            (LongToDouble op) {
             return new DFDMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping
-                (LongOp op) {
+            (LongOp op) {
             return new DFLMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+            (LongToObject<? extends U> op) {
             return new DFOMPap<U>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new DFOCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new DFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new DFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -6123,7 +5710,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -6133,53 +5721,47 @@ public abstract class AbstractParallelAnyArray {
 
     static final class LFLMPap extends LLMPap {
         final LongPredicate selector;
-
         LFLMPap(ForkJoinPool ex, int origin, int fence,
                 long[] array, LongPredicate selector, LongOp op) {
             super(ex, origin, fence, array, op);
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelLongArrayWithLongMapping withMapping(LongOp op) {
             return new LFLMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelLongArrayWithDoubleMapping withMapping(LongToDouble op) {
             return new LFDMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <U> ParallelLongArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+            (LongToObject<? extends U> op) {
             return new LFOMPap<U>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new LFOCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new LFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new LFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -6206,7 +5788,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -6217,7 +5800,6 @@ public abstract class AbstractParallelAnyArray {
     // Long-mapped, relational
     static final class ORLMPap<T> extends OLMPap<T> {
         final IntAndObjectPredicate<? super T> selector;
-
         ORLMPap(ForkJoinPool ex, int origin, int fence,
                 T[] array, IntAndObjectPredicate<? super T> selector,
                 ObjectToLong<? super T> op) {
@@ -6225,48 +5807,43 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelArrayWithDoubleMapping<T> withMapping
-                (LongToDouble op) {
+            (LongToDouble op) {
             return new ORDMPap<T>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping
-                (LongOp op) {
+            (LongOp op) {
             return new ORLMPap<T>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (LongToObject<? extends U> op) {
-            return new OROMPap<T, U>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (LongToObject<? extends U> op) {
+            return new OROMPap<T,U>(ex, origin, fence, array, selector,
+                                    CommonOps.compoundOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
-            return new OROCPap<T, V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndLongToObject<? extends V> mapper) {
+            return new OROCPap<T,V>(ex, origin, fence, array, selector,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new ORDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new ORLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -6293,7 +5870,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -6303,55 +5881,49 @@ public abstract class AbstractParallelAnyArray {
 
     static final class DRLMPap extends DLMPap {
         final IntAndDoublePredicate selector;
-
         DRLMPap(ForkJoinPool ex, int origin, int fence, double[] array,
                 IntAndDoublePredicate selector, DoubleToLong op) {
             super(ex, origin, fence, array, op);
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping
-                (LongToDouble op) {
+            (LongToDouble op) {
             return new DRDMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping
-                (LongOp op) {
+            (LongOp op) {
             return new DRLMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+            (LongToObject<? extends U> op) {
             return new DROMPap<U>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new DROCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new DRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new DRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -6378,7 +5950,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -6388,53 +5961,47 @@ public abstract class AbstractParallelAnyArray {
 
     static final class LRLMPap extends LLMPap {
         final IntAndLongPredicate selector;
-
         LRLMPap(ForkJoinPool ex, int origin, int fence,
                 long[] array, IntAndLongPredicate selector, LongOp op) {
             super(ex, origin, fence, array, op);
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelLongArrayWithLongMapping withMapping(LongOp op) {
             return new LRLMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public ParallelLongArrayWithDoubleMapping withMapping(LongToDouble op) {
             return new LRDMPap(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                               CommonOps.compoundOp(this.op, op));
         }
 
         public <U> ParallelLongArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+            (LongToObject<? extends U> op) {
             return new LROMPap<U>(ex, origin, fence, array, selector,
-                    CommonOps.compoundOp(this.op, op));
+                                  CommonOps.compoundOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new LROCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new LRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new LRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -6461,7 +6028,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -6472,28 +6040,16 @@ public abstract class AbstractParallelAnyArray {
     // long-combined
     abstract static class OLCPap<T> extends ParallelArrayWithLongMapping<T> {
         final IntAndObjectToLong<? super T> op;
-
         OLCPap(ForkJoinPool ex, int origin, int fence,
                T[] array, IntAndObjectToLong<? super T> op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final long lget(int i) {
-            return op.op(i, this.array[i]);
-        }
-
-        final Object oget(int i) {
-            return Long.valueOf(lget(i));
-        }
-
-        final double dget(int i) {
-            return (double) (lget(i));
-        }
+        final boolean hasMap() { return true; }
+        final long lget(int i) { return op.op(i, this.array[i]); }
+        final Object oget(int i) { return Long.valueOf(lget(i)); }
+        final double dget(int i) { return (double)(lget(i)); }
 
         final void leafTransfer(int lo, int hi, long[] dest, int offset) {
             final IntAndObjectToLong f = op;
@@ -6515,28 +6071,16 @@ public abstract class AbstractParallelAnyArray {
 
     abstract static class DLCPap extends ParallelDoubleArrayWithLongMapping {
         final IntAndDoubleToLong op;
-
         DLCPap(ForkJoinPool ex, int origin, int fence,
                double[] array, IntAndDoubleToLong op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final long lget(int i) {
-            return op.op(i, this.array[i]);
-        }
-
-        final Object oget(int i) {
-            return Long.valueOf(lget(i));
-        }
-
-        final double dget(int i) {
-            return (double) (lget(i));
-        }
+        final boolean hasMap() { return true; }
+        final long lget(int i) { return op.op(i, this.array[i]); }
+        final Object oget(int i) { return Long.valueOf(lget(i)); }
+        final double dget(int i) { return (double)(lget(i)); }
 
         final void leafTransfer(int lo, int hi, long[] dest, int offset) {
             final IntAndDoubleToLong f = op;
@@ -6558,28 +6102,16 @@ public abstract class AbstractParallelAnyArray {
 
     abstract static class LLCPap extends ParallelLongArrayWithLongMapping {
         final IntAndLongToLong op;
-
         LLCPap(ForkJoinPool ex, int origin, int fence,
                long[] array, IntAndLongToLong op) {
             super(ex, origin, fence, array);
             this.op = op;
         }
 
-        final boolean hasMap() {
-            return true;
-        }
-
-        final long lget(int i) {
-            return op.op(i, this.array[i]);
-        }
-
-        final Object oget(int i) {
-            return Long.valueOf(lget(i));
-        }
-
-        final double dget(int i) {
-            return (double) (lget(i));
-        }
+        final boolean hasMap() { return true; }
+        final long lget(int i) { return op.op(i, this.array[i]); }
+        final Object oget(int i) { return Long.valueOf(lget(i)); }
+        final double dget(int i) { return (double)(lget(i)); }
 
         final void leafTransfer(int lo, int hi, long[] dest, int offset) {
             final IntAndLongToLong f = op;
@@ -6608,36 +6140,36 @@ public abstract class AbstractParallelAnyArray {
 
         public ParallelArrayWithDoubleMapping<T> withMapping(LongToDouble op) {
             return new OUDCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping(LongOp op) {
             return new OULCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (LongToObject<? extends U> op) {
-            return new OUOCPap<T, U>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (LongToObject<? extends U> op) {
+            return new OUOCPap<T,U>(ex, origin, fence, array,
+                                    compoundIndexedOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
-            return new OUOCPap<T, V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndLongToObject<? extends V> mapper) {
+            return new OUOCPap<T,V>(ex, origin, fence, array,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new OUDCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new OULCPap<T>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -6653,13 +6185,12 @@ public abstract class AbstractParallelAnyArray {
             final Object[] a = this.array;
             final IntAndObjectToLong f = op;
             long r = f.op(lo, a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(i, a[i]));
             return r;
         }
 
     }
-
     static final class DULCPap extends DLCPap {
         DULCPap(ForkJoinPool ex, int origin, int fence,
                 double[] array, IntAndDoubleToLong op) {
@@ -6667,38 +6198,38 @@ public abstract class AbstractParallelAnyArray {
         }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping
-                (LongToDouble op) {
+            (LongToDouble op) {
             return new DUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping(LongOp op) {
             return new DULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+        public <U> ParallelDoubleArrayWithMapping< U> withMapping
+            (LongToObject<? extends U> op) {
             return new DUOCPap<U>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new DUOCPap<V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new DUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new DULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -6714,7 +6245,7 @@ public abstract class AbstractParallelAnyArray {
             final double[] a = this.array;
             final IntAndDoubleToLong f = op;
             long r = f.op(lo, a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(i, a[i]));
             return r;
         }
@@ -6728,36 +6259,36 @@ public abstract class AbstractParallelAnyArray {
 
         public ParallelLongArrayWithDoubleMapping withMapping(LongToDouble op) {
             return new LUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelLongArrayWithLongMapping withMapping(LongOp op) {
             return new LULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelLongArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+        public <U> ParallelLongArrayWithMapping< U> withMapping
+            (LongToObject<? extends U> op) {
             return new LUOCPap<U>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new LUOCPap<V>(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new LUDCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new LULCPap(ex, origin, fence, array,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -6773,7 +6304,7 @@ public abstract class AbstractParallelAnyArray {
             final long[] a = this.array;
             final IntAndLongToLong f = op;
             long r = f.op(lo, a[lo]);
-            for (int i = lo + 1; i < hi; ++i)
+            for (int i = lo+1; i < hi; ++i)
                 r = reducer.op(r, f.op(i, a[i]));
             return r;
         }
@@ -6782,7 +6313,6 @@ public abstract class AbstractParallelAnyArray {
     // long-combined, filtered
     static final class OFLCPap<T> extends OLCPap<T> {
         final Predicate<? super T> selector;
-
         OFLCPap(ForkJoinPool ex, int origin, int fence,
                 T[] array, Predicate<? super T> selector,
                 IntAndObjectToLong<? super T> op) {
@@ -6790,48 +6320,43 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelArrayWithDoubleMapping<T> withMapping(LongToDouble op) {
             return new OFDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping(LongOp op) {
             return new OFLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (LongToObject<? extends U> op) {
-            return new OFOCPap<T, U>(ex, origin, fence, array,
-                    selector,
-                    compoundIndexedOp(this.op, op));
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (LongToObject<? extends U> op) {
+            return new OFOCPap<T,U>(ex, origin, fence, array,
+                                    selector,
+                                    compoundIndexedOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
-            return new OFOCPap<T, V>(ex, origin, fence, array,
-                    selector,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndLongToObject<? extends V> mapper) {
+            return new OFOCPap<T,V>(ex, origin, fence, array,
+                                    selector,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new OFDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new OFLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -6858,7 +6383,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -6869,7 +6395,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class DFLCPap extends DLCPap {
         final DoublePredicate selector;
-
         DFLCPap(ForkJoinPool ex, int origin, int fence,
                 double[] array, DoublePredicate selector,
                 IntAndDoubleToLong op) {
@@ -6877,47 +6402,42 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping
-                (LongToDouble op) {
+            (LongToDouble op) {
             return new DFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping(LongOp op) {
             return new DFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+        public <U> ParallelDoubleArrayWithMapping< U> withMapping
+            (LongToObject<? extends U> op) {
             return new DFOCPap<U>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new DFOCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new DFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new DFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -6944,7 +6464,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -6954,7 +6475,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class LFLCPap extends LLCPap {
         final LongPredicate selector;
-
         LFLCPap(ForkJoinPool ex, int origin, int fence,
                 long[] array, LongPredicate selector,
                 IntAndLongToLong op) {
@@ -6962,46 +6482,41 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(this.array[i]); }
 
         public ParallelLongArrayWithDoubleMapping withMapping(LongToDouble op) {
             return new LFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelLongArrayWithLongMapping withMapping(LongOp op) {
             return new LFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelLongArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+        public <U> ParallelLongArrayWithMapping< U> withMapping
+            (LongToObject<? extends U> op) {
             return new LFOCPap<U>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new LFOCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new LFDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new LFLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -7028,7 +6543,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -7039,7 +6555,6 @@ public abstract class AbstractParallelAnyArray {
     // long-combined, relational
     static final class ORLCPap<T> extends OLCPap<T> {
         final IntAndObjectPredicate<? super T> selector;
-
         ORLCPap(ForkJoinPool ex, int origin, int fence,
                 T[] array, IntAndObjectPredicate<? super T> selector,
                 IntAndObjectToLong<? super T> op) {
@@ -7047,48 +6562,43 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelArrayWithDoubleMapping<T> withMapping(LongToDouble op) {
             return new ORDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public ParallelArrayWithLongMapping<T> withMapping(LongOp op) {
             return new ORLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelArrayWithMapping<T, U> withMapping
-                (LongToObject<? extends U> op) {
-            return new OROCPap<T, U>(ex, origin, fence, array,
-                    selector,
-                    compoundIndexedOp(this.op, op));
+        public <U> ParallelArrayWithMapping<T,U> withMapping
+            (LongToObject<? extends U> op) {
+            return new OROCPap<T,U>(ex, origin, fence, array,
+                                    selector,
+                                    compoundIndexedOp(this.op, op));
         }
 
-        public <V> ParallelArrayWithMapping<T, V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
-            return new OROCPap<T, V>(ex, origin, fence, array,
-                    selector,
-                    compoundIndexedOp(this.op, mapper));
+        public <V> ParallelArrayWithMapping<T,V> withIndexedMapping
+            (IntAndLongToObject<? extends V> mapper) {
+            return new OROCPap<T,V>(ex, origin, fence, array,
+                                    selector,
+                                    compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new ORDCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelArrayWithLongMapping<T> withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new ORLCPap<T>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -7115,7 +6625,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -7126,7 +6637,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class DRLCPap extends DLCPap {
         final IntAndDoublePredicate selector;
-
         DRLCPap(ForkJoinPool ex, int origin, int fence,
                 double[] array, IntAndDoublePredicate selector,
                 IntAndDoubleToLong op) {
@@ -7134,47 +6644,42 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelDoubleArrayWithDoubleMapping withMapping
-                (LongToDouble op) {
+            (LongToDouble op) {
             return new DRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelDoubleArrayWithLongMapping withMapping(LongOp op) {
             return new DRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelDoubleArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+        public <U> ParallelDoubleArrayWithMapping< U> withMapping
+            (LongToObject<? extends U> op) {
             return new DROCPap<U>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelDoubleArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new DROCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new DRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelDoubleArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new DRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -7201,7 +6706,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -7211,7 +6717,6 @@ public abstract class AbstractParallelAnyArray {
 
     static final class LRLCPap extends LLCPap {
         final IntAndLongPredicate selector;
-
         LRLCPap(ForkJoinPool ex, int origin, int fence,
                 long[] array, IntAndLongPredicate selector,
                 IntAndLongToLong op) {
@@ -7219,46 +6724,41 @@ public abstract class AbstractParallelAnyArray {
             this.selector = selector;
         }
 
-        boolean hasFilter() {
-            return true;
-        }
-
-        boolean isSelected(int i) {
-            return selector.op(i, this.array[i]);
-        }
+        boolean hasFilter() { return true; }
+        boolean isSelected(int i) { return selector.op(i, this.array[i]); }
 
         public ParallelLongArrayWithDoubleMapping withMapping(LongToDouble op) {
             return new LRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
         public ParallelLongArrayWithLongMapping withMapping(LongOp op) {
             return new LRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                               compoundIndexedOp(this.op, op));
         }
 
-        public <U> ParallelLongArrayWithMapping<U> withMapping
-                (LongToObject<? extends U> op) {
+        public <U> ParallelLongArrayWithMapping< U> withMapping
+            (LongToObject<? extends U> op) {
             return new LROCPap<U>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, op));
+                                  compoundIndexedOp(this.op, op));
         }
 
         public <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-                (IntAndLongToObject<? extends V> mapper) {
+            (IntAndLongToObject<? extends V> mapper) {
             return new LROCPap<V>(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                                  compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithDoubleMapping withIndexedMapping
-                (IntAndLongToDouble mapper) {
+            (IntAndLongToDouble mapper) {
             return new LRDCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         public ParallelLongArrayWithLongMapping withIndexedMapping
-                (IntAndLongToLong mapper) {
+            (IntAndLongToLong mapper) {
             return new LRLCPap(ex, origin, fence, array, selector,
-                    compoundIndexedOp(this.op, mapper));
+                               compoundIndexedOp(this.op, mapper));
         }
 
         void leafApply(int lo, int hi, LongProcedure procedure) {
@@ -7285,7 +6785,8 @@ public abstract class AbstractParallelAnyArray {
                     if (!gotFirst) {
                         gotFirst = true;
                         r = y;
-                    } else
+                    }
+                    else
                         r = reducer.op(r, y);
                 }
             }
@@ -7308,17 +6809,12 @@ public abstract class AbstractParallelAnyArray {
 
     class UnfilteredAsDoubleIterator implements Iterator<Double> {
         int cursor = origin;
-
-        public boolean hasNext() {
-            return cursor < fence;
-        }
-
+        public boolean hasNext() { return cursor < fence; }
         public Double next() {
             if (cursor >= fence)
                 throw new NoSuchElementException();
             return Double.valueOf(dget(cursor++));
         }
-
         public void remove() {
             throw new UnsupportedOperationException();
         }
@@ -7327,12 +6823,10 @@ public abstract class AbstractParallelAnyArray {
     class FilteredAsDoubleIterator implements Iterator<Double> {
         double next;
         int cursor;
-
         FilteredAsDoubleIterator() {
             cursor = origin;
-            advance();
+            advance() ;
         }
-
         private void advance() {
             while (cursor < fence) {
                 if (isSelected(cursor)) {
@@ -7343,10 +6837,7 @@ public abstract class AbstractParallelAnyArray {
             }
         }
 
-        public boolean hasNext() {
-            return cursor < fence;
-        }
-
+        public boolean hasNext() { return cursor < fence; }
         public Double next() {
             if (cursor >= fence)
                 throw new NoSuchElementException();
@@ -7355,7 +6846,6 @@ public abstract class AbstractParallelAnyArray {
             advance();
             return x;
         }
-
         public void remove() {
             throw new UnsupportedOperationException();
         }
@@ -7372,17 +6862,12 @@ public abstract class AbstractParallelAnyArray {
 
     class UnfilteredAsLongIterator implements Iterator<Long> {
         int cursor = origin;
-
-        public boolean hasNext() {
-            return cursor < fence;
-        }
-
+        public boolean hasNext() { return cursor < fence; }
         public Long next() {
             if (cursor >= fence)
                 throw new NoSuchElementException();
             return Long.valueOf(lget(cursor++));
         }
-
         public void remove() {
             throw new UnsupportedOperationException();
         }
@@ -7391,12 +6876,10 @@ public abstract class AbstractParallelAnyArray {
     class FilteredAsLongIterator implements Iterator<Long> {
         long next;
         int cursor;
-
         FilteredAsLongIterator() {
             cursor = origin;
-            advance();
+            advance() ;
         }
-
         private void advance() {
             while (cursor < fence) {
                 if (isSelected(cursor)) {
@@ -7407,10 +6890,7 @@ public abstract class AbstractParallelAnyArray {
             }
         }
 
-        public boolean hasNext() {
-            return cursor < fence;
-        }
-
+        public boolean hasNext() { return cursor < fence; }
         public Long next() {
             if (cursor >= fence)
                 throw new NoSuchElementException();
@@ -7419,7 +6899,6 @@ public abstract class AbstractParallelAnyArray {
             advance();
             return x;
         }
-
         public void remove() {
             throw new UnsupportedOperationException();
         }
@@ -7436,17 +6915,12 @@ public abstract class AbstractParallelAnyArray {
 
     class UnfilteredIterator<U> implements Iterator<U> {
         int cursor = origin;
-
-        public boolean hasNext() {
-            return cursor < fence;
-        }
-
+        public boolean hasNext() { return cursor < fence; }
         public U next() {
             if (cursor >= fence)
                 throw new NoSuchElementException();
-            return (U) oget(cursor++);
+            return (U)oget(cursor++);
         }
-
         public void remove() {
             throw new UnsupportedOperationException();
         }
@@ -7455,12 +6929,10 @@ public abstract class AbstractParallelAnyArray {
     class FilteredIterator<U> implements Iterator<U> {
         Object next;
         int cursor;
-
         FilteredIterator() {
             cursor = origin;
-            advance();
+            advance() ;
         }
-
         private void advance() {
             while (cursor < fence) {
                 if (isSelected(cursor)) {
@@ -7471,19 +6943,15 @@ public abstract class AbstractParallelAnyArray {
             }
         }
 
-        public boolean hasNext() {
-            return cursor < fence;
-        }
-
+        public boolean hasNext() { return cursor < fence; }
         public U next() {
             if (cursor >= fence)
                 throw new NoSuchElementException();
-            U x = (U) next;
+            U x = (U)next;
             cursor++;
             advance();
             return x;
         }
-
         public void remove() {
             throw new UnsupportedOperationException();
         }
@@ -7492,1231 +6960,967 @@ public abstract class AbstractParallelAnyArray {
     // Zillions of little classes to support binary ops
     // ToDo: specialize to flatten dispatch
 
-    static <T, U, V, W> IntAndObjectToObject<T, V> indexedMapper
-            (final BinaryOp<? super T, ? super U, ? extends V> combiner,
-             final ParallelArrayWithMapping<W, U> u, final int origin) {
-        return new IntAndObjectToObject<T, V>() {
+    static <T,U,V,W> IntAndObjectToObject<T,V> indexedMapper
+        (final BinaryOp<? super T, ? super U, ? extends V> combiner,
+         final ParallelArrayWithMapping<W,U> u, final int origin) {
+        return new IntAndObjectToObject<T,V>() {
             final int offset = u.origin - origin;
-
-            public V op(int i, T a) {
-                return combiner.op(a, (U) (u.oget(i + offset)));
-            }
+            public V op(int i, T a) { return combiner.op(a, (U)(u.oget(i+offset))); }
         };
     }
 
-    static <T, U, W> IntAndObjectToDouble<T> indexedMapper
-            (final ObjectAndObjectToDouble<? super T, ? super U> combiner,
-             final ParallelArrayWithMapping<W, U> u, final int origin) {
+    static <T,U,W> IntAndObjectToDouble<T> indexedMapper
+        (final ObjectAndObjectToDouble<? super T, ? super U> combiner,
+         final ParallelArrayWithMapping<W,U> u, final int origin) {
         return new IntAndObjectToDouble<T>() {
             final int offset = u.origin - origin;
-
-            public double op(int i, T a) {
-                return combiner.op(a, (U) (u.oget(i + offset)));
-            }
+            public double op(int i, T a) { return combiner.op(a, (U)(u.oget(i+offset))); }
         };
     }
 
-    static <T, U, W> IntAndObjectToLong<T> indexedMapper
-            (final ObjectAndObjectToLong<? super T, ? super U> combiner,
-             final ParallelArrayWithMapping<W, U> u, final int origin) {
+    static <T,U,W> IntAndObjectToLong<T> indexedMapper
+        (final ObjectAndObjectToLong<? super T, ? super U> combiner,
+         final ParallelArrayWithMapping<W,U> u, final int origin) {
         return new IntAndObjectToLong<T>() {
             final int offset = u.origin - origin;
-
-            public long op(int i, T a) {
-                return combiner.op(a, (U) (u.oget(i + offset)));
-            }
+            public long op(int i, T a) { return combiner.op(a, (U)(u.oget(i+offset))); }
         };
     }
 
-    static <T, V> IntAndObjectToObject<T, V> indexedMapper
-            (final ObjectAndDoubleToObject<? super T, ? extends V> combiner,
-             final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
-        return new IntAndObjectToObject<T, V>() {
+    static <T,V> IntAndObjectToObject<T,V> indexedMapper
+        (final ObjectAndDoubleToObject<? super T, ? extends V> combiner,
+         final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
+        return new IntAndObjectToObject<T,V>() {
             final int offset = u.origin - origin;
-
-            public V op(int i, T a) {
-                return combiner.op(a, u.dget(i + offset));
-            }
+            public V op(int i, T a) { return combiner.op(a, u.dget(i+offset)); }
         };
     }
 
     static <T> IntAndObjectToDouble<T> indexedMapper
-            (final ObjectAndDoubleToDouble<? super T> combiner,
-             final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
+        (final ObjectAndDoubleToDouble<? super T> combiner,
+         final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
         return new IntAndObjectToDouble<T>() {
             final int offset = u.origin - origin;
-
-            public double op(int i, T a) {
-                return combiner.op(a, u.dget(i + offset));
-            }
+            public double op(int i, T a) { return combiner.op(a, u.dget(i+offset)); }
         };
     }
 
-    static <T, U> IntAndObjectToLong<T> indexedMapper
-            (final ObjectAndDoubleToLong<? super T> combiner,
-             final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
+    static <T,U> IntAndObjectToLong<T> indexedMapper
+        (final ObjectAndDoubleToLong<? super T> combiner,
+         final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
         return new IntAndObjectToLong<T>() {
             final int offset = u.origin - origin;
-
-            public long op(int i, T a) {
-                return combiner.op(a, u.dget(i + offset));
-            }
+            public long op(int i, T a) { return combiner.op(a, u.dget(i+offset)); }
         };
     }
 
-    static <T, V> IntAndObjectToObject<T, V> indexedMapper
-            (final ObjectAndLongToObject<? super T, ? extends V> combiner,
-             final ParallelLongArrayWithLongMapping u, final int origin) {
-        return new IntAndObjectToObject<T, V>() {
+    static <T,V> IntAndObjectToObject<T,V> indexedMapper
+        (final ObjectAndLongToObject<? super T, ? extends V> combiner,
+         final ParallelLongArrayWithLongMapping u, final int origin) {
+        return new IntAndObjectToObject<T,V>() {
             final int offset = u.origin - origin;
-
-            public V op(int i, T a) {
-                return combiner.op(a, u.lget(i + offset));
-            }
+            public V op(int i, T a) { return combiner.op(a, u.lget(i+offset)); }
         };
     }
 
     static <T> IntAndObjectToDouble<T> indexedMapper
-            (final ObjectAndLongToDouble<? super T> combiner,
-             final ParallelLongArrayWithLongMapping u, final int origin) {
+        (final ObjectAndLongToDouble<? super T> combiner,
+         final ParallelLongArrayWithLongMapping u, final int origin) {
         return new IntAndObjectToDouble<T>() {
             final int offset = u.origin - origin;
-
-            public double op(int i, T a) {
-                return combiner.op(a, u.lget(i + offset));
-            }
+            public double op(int i, T a) { return combiner.op(a, u.lget(i+offset)); }
         };
     }
 
     static <T> IntAndObjectToLong<T> indexedMapper
-            (final ObjectAndLongToLong<? super T> combiner,
-             final ParallelLongArrayWithLongMapping u, final int origin) {
+        (final ObjectAndLongToLong<? super T> combiner,
+         final ParallelLongArrayWithLongMapping u, final int origin) {
         return new IntAndObjectToLong<T>() {
             final int offset = u.origin - origin;
-
-            public long op(int i, T a) {
-                return combiner.op(a, u.lget(i + offset));
-            }
+            public long op(int i, T a) { return combiner.op(a, u.lget(i+offset)); }
         };
     }
 
-    static <U, V, W> IntAndDoubleToObject<V> indexedMapper
-            (final DoubleAndObjectToObject<? super U, ? extends V> combiner,
-             final ParallelArrayWithMapping<W, U> u, final int origin) {
+    static <U,V,W> IntAndDoubleToObject<V> indexedMapper
+        (final DoubleAndObjectToObject<? super U, ? extends V> combiner,
+         final ParallelArrayWithMapping<W,U> u, final int origin) {
         return new IntAndDoubleToObject<V>() {
             final int offset = u.origin - origin;
-
-            public V op(int i, double a) {
-                return combiner.op(a, (U) (u.oget(i + offset)));
-            }
+            public V op(int i, double a) { return combiner.op(a, (U)(u.oget(i+offset))); }
         };
     }
 
-    static <U, W> IntAndDoubleToDouble indexedMapper
-            (final DoubleAndObjectToDouble<? super U> combiner,
-             final ParallelArrayWithMapping<W, U> u, final int origin) {
+    static <U,W> IntAndDoubleToDouble indexedMapper
+        (final DoubleAndObjectToDouble<? super U> combiner,
+         final ParallelArrayWithMapping<W,U> u, final int origin) {
         return new IntAndDoubleToDouble() {
-            final int offset = u.origin - origin;
-
-            public double op(int i, double a) {
-                return combiner.op(a, (U) (u.oget(i + offset)));
-            }
-        };
+                final int offset = u.origin - origin;
+                public double op(int i, double a) { return combiner.op(a, (U)(u.oget(i+offset))); }
+            };
     }
 
-    static <U, W> IntAndDoubleToLong indexedMapper
-            (final DoubleAndObjectToLong<? super U> combiner,
-             final ParallelArrayWithMapping<W, U> u, final int origin) {
+    static <U,W> IntAndDoubleToLong indexedMapper
+        (final DoubleAndObjectToLong<? super U> combiner,
+         final ParallelArrayWithMapping<W,U> u, final int origin) {
         return new IntAndDoubleToLong() {
-            final int offset = u.origin - origin;
-
-            public long op(int i, double a) {
-                return combiner.op(a, (U) (u.oget(i + offset)));
-            }
-        };
+                final int offset = u.origin - origin;
+                public long op(int i, double a) { return combiner.op(a, (U)(u.oget(i+offset))); }
+            };
     }
 
     static <V> IntAndDoubleToObject<V> indexedMapper
-            (final DoubleAndDoubleToObject<? extends V> combiner,
-             final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
+        (final DoubleAndDoubleToObject<? extends V> combiner,
+         final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
         return new IntAndDoubleToObject<V>() {
             final int offset = u.origin - origin;
-
-            public V op(int i, double a) {
-                return combiner.op(a, u.dget(i + offset));
-            }
+            public V op(int i, double a) { return combiner.op(a, u.dget(i+offset)); }
         };
     }
 
     static IntAndDoubleToDouble indexedMapper
-            (final BinaryDoubleOp combiner,
-             final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
+        (final BinaryDoubleOp combiner,
+         final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
         return new IntAndDoubleToDouble() {
-            final int offset = u.origin - origin;
-
-            public double op(int i, double a) {
-                return combiner.op(a, u.dget(i + offset));
-            }
-        };
+                final int offset = u.origin - origin;
+                public double op(int i, double a) { return combiner.op(a, u.dget(i+offset)); }
+            };
     }
 
     static IntAndDoubleToLong indexedMapper
-            (final DoubleAndDoubleToLong combiner,
-             final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
+        (final DoubleAndDoubleToLong combiner,
+         final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
         return new IntAndDoubleToLong() {
-            final int offset = u.origin - origin;
-
-            public long op(int i, double a) {
-                return combiner.op(a, u.dget(i + offset));
-            }
-        };
+                final int offset = u.origin - origin;
+                public long op(int i, double a) { return combiner.op(a, u.dget(i+offset)); }
+            };
     }
 
     static <V> IntAndDoubleToObject<V> indexedMapper
-            (final DoubleAndLongToObject<? extends V> combiner,
-             final ParallelLongArrayWithLongMapping u, final int origin) {
+        (final DoubleAndLongToObject<? extends V> combiner,
+         final ParallelLongArrayWithLongMapping u, final int origin) {
         return new IntAndDoubleToObject<V>() {
             final int offset = u.origin - origin;
-
-            public V op(int i, double a) {
-                return combiner.op(a, u.lget(i + offset));
-            }
+            public V op(int i, double a) { return combiner.op(a, u.lget(i+offset)); }
         };
     }
 
     static IntAndDoubleToDouble indexedMapper
-            (final DoubleAndLongToDouble combiner,
-             final ParallelLongArrayWithLongMapping u, final int origin) {
+        (final DoubleAndLongToDouble combiner,
+         final ParallelLongArrayWithLongMapping u, final int origin) {
         return new IntAndDoubleToDouble() {
-            final int offset = u.origin - origin;
-
-            public double op(int i, double a) {
-                return combiner.op(a, u.lget(i + offset));
-            }
-        };
+                final int offset = u.origin - origin;
+                public double op(int i, double a) { return combiner.op(a, u.lget(i+offset)); }
+            };
     }
 
     static IntAndDoubleToLong indexedMapper
-            (final DoubleAndLongToLong combiner,
-             final ParallelLongArrayWithLongMapping u, final int origin) {
+        (final DoubleAndLongToLong combiner,
+         final ParallelLongArrayWithLongMapping u, final int origin) {
         return new IntAndDoubleToLong() {
-            final int offset = u.origin - origin;
-
-            public long op(int i, double a) {
-                return combiner.op(a, u.lget(i + offset));
-            }
-        };
+                final int offset = u.origin - origin;
+                public long op(int i, double a) { return combiner.op(a, u.lget(i+offset)); }
+            };
     }
 
-    static <U, V, W> IntAndLongToObject<V> indexedMapper
-            (final LongAndObjectToObject<? super U, ? extends V> combiner,
-             final ParallelArrayWithMapping<W, U> u, final int origin) {
+    static <U,V,W> IntAndLongToObject<V> indexedMapper
+        (final LongAndObjectToObject<? super U, ? extends V> combiner,
+         final ParallelArrayWithMapping<W,U> u, final int origin) {
         return new IntAndLongToObject<V>() {
             final int offset = u.origin - origin;
-
-            public V op(int i, long a) {
-                return combiner.op(a, (U) (u.oget(i + offset)));
-            }
+            public V op(int i, long a) { return combiner.op(a, (U)(u.oget(i+offset))); }
         };
     }
 
-    static <U, W> IntAndLongToDouble indexedMapper
-            (final LongAndObjectToDouble<? super U> combiner,
-             final ParallelArrayWithMapping<W, U> u, final int origin) {
+    static <U,W> IntAndLongToDouble indexedMapper
+        (final LongAndObjectToDouble<? super U> combiner,
+         final ParallelArrayWithMapping<W,U> u, final int origin) {
         return new IntAndLongToDouble() {
-            final int offset = u.origin - origin;
-
-            public double op(int i, long a) {
-                return combiner.op(a, (U) (u.oget(i + offset)));
-            }
-        };
+                final int offset = u.origin - origin;
+                public double op(int i, long a) { return combiner.op(a, (U)(u.oget(i+offset))); }
+            };
     }
 
-    static <U, W> IntAndLongToLong indexedMapper
-            (final LongAndObjectToLong<? super U> combiner,
-             final ParallelArrayWithMapping<W, U> u, final int origin) {
+    static <U,W> IntAndLongToLong indexedMapper
+        (final LongAndObjectToLong<? super U> combiner,
+         final ParallelArrayWithMapping<W,U> u, final int origin) {
         return new IntAndLongToLong() {
-            final int offset = u.origin - origin;
-
-            public long op(int i, long a) {
-                return combiner.op(a, (U) (u.oget(i + offset)));
-            }
-        };
+                final int offset = u.origin - origin;
+                public long op(int i, long a) { return combiner.op(a, (U)(u.oget(i+offset))); }
+            };
     }
 
     static <V> IntAndLongToObject<V> indexedMapper
-            (final LongAndDoubleToObject<? extends V> combiner,
-             final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
+        (final LongAndDoubleToObject<? extends V> combiner,
+         final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
         return new IntAndLongToObject<V>() {
             final int offset = u.origin - origin;
-
-            public V op(int i, long a) {
-                return combiner.op(a, u.dget(i + offset));
-            }
+            public V op(int i, long a) { return combiner.op(a, u.dget(i+offset)); }
         };
     }
 
     static IntAndLongToDouble indexedMapper
-            (final LongAndDoubleToDouble combiner,
-             final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
+        (final LongAndDoubleToDouble combiner,
+         final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
         return new IntAndLongToDouble() {
-            final int offset = u.origin - origin;
-
-            public double op(int i, long a) {
-                return combiner.op(a, u.dget(i + offset));
-            }
-        };
+                final int offset = u.origin - origin;
+                public double op(int i, long a) { return combiner.op(a, u.dget(i+offset)); }
+            };
     }
 
     static IntAndLongToLong indexedMapper
-            (final LongAndDoubleToLong combiner,
-             final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
+        (final LongAndDoubleToLong combiner,
+         final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
         return new IntAndLongToLong() {
-            final int offset = u.origin - origin;
-
-            public long op(int i, long a) {
-                return combiner.op(a, u.dget(i + offset));
-            }
-        };
+                final int offset = u.origin - origin;
+                public long op(int i, long a) { return combiner.op(a, u.dget(i+offset)); }
+            };
     }
 
     static <V> IntAndLongToObject<V> indexedMapper
-            (final LongAndLongToObject<? extends V> combiner,
-             final ParallelLongArrayWithLongMapping u, final int origin) {
+        (final LongAndLongToObject<? extends V> combiner,
+         final ParallelLongArrayWithLongMapping u, final int origin) {
         return new IntAndLongToObject<V>() {
             final int offset = u.origin - origin;
-
-            public V op(int i, long a) {
-                return combiner.op(a, u.lget(i + offset));
-            }
+            public V op(int i, long a) { return combiner.op(a, u.lget(i+offset)); }
         };
     }
 
     static IntAndLongToDouble indexedMapper
-            (final LongAndLongToDouble combiner,
-             final ParallelLongArrayWithLongMapping u, final int origin) {
+        (final LongAndLongToDouble combiner,
+         final ParallelLongArrayWithLongMapping u, final int origin) {
         return new IntAndLongToDouble() {
-            final int offset = u.origin - origin;
-
-            public double op(int i, long a) {
-                return combiner.op(a, u.lget(i + offset));
-            }
-        };
+                final int offset = u.origin - origin;
+                public double op(int i, long a) { return combiner.op(a, u.lget(i+offset)); }
+            };
     }
 
     static IntAndLongToLong indexedMapper
-            (final BinaryLongOp combiner,
-             final ParallelLongArrayWithLongMapping u, final int origin) {
+        (final BinaryLongOp combiner,
+         final ParallelLongArrayWithLongMapping u, final int origin) {
         return new IntAndLongToLong() {
-            final int offset = u.origin - origin;
+                final int offset = u.origin - origin;
+                public long op(int i, long a) { return combiner.op(a, u.lget(i+offset)); }
+            };
+    }
 
-            public long op(int i, long a) {
-                return combiner.op(a, u.lget(i + offset));
-            }
+    static <T,U,V> IntAndObjectToObject<T,V> compoundIndexedOp
+        (final IntAndObjectToObject<? super T, ? extends U> fst,
+         final IntAndObjectToObject<? super U, ? extends V> snd) {
+        return new IntAndObjectToObject<T,V>() {
+            public V op(int i, T a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
-    static <T, U, V> IntAndObjectToObject<T, V> compoundIndexedOp
-            (final IntAndObjectToObject<? super T, ? extends U> fst,
-             final IntAndObjectToObject<? super U, ? extends V> snd) {
-        return new IntAndObjectToObject<T, V>() {
-            public V op(int i, T a) {
-                return snd.op(i, fst.op(i, a));
-            }
-        };
-    }
-
-    static <T, U> IntAndObjectToDouble<T> compoundIndexedOp
-            (final IntAndObjectToObject<? super T, ? extends U> fst,
-             final IntAndObjectToDouble<? super U> snd) {
+    static <T,U> IntAndObjectToDouble<T> compoundIndexedOp
+        (final IntAndObjectToObject<? super T, ? extends U> fst,
+         final IntAndObjectToDouble<? super U> snd) {
         return new IntAndObjectToDouble<T>() {
-            public double op(int i, T a) {
-                return snd.op(i, fst.op(i, a));
-            }
+            public double op(int i, T a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
-    static <T, U> IntAndObjectToLong<T> compoundIndexedOp
-            (final IntAndObjectToObject<? super T, ? extends U> fst,
-             final IntAndObjectToLong<? super U> snd) {
+    static <T,U> IntAndObjectToLong<T> compoundIndexedOp
+        (final IntAndObjectToObject<? super T, ? extends U> fst,
+         final IntAndObjectToLong<? super U> snd) {
         return new IntAndObjectToLong<T>() {
-            public long op(int i, T a) {
-                return snd.op(i, fst.op(i, a));
-            }
+            public long op(int i, T a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
-    static <U, V> IntAndDoubleToObject<V> compoundIndexedOp
-            (final IntAndDoubleToObject<? extends U> fst,
-             final IntAndObjectToObject<? super U, ? extends V> snd) {
+    static <U,V> IntAndDoubleToObject<V> compoundIndexedOp
+        (final IntAndDoubleToObject<? extends U> fst,
+         final IntAndObjectToObject<? super U, ? extends V> snd) {
         return new IntAndDoubleToObject<V>() {
-            public V op(int i, double a) {
-                return snd.op(i, fst.op(i, a));
-            }
+            public V op(int i, double a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
     static <U> IntAndDoubleToDouble compoundIndexedOp
-            (final IntAndDoubleToObject<? extends U> fst,
-             final IntAndObjectToDouble<? super U> snd) {
+        (final IntAndDoubleToObject<? extends U> fst,
+         final IntAndObjectToDouble<? super U> snd) {
         return new IntAndDoubleToDouble() {
-            public double op(int i, double a) {
-                return snd.op(i, fst.op(i, a));
-            }
-        };
+                public double op(int i, double a) { return snd.op(i, fst.op(i, a)); }
+            };
     }
 
     static <U> IntAndDoubleToLong compoundIndexedOp
-            (final IntAndDoubleToObject<? extends U> fst,
-             final IntAndObjectToLong<? super U> snd) {
+        (final IntAndDoubleToObject<? extends U> fst,
+         final IntAndObjectToLong<? super U> snd) {
         return new IntAndDoubleToLong() {
-            public long op(int i, double a) {
-                return snd.op(i, fst.op(i, a));
-            }
-        };
+                public long op(int i, double a) { return snd.op(i, fst.op(i, a)); }
+            };
     }
 
-    static <U, V> IntAndLongToObject<V> compoundIndexedOp
-            (final IntAndLongToObject<? extends U> fst,
-             final IntAndObjectToObject<? super U, ? extends V> snd) {
+    static <U,V> IntAndLongToObject<V> compoundIndexedOp
+        (final IntAndLongToObject<? extends U> fst,
+         final IntAndObjectToObject<? super U, ? extends V> snd) {
         return new IntAndLongToObject<V>() {
-            public V op(int i, long a) {
-                return snd.op(i, fst.op(i, a));
-            }
+            public V op(int i, long a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
     static <U> IntAndLongToDouble compoundIndexedOp
-            (final IntAndLongToObject<? extends U> fst,
-             final IntAndObjectToDouble<? super U> snd) {
+        (final IntAndLongToObject<? extends U> fst,
+         final IntAndObjectToDouble<? super U> snd) {
         return new IntAndLongToDouble() {
-            public double op(int i, long a) {
-                return snd.op(i, fst.op(i, a));
-            }
-        };
+                public double op(int i, long a) { return snd.op(i, fst.op(i, a)); }
+            };
     }
 
     static <U> IntAndLongToLong compoundIndexedOp
-            (final IntAndLongToObject<? extends U> fst,
-             final IntAndObjectToLong<? super U> snd) {
+        (final IntAndLongToObject<? extends U> fst,
+         final IntAndObjectToLong<? super U> snd) {
         return new IntAndLongToLong() {
-            public long op(int i, long a) {
-                return snd.op(i, fst.op(i, a));
-            }
-        };
+                public long op(int i, long a) { return snd.op(i, fst.op(i, a)); }
+            };
     }
 
-    static <T, V> IntAndObjectToObject<T, V> compoundIndexedOp
-            (final IntAndObjectToDouble<? super T> fst,
-             final IntAndDoubleToObject<? extends V> snd) {
-        return new IntAndObjectToObject<T, V>() {
-            public V op(int i, T a) {
-                return snd.op(i, fst.op(i, a));
-            }
+    static <T,V> IntAndObjectToObject<T,V> compoundIndexedOp
+        (final IntAndObjectToDouble<? super T> fst,
+         final IntAndDoubleToObject<? extends V> snd) {
+        return new IntAndObjectToObject<T,V>() {
+            public V op(int i, T a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
     static <T> IntAndObjectToDouble<T> compoundIndexedOp
-            (final IntAndObjectToDouble<? super T> fst,
-             final IntAndDoubleToDouble snd) {
+        (final IntAndObjectToDouble<? super T> fst,
+         final IntAndDoubleToDouble snd) {
         return new IntAndObjectToDouble<T>() {
-            public double op(int i, T a) {
-                return snd.op(i, fst.op(i, a));
-            }
+            public double op(int i, T a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
     static <T> IntAndObjectToLong<T> compoundIndexedOp
-            (final IntAndObjectToLong<? super T> fst,
-             final IntAndLongToLong snd) {
+        (final IntAndObjectToLong<? super T> fst,
+         final IntAndLongToLong snd) {
         return new IntAndObjectToLong<T>() {
-            public long op(int i, T a) {
-                return snd.op(i, fst.op(i, a));
-            }
+            public long op(int i, T a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
     static <V> IntAndDoubleToObject<V> compoundIndexedOp
-            (final IntAndDoubleToLong fst,
-             final IntAndLongToObject<? extends V> snd) {
+        (final IntAndDoubleToLong fst,
+         final IntAndLongToObject<? extends V> snd) {
         return new IntAndDoubleToObject<V>() {
-            public V op(int i, double a) {
-                return snd.op(i, fst.op(i, a));
-            }
+            public V op(int i, double a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
     static IntAndDoubleToDouble compoundIndexedOp
-            (final IntAndDoubleToDouble fst,
-             final IntAndDoubleToDouble snd) {
+        (final IntAndDoubleToDouble fst,
+         final IntAndDoubleToDouble snd) {
         return new IntAndDoubleToDouble() {
-            public double op(int i, double a) {
-                return snd.op(i, fst.op(i, a));
-            }
-        };
+                public double op(int i, double a) { return snd.op(i, fst.op(i, a)); }
+            };
     }
 
     static IntAndDoubleToLong compoundIndexedOp
-            (final IntAndDoubleToDouble fst,
-             final IntAndDoubleToLong snd) {
+        (final IntAndDoubleToDouble fst,
+         final IntAndDoubleToLong snd) {
         return new IntAndDoubleToLong() {
-            public long op(int i, double a) {
-                return snd.op(i, fst.op(i, a));
-            }
-        };
+                public long op(int i, double a) { return snd.op(i, fst.op(i, a)); }
+            };
     }
 
     static <V> IntAndLongToObject<V> compoundIndexedOp
-            (final IntAndLongToDouble fst,
-             final IntAndDoubleToObject<? extends V> snd) {
+        (final IntAndLongToDouble fst,
+         final IntAndDoubleToObject<? extends V> snd) {
         return new IntAndLongToObject<V>() {
-            public V op(int i, long a) {
-                return snd.op(i, fst.op(i, a));
-            }
+            public V op(int i, long a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
     static IntAndLongToDouble compoundIndexedOp
-            (final IntAndLongToDouble fst,
-             final IntAndDoubleToDouble snd) {
+        (final IntAndLongToDouble fst,
+         final IntAndDoubleToDouble snd) {
         return new IntAndLongToDouble() {
-            public double op(int i, long a) {
-                return snd.op(i, fst.op(i, a));
-            }
-        };
+                public double op(int i, long a) { return snd.op(i, fst.op(i, a)); }
+            };
     }
 
     static IntAndLongToLong compoundIndexedOp
-            (final IntAndLongToDouble fst,
-             final IntAndDoubleToLong snd) {
+        (final IntAndLongToDouble fst,
+         final IntAndDoubleToLong snd) {
         return new IntAndLongToLong() {
-            public long op(int i, long a) {
-                return snd.op(i, fst.op(i, a));
-            }
-        };
+                public long op(int i, long a) { return snd.op(i, fst.op(i, a)); }
+            };
     }
 
-    static <T, V> IntAndObjectToObject<T, V> compoundIndexedOp
-            (final IntAndObjectToLong<? super T> fst,
-             final IntAndLongToObject<? extends V> snd) {
-        return new IntAndObjectToObject<T, V>() {
-            public V op(int i, T a) {
-                return snd.op(i, fst.op(i, a));
-            }
+    static <T,V> IntAndObjectToObject<T,V> compoundIndexedOp
+        (final IntAndObjectToLong<? super T> fst,
+         final IntAndLongToObject<? extends V> snd) {
+        return new IntAndObjectToObject<T,V>() {
+            public V op(int i, T a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
     static <T> IntAndObjectToDouble<T> compoundIndexedOp
-            (final IntAndObjectToLong<? super T> fst,
-             final IntAndLongToDouble snd) {
+        (final IntAndObjectToLong<? super T> fst,
+         final IntAndLongToDouble snd) {
         return new IntAndObjectToDouble<T>() {
-            public double op(int i, T a) {
-                return snd.op(i, fst.op(i, a));
-            }
+            public double op(int i, T a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
     static <T> IntAndObjectToLong<T> compoundIndexedOp
-            (final IntAndObjectToDouble<? super T> fst,
-             final IntAndDoubleToLong snd) {
+        (final IntAndObjectToDouble<? super T> fst,
+         final IntAndDoubleToLong snd) {
         return new IntAndObjectToLong<T>() {
-            public long op(int i, T a) {
-                return snd.op(i, fst.op(i, a));
-            }
+            public long op(int i, T a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
     static <V> IntAndDoubleToObject<V> compoundIndexedOp
-            (final IntAndDoubleToDouble fst,
-             final IntAndDoubleToObject<? extends V> snd) {
+        (final IntAndDoubleToDouble fst,
+         final IntAndDoubleToObject<? extends V> snd) {
         return new IntAndDoubleToObject<V>() {
-            public V op(int i, double a) {
-                return snd.op(i, fst.op(i, a));
-            }
+            public V op(int i, double a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
     static IntAndDoubleToDouble compoundIndexedOp
-            (final IntAndDoubleToLong fst,
-             final IntAndLongToDouble snd) {
+        (final IntAndDoubleToLong fst,
+         final IntAndLongToDouble snd) {
         return new IntAndDoubleToDouble() {
-            public double op(int i, double a) {
-                return snd.op(i, fst.op(i, a));
-            }
-        };
+                public double op(int i, double a) { return snd.op(i, fst.op(i, a)); }
+            };
     }
 
     static IntAndDoubleToLong compoundIndexedOp
-            (final IntAndDoubleToLong fst,
-             final IntAndLongToLong snd) {
+        (final IntAndDoubleToLong fst,
+         final IntAndLongToLong snd) {
         return new IntAndDoubleToLong() {
-            public long op(int i, double a) {
-                return snd.op(i, fst.op(i, a));
-            }
-        };
+                public long op(int i, double a) { return snd.op(i, fst.op(i, a)); }
+            };
     }
 
     static <V> IntAndLongToObject<V> compoundIndexedOp
-            (final IntAndLongToLong fst,
-             final IntAndLongToObject<? extends V> snd) {
+        (final IntAndLongToLong fst,
+         final IntAndLongToObject<? extends V> snd) {
         return new IntAndLongToObject<V>() {
-            public V op(int i, long a) {
-                return snd.op(i, fst.op(i, a));
-            }
+            public V op(int i, long a) { return snd.op(i, fst.op(i, a)); }
         };
     }
 
     static IntAndLongToDouble compoundIndexedOp
-            (final IntAndLongToLong fst,
-             final IntAndLongToDouble snd) {
+        (final IntAndLongToLong fst,
+         final IntAndLongToDouble snd) {
         return new IntAndLongToDouble() {
-            public double op(int i, long a) {
-                return snd.op(i, fst.op(i, a));
-            }
-        };
+                public double op(int i, long a) { return snd.op(i, fst.op(i, a)); }
+            };
     }
 
     static IntAndLongToLong compoundIndexedOp
-            (final IntAndLongToLong fst,
-             final IntAndLongToLong snd) {
+        (final IntAndLongToLong fst,
+         final IntAndLongToLong snd) {
         return new IntAndLongToLong() {
-            public long op(int i, long a) {
-                return snd.op(i, fst.op(i, a));
-            }
+                public long op(int i, long a) { return snd.op(i, fst.op(i, a)); }
+            };
+    }
+
+    static <T,U,V> IntAndObjectToObject<T,V> compoundIndexedOp
+        (final IntAndObjectToObject<? super T, ? extends U> fst,
+         final Op<? super U, ? extends V> snd) {
+        return new IntAndObjectToObject<T,V>() {
+            public V op(int i, T a) { return snd.op(fst.op(i, a)); }
         };
     }
 
-    static <T, U, V> IntAndObjectToObject<T, V> compoundIndexedOp
-            (final IntAndObjectToObject<? super T, ? extends U> fst,
-             final Op<? super U, ? extends V> snd) {
-        return new IntAndObjectToObject<T, V>() {
-            public V op(int i, T a) {
-                return snd.op(fst.op(i, a));
-            }
-        };
-    }
-
-    static <T, U> IntAndObjectToDouble<T> compoundIndexedOp
-            (final IntAndObjectToObject<? super T, ? extends U> fst,
-             final ObjectToDouble<? super U> snd) {
+    static <T,U> IntAndObjectToDouble<T> compoundIndexedOp
+        (final IntAndObjectToObject<? super T, ? extends U> fst,
+         final ObjectToDouble<? super U> snd) {
         return new IntAndObjectToDouble<T>() {
-            public double op(int i, T a) {
-                return snd.op(fst.op(i, a));
-            }
+            public double op(int i, T a) { return snd.op(fst.op(i, a)); }
         };
     }
 
-    static <T, U> IntAndObjectToLong<T> compoundIndexedOp
-            (final IntAndObjectToObject<? super T, ? extends U> fst,
-             final ObjectToLong<? super U> snd) {
+    static <T,U> IntAndObjectToLong<T> compoundIndexedOp
+        (final IntAndObjectToObject<? super T, ? extends U> fst,
+         final ObjectToLong<? super U> snd) {
         return new IntAndObjectToLong<T>() {
-            public long op(int i, T a) {
-                return snd.op(fst.op(i, a));
-            }
+            public long op(int i, T a) { return snd.op(fst.op(i, a)); }
         };
     }
 
-    static <U, V> IntAndDoubleToObject<V> compoundIndexedOp
-            (final IntAndDoubleToObject<? extends U> fst,
-             final Op<? super U, ? extends V> snd) {
+    static <U,V> IntAndDoubleToObject<V> compoundIndexedOp
+        (final IntAndDoubleToObject<? extends U> fst,
+         final Op<? super U, ? extends V> snd) {
         return new IntAndDoubleToObject<V>() {
-            public V op(int i, double a) {
-                return snd.op(fst.op(i, a));
-            }
+            public V op(int i, double a) { return snd.op(fst.op(i, a)); }
         };
     }
 
     static <U> IntAndDoubleToDouble compoundIndexedOp
-            (final IntAndDoubleToObject<? extends U> fst,
-             final ObjectToDouble<? super U> snd) {
+        (final IntAndDoubleToObject<? extends U> fst,
+         final ObjectToDouble<? super U> snd) {
         return new IntAndDoubleToDouble() {
-            public double op(int i, double a) {
-                return snd.op(fst.op(i, a));
-            }
-        };
+                public double op(int i, double a) { return snd.op(fst.op(i, a)); }
+            };
     }
 
     static <U> IntAndDoubleToLong compoundIndexedOp
-            (final IntAndDoubleToObject<? extends U> fst,
-             final ObjectToLong<? super U> snd) {
+        (final IntAndDoubleToObject<? extends U> fst,
+         final ObjectToLong<? super U> snd) {
         return new IntAndDoubleToLong() {
-            public long op(int i, double a) {
-                return snd.op(fst.op(i, a));
-            }
-        };
+                public long op(int i, double a) { return snd.op(fst.op(i, a)); }
+            };
     }
 
-    static <U, V> IntAndLongToObject<V> compoundIndexedOp
-            (final IntAndLongToObject<? extends U> fst,
-             final Op<? super U, ? extends V> snd) {
+    static <U,V> IntAndLongToObject<V> compoundIndexedOp
+        (final IntAndLongToObject<? extends U> fst,
+         final Op<? super U, ? extends V> snd) {
         return new IntAndLongToObject<V>() {
-            public V op(int i, long a) {
-                return snd.op(fst.op(i, a));
-            }
+            public V op(int i, long a) { return snd.op(fst.op(i, a)); }
         };
     }
 
     static <U> IntAndLongToDouble compoundIndexedOp
-            (final IntAndLongToObject<? extends U> fst,
-             final ObjectToDouble<? super U> snd) {
+        (final IntAndLongToObject<? extends U> fst,
+         final ObjectToDouble<? super U> snd) {
         return new IntAndLongToDouble() {
-            public double op(int i, long a) {
-                return snd.op(fst.op(i, a));
-            }
-        };
+                public double op(int i, long a) { return snd.op(fst.op(i, a)); }
+            };
     }
 
     static <U> IntAndLongToLong compoundIndexedOp
-            (final IntAndLongToObject<? extends U> fst,
-             final ObjectToLong<? super U> snd) {
+        (final IntAndLongToObject<? extends U> fst,
+         final ObjectToLong<? super U> snd) {
         return new IntAndLongToLong() {
-            public long op(int i, long a) {
-                return snd.op(fst.op(i, a));
-            }
-        };
+                public long op(int i, long a) { return snd.op(fst.op(i, a)); }
+            };
     }
 
-    static <T, V> IntAndObjectToObject<T, V> compoundIndexedOp
-            (final IntAndObjectToDouble<? super T> fst,
-             final DoubleToObject<? extends V> snd) {
-        return new IntAndObjectToObject<T, V>() {
-            public V op(int i, T a) {
-                return snd.op(fst.op(i, a));
-            }
+    static <T,V> IntAndObjectToObject<T,V> compoundIndexedOp
+        (final IntAndObjectToDouble<? super T> fst,
+         final DoubleToObject<? extends V> snd) {
+        return new IntAndObjectToObject<T,V>() {
+            public V op(int i, T a) { return snd.op(fst.op(i, a)); }
         };
     }
 
     static <T> IntAndObjectToDouble<T> compoundIndexedOp
-            (final IntAndObjectToDouble<? super T> fst, final DoubleOp snd) {
+        (final IntAndObjectToDouble<? super T> fst, final DoubleOp snd) {
         return new IntAndObjectToDouble<T>() {
-            public double op(int i, T a) {
-                return snd.op(fst.op(i, a));
-            }
+            public double op(int i, T a) { return snd.op(fst.op(i, a)); }
         };
     }
 
     static <T> IntAndObjectToLong<T> compoundIndexedOp
-            (final IntAndObjectToDouble<? super T> fst, final DoubleToLong snd) {
+        (final IntAndObjectToDouble<? super T> fst, final DoubleToLong snd) {
         return new IntAndObjectToLong<T>() {
-            public long op(int i, T a) {
-                return snd.op(fst.op(i, a));
-            }
+            public long op(int i, T a) { return snd.op(fst.op(i, a)); }
         };
     }
 
     static <V> IntAndDoubleToObject<V> compoundIndexedOp
-            (final IntAndDoubleToDouble fst,
-             final DoubleToObject<? extends V> snd) {
+        (final IntAndDoubleToDouble fst,
+         final DoubleToObject<? extends V> snd) {
         return new IntAndDoubleToObject<V>() {
-            public V op(int i, double a) {
-                return snd.op(fst.op(i, a));
-            }
+            public V op(int i, double a) { return snd.op(fst.op(i, a)); }
         };
     }
 
     static IntAndDoubleToDouble compoundIndexedOp
-            (final IntAndDoubleToDouble fst, final DoubleOp snd) {
+        (final IntAndDoubleToDouble fst, final DoubleOp snd) {
         return new IntAndDoubleToDouble() {
-            public double op(int i, double a) {
-                return snd.op(fst.op(i, a));
-            }
-        };
+                public double op(int i, double a) { return snd.op(fst.op(i, a)); }
+            };
     }
 
     static IntAndDoubleToLong compoundIndexedOp
-            (final IntAndDoubleToDouble fst, final DoubleToLong snd) {
+        (final IntAndDoubleToDouble fst, final DoubleToLong snd) {
         return new IntAndDoubleToLong() {
-            public long op(int i, double a) {
-                return snd.op(fst.op(i, a));
-            }
-        };
+                public long op(int i, double a) { return snd.op(fst.op(i, a)); }
+            };
     }
 
     static <V> IntAndLongToObject<V> compoundIndexedOp
-            (final IntAndLongToDouble fst, final DoubleToObject<? extends V> snd) {
+        (final IntAndLongToDouble fst, final DoubleToObject<? extends V> snd) {
         return new IntAndLongToObject<V>() {
-            public V op(int i, long a) {
-                return snd.op(fst.op(i, a));
-            }
+            public V op(int i, long a) { return snd.op(fst.op(i, a)); }
         };
     }
 
     static IntAndLongToDouble compoundIndexedOp
-            (final IntAndLongToDouble fst, final DoubleOp snd) {
+        (final IntAndLongToDouble fst, final DoubleOp snd) {
         return new IntAndLongToDouble() {
-            public double op(int i, long a) {
-                return snd.op(fst.op(i, a));
-            }
-        };
+                public double op(int i,long a) { return snd.op(fst.op(i, a)); }
+            };
     }
 
     static IntAndLongToLong compoundIndexedOp
-            (final IntAndLongToDouble fst, final DoubleToLong snd) {
+        (final IntAndLongToDouble fst, final DoubleToLong snd) {
         return new IntAndLongToLong() {
-            public long op(int i, long a) {
-                return snd.op(fst.op(i, a));
-            }
-        };
+                public long op(int i, long a) { return snd.op(fst.op(i, a)); }
+            };
     }
 
-    static <T, V> IntAndObjectToObject<T, V> compoundIndexedOp
-            (final IntAndObjectToLong<? super T> fst,
-             final LongToObject<? extends V> snd) {
-        return new IntAndObjectToObject<T, V>() {
-            public V op(int i, T a) {
-                return snd.op(fst.op(i, a));
-            }
+    static <T,V> IntAndObjectToObject<T,V> compoundIndexedOp
+        (final IntAndObjectToLong<? super T> fst,
+         final LongToObject<? extends V> snd) {
+        return new IntAndObjectToObject<T,V>() {
+            public V op(int i, T a) { return snd.op(fst.op(i, a)); }
         };
     }
 
     static <T> IntAndObjectToDouble<T> compoundIndexedOp
-            (final IntAndObjectToLong<? super T> fst, final LongToDouble snd) {
+        (final IntAndObjectToLong<? super T> fst, final LongToDouble snd) {
         return new IntAndObjectToDouble<T>() {
-            public double op(int i, T a) {
-                return snd.op(fst.op(i, a));
-            }
+            public double op(int i, T a) { return snd.op(fst.op(i, a)); }
         };
     }
 
     static <T> IntAndObjectToLong<T> compoundIndexedOp
-            (final IntAndObjectToLong<? super T> fst, final LongOp snd) {
+        (final IntAndObjectToLong<? super T> fst, final LongOp snd) {
         return new IntAndObjectToLong<T>() {
-            public long op(int i, T a) {
-                return snd.op(fst.op(i, a));
-            }
+            public long op(int i, T a) { return snd.op(fst.op(i, a)); }
         };
     }
 
     static <V> IntAndDoubleToObject<V> compoundIndexedOp
-            (final IntAndDoubleToLong fst, final LongToObject<? extends V> snd) {
+        (final IntAndDoubleToLong fst, final LongToObject<? extends V> snd) {
         return new IntAndDoubleToObject<V>() {
-            public V op(int i, double a) {
-                return snd.op(fst.op(i, a));
-            }
+            public V op(int i, double a) { return snd.op(fst.op(i, a)); }
         };
     }
 
     static IntAndDoubleToDouble compoundIndexedOp
-            (final IntAndDoubleToLong fst, final LongToDouble snd) {
+        (final IntAndDoubleToLong fst, final LongToDouble snd) {
         return new IntAndDoubleToDouble() {
-            public double op(int i, double a) {
-                return snd.op(fst.op(i, a));
-            }
-        };
+                public double op(int i, double a) { return snd.op(fst.op(i, a)); }
+            };
     }
 
     static IntAndDoubleToLong compoundIndexedOp
-            (final IntAndDoubleToLong fst, final LongOp snd) {
+        (final IntAndDoubleToLong fst, final LongOp snd) {
         return new IntAndDoubleToLong() {
-            public long op(int i, double a) {
-                return snd.op(fst.op(i, a));
-            }
-        };
+                public long op(int i, double a) { return snd.op(fst.op(i, a)); }
+            };
     }
 
     static <V> IntAndLongToObject<V> compoundIndexedOp
-            (final IntAndLongToLong fst, final LongToObject<? extends V> snd) {
+        (final IntAndLongToLong fst, final LongToObject<? extends V> snd) {
         return new IntAndLongToObject<V>() {
-            public V op(int i, long a) {
-                return snd.op(fst.op(i, a));
-            }
+            public V op(int i, long a) { return snd.op(fst.op(i, a)); }
         };
     }
 
     static IntAndLongToDouble compoundIndexedOp
-            (final IntAndLongToLong fst, final LongToDouble snd) {
+        (final IntAndLongToLong fst, final LongToDouble snd) {
         return new IntAndLongToDouble() {
-            public double op(int i, long a) {
-                return snd.op(fst.op(i, a));
-            }
-        };
+                public double op(int i,long a) { return snd.op(fst.op(i, a)); }
+            };
     }
 
     static IntAndLongToLong compoundIndexedOp
-            (final IntAndLongToLong fst,
-             final LongOp snd) {
+        (final IntAndLongToLong fst,
+         final LongOp snd) {
         return new IntAndLongToLong() {
-            public long op(int i, long a) {
-                return snd.op(fst.op(i, a));
-            }
+                public long op(int i, long a) { return snd.op(fst.op(i, a)); }
+            };
+    }
+
+    static <T,U,V> IntAndObjectToObject<T,V> compoundIndexedOp
+        (final Op<? super T, ? extends U> fst,
+         final IntAndObjectToObject<? super U, ? extends V> snd) {
+        return new IntAndObjectToObject<T,V>() {
+            public V op(int i, T a) { return snd.op(i, fst.op(a)); }
         };
     }
 
-    static <T, U, V> IntAndObjectToObject<T, V> compoundIndexedOp
-            (final Op<? super T, ? extends U> fst,
-             final IntAndObjectToObject<? super U, ? extends V> snd) {
-        return new IntAndObjectToObject<T, V>() {
-            public V op(int i, T a) {
-                return snd.op(i, fst.op(a));
-            }
-        };
-    }
-
-    static <T, U> IntAndObjectToDouble<T> compoundIndexedOp
-            (final Op<? super T, ? extends U> fst,
-             final IntAndObjectToDouble<? super U> snd) {
+    static <T,U> IntAndObjectToDouble<T> compoundIndexedOp
+        (final Op<? super T, ? extends U> fst,
+         final IntAndObjectToDouble<? super U> snd) {
         return new IntAndObjectToDouble<T>() {
-            public double op(int i, T a) {
-                return snd.op(i, fst.op(a));
-            }
+            public double op(int i, T a) { return snd.op(i, fst.op(a)); }
         };
     }
 
-    static <T, U> IntAndObjectToLong<T> compoundIndexedOp
-            (final Op<? super T, ? extends U> fst,
-             final IntAndObjectToLong<? super U> snd) {
+    static <T,U> IntAndObjectToLong<T> compoundIndexedOp
+        (final Op<? super T, ? extends U> fst,
+         final IntAndObjectToLong<? super U> snd) {
         return new IntAndObjectToLong<T>() {
-            public long op(int i, T a) {
-                return snd.op(i, fst.op(a));
-            }
+            public long op(int i, T a) { return snd.op(i, fst.op(a)); }
         };
     }
 
-    static <U, V> IntAndDoubleToObject<V> compoundIndexedOp
-            (final DoubleToObject<? extends U> fst,
-             final IntAndObjectToObject<? super U, ? extends V> snd) {
+    static <U,V> IntAndDoubleToObject<V> compoundIndexedOp
+        (final DoubleToObject<? extends U> fst,
+         final IntAndObjectToObject<? super U, ? extends V> snd) {
         return new IntAndDoubleToObject<V>() {
-            public V op(int i, double a) {
-                return snd.op(i, fst.op(a));
-            }
+            public V op(int i, double a) { return snd.op(i, fst.op(a)); }
         };
     }
 
     static <U> IntAndDoubleToDouble compoundIndexedOp
-            (final DoubleToObject<? extends U> fst,
-             final IntAndObjectToDouble<? super U> snd) {
+        (final DoubleToObject<? extends U> fst,
+         final IntAndObjectToDouble<? super U> snd) {
         return new IntAndDoubleToDouble() {
-            public double op(int i, double a) {
-                return snd.op(i, fst.op(a));
-            }
-        };
+                public double op(int i, double a) { return snd.op(i, fst.op(a)); }
+            };
     }
 
     static <U> IntAndDoubleToLong compoundIndexedOp
-            (final DoubleToObject<? extends U> fst,
-             final IntAndObjectToLong<? super U> snd) {
+        (final DoubleToObject<? extends U> fst,
+         final IntAndObjectToLong<? super U> snd) {
         return new IntAndDoubleToLong() {
-            public long op(int i, double a) {
-                return snd.op(i, fst.op(a));
-            }
-        };
+                public long op(int i, double a) { return snd.op(i, fst.op(a)); }
+            };
     }
 
-    static <U, V> IntAndLongToObject<V> compoundIndexedOp
-            (final LongToObject<? extends U> fst,
-             final IntAndObjectToObject<? super U, ? extends V> snd) {
+    static <U,V> IntAndLongToObject<V> compoundIndexedOp
+        (final LongToObject<? extends U> fst,
+         final IntAndObjectToObject<? super U, ? extends V> snd) {
         return new IntAndLongToObject<V>() {
-            public V op(int i, long a) {
-                return snd.op(i, fst.op(a));
-            }
+            public V op(int i, long a) { return snd.op(i, fst.op(a)); }
         };
     }
 
     static <U> IntAndLongToDouble compoundIndexedOp
-            (final LongToObject<? extends U> fst,
-             final IntAndObjectToDouble<? super U> snd) {
+        (final LongToObject<? extends U> fst,
+         final IntAndObjectToDouble<? super U> snd) {
         return new IntAndLongToDouble() {
-            public double op(int i, long a) {
-                return snd.op(i, fst.op(a));
-            }
-        };
+                public double op(int i, long a) { return snd.op(i, fst.op(a)); }
+            };
     }
 
     static <U> IntAndLongToLong compoundIndexedOp
-            (final LongToObject<? extends U> fst,
-             final IntAndObjectToLong<? super U> snd) {
+        (final LongToObject<? extends U> fst,
+         final IntAndObjectToLong<? super U> snd) {
         return new IntAndLongToLong() {
-            public long op(int i, long a) {
-                return snd.op(i, fst.op(a));
-            }
-        };
+                public long op(int i, long a) { return snd.op(i, fst.op(a)); }
+            };
     }
 
-    static <T, V> IntAndObjectToObject<T, V> compoundIndexedOp
-            (final ObjectToDouble<? super T> fst,
-             final IntAndDoubleToObject<? extends V> snd) {
-        return new IntAndObjectToObject<T, V>() {
-            public V op(int i, T a) {
-                return snd.op(i, fst.op(a));
-            }
+    static <T,V> IntAndObjectToObject<T,V> compoundIndexedOp
+        (final ObjectToDouble<? super T> fst,
+         final IntAndDoubleToObject<? extends V> snd) {
+        return new IntAndObjectToObject<T,V>() {
+            public V op(int i, T a) { return snd.op(i, fst.op(a)); }
         };
     }
 
     static <T> IntAndObjectToDouble<T> compoundIndexedOp
-            (final ObjectToDouble<? super T> fst, final IntAndDoubleToDouble snd) {
+        (final ObjectToDouble<? super T> fst, final IntAndDoubleToDouble snd) {
         return new IntAndObjectToDouble<T>() {
-            public double op(int i, T a) {
-                return snd.op(i, fst.op(a));
-            }
+            public double op(int i, T a) { return snd.op(i, fst.op(a)); }
         };
     }
 
     static <T> IntAndObjectToLong<T> compoundIndexedOp
-            (final ObjectToDouble<? super T> fst, final IntAndDoubleToLong snd) {
+        (final ObjectToDouble<? super T> fst, final IntAndDoubleToLong snd) {
         return new IntAndObjectToLong<T>() {
-            public long op(int i, T a) {
-                return snd.op(i, fst.op(a));
-            }
+            public long op(int i, T a) { return snd.op(i, fst.op(a)); }
         };
     }
 
     static <V> IntAndDoubleToObject<V> compoundIndexedOp
-            (final DoubleOp fst, final IntAndDoubleToObject<? extends V> snd) {
+        (final DoubleOp fst, final IntAndDoubleToObject<? extends V> snd) {
         return new IntAndDoubleToObject<V>() {
-            public V op(int i, double a) {
-                return snd.op(i, fst.op(a));
-            }
+            public V op(int i, double a) { return snd.op(i, fst.op(a)); }
         };
     }
 
     static IntAndDoubleToDouble compoundIndexedOp
-            (final DoubleOp fst, final IntAndDoubleToDouble snd) {
+        (final DoubleOp fst, final IntAndDoubleToDouble snd) {
         return new IntAndDoubleToDouble() {
-            public double op(int i, double a) {
-                return snd.op(i, fst.op(a));
-            }
-        };
+                public double op(int i, double a) { return snd.op(i, fst.op(a)); }
+            };
     }
 
     static IntAndDoubleToLong compoundIndexedOp
-            (final DoubleOp fst, final IntAndDoubleToLong snd) {
+        (final DoubleOp fst, final IntAndDoubleToLong snd) {
         return new IntAndDoubleToLong() {
-            public long op(int i, double a) {
-                return snd.op(i, fst.op(a));
-            }
-        };
+                public long op(int i, double a) { return snd.op(i, fst.op(a)); }
+            };
     }
 
     static <V> IntAndLongToObject<V> compoundIndexedOp
-            (final LongToDouble fst, final IntAndDoubleToObject<? extends V> snd) {
+        (final LongToDouble fst, final IntAndDoubleToObject<? extends V> snd) {
         return new IntAndLongToObject<V>() {
-            public V op(int i, long a) {
-                return snd.op(i, fst.op(a));
-            }
+            public V op(int i, long a) { return snd.op(i, fst.op(a)); }
         };
     }
 
     static IntAndLongToDouble compoundIndexedOp
-            (final LongToDouble fst, final IntAndDoubleToDouble snd) {
+        (final LongToDouble fst, final IntAndDoubleToDouble snd) {
         return new IntAndLongToDouble() {
-            public double op(int i, long a) {
-                return snd.op(i, fst.op(a));
-            }
-        };
+                public double op(int i, long a) { return snd.op(i, fst.op(a)); }
+            };
     }
 
     static IntAndLongToLong compoundIndexedOp
-            (final LongToDouble fst, final IntAndDoubleToLong snd) {
+        (final LongToDouble fst, final IntAndDoubleToLong snd) {
         return new IntAndLongToLong() {
-            public long op(int i, long a) {
-                return snd.op(i, fst.op(a));
-            }
-        };
+                public long op(int i, long a) { return snd.op(i, fst.op(a)); }
+            };
     }
 
-    static <T, V> IntAndObjectToObject<T, V> compoundIndexedOp
-            (final ObjectToLong<? super T> fst,
-             final IntAndLongToObject<? extends V> snd) {
-        return new IntAndObjectToObject<T, V>() {
-            public V op(int i, T a) {
-                return snd.op(i, fst.op(a));
-            }
+    static <T,V> IntAndObjectToObject<T,V> compoundIndexedOp
+        (final ObjectToLong<? super T> fst,
+         final IntAndLongToObject<? extends V> snd) {
+        return new IntAndObjectToObject<T,V>() {
+            public V op(int i, T a) { return snd.op(i, fst.op(a)); }
         };
     }
 
     static <T> IntAndObjectToDouble<T> compoundIndexedOp
-            (final ObjectToLong<? super T> fst, final IntAndLongToDouble snd) {
+        (final ObjectToLong<? super T> fst, final IntAndLongToDouble snd) {
         return new IntAndObjectToDouble<T>() {
-            public double op(int i, T a) {
-                return snd.op(i, fst.op(a));
-            }
+            public double op(int i, T a) { return snd.op(i, fst.op(a)); }
         };
     }
 
     static <T> IntAndObjectToLong<T> compoundIndexedOp
-            (final ObjectToLong<? super T> fst, final IntAndLongToLong snd) {
+        (final ObjectToLong<? super T> fst, final IntAndLongToLong snd) {
         return new IntAndObjectToLong<T>() {
-            public long op(int i, T a) {
-                return snd.op(i, fst.op(a));
-            }
+            public long op(int i, T a) { return snd.op(i, fst.op(a)); }
         };
     }
 
     static <V> IntAndDoubleToObject<V> compoundIndexedOp
-            (final DoubleToLong fst, final IntAndLongToObject<? extends V> snd) {
+        (final DoubleToLong fst, final IntAndLongToObject<? extends V> snd) {
         return new IntAndDoubleToObject<V>() {
-            public V op(int i, double a) {
-                return snd.op(i, fst.op(a));
-            }
+            public V op(int i, double a) { return snd.op(i, fst.op(a)); }
         };
     }
 
     static IntAndDoubleToDouble compoundIndexedOp
-            (final DoubleToLong fst, final IntAndLongToDouble snd) {
+        (final DoubleToLong fst, final IntAndLongToDouble snd) {
         return new IntAndDoubleToDouble() {
-            public double op(int i, double a) {
-                return snd.op(i, fst.op(a));
-            }
-        };
+                public double op(int i, double a) { return snd.op(i, fst.op(a)); }
+            };
     }
 
     static IntAndDoubleToLong compoundIndexedOp
-            (final DoubleToLong fst, final IntAndLongToLong snd) {
+        (final DoubleToLong fst, final IntAndLongToLong snd) {
         return new IntAndDoubleToLong() {
-            public long op(int i, double a) {
-                return snd.op(i, fst.op(a));
-            }
-        };
+                public long op(int i, double a) { return snd.op(i, fst.op(a)); }
+            };
     }
 
     static <V> IntAndLongToObject<V> compoundIndexedOp
-            (final LongOp fst, final IntAndLongToObject<? extends V> snd) {
+        (final LongOp fst, final IntAndLongToObject<? extends V> snd) {
         return new IntAndLongToObject<V>() {
-            public V op(int i, long a) {
-                return snd.op(i, fst.op(a));
-            }
+            public V op(int i, long a) { return snd.op(i, fst.op(a)); }
         };
     }
 
     static IntAndLongToDouble compoundIndexedOp
-            (final LongOp fst, final IntAndLongToDouble snd) {
+        (final LongOp fst, final IntAndLongToDouble snd) {
         return new IntAndLongToDouble() {
-            public double op(int i, long a) {
-                return snd.op(i, fst.op(a));
-            }
-        };
+                public double op(int i, long a) { return snd.op(i, fst.op(a)); }
+            };
     }
 
     static IntAndLongToLong compoundIndexedOp
-            (final LongOp fst, final IntAndLongToLong snd) {
+        (final LongOp fst, final IntAndLongToLong snd) {
         return new IntAndLongToLong() {
-            public long op(int i, long a) {
-                return snd.op(i, fst.op(a));
-            }
-        };
+                public long op(int i, long a) { return snd.op(i, fst.op(a)); }
+            };
     }
 
     // binary predicates
 
-    static <T, U, W> IntAndObjectPredicate<T> indexedSelector
-            (final BinaryPredicate<? super T, ? super U> bp,
-             final ParallelArrayWithMapping<W, U> u, final int origin) {
+    static <T,U,W> IntAndObjectPredicate<T> indexedSelector
+        (final BinaryPredicate<? super T, ? super U> bp,
+         final ParallelArrayWithMapping<W,U> u, final int origin) {
         return new IntAndObjectPredicate<T>() {
             final int offset = u.origin - origin;
-
             public boolean op(int i, T a) {
                 int k = i + offset;
-                return u.isSelected(k) && bp.op(a, (U) (u.oget(k)));
+                return u.isSelected(k) && bp.op(a, (U)(u.oget(k)));
             }
         };
     }
 
     static IntAndDoublePredicate indexedSelector
-            (final BinaryDoublePredicate bp,
-             final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
+        (final BinaryDoublePredicate bp,
+         final ParallelDoubleArrayWithDoubleMapping u, final int origin) {
         return new IntAndDoublePredicate() {
-            final int offset = u.origin - origin;
-
-            public boolean op(int i, double a) {
-                int k = i + offset;
-                return u.isSelected(k) && bp.op(a, u.dget(k));
-            }
-        };
+                final int offset = u.origin - origin;
+                public boolean op(int i, double a) {
+                    int k = i + offset;
+                    return u.isSelected(k) && bp.op(a, u.dget(k));
+                }
+            };
     }
 
     static IntAndLongPredicate indexedSelector
-            (final BinaryLongPredicate bp,
-             final ParallelLongArrayWithLongMapping u, final int origin) {
+        (final BinaryLongPredicate bp,
+         final ParallelLongArrayWithLongMapping u, final int origin) {
         return new IntAndLongPredicate() {
-            final int offset = u.origin - origin;
+                final int offset = u.origin - origin;
+                public boolean op(int i, long a) {
+                    int k = i + offset;
+                    return u.isSelected(k) && bp.op(a, u.lget(k));
+                }
+            };
+    }
 
-            public boolean op(int i, long a) {
-                int k = i + offset;
-                return u.isSelected(k) && bp.op(a, u.lget(k));
-            }
+    static <S, T extends S> IntAndObjectPredicate<T> compoundIndexedSelector
+                         (final Predicate<S> fst, final IntAndObjectPredicate<? super T> snd) {
+        return new IntAndObjectPredicate<T>() {
+            public boolean op(int i, T a) { return fst.op(a) && snd.op(i, a); }
         };
     }
 
     static <S, T extends S> IntAndObjectPredicate<T> compoundIndexedSelector
-            (final Predicate<S> fst, final IntAndObjectPredicate<? super T> snd) {
+                         (final IntAndObjectPredicate<S> fst,
+                          final IntAndObjectPredicate<? super T> snd) {
         return new IntAndObjectPredicate<T>() {
-            public boolean op(int i, T a) {
-                return fst.op(a) && snd.op(i, a);
-            }
+            public boolean op(int i, T a) { return fst.op(i, a) && snd.op(i, a); }
         };
     }
 
     static <S, T extends S> IntAndObjectPredicate<T> compoundIndexedSelector
-            (final IntAndObjectPredicate<S> fst,
-             final IntAndObjectPredicate<? super T> snd) {
+                         (final IntAndObjectPredicate<S> fst, final Predicate<? super T> snd) {
         return new IntAndObjectPredicate<T>() {
-            public boolean op(int i, T a) {
-                return fst.op(i, a) && snd.op(i, a);
-            }
-        };
-    }
-
-    static <S, T extends S> IntAndObjectPredicate<T> compoundIndexedSelector
-            (final IntAndObjectPredicate<S> fst, final Predicate<? super T> snd) {
-        return new IntAndObjectPredicate<T>() {
-            public boolean op(int i, T a) {
-                return fst.op(i, a) && snd.op(a);
-            }
+            public boolean op(int i, T a) { return fst.op(i, a) && snd.op(a); }
         };
     }
 
     static IntAndDoublePredicate compoundIndexedSelector
-            (final DoublePredicate fst, final IntAndDoublePredicate snd) {
+        (final DoublePredicate fst, final IntAndDoublePredicate snd) {
         return new IntAndDoublePredicate() {
-            public boolean op(int i, double a) {
-                return fst.op(a) && snd.op(i, a);
-            }
-        };
+                public boolean op(int i, double a) { return fst.op(a) && snd.op(i, a); }
+            };
     }
 
     static IntAndDoublePredicate compoundIndexedSelector
-            (final IntAndDoublePredicate fst, final IntAndDoublePredicate snd) {
+        (final IntAndDoublePredicate fst, final IntAndDoublePredicate snd) {
         return new IntAndDoublePredicate() {
-            public boolean op(int i, double a) {
-                return fst.op(i, a) && snd.op(i, a);
-            }
-        };
+                public boolean op(int i, double a) { return fst.op(i, a) && snd.op(i, a); }
+            };
     }
 
     static IntAndDoublePredicate compoundIndexedSelector
-            (final IntAndDoublePredicate fst, final DoublePredicate snd) {
+        (final IntAndDoublePredicate fst, final DoublePredicate snd) {
         return new IntAndDoublePredicate() {
-            public boolean op(int i, double a) {
-                return fst.op(i, a) && snd.op(a);
-            }
-        };
+                public boolean op(int i, double a) { return fst.op(i, a) && snd.op(a); }
+            };
     }
 
     static IntAndLongPredicate compoundIndexedSelector
-            (final LongPredicate fst, final IntAndLongPredicate snd) {
+        (final LongPredicate fst, final IntAndLongPredicate snd) {
         return new IntAndLongPredicate() {
-            public boolean op(int i, long a) {
-                return fst.op(a) && snd.op(i, a);
-            }
-        };
+                public boolean op(int i, long a) { return fst.op(a) && snd.op(i, a); }
+            };
     }
 
     static IntAndLongPredicate compoundIndexedSelector
-            (final IntAndLongPredicate fst, final IntAndLongPredicate snd) {
+        (final IntAndLongPredicate fst, final IntAndLongPredicate snd) {
         return new IntAndLongPredicate() {
-            public boolean op(int i, long a) {
-                return fst.op(i, a) && snd.op(i, a);
-            }
-        };
+                public boolean op(int i, long a) { return fst.op(i, a) && snd.op(i, a); }
+            };
     }
 
     static IntAndLongPredicate compoundIndexedSelector
-            (final IntAndLongPredicate fst, final LongPredicate snd) {
+        (final IntAndLongPredicate fst, final LongPredicate snd) {
         return new IntAndLongPredicate() {
-            public boolean op(int i, long a) {
-                return fst.op(i, a) && snd.op(a);
-            }
-        };
+                public boolean op(int i, long a) { return fst.op(i, a) && snd.op(a); }
+            };
     }
 
 }

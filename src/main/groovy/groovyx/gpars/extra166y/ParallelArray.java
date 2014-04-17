@@ -44,7 +44,7 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
 
 /**
  * An array supporting parallel operations.
- * <p/>
+ *
  * <p>A ParallelArray maintains a {@link ForkJoinPool} and an
  * array in order to provide parallel aggregate operations.  The main
  * operations are to <em>apply</em> some procedure to each element, to
@@ -52,7 +52,7 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * each element, to <em>select</em> a subset of elements based on
  * matching a predicate or ranges of indices, and to <em>reduce</em>
  * all elements into a single value such as a sum.
- * <p/>
+ *
  * <p>A ParallelArray is constructed by allocating, using, or copying
  * an array, using one of the static factory methods {@link #create},
  * {@link #createEmpty}, {@link #createUsingHandoff} and {@link
@@ -61,7 +61,7 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * external synchronization. In particular, as is the case with any
  * array, access by another thread of an element of a ParallelArray
  * while another operation is in progress has undefined effects.
- * <p/>
+ *
  * <p>The ForkJoinPool used to construct a ParallelArray can be
  * shared safely by other threads (and used in other
  * ParallelArrays). To avoid the overhead associated with creating
@@ -69,7 +69,7 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * #defaultExecutor()} across all ParallelArrays. However, you might
  * choose to use different ones for the sake of controlling processor
  * usage, isolating faults, and/or ensuring progress.
- * <p/>
+ *
  * <p>A ParallelArray is not a List. It relies on random access across
  * array elements to support efficient parallel operations.  However,
  * a ParallelArray can be viewed and manipulated as a List, via method
@@ -83,8 +83,8 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * Collection's {@code toArray} method. The effects of mutative
  * {@code asList} operations may also be achieved directly using
  * method {@link #setLimit} along with element-by-element access
- * methods {@link #get} and {@link #set}.
- * <p/>
+ * methods {@link #get}</tt> and {@link #set}.
+ *
  * <p>While ParallelArrays can be based on any kind of an object
  * array, including "boxed" types such as Long, parallel operations on
  * scalar "unboxed" type are likely to be substantially more
@@ -97,7 +97,7 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * specializations for these other types would add clutter without
  * significantly improving performance beyond that of the Long and
  * Double versions.)
- * <p/>
+ *
  * <p>Most usages of ParallelArray involve sets of operations prefixed
  * with range bounds, filters, and mappings (including mappings that
  * combine elements from other ParallelArrays), using
@@ -106,7 +106,7 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * {@code aParallelArray.withFilter(aPredicate).all()} creates a new
  * ParallelArray containing only those elements matching the
  * predicate. And for ParallelLongArrays a, b, and c,
- * {@code a.withMapping(CommonOps.longAdder(), b).withMapping(CommonOps.longAdder(),c).min()}
+ * {@code a.withMapping(CommonOps.longAdder(),b).withMapping(CommonOps.longAdder(),c).min()}
  * returns the minimum value of a[i]+b[i]+c[i] for all i.  As
  * illustrated below, a <em>mapping</em> often represents accessing
  * some field or invoking some method of an element.  These versions
@@ -119,9 +119,9 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * prefixes, to ensure efficient execution in a single parallel step.
  * In cases of combined mapping expressions, this rule is only
  * dynamically enforced. For example, {@code pa.withMapping(op,
- *pb.withFilter(f))} will compile but throw an exception upon
+ * pb.withFilter(f))} will compile but throw an exception upon
  * execution because the filter precedes the mapping.
- * <p/>
+ *
  * <p>While series of filters and mappings are allowed, it is
  * usually more efficient to combine them into single filters or
  * mappings when possible. For example
@@ -129,27 +129,27 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * less efficient than {@code pa.withMapping(addTwo)}. Methods
  * {@code withIndexedFilter} and {@code withIndexedMapping} may be
  * useful when combining such expressions.
- * <p/>
+ *
  * <p>This class includes some reductions, such as {@code min}, that
  * are commonly useful for most element types, as well as a combined
  * version, {@code summary}, that computes all of them in a single
  * parallel step, which is normally more efficient than computing each
  * in turn.
- * <p/>
+ *
  * <p>The methods in this class are designed to perform efficiently
  * with both large and small pools, even with single-thread pools on
  * uniprocessors.  However, there is some overhead in parallelizing
  * operations, so short computations on small arrays might not execute
  * faster than sequential versions, and might even be slower.
- * <p/>
+ *
  * <p><b>Sample usages</b>.
- * <p/>
+ *
  * The main difference between programming with plain arrays and
  * programming with aggregates is that you must separately define each
  * of the component functions on elements. For example, the following
  * returns the maximum Grade Point Average across all senior students,
  * given a (fictional) {@code Student} class:
- * <p/>
+ *
  * <pre>
  * import static Ops.*;
  * class StudentStatistics {
@@ -181,16 +181,13 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Returns a common default executor for use in ParallelArrays.
      * This executor arranges enough parallelism to use most, but not
      * necessarily all, of the available processors on this system.
-     *
      * @return the executor
      */
     public static ForkJoinPool defaultExecutor() {
         return PAS.defaultExecutor();
     }
 
-    /**
-     * Lazily constructed list view
-     */
+    /** Lazily constructed list view */
     AsList listView;
 
     /**
@@ -201,10 +198,9 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * subclassing. To create a ParallelArray, use {@link #create},
      * {@link #createEmpty}, {@link #createUsingHandoff} or {@link
      * #createFromCopy}.
-     *
      * @param executor the executor
-     * @param array    the array
-     * @param limit    the upper bound limit
+     * @param array the array
+     * @param limit the upper bound limit
      */
     protected ParallelArray(ForkJoinPool executor, T[] array, int limit) {
         super(executor, 0, limit, array);
@@ -225,15 +221,14 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Creates a new ParallelArray using the given executor and
      * an array of the given size constructed using the
      * indicated base element type.
-     *
-     * @param size        the array size
+     * @param size the array size
      * @param elementType the type of the elements
-     * @param executor    the executor
+     * @param executor the executor
      */
     public static <T> ParallelArray<T> create
-    (int size, Class<? super T> elementType,
-     ForkJoinPool executor) {
-        T[] array = (T[]) Array.newInstance(elementType, size);
+        (int size, Class<? super T> elementType,
+         ForkJoinPool executor) {
+        T[] array = (T[])Array.newInstance(elementType, size);
         return new ParallelArray<T>(executor, array, size);
     }
 
@@ -243,12 +238,11 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * for other purposes once constructing this ParallelArray.  The
      * given array may be internally replaced by another array in the
      * course of methods that add or remove elements.
-     *
-     * @param handoff  the array
+     * @param handoff the array
      * @param executor the executor
      */
     public static <T> ParallelArray<T> createUsingHandoff
-    (T[] handoff, ForkJoinPool executor) {
+        (T[] handoff, ForkJoinPool executor) {
         return new ParallelArray<T>(executor, handoff, handoff.length);
     }
 
@@ -256,16 +250,15 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Creates a new ParallelArray using the given executor and
      * initially holding copies of the given
      * source elements.
-     *
-     * @param source   the source of initial elements
+     * @param source the source of initial elements
      * @param executor the executor
      */
     public static <T> ParallelArray<T> createFromCopy
-    (T[] source, ForkJoinPool executor) {
+        (T[] source, ForkJoinPool executor) {
         // For now, avoid copyOf so people can compile with Java5
         int size = source.length;
-        T[] array = (T[]) Array.newInstance
-                (source.getClass().getComponentType(), size);
+        T[] array = (T[])Array.newInstance
+            (source.getClass().getComponentType(), size);
         System.arraycopy(source, 0, array, 0, size);
         return new ParallelArray<T>(executor, array, size);
     }
@@ -274,18 +267,17 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Creates a new ParallelArray using an array of the given size,
      * initially holding copies of the given source truncated or
      * padded with nulls to obtain the specified length.
-     *
-     * @param source   the source of initial elements
-     * @param size     the array size
+     * @param source the source of initial elements
+     * @param size the array size
      * @param executor the executor
      */
     public static <T> ParallelArray<T> createFromCopy
-    (int size, T[] source, ForkJoinPool executor) {
+        (int size, T[] source, ForkJoinPool executor) {
         // For now, avoid copyOf so people can compile with Java5
-        T[] array = (T[]) Array.newInstance
-                (source.getClass().getComponentType(), size);
+        T[] array = (T[])Array.newInstance
+            (source.getClass().getComponentType(), size);
         System.arraycopy(source, 0, array, 0,
-                Math.min(source.length, size));
+                         Math.min(source.length, size));
         return new ParallelArray<T>(executor, array, size);
     }
 
@@ -295,15 +287,14 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * element type, but with an initial effective size of zero,
      * enabling incremental insertion via {@link ParallelArray#asList}
      * operations.
-     *
-     * @param size        the array size
+     * @param size the array size
      * @param elementType the type of the elements
-     * @param executor    the executor
+     * @param executor the executor
      */
     public static <T> ParallelArray<T> createEmpty
-    (int size, Class<? super T> elementType,
-     ForkJoinPool executor) {
-        T[] array = (T[]) Array.newInstance(elementType, size);
+        (int size, Class<? super T> elementType,
+         ForkJoinPool executor) {
+        T[] array = (T[])Array.newInstance(elementType, size);
         return new ParallelArray<T>(executor, array, 0);
     }
 
@@ -312,44 +303,26 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * mapped ParallelArray.
      */
     public static interface SummaryStatistics<T> {
-        /**
-         * Returns the number of elements
-         */
+        /** Returns the number of elements */
         public int size();
-
-        /**
-         * Returns the minimum element, or null if empty
-         */
+        /** Returns the minimum element, or null if empty */
         public T min();
-
-        /**
-         * Returns the maximum element, or null if empty
-         */
+        /** Returns the maximum element, or null if empty */
         public T max();
-
-        /**
-         * Returns the index of the minimum element, or -1 if empty
-         */
+        /** Returns the index of the minimum element, or -1 if empty */
         public int indexOfMin();
-
-        /**
-         * Returns the index of the maximum element, or -1 if empty
-         */
+        /** Returns the index of the maximum element, or -1 if empty */
         public int indexOfMax();
     }
 
     /**
      * Returns the executor used for computations.
-     *
      * @return the executor
      */
-    public ForkJoinPool getExecutor() {
-        return ex;
-    }
+    public ForkJoinPool getExecutor() { return ex; }
 
     /**
      * Applies the given procedure to elements.
-     *
      * @param procedure the procedure
      */
     public void apply(Procedure<? super T> procedure) {
@@ -358,9 +331,8 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
 
     /**
      * Returns reduction of elements.
-     *
      * @param reducer the reducer
-     * @param base    the result for an empty array
+     * @param base the result for an empty array
      * @return reduction
      */
     public T reduce(Reducer<T> reducer, T base) {
@@ -369,7 +341,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
 
     /**
      * Returns a new ParallelArray holding all elements.
-     *
      * @return a new ParallelArray holding all elements
      */
     public ParallelArray<T> all() {
@@ -379,7 +350,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Returns a new ParallelArray with the given element type holding
      * all elements.
-     *
      * @param elementType the type of the elements
      * @return a new ParallelArray holding all elements
      */
@@ -390,12 +360,11 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Replaces elements with the results of applying the given transform
      * to their current values.
-     *
      * @param op the op
      * @return this (to simplify use in expressions)
      */
     public ParallelArray<T> replaceWithMapping
-    (Op<? super T, ? extends T> op) {
+        (Op<? super T, ? extends T> op) {
         super.replaceWithMapping(op);
         return this;
     }
@@ -403,12 +372,11 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Replaces elements with the results of applying the given
      * mapping to their indices.
-     *
      * @param op the op
      * @return this (to simplify use in expressions)
      */
     public ParallelArray<T> replaceWithMappedIndex
-    (IntToObject<? extends T> op) {
+        (IntToObject<? extends T> op) {
         super.replaceWithMappedIndex(op);
         return this;
     }
@@ -416,12 +384,11 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Replaces elements with the results of applying the given
      * mapping to each index and current element value.
-     *
      * @param op the op
      * @return this (to simplify use in expressions)
      */
     public ParallelArray<T> replaceWithMappedIndex
-    (IntAndObjectToObject<? super T, ? extends T> op) {
+        (IntAndObjectToObject<? super T, ? extends T> op) {
         super.replaceWithMappedIndex(op);
         return this;
     }
@@ -429,19 +396,17 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Replaces elements with the results of applying the given
      * generator.
-     *
      * @param generator the generator
      * @return this (to simplify use in expressions)
      */
     public ParallelArray<T> replaceWithGeneratedValue
-    (Generator<? extends T> generator) {
+        (Generator<? extends T> generator) {
         super.replaceWithGeneratedValue(generator);
         return this;
     }
 
     /**
      * Replaces elements with the given value.
-     *
      * @param value the value
      * @return this (to simplify use in expressions)
      */
@@ -453,14 +418,13 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Replaces elements with results of applying
      * {@code op(thisElement, otherElement)}.
-     *
-     * @param other    the other array
+     * @param other the other array
      * @param combiner the combiner
      * @return this (to simplify use in expressions)
      */
-    public <V, W> ParallelArray<T> replaceWithMapping
-    (BinaryOp<? super T, ? super V, ? extends T> combiner,
-     ParallelArrayWithMapping<W, V> other) {
+    public <V,W> ParallelArray<T> replaceWithMapping
+        (BinaryOp<? super T, ? super V, ? extends T> combiner,
+         ParallelArrayWithMapping<W,V> other) {
         super.replaceWithMapping(combiner, other);
         return this;
     }
@@ -468,13 +432,12 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Replaces elements with results of applying
      * {@code op(thisElement, otherElement)}.
-     *
-     * @param other    the other array
+     * @param other the other array
      * @param combiner the combiner
      * @return this (to simplify use in expressions)
      */
     public ParallelArray<T> replaceWithMapping
-    (BinaryOp<T, T, T> combiner, T[] other) {
+        (BinaryOp<T,T,T> combiner, T[] other) {
         super.replaceWithMapping(combiner, other);
         return this;
     }
@@ -482,7 +445,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Returns the index of some element equal to given target,
      * or -1 if not present.
-     *
      * @param target the element to search for
      * @return the index or -1 if not present
      */
@@ -494,7 +456,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Assuming this array is sorted, returns the index of an element
      * equal to given target, or -1 if not present. If the array
      * is not sorted, the results are undefined.
-     *
      * @param target the element to search for
      * @return the index or -1 if not present
      */
@@ -507,8 +468,7 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * comparator, returns the index of an element equal to given
      * target, or -1 if not present. If the array is not sorted, the
      * results are undefined.
-     *
-     * @param target     the element to search for
+     * @param target the element to search for
      * @param comparator the comparator
      * @return the index or -1 if not present
      */
@@ -519,20 +479,18 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Returns summary statistics, using the given comparator
      * to locate minimum and maximum elements.
-     *
      * @param comparator the comparator to use for
-     *                   locating minimum and maximum elements
+     * locating minimum and maximum elements
      * @return the summary
      */
     public ParallelArray.SummaryStatistics<T> summary
-    (Comparator<? super T> comparator) {
+        (Comparator<? super T> comparator) {
         return super.summary(comparator);
     }
 
     /**
      * Returns summary statistics, assuming that all elements are
      * Comparables.
-     *
      * @return the summary
      */
     public ParallelArray.SummaryStatistics<T> summary() {
@@ -541,7 +499,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
 
     /**
      * Returns the minimum element, or null if empty.
-     *
      * @param comparator the comparator
      * @return minimum element, or null if empty
      */
@@ -552,7 +509,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Returns the minimum element, or null if empty,
      * assuming that all elements are Comparables.
-     *
      * @return minimum element, or null if empty
      * @throws ClassCastException if any element is not Comparable
      */
@@ -562,7 +518,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
 
     /**
      * Returns the maximum element, or null if empty.
-     *
      * @param comparator the comparator
      * @return maximum element, or null if empty
      */
@@ -573,7 +528,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Returns the maximum element, or null if empty,
      * assuming that all elements are Comparables.
-     *
      * @return maximum element, or null if empty
      * @throws ClassCastException if any element is not Comparable
      */
@@ -587,9 +541,8 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * {@code 1, 2, 3}, and the reducer operation adds numbers, then
      * after invocation of this method, the contents would be {@code 1,
      * 3, 6} (that is, {@code 1, 1+2, 1+2+3}).
-     *
      * @param reducer the reducer
-     * @param base    the result for an empty array
+     * @param base the result for an empty array
      * @return this (to simplify use in expressions)
      */
     public ParallelArray<T> cumulate(Reducer<T> reducer, T base) {
@@ -605,9 +558,8 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * invocation of this method, the contents would be {@code 0, 1,
      * 3} (that is, {@code 0, 0+1, 0+1+2}, and the return value
      * would be 6 (that is, {@code 1+2+3}).
-     *
      * @param reducer the reducer
-     * @param base    the result for an empty array
+     * @param base the result for an empty array
      * @return the total reduction
      */
     public T precumulate(Reducer<T> reducer, T base) {
@@ -618,7 +570,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Sorts the array. Unlike Arrays.sort, this sort does
      * not guarantee that elements with equal keys maintain their
      * relative position in the array.
-     *
      * @param comparator the comparator to use
      * @return this (to simplify use in expressions)
      */
@@ -631,7 +582,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Sorts the array, assuming all elements are Comparable. Unlike
      * Arrays.sort, this sort does not guarantee that elements
      * with equal keys maintain their relative position in the array.
-     *
      * @return this (to simplify use in expressions)
      * @throws ClassCastException if any element is not Comparable
      */
@@ -644,7 +594,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Returns a new ParallelArray containing only the non-null unique
      * elements of this array (that is, without any duplicates), using
      * each element's {@code equals} method to test for duplication.
-     *
      * @return the new ParallelArray
      */
     public ParallelArray<T> allUniqueElements() {
@@ -655,7 +604,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Returns a new ParallelArray containing only the non-null unique
      * elements of this array (that is, without any duplicates), using
      * reference identity to test for duplication.
-     *
      * @return the new ParallelArray
      */
     public ParallelArray<T> allNonidenticalElements() {
@@ -665,7 +613,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Removes from the array all elements for which the given
      * selector holds.
-     *
      * @param selector the selector
      * @return this (to simplify use in expressions)
      */
@@ -680,24 +627,22 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Returns true if all elements at the same relative positions
      * of this and other array are equal.
-     *
      * @param other the other array
      * @return true if equal
      */
-    public <U, V> boolean hasAllEqualElements
-    (ParallelArrayWithMapping<U, V> other) {
+    public <U,V> boolean hasAllEqualElements
+        (ParallelArrayWithMapping<U,V> other) {
         return super.hasAllEqualElements(other);
     }
 
     /**
      * Returns true if all elements at the same relative positions
      * of this and other array are identical.
-     *
      * @param other the other array
      * @return true if equal
      */
-    public <U, V> boolean hasAllIdenticalElements
-    (ParallelArrayWithMapping<U, V> other) {
+    public <U,V> boolean hasAllIdenticalElements
+        (ParallelArrayWithMapping<U,V> other) {
         return super.hasAllIdenticalElements(other);
     }
 
@@ -706,7 +651,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * shifting others leftward, and possibly decreasing size.  This
      * method may be used after sorting to ensure that this
      * ParallelArray contains a set of unique elements.
-     *
      * @return this (to simplify use in expressions)
      */
     public ParallelArray<T> removeConsecutiveDuplicates() {
@@ -727,7 +671,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Removes null elements, shifting others leftward, and possibly
      * decreasing size.
-     *
      * @return this (to simplify use in expressions)
      */
     public ParallelArray<T> removeNulls() {
@@ -747,7 +690,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     /**
      * Equivalent to {@code asList().addAll} but specialized for array
      * arguments and likely to be more efficient.
-     *
      * @param other the elements to add
      * @return this (to simplify use in expressions)
      */
@@ -763,25 +705,25 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Appends all (possibly bounded, filtered, or mapped) elements of
      * the given ParallelArray, resizing and/or reallocating this
      * array if necessary.
-     *
      * @param other the elements to add
      * @return this (to simplify use in expressions)
      */
     public <V> ParallelArray<T> addAll
-    (ParallelArrayWithMapping<V, T> other) {
+        (ParallelArrayWithMapping<V,T> other) {
         int end = fence;
         if (other.hasFilter()) {
             PAS.FJOAppendAllDriver r = new PAS.FJOAppendAllDriver
-                    (other, end, array);
+                (other, end, array);
             ex.invoke(r);
-            array = (T[]) (r.results);
+            array = (T[])(r.results);
             fence = end + r.resultSize;
-        } else {
+        }
+        else {
             int csize = other.size();
             insertSlotsAt(end, csize);
             if (other.hasMap())
                 ex.invoke(new PAS.FJOMap(other, other.origin, other.fence,
-                        null, array, end - other.origin));
+                                         null, array, end - other.origin));
             else
                 System.arraycopy(other.array, 0, array, end, csize);
         }
@@ -792,13 +734,12 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Returns an operation prefix that causes a method to
      * operate only on the elements of the array between
      * firstIndex (inclusive) and upperBound (exclusive).
-     *
      * @param firstIndex the lower bound (inclusive)
      * @param upperBound the upper bound (exclusive)
      * @return operation prefix
      */
     public ParallelArrayWithBounds<T> withBounds
-    (int firstIndex, int upperBound) {
+        (int firstIndex, int upperBound) {
         return super.withBounds(firstIndex, upperBound);
     }
 
@@ -806,12 +747,11 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Returns an operation prefix that causes a method to operate
      * only on the elements of the array for which the given selector
      * returns true.
-     *
      * @param selector the selector
      * @return operation prefix
      */
     public ParallelArrayWithFilter<T> withFilter
-    (Predicate<? super T> selector) {
+        (Predicate<? super T> selector) {
         return super.withFilter(selector);
     }
 
@@ -819,13 +759,12 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Returns an operation prefix that causes a method to operate
      * only on elements for which the given binary selector returns
      * true.
-     *
      * @param selector the selector
      * @return operation prefix
      */
-    public <V, W> ParallelArrayWithFilter<T> withFilter
-    (BinaryPredicate<? super T, ? super V> selector,
-     ParallelArrayWithMapping<W, V> other) {
+    public <V,W> ParallelArrayWithFilter<T> withFilter
+        (BinaryPredicate<? super T, ? super V> selector,
+         ParallelArrayWithMapping<W,V> other) {
         return super.withFilter(selector, other);
     }
 
@@ -833,192 +772,179 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Returns an operation prefix that causes a method to operate
      * only on elements for which the given indexed selector returns
      * true.
-     *
      * @param selector the selector
      * @return operation prefix
      */
     public ParallelArrayWithFilter<T> withIndexedFilter
-    (IntAndObjectPredicate<? super T> selector) {
+        (IntAndObjectPredicate<? super T> selector) {
         return super.withIndexedFilter(selector);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op.
-     *
      * @param op the op
      * @return operation prefix
      */
-    public <U> ParallelArrayWithMapping<T, U> withMapping
-    (Op<? super T, ? extends U> op) {
+    public <U> ParallelArrayWithMapping<T,U> withMapping
+        (Op<? super T, ? extends U> op) {
         return super.withMapping(op);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op.
-     *
      * @param op the op
      * @return operation prefix
      */
     public ParallelArrayWithDoubleMapping<T> withMapping
-    (ObjectToDouble<? super T> op) {
+        (ObjectToDouble<? super T> op) {
         return super.withMapping(op);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op.
-     *
      * @param op the op
      * @return operation prefix
      */
     public ParallelArrayWithLongMapping<T> withMapping
-    (ObjectToLong<? super T> op) {
+        (ObjectToLong<? super T> op) {
         return super.withMapping(op);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
-    public <U, V, W> ParallelArrayWithMapping<T, V> withMapping
-    (BinaryOp<? super T, ? super U, ? extends V> combiner,
-     ParallelArrayWithMapping<W, U> other) {
+    public <U,V,W> ParallelArrayWithMapping<T,V> withMapping
+        (BinaryOp<? super T, ? super U, ? extends V> combiner,
+         ParallelArrayWithMapping<W,U> other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
-    public <V> ParallelArrayWithMapping<T, V> withMapping
-    (ObjectAndDoubleToObject<? super T, ? extends V> combiner,
-     ParallelDoubleArrayWithDoubleMapping other) {
+    public <V> ParallelArrayWithMapping<T,V> withMapping
+        (ObjectAndDoubleToObject<? super T, ? extends V> combiner,
+         ParallelDoubleArrayWithDoubleMapping other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
-    public <V> ParallelArrayWithMapping<T, V> withMapping
-    (ObjectAndLongToObject<? super T, ? extends V> combiner,
-     ParallelLongArrayWithLongMapping other) {
+    public <V> ParallelArrayWithMapping<T,V> withMapping
+        (ObjectAndLongToObject<? super T, ? extends V> combiner,
+         ParallelLongArrayWithLongMapping other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
-    public <U, W> ParallelArrayWithDoubleMapping<T> withMapping
-    (ObjectAndObjectToDouble<? super T, ? super U> combiner,
-     ParallelArrayWithMapping<W, U> other) {
+    public <U,W> ParallelArrayWithDoubleMapping<T> withMapping
+        (ObjectAndObjectToDouble<? super T, ? super U> combiner,
+         ParallelArrayWithMapping<W,U> other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelArrayWithDoubleMapping<T> withMapping
-    (ObjectAndDoubleToDouble<? super T> combiner,
-     ParallelDoubleArrayWithDoubleMapping other) {
+        (ObjectAndDoubleToDouble<? super T> combiner,
+         ParallelDoubleArrayWithDoubleMapping other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelArrayWithDoubleMapping<T> withMapping
-    (ObjectAndLongToDouble<? super T> combiner,
-     ParallelLongArrayWithLongMapping other) {
+        (ObjectAndLongToDouble<? super T> combiner,
+         ParallelLongArrayWithLongMapping other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
-    public <U, W> ParallelArrayWithLongMapping<T> withMapping
-    (ObjectAndObjectToLong<? super T, ? super U> combiner,
-     ParallelArrayWithMapping<W, U> other) {
+    public <U,W> ParallelArrayWithLongMapping<T> withMapping
+        (ObjectAndObjectToLong<? super T, ? super U> combiner,
+         ParallelArrayWithMapping<W,U> other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelArrayWithLongMapping<T> withMapping
-    (ObjectAndDoubleToLong<? super T> combiner,
-     ParallelDoubleArrayWithDoubleMapping other) {
+        (ObjectAndDoubleToLong<? super T> combiner,
+         ParallelDoubleArrayWithDoubleMapping other) {
         return super.withMapping(combiner, other);
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings)
+     * filtered view (all filters must precede all mappings)
      */
     public ParallelArrayWithLongMapping<T> withMapping
-    (ObjectAndLongToLong<? super T> combiner,
-     ParallelLongArrayWithLongMapping other) {
+        (ObjectAndLongToLong<? super T> combiner,
+         ParallelLongArrayWithLongMapping other) {
         return super.withMapping(combiner, other);
     }
 
@@ -1030,12 +956,11 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * many common array operations. For example, you could create
      * function to average the values at the same index of multiple
      * arrays and apply it using this method.
-     *
      * @param mapper the mapper
      * @return operation prefix
      */
-    public <U> ParallelArrayWithMapping<T, U> withIndexedMapping
-    (IntAndObjectToObject<? super T, ? extends U> mapper) {
+    public <U> ParallelArrayWithMapping<T,U> withIndexedMapping
+        (IntAndObjectToObject<? super T, ? extends U> mapper) {
         return super.withIndexedMapping(mapper);
     }
 
@@ -1044,12 +969,11 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * mappings of this array using the given mapper that accepts as
      * arguments an element's current index and value, and produces a
      * new value.
-     *
      * @param mapper the mapper
      * @return operation prefix
      */
     public ParallelArrayWithDoubleMapping<T> withIndexedMapping
-    (IntAndObjectToDouble<? super T> mapper) {
+        (IntAndObjectToDouble<? super T> mapper) {
         return super.withIndexedMapping(mapper);
     }
 
@@ -1058,12 +982,11 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * mappings of this array using the given mapper that accepts as
      * arguments an element's current index and value, and produces a
      * new value.
-     *
      * @param mapper the mapper
      * @return operation prefix
      */
     public ParallelArrayWithLongMapping<T> withIndexedMapping
-    (IntAndObjectToLong<? super T> mapper) {
+        (IntAndObjectToLong<? super T> mapper) {
         return super.withIndexedMapping(mapper);
     }
 
@@ -1073,7 +996,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * support the remove operation. However, a full
      * {@code ListIterator} supporting add, remove, and set
      * operations is available via {@link #asList}.
-     *
      * @return an iterator stepping through each element
      */
     public Iterator<T> iterator() {
@@ -1084,22 +1006,13 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
         int cursor;
         final T[] arr;
         final int hi;
-
-        ParallelArrayIterator(T[] a, int limit) {
-            arr = a;
-            hi = limit;
-        }
-
-        public boolean hasNext() {
-            return cursor < hi;
-        }
-
+        ParallelArrayIterator(T[] a, int limit) { arr = a; hi = limit; }
+        public boolean hasNext() { return cursor < hi; }
         public T next() {
             if (cursor >= hi)
                 throw new NoSuchElementException();
             return arr[cursor++];
         }
-
         public void remove() {
             throw new UnsupportedOperationException();
         }
@@ -1117,7 +1030,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * itself thread-safe.  In particular, performing list updates
      * while other parallel operations are in progress has undefined
      * (and surely undesired) effects.
-     *
      * @return a list view
      */
     public List<T> asList() {
@@ -1131,45 +1043,32 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * Returns the effective size of the underlying array. The
      * effective size is the current limit, if used (see {@link
      * #setLimit}), or the length of the array otherwise.
-     *
      * @return the effective size of array
      */
-    public int size() {
-        return fence;
-    }
+    public int size() { return fence; }
 
     /**
      * Returns the element of the array at the given index.
-     *
      * @param i the index
      * @return the element of the array at the given index
      */
-    public T get(int i) {
-        return array[i];
-    }
+    public T get(int i) { return array[i]; }
 
     /**
      * Sets the element of the array at the given index to the given value.
-     *
      * @param i the index
      * @param x the value
      */
-    public void set(int i, T x) {
-        array[i] = x;
-    }
+    public void set(int i, T x) { array[i] = x; }
 
     /**
      * Returns the underlying array used for computations.
-     *
      * @return the array
      */
-    public T[] getArray() {
-        return array;
-    }
+    public T[] getArray() { return array; }
 
     /**
      * Equivalent to {@code asList().toString()}.
-     *
      * @return a string representation
      */
     public String toString() {
@@ -1183,7 +1082,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
      * array to expand if necessary. Or, if the given limit is less
      * than the length of the underlying array, causes computations to
      * ignore elements past the given limit.
-     *
      * @param newLimit the new upper bound
      * @throws IllegalArgumentException if newLimit less than zero
      */
@@ -1205,7 +1103,7 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
         int cap = array.length;
         if (newCap > cap) {
             Class elementType = array.getClass().getComponentType();
-            T[] a = (T[]) Array.newInstance(elementType, newCap);
+            T[] a =(T[])Array.newInstance(elementType, newCap);
             System.arraycopy(array, 0, a, 0, cap);
             array = a;
         }
@@ -1214,16 +1112,16 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
     final void insertElementAt(int index, T e) {
         int hi = fence++;
         if (hi >= array.length)
-            resizeArray((hi * 3) / 2 + 1);
+            resizeArray((hi * 3)/2 + 1);
         if (hi > index)
-            System.arraycopy(array, index, array, index + 1, hi - index);
+            System.arraycopy(array, index, array, index+1, hi - index);
         array[index] = e;
     }
 
     final void appendElement(T e) {
         int hi = fence++;
         if (hi >= array.length)
-            resizeArray((hi * 3) / 2 + 1);
+            resizeArray((hi * 3)/2 + 1);
         array[hi] = e;
     }
 
@@ -1236,7 +1134,7 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
         int cap = array.length;
         int newSize = fence + len;
         if (cap < newSize) {
-            cap = (cap * 3) / 2 + 1;
+            cap = (cap * 3)/2 + 1;
             if (cap < newSize)
                 cap = newSize;
             resizeArray(cap);
@@ -1297,7 +1195,6 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
         int lastRet;
         T[] arr; // cache array and bound
         int hi;
-
         ListIter(int lo) {
             this.cursor = lo;
             this.lastRet = -1;
@@ -1486,11 +1383,11 @@ public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implemen
             return a;
         }
 
-        public <V> V[] toArray(V a[]) {
+        public <V> V[] toArray(V[] a) {
             int len = fence;
             if (a.length < len) {
                 Class elementType = a.getClass().getComponentType();
-                a = (V[]) Array.newInstance(elementType, len);
+                a =(V[])Array.newInstance(elementType, len);
             }
             System.arraycopy(array, 0, a, 0, len);
             if (a.length > len)
