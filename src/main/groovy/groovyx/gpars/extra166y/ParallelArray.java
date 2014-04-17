@@ -83,7 +83,7 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * Collection's {@code toArray} method. The effects of mutative
  * {@code asList} operations may also be achieved directly using
  * method {@link #setLimit} along with element-by-element access
- * methods {@link #get}</tt> and {@link #set}.
+ * methods {@link #get} and {@link #set}.
  *
  * <p>While ParallelArrays can be based on any kind of an object
  * array, including "boxed" types such as Long, parallel operations on
