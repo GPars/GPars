@@ -18,21 +18,20 @@ package groovyx.gpars;
 
 import groovy.lang.Closure;
 import groovy.time.Duration;
+
 // TODO: delete
-//import groovyx.gpars.extra166y.Ops;
-//import groovyx.gpars.extra166y.ParallelArray;
-//import groovyx.gpars.memoize.LRUProtectionStorage;
-// TODO: delete
-//import groovyx.gpars.pa.CallAsyncTask;
+import groovyx.gpars.forkjoin.CallAsyncTask;
 //import groovyx.gpars.pa.CallClosure;
 //import groovyx.gpars.pa.ClosureMapper;
 //import groovyx.gpars.pa.ClosureNegationPredicate;
 //import groovyx.gpars.pa.ClosurePredicate;
 //import groovyx.gpars.pa.ClosureReducer;
-//import groovyx.gpars.pa.GParsPoolUtilHelper;
+import groovyx.gpars.forkjoin.GParsPoolUtilHelper;
 //import groovyx.gpars.pa.PAWrapper;
 //import groovyx.gpars.pa.SumClosure;
 import groovyx.gpars.scheduler.FJPool;
+import groovyx.gpars.streams.ClosureConsumer;
+import groovyx.gpars.streams.ClosureReducer;
 import groovyx.gpars.util.GeneralTimer;
 // TODO: delete
 //import groovyx.gpars.util.PAUtils;
@@ -47,6 +46,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.RecursiveTask;
+
+import java.util.stream.Stream;
 
 // TODO: delete
 //import static groovyx.gpars.util.PAGroovyUtils.createCollection;
@@ -359,34 +360,35 @@ public class GParsPoolUtil {
      * </p>
      */
     public static <T> Collection<T> eachParallel(final Collection<T> collection, final Closure cl) {
-        GParsPoolUtilHelper.eachParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
+      collection.parallelStream().forEach(new ClosureConsumer<T>(cl));
+        //GParsPoolUtilHelper.eachParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
         return collection;
     }
 
-    /**
-     * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
-     * closure as the transformation operation.
-     * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the {@code withPool} block
-     * have a new {@code eachParallel(Closure cl)} method, which delegates to the {@code GParsPoolUtil} class.
-     * Example:
-     * <pre>
-     * GParsPool.withPool {
-     *     def result = new ConcurrentSkipListSet()
-     *     [1, 2, 3, 4, 5].eachParallel {Number number -&gt; result.add(number * 10)}
-     *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-     * }
-     * </pre>
-     * <p>
-     * Note that the {@code result} variable is synchronized to prevent race conditions between multiple threads.
-     * </p>
-     */
-    public static <T> T eachParallel(final T collection, final Closure cl) {
-        GParsPoolUtilHelper.eachParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), cl);
-        return collection;
-    }
+//    /**
+//     * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
+//     * closure as the transformation operation.
+//     * The closure will be effectively invoked concurrently on the elements of the collection.
+//     * After all the elements have been processed, the method returns.
+//     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+//     * Alternatively a DSL can be used to simplify the code. All collections/objects within the {@code withPool} block
+//     * have a new {@code eachParallel(Closure cl)} method, which delegates to the {@code GParsPoolUtil} class.
+//     * Example:
+//     * <pre>
+//     * GParsPool.withPool {
+//     *     def result = new ConcurrentSkipListSet()
+//     *     [1, 2, 3, 4, 5].eachParallel {Number number -&gt; result.add(number * 10)}
+//     *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+//     * }
+//     * </pre>
+//     * <p>
+//     * Note that the {@code result} variable is synchronized to prevent race conditions between multiple threads.
+//     * </p>
+//     */
+//    public static <T> T eachParallel(final T collection, final Closure cl) {
+//        GParsPoolUtilHelper.eachParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), cl);
+//        return collection;
+//    }
 
     /**
      * Creates a Parallel Array out of the supplied map and invokes the withMapping() method using the supplied
@@ -1380,48 +1382,49 @@ public class GParsPoolUtil {
         return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).reduce(new ClosureReducer<T>(cl), null);
     }
 
-    /**
-     * Creates a Parallel Array out of the supplied collection/object and invokes its reduce() method using the supplied
-     * closure as the reduction operation.
-     * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the {@code withPool} block
-     * have a new {@code reduce(Closure cl)} method, which delegates to the {@code GParsPoolUtil} class.
-     */
-    public static Object injectParallel(final Object collection, final Closure cl) {
-        return GParsPoolUtilHelper.createPA(collection, retrievePool()).reduce(new ClosureReducer(cl), null);
-    }
+//    /**
+//     * Creates a Parallel Array out of the supplied collection/object and invokes its reduce() method using the supplied
+//     * closure as the reduction operation.
+//     * The closure will be effectively invoked concurrently on the elements of the collection.
+//     * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
+//     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+//     * Alternatively a DSL can be used to simplify the code. All collections/objects within the {@code withPool} block
+//     * have a new {@code reduce(Closure cl)} method, which delegates to the {@code GParsPoolUtil} class.
+//     */
+//    public static Object injectParallel(final Object collection, final Closure cl) {
+//        return GParsPoolUtilHelper.createPA(collection, retrievePool()).reduce(new ClosureReducer(cl), null);
+//    }
 
     /**
-     * Creates a Parallel Array out of the supplied collection/object and invokes its reduce() method using the supplied
+     * Creates a {@code Stream} out of the supplied collection/object and invokes its reduce() method using the supplied
      * closure as the reduction operation.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the {@code withPool} block
-     * have a new {@code reduce(Closure cl)} method, which delegates to the {@code GParsPoolUtil} class.
      *
-     * @param seed A seed value to initialize the operation
+     * @param collection The collection to reduce over.
+     * @param seed A seed value to initialize the operation.
+     * @param cl A binary operation (assumed to be an accumulation) to apply during the reduction.
+     * @return The value calculated by the reduction.
      */
     public static <T> T injectParallel(final Collection<T> collection, final T seed, final Closure cl) {
-        return GParsPoolUtilHelper.foldParallel(collection, seed, cl);
+      return collection.parallelStream().reduce(seed, new ClosureReducer<T>(cl));
     }
 
-    /**
-     * Creates a Parallel Array out of the supplied collection/object and invokes its reduce() method using the supplied
-     * closure as the reduction operation.
-     * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the {@code withPool} block
-     * have a new {@code reduce(Closure cl)} method, which delegates to the {@code GParsPoolUtil} class.
-     *
-     * @param seed A seed value to initialize the operation
-     */
-    public static Object injectParallel(final Object collection, final Object seed, final Closure cl) {
-        return GParsPoolUtilHelper.foldParallel(collection, seed, cl);
-    }
+//    /**
+//     * Creates a Parallel Array out of the supplied collection/object and invokes its reduce() method using the supplied
+//     * closure as the reduction operation.
+//     * The closure will be effectively invoked concurrently on the elements of the collection.
+//     * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
+//     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+//     * Alternatively a DSL can be used to simplify the code. All collections/objects within the {@code withPool} block
+//     * have a new {@code reduce(Closure cl)} method, which delegates to the {@code GParsPoolUtil} class.
+//     *
+//     * @param seed A seed value to initialize the operation
+//     */
+//    public static Object injectParallel(final Object collection, final Object seed, final Closure cl) {
+//        return GParsPoolUtilHelper.foldParallel(collection, seed, cl);
+//    }
 
 //    /**
 //     * Creates a PAWrapper around a ParallelArray wrapping the elements of the original collection.
