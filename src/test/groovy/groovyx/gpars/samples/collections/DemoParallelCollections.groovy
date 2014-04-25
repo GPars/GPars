@@ -20,6 +20,7 @@
 
 package groovyx.gpars.samples.collections
 
+import groovyx.gpars.GParsConfig
 import groovyx.gpars.GParsPool
 
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -48,4 +49,6 @@ GParsPool.withPool {
     // here use parallel implementation under the covers
     println(animals.makeConcurrent().collect { it.toUpperCase() }.groupBy { it.contains 'A' })
 }
+
+GParsConfig.shutdown()
 

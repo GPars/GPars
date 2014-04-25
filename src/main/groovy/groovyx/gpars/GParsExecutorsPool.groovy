@@ -45,7 +45,11 @@ class GParsExecutorsPool {
     /**
      * Maps threads to their appropriate thread pools
      */
-    private static final ThreadLocalPools currentPoolStack = new ThreadLocalPools()
+    private static ThreadLocalPools currentPoolStack = new ThreadLocalPools()
+
+    public final static void shutdown() {
+        currentPoolStack = null;
+    }
 
     /**
      * Caches the default pool size.
@@ -189,6 +193,7 @@ class GParsExecutorsPool {
             }
         } finally {
             currentPoolStack.pop()
+            if (currentPoolStack.isEmpty()) currentPoolStack.remove()
         }
         return result
     }

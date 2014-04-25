@@ -31,7 +31,9 @@ h3. Stm
 
 h3. Other
 
-    Replaced java.util.Timer with ScheduledExecutorService for timeout handling
+* Replaced java.util.Timer with ScheduledExecutorService for timeout handling
+* Proper shutdown of timers and thread-local variables added to the GParsConfig class
+
 
 h3. Renaming hints
 

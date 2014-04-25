@@ -20,11 +20,19 @@ public final class GParsConfig {
     public static TimerFactory getTimerFactory()
 
     public static GeneralTimer retrieveDefaultTimer(final String name, final boolean daemon)
+
+    public static void shutdown()
 }
 {code}
 
 The custom factories should be registered immediately after the application startup in order for Actors and Dataflow
 to be able to use them for their default groups.
+
+h3. Shutdown
+
+The _GParsConfig.shutdown()_ method can be used in managed environments to properly shutdown all asynchronously run timers
+and free the memory from all thread-local variables. After the call to this method the GPars library will no longer provide
+the declared services.
 
 h3. Compatibility
 

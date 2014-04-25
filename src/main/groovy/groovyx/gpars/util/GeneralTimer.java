@@ -21,4 +21,6 @@ package groovyx.gpars.util;
  */
 public interface GeneralTimer {
     void schedule(Runnable task, long timeout);
+
+    void shutdown();
 }

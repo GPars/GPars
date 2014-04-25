@@ -118,6 +118,11 @@ class GParsConfigTest extends Specification {
         final myTimer = new GeneralTimer() {
             @Override
             void schedule(final Runnable task, final long timeout) {}
+
+            @Override
+            void shutdown() {
+
+            }
         }
 
         final myTimerFactory = new TimerFactory() {
