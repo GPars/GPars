@@ -59,4 +59,13 @@ final class ThreadLocalPools extends ThreadLocal<LinkedList<Object>> {
         final Deque<Object> stack = get();
         return stack.isEmpty() ? null : stack.getLast();
     }
+
+    /**
+     * Indicates whether the stack is empty
+     *
+     * @return True if the stack is empty
+     */
+    Object isEmpty() {
+        return get().isEmpty();
+    }
 }
