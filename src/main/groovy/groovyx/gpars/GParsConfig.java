@@ -23,6 +23,8 @@ import groovyx.gpars.util.GeneralTimer;
 import groovyx.gpars.util.PoolFactory;
 import groovyx.gpars.util.TimerFactory;
 
+import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -69,6 +71,8 @@ public final class GParsConfig {
         return timerFactory;
     }
 
+    private static final Collection<GeneralTimer> timers = new CopyOnWriteArrayList<GeneralTimer>();
+
     /**
      * If a timer factory has been set, it will be used to create a timer.
      * Otherwise a new instance of java.util.Timer will be created, wrapped inside a GeneralTimer instance and returned.
@@ -76,13 +80,32 @@ public final class GParsConfig {
      * @return A timer instance to use to handle timeouts (actors, GParsPool, GParsExecutorsPool)
      */
     public static GeneralTimer retrieveDefaultTimer(final String name, final boolean daemon) {
-        if (timerFactory != null) return timerFactory.createTimer(name, daemon);
-        return new GeneralTimer() {
+        final GeneralTimer timer;
+        if (timerFactory != null) {
+            timer = timerFactory.createTimer(name, daemon);
+        } else {
+            timer = new GeneralTimer() {
 
-            @Override
-            public void schedule(final Runnable task, final long timeout) {
-                Timer.timer.schedule(task, timeout, TimeUnit.MILLISECONDS);
-            }
-        };
+                @Override
+                public void schedule(final Runnable task, final long timeout) {
+                    Timer.timer.schedule(task, timeout, TimeUnit.MILLISECONDS);
+                }
+
+                @Override
+                public void shutdown() {
+                    Timer.timer.shutdown();
+                }
+            };
+        }
+        if (!timers.contains(timer)) timers.add(timer);
+        return timer;
+    }
+
+    public static void shutdown() {
+        for (final GeneralTimer timer : timers) {
+            timer.shutdown();
+        }
+        GParsPool.shutdown();
+        GParsExecutorsPool.shutdown();
     }
 }

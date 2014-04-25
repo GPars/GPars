@@ -43,8 +43,11 @@ public class GParsPool {
     /**
      * Maps threads to their appropriate thread pools
      */
-    private static final ThreadLocalPools currentPoolStack = new ThreadLocalPools()
+    private static ThreadLocalPools currentPoolStack = new ThreadLocalPools()
 
+    public final static void shutdown() {
+        currentPoolStack = null;
+    }
     /**
      * Caches the default pool size.
      */
@@ -172,6 +175,7 @@ public class GParsPool {
             }
         } finally {
             currentPoolStack.pop()
+            if (currentPoolStack.isEmpty()) currentPoolStack.remove()
         }
         return result
     }
@@ -186,6 +190,7 @@ public class GParsPool {
             return cl(pool)
         } finally {
             currentPoolStack.pop()
+            if (currentPoolStack.isEmpty()) currentPoolStack.remove()
         }
     }
 
