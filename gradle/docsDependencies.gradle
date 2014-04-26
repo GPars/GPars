@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008–2012  The original author or authors
+// Copyright © 2008–2012, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 //  Author: Václav Pech
 //  Author: Russel Winder
 
-ext.grailsDocs = 'org.grails:grails-docs:2.0.3@jar'
+ext.grailsDocs = 'org.grails:grails-docs:2.3.8@jar'
 ext.xhtmlRenderer = 'org.xhtmlrenderer:core-renderer:R8'
+//ext.lowagieItext = 'com.lowagie:itext:4.2.1'
 ext.lowagieItext = 'com.lowagie:itext:2.0.8'
-//ext.lowagieItext = 'com.lowagie:itext:2.1.7'
 ext.radeox = 'radeox:radeox:1.0-b2'
