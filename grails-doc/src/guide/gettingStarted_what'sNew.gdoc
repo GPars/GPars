@@ -1,4 +1,4 @@
-The new GPars 1.2.0 release introduces several enhancements and improvements on top of the previous release,
+The new GPars 1.3.0 release introduces several enhancements and improvements on top of the previous release,
 mainly in the dataflow area.
 
 Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=19439
@@ -17,13 +17,7 @@ h3. Fork / Join
 
 h3. Actors
 
-* Annotated actor and actor factory methods with @DelegatesTo to enable use of actors inside statically compiled Groovy code
-
 h3. Dataflow
-
-* A thenForkAndJoin() method added to Promises to ease the creation of a fork/join algorithm with promises
-* Lazy tasks were added to simplify creation of asynchronous activities with execution delayed until their result is actually asked for
-* Annotated operator factory methods with @DelegatesTo to enable use of dataflow operators and selectors inside statically compiled Groovy code
 
 h3. Agent
 
@@ -31,9 +25,10 @@ h3. Stm
 
 h3. Other
 
-* Replaced java.util.Timer with ScheduledExecutorService for timeout handling
-* Proper shutdown of timers and thread-local variables added to the GParsConfig class
-
+* Raised the JDK dependency to version 1.7
+* Raised the Groovy dependency to version 2.2
+* Replaced the jsr-177y fork-join pool implementation with the one from JDK 1.7
+* Removed the dependency on jsr-166y
 
 h3. Renaming hints
 
