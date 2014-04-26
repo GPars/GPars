@@ -3,7 +3,7 @@ define your data together with functions that should be applied to it and then l
 Typically a set of concurrent tasks will be created and then they will be submitted to a thread pool for processing.
 
 In *GPars* the _GParsPool_ and _GParsExecutorsPool_ classes give you access to low-level data parallelism techniques.
-While the _GParsPool_ class relies on the jsr-166y Fork/Join framework and so offers greater functionality and better performance,
+While the _GParsPool_ class relies on the JDK 7 Fork/Join implementation and so offers greater functionality and better performance,
 the _GParsExecutorsPool_ uses good old Java executors and so is easier to setup in a managed or restricted environment.
 
 There are three fundamental domains covered by the GPars low-level data parallelism:

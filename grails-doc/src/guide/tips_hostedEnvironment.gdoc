@@ -37,6 +37,6 @@ the declared services.
 h3. Compatibility
 
 Some further compatibility problems may occur when running GPars in a hosted environment. The most noticeable one is probably
- the lack of ForkJoinThreadPool (aka jsr-166y) support in GAE. Functionality such as Fork/Join and GParsPool may thus not be available on some
+ the lack of ForkJoinThreadPool support in GAE. Functionality such as Fork/Join and GParsPool may thus not be available on some
  services as a result. However, GParsExecutorsPool, Dataflow, Actors, Agents and Stm should work normally
  even when using managed non-Java SE thread pools.

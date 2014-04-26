@@ -4,7 +4,7 @@ h2. Usage of GParsExecutorsPool
 
 The _GParsPool_ class enables a Java Executors-based concurrency DSL for collections and objects.
 
-The _GParsExecutorsPool_ class can be used as a pure-JDK-based collection parallel processor. Unlike the _GParsPool_ class, _GParsExecutorsPool_ doesn't require jsr-166y jar file, but leverages the standard JDK executor services to parallelize closures processing a collections or an object iteratively.
+The _GParsExecutorsPool_ class can be used as a pure-JDK-based collection parallel processor. Unlike the _GParsPool_ class, _GParsExecutorsPool_ doesn't require fork/join thread pools, but leverages the standard JDK executor services to parallelize closures processing a collections or an object iteratively.
 It needs to be states, however, that _GParsPool_ performs typically much better than _GParsExecutorsPool_ does.
 
 Examples of use:
