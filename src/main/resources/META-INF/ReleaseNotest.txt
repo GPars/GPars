@@ -1,5 +1,36 @@
 GPars - Groovy Parallel Systems
 
+1.2.0
+Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=19439
+
+h3. Project changes
+
+h3. Asynchronous functions
+
+h3. Parallel collections
+
+h3. Fork / Join
+
+h3. Actors
+
+* Annotated actor and actor factory methods with @DelegatesTo to enable use of actors inside statically compiled Groovy code
+
+h3. Dataflow
+
+* A thenForkAndJoin() method added to Promises to ease the creation of a fork/join algorithm with promises
+* Lazy tasks were added to simplify creation of asynchronous activities with execution delayed until their result is actually asked for
+* Annotated operator factory methods with @DelegatesTo to enable use of dataflow operators and selectors inside statically compiled Groovy code
+
+h3. Agent
+
+h3. Stm
+
+h3. Other
+
+* Replaced java.util.Timer with ScheduledExecutorService for timeout handling
+* Proper shutdown of timers and thread-local variables added to the GParsConfig class
+
+
 1.1.0
 Check out the "JIRA release notes":https://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=17399
 
