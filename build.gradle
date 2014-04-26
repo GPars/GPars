@@ -1,8 +1,6 @@
-import org.apache.tools.ant.taskdefs.Javadoc
-
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008–2013 The original author or authors
+// Copyright © 2008-2013  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +13,8 @@ import org.apache.tools.ant.taskdefs.Javadoc
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+import org.apache.tools.ant.taskdefs.Javadoc
 
 //  Author: Václav Pech
 //  Author: Russel Winder
@@ -43,7 +43,7 @@ defaultTasks 'test'
 
 archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
-version = '1.2-SNAPSHOT'
+version = '1.2.0'
 
 sourceCompatibility = 6
 targetCompatibility = 6

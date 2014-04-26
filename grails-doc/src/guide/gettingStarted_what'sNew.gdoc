@@ -1,7 +1,7 @@
 The new GPars 1.2.0 release introduces several enhancements and improvements on top of the previous release,
 mainly in the dataflow area.
 
-Check out the "JIRA release notes":https://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=17399
+Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=19439
 
 h3. Project changes
 
