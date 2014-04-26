@@ -16,8 +16,8 @@
 
 package groovyx.gpars.forkjoin;
 
-import jsr166y.ForkJoinPool;
-import jsr166y.ForkJoinTask;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 
 import java.util.concurrent.ExecutionException;
 

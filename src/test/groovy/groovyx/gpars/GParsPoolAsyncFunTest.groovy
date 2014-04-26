@@ -19,7 +19,7 @@ package groovyx.gpars
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.Promise
 import groovyx.gpars.scheduler.FJPool
-import jsr166y.RecursiveAction
+import java.util.concurrent.RecursiveAction
 
 /**
  * @author Vaclav Pech

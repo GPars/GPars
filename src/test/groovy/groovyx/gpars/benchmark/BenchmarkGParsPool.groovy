@@ -19,9 +19,10 @@ package groovyx.gpars.benchmark
 import groovy.time.TimeCategory
 import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.ParallelEnhancer
+import java.util.concurrent.ForkJoinPool
+
 import groovyx.gpars.extra166y.Ops.Reducer
 import groovyx.gpars.extra166y.ParallelArray
-import jsr166y.ForkJoinPool
 
 import static groovyx.gpars.GParsPool.withExistingPool
 import static groovyx.gpars.GParsPool.withPool

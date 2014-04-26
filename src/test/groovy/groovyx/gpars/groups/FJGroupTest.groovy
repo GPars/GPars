@@ -21,7 +21,7 @@ import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.DefaultPool
 import groovyx.gpars.scheduler.FJPool
 import java.util.concurrent.CountDownLatch
-import jsr166y.ForkJoinWorkerThread
+import java.util.concurrent.ForkJoinWorkerThread
 
 public class FJGroupTest extends GroovyTestCase {
     public void testFJGroup() {

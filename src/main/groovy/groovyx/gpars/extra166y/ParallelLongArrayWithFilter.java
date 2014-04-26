@@ -6,7 +6,7 @@
 
 package groovyx.gpars.extra166y;
 
-import jsr166y.ForkJoinPool;
+import java.util.concurrent.ForkJoinPool;
 
 import static groovyx.gpars.extra166y.Ops.BinaryLongOp;
 import static groovyx.gpars.extra166y.Ops.BinaryLongPredicate;

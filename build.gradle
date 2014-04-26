@@ -323,7 +323,7 @@ task zipJavaDemo(type: Zip) {
 task zipDist(type: Zip) {
     from jar.outputs.files
     from(runtimeClasspath) {
-        include('jsr166*', 'netty*', 'multiverse*')
+        include('netty*', 'multiverse*')
     }
     from('licenses') {
         include '*'
@@ -408,7 +408,7 @@ idea {
     }
     project {
         jdkName '1.7'
-        languageLevel 'JDK_1_6'
+        languageLevel 'JDK_1_7'
         ipr {
             withXml { provider ->
                 def node = provider.asNode()

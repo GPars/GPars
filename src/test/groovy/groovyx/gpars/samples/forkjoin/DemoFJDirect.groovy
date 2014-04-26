@@ -16,9 +16,9 @@
 
 package groovyx.gpars.samples.forkjoin
 
-import jsr166y.ForkJoinPool
-import jsr166y.ForkJoinTask
-import jsr166y.RecursiveTask
+import java.util.concurrent.ForkJoinPool
+import java.util.concurrent.ForkJoinTask
+import java.util.concurrent.RecursiveTask
 
 class Fibonacci extends RecursiveTask<Integer> {
     final int n;

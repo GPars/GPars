@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.forkjoin
 
 import groovyx.gpars.GParsPool
-import jsr166y.RecursiveTask
+import java.util.concurrent.RecursiveTask
 
 /**
  * Shows use of the ForkJoin mechanics to count files recursively in a directory.

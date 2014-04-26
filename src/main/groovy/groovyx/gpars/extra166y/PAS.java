@@ -6,9 +6,9 @@
 
 package groovyx.gpars.extra166y;
 
-import jsr166y.ForkJoinPool;
-import jsr166y.ForkJoinTask;
-import jsr166y.RecursiveAction;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.RecursiveAction;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
