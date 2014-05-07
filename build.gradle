@@ -231,7 +231,7 @@ gradle.taskGraph.whenReady { taskGraph ->
             pom.whenConfigured { pom ->
                 // dependency is a native Maven dependency object (With properties artifactId, groupId, ...)
                 pom.dependencies.each { dependency ->
-                    if (dependency.artifactId in ['netty', 'jcsp', 'multiverse']) {
+                    if (dependency.artifactId in ['netty', 'jcsp', 'multiverse', 'groovy-all']) {
                         dependency.optional = true
                     }
                 }
