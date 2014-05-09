@@ -1,5 +1,9 @@
 GPars - Groovy Parallel Systems
 
+1.2.1
+
+A fix in the generated pom file to make the groovy-all dependency optional.
+
 1.2.0
 Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=19439
 

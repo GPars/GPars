@@ -20,7 +20,7 @@
 
     <groupId>org.codehaus.gpars</groupId>
     <artifactId>gpars-java-demo</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <packaging>jar</packaging>
 
     <name>gpars-java-demo</name>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>org.codehaus.gpars</groupId>
             <artifactId>gpars</artifactId>
-            <version>1.2.0</version>
+            <version>1.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
