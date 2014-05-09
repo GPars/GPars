@@ -51,10 +51,17 @@ targetCompatibility = 6
 def theVendor = 'gpars.org'
 def theTitle = 'GPars: Groovy Parallel Systems'
 
+//  The "apply {}" form was broken between Gradle 1.11 and Gradle 1.12 but is fixed again in Gradle 2.0.
+//  See http://forums.gradle.org/gradle/topics/groovyfx_build_fails_with_gradle_1_12_but_succeeds_with_1_11 and
+//  http://issues.gradle.org/browse/GRADLE-3082
+/*
 apply {
     from 'gradle/docs.gradle'
     from 'gradle/docsDependencies.gradle'
 }
+*/
+apply from: 'gradle/docs.gradle'
+apply from: 'gradle/docsDependencies.gradle'
 
 task copyDSLDefinitions(type: Copy) {
     into "$buildDir/classes/main"
@@ -336,7 +343,7 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.11'
+    gradleVersion = '1.12'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
