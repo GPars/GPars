@@ -23,6 +23,10 @@ import org.apache.tools.ant.taskdefs.Javadoc
 //  Author: Rene Groeschke
 //  Author: Hamlet D'Arcy - Updated OSGi configuration
 
+final userPropertiesAreSet = {
+    project.hasProperty('codehausUsername') && project.hasProperty('codehausPassword')
+}
+
 final signingPropertiesAreSet = {
     project.hasProperty('signing.keyId') && project.hasProperty('signing.password') && project.hasProperty('signing.secretKeyRingFile')
 }
@@ -214,19 +218,16 @@ if (signingPropertiesAreSet()) {
 
 gradle.taskGraph.whenReady { taskGraph ->
     if (taskGraph.hasTask(uploadArchives)) {
-        if (!(project.hasProperty('codehausUsername') && project.hasProperty('codehausPassword'))) {
-            throw new RuntimeException('Must define both codehausUsername and codehausPassword to upload archives.')
-        }
-        if (!signingPropertiesAreSet()) {
-            throw new RuntimeException('Must define signing.keyId, signing.password, and signing.secretKeyRingFile to upload signed archives.')
+        if (!(userPropertiesAreSet() && signingPropertiesAreSet())) {
+            throw new RuntimeException('Must define both codehausUsername, codehausPassword, signing.keyId, signing.password, and signing.secretKeyRingFile to upload signed archives.')
         }
         project.ext.deployer = uploadArchives.repositories.mavenDeployer {
             uniqueVersion = false
             configuration = configurations.deployerJars
-            repository(url: 'https://dav.codehaus.org/repository/gpars/') {
+            repository(url: 'https://nexus.codehaus.org/service/local/staging/deploy/maven2') {
                 authentication(userName: codehausUsername, password: codehausPassword)
             }
-            snapshotRepository(url: 'https://dav.codehaus.org/snapshots.repository/gpars/') {
+            snapshotRepository(url: 'https://nexus.codehaus.org/content/repositories/snapshots') {
                 authentication(userName: codehausUsername, password: codehausPassword)
             }
             pom.project {
