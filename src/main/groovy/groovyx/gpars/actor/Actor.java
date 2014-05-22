@@ -480,7 +480,8 @@ public abstract class Actor extends MessageStream {
         @Override
         public MessageStream send(Object message) {
             if (!(message instanceof ActorMessage)) {
-                message = new ActorMessage(message, Actor.threadBoundActor());
+                // message = new ActorMessage(message, Actor.threadBoundActor());
+                message = new ActorMessage(message, remoteHost.getLocalHost().getLocalNode().getMainActor());
             }
             remoteHost.write(new SendTo(this, (ActorMessage) message));
             return this;

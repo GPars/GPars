@@ -203,4 +203,8 @@ public class LocalHost extends SerialHandles {
             localNode.onDisconnect(t);
         }
     }
+
+    public LocalNode getLocalNode() {
+        return localNodes.values().iterator().next();
+    }
 }
