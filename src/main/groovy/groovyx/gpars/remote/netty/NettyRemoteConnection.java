@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-10, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package groovyx.gpars.remote.netty;
 
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
+
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class NettyRemoteConnection extends RemoteConnection {
     private final NettyHandler handler;
-    private final MyChannelFutureListener writeListener = new MyChannelFutureListener();
+    //private final MyChannelFutureListener writeListener = new MyChannelFutureListener();
 
     public NettyRemoteConnection(final NettyTransportProvider provider, final NettyHandler netHandler) {
         super(provider);
@@ -40,23 +42,25 @@ public class NettyRemoteConnection extends RemoteConnection {
 
     @Override
     public void write(final SerialMsg msg) {
-        if (handler.getChannel().isConnected() && handler.getChannel().isOpen()) {
-            writeListener.incrementAndGet();
-            handler.getChannel().write(msg).addListener(writeListener);
-        }
+        throw new NotImplementedException();
+//        if (handler.getChannel().isActive() && handler.getChannel().isOpen()) {
+//            writeListener.incrementAndGet();
+//            handler.getChannel().write(msg).addListener(writeListener);
+//        }
     }
 
     @Override
     public void disconnect() {
-        writeListener.incrementAndGet();
-        writeListener.handler = handler;
-        try {
-            writeListener.operationComplete(null);
-        } catch (Exception ignored) {
-        }
+        throw new NotImplementedException();
+//        writeListener.incrementAndGet();
+//        writeListener.handler = handler;
+//        try {
+//            writeListener.operationComplete(null);
+//        } catch (Exception ignored) {
+//        }
     }
 
-    private static class MyChannelFutureListener extends AtomicInteger implements ChannelFutureListener {
+    /*private static class MyChannelFutureListener extends AtomicInteger implements ChannelFutureListener {
         private static final long serialVersionUID = -3054880716233778157L;
         public volatile NettyHandler handler;
 
@@ -78,5 +82,5 @@ public class NettyRemoteConnection extends RemoteConnection {
                 }
             }
         }
-    }
+    }*/
 }
