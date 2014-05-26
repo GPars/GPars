@@ -20,13 +20,59 @@ class NettyClientServerTest extends GroovyTestCase {
 
     public void testConnectionLocal() {
         // start server on localhost
-        NettyServer server = new NettyServer();
+        NettyServer server = new NettyServer('localhost')
+        server.start()
+        println "Server ${server.channel} active=${server.channel.isActive()}"
+        def serverStarted = server.channel.isActive()
+        def clientConnected = false
 
-        //start client on localhost
-        // NettyClient ...
+        if (serverStarted) {
+            def serverPort = ((InetSocketAddress) server.channel.localAddress()).getPort()
 
-        // client connects to server
+            //client connects to server
+            NettyClient client = new NettyClient('localhost', serverPort)
+            client.start()
+            println "Client ${client.channel} active=${client.channel.isActive()}"
+            clientConnected = client.channel.isActive()
+
+            // stop client
+            client.stop()
+        }
+        // stop server
+        server.stop()
 
         // client sends message
+        assert serverStarted && clientConnected
+    }
+
+    public void testMessageLocal() {
+        // start server on localhost
+        NettyServer server = new NettyServer('localhost')
+        server.start()
+        println "Server ${server.channel} active=${server.channel.isActive()}"
+        def serverStarted = server.channel.isActive()
+        def clientConnected = false
+
+        if (serverStarted) {
+            def serverPort = ((InetSocketAddress) server.channel.localAddress()).getPort()
+
+            //start client on localhost
+            NettyClient client = new NettyClient('localhost', serverPort)
+
+            // client connects to server
+            client.start()
+            println "Client ${client.channel} active=${client.channel.isActive()}"
+            clientConnected = client.channel.isActive()
+
+            client.channel.writeAndFlush("Hi, I'm client!").sync()
+
+            // stop client
+            client.stop()
+        }
+        // stop server
+        server.stop()
+
+        // client sends message
+        assert serverStarted && clientConnected
     }
 }
