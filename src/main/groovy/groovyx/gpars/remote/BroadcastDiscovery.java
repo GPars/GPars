@@ -112,7 +112,7 @@ public class BroadcastDiscovery {
                                     onDiscovery(uuid, new InetSocketAddress(InetAddress.getByAddress(addrBuf6), port));
                                 }
                             }
-                        } catch (IOException e) {
+                        } catch (IOException | InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
@@ -144,6 +144,6 @@ public class BroadcastDiscovery {
         }
     }
 
-    protected void onDiscovery(final UUID uuid, final SocketAddress address) {
+    protected void onDiscovery(final UUID uuid, final SocketAddress address) throws InterruptedException {
     }
 }

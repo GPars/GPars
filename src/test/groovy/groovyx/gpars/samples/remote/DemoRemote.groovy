@@ -23,6 +23,7 @@ import groovyx.gpars.remote.netty.NettyTransportProvider
 println """Welcome to chat!
 Every line you will type will be printed on all JVM, which runs this script.
 
+Type '@show' to show detected nodes
 Type '@bye' to exit
 Type '@kill <UUID of other node>' to stop it
 Type '@kill all' to stop all other nodes
@@ -31,7 +32,7 @@ Type '@kill all' to stop all other nodes
 def readAddress() {
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in))
     print 'Bind server to address: '
-    br.readLine()
+    "10.0.0." + br.readLine()
 }
 
 // transport provider communicating over IP
@@ -124,6 +125,11 @@ def mainNode = new LocalNode(transport, {
                             e.printStackTrace()
                         }
                     }
+                    return
+                }
+
+                if (line.startsWith("@show")) {
+                    println connected
                     return
                 }
                 mainActor << [command: "broadcast", line: line, id: id]

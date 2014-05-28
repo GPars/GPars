@@ -16,18 +16,39 @@
 
 package groovyx.gpars.remote.netty;
 
+import groovyx.gpars.remote.LocalHost;
+import groovyx.gpars.remote.RemoteConnection;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
+    private final List<NettyClient.DisconnectListener> disconnectListeners;
+
+    private final LocalHost localHost;
+
+    public NettyChannelInitializer(LocalHost localHost) {
+        this(localHost, new ArrayList<>());
+    }
+
+    public NettyChannelInitializer(LocalHost localHost, List<NettyClient.DisconnectListener> disconnectListeners) {
+        this.disconnectListeners = disconnectListeners;
+        this.localHost = localHost;
+    }
+
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         ChannelPipeline pipeline = socketChannel.pipeline();
 
-        pipeline.addLast("decoder", new RemoteObjectDecoder(null));
-        pipeline.addLast("encoder", new RemoteObjectEncoder(null));
+        NettyHandler handler = new NettyHandler(localHost, disconnectListeners);
+        RemoteConnection remoteConnection = handler.getRemoteConnection();
 
-        pipeline.addLast("handler", new NettyHandler());
+        pipeline.addLast("decoder", new RemoteObjectDecoder(remoteConnection));
+        pipeline.addLast("encoder", new RemoteObjectEncoder(remoteConnection));
+
+        pipeline.addLast("handler", handler);
     }
 }

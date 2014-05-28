@@ -16,9 +16,11 @@
 
 package groovyx.gpars.remote.netty;
 
+import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -33,34 +35,37 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class NettyRemoteConnection extends RemoteConnection {
     private final NettyHandler handler;
-    //private final MyChannelFutureListener writeListener = new MyChannelFutureListener();
+    private final MyChannelFutureListener writeListener = new MyChannelFutureListener();
 
-    public NettyRemoteConnection(final NettyTransportProvider provider, final NettyHandler netHandler) {
+    public NettyRemoteConnection(final LocalHost provider, final NettyHandler netHandler) {
         super(provider);
         this.handler = netHandler;
     }
 
     @Override
-    public void write(final SerialMsg msg) {
-        throw new NotImplementedException();
-//        if (handler.getChannel().isActive() && handler.getChannel().isOpen()) {
-//            writeListener.incrementAndGet();
-//            handler.getChannel().write(msg).addListener(writeListener);
-//        }
+    public void write(Channel channel, final SerialMsg msg) {
+        if (channel.isActive() && channel.isOpen()) {
+            writeListener.incrementAndGet();
+            channel.writeAndFlush(msg).addListener(writeListener);
+        }
+    }
+
+    @Override
+    public void write(SerialMsg msg) {
+        write(handler.getChannel(), msg);
     }
 
     @Override
     public void disconnect() {
-        throw new NotImplementedException();
-//        writeListener.incrementAndGet();
-//        writeListener.handler = handler;
-//        try {
-//            writeListener.operationComplete(null);
-//        } catch (Exception ignored) {
-//        }
+        writeListener.incrementAndGet();
+        writeListener.handler = handler;
+        try {
+            writeListener.operationComplete(null);
+        } catch (Exception ignored) {
+        }
     }
 
-    /*private static class MyChannelFutureListener extends AtomicInteger implements ChannelFutureListener {
+    private static class MyChannelFutureListener extends AtomicInteger implements ChannelFutureListener {
         private static final long serialVersionUID = -3054880716233778157L;
         public volatile NettyHandler handler;
 
@@ -68,7 +73,7 @@ public class NettyRemoteConnection extends RemoteConnection {
         public void operationComplete(final ChannelFuture future) throws Exception {
             if (decrementAndGet() == 0 && handler != null) {
                 final CountDownLatch cdl = new CountDownLatch(1);
-                handler.getChannel().close().addListener(new ChannelFutureListener() {
+                future.channel().close().addListener(new ChannelFutureListener() {
                     @Override
                     @SuppressWarnings({"AnonymousClassVariableHidesContainingMethodVariable"})
                     public void operationComplete(final ChannelFuture future) throws Exception {
@@ -82,5 +87,5 @@ public class NettyRemoteConnection extends RemoteConnection {
                 }
             }
         }
-    }*/
+    }
 }

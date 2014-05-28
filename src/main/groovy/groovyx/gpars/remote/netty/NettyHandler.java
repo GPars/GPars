@@ -16,6 +16,7 @@
 
 package groovyx.gpars.remote.netty;
 
+import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
@@ -23,47 +24,56 @@ import static io.netty.channel.ChannelHandler.Sharable;
 
 import io.netty.channel.*;
 
+import java.util.List;
+
 /**
  * @author Alex Tkachman
  */
 @Sharable
 public class NettyHandler extends ChannelInboundHandlerAdapter {
+    private final List<NettyClient.DisconnectListener> disconnectListeners;
+
+    private final RemoteConnection remoteConnection;
+
+    private Channel channel;
+
+    public NettyHandler(LocalHost localHost, final List<NettyClient.DisconnectListener> disconnectListeners) {
+        this.disconnectListeners = disconnectListeners;
+        remoteConnection = new NettyRemoteConnection(localHost, this);
+    }
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
+        System.err.println("connected");
+        remoteConnection.onConnect(ctx.channel());
+        channel = ctx.channel();
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
+        System.err.println("disconnected");
+        remoteConnection.onDisconnect();
+        for (NettyClient.DisconnectListener listener : disconnectListeners) {
+            listener.onDisconnect();
+        }
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         super.channelRead(ctx, msg);
-        System.err.println(msg);
+        System.err.println("Message received: " + msg);
+        if (msg instanceof SerialMsg) {
+            ((SerialMsg) msg).execute(remoteConnection);
+        }
     }
-//
-//    private final RemoteConnection connection;
-//
-//    public NettyHandler(final NettyTransportProvider provider) {
-//        connection = new NettyRemoteConnection(provider, this);
-//    }
-//
-//    @Override
-//    public void channelConnected(final ChannelHandlerContext ctx, final ChannelStateEvent e) throws Exception {
-//        connection.onConnect();
-//    }
-//
-//    @Override
-//    public void channelDisconnected(final ChannelHandlerContext ctx, final ChannelStateEvent e) throws Exception {
-//        connection.onDisconnect();
-//    }
-//
-//    @Override
-//    public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e) {
-//        final SerialMsg msg = (SerialMsg) e.getMessage();
-//        msg.execute(connection);
-//    }
-//
+
+    public RemoteConnection getRemoteConnection() {
+        return remoteConnection;
+    }
+
+    public Channel getChannel() {
+        return channel;
+    }
 }

@@ -18,6 +18,7 @@ package groovyx.gpars.remote;
 
 import groovyx.gpars.remote.message.HostIdMsg;
 import groovyx.gpars.serial.SerialMsg;
+import io.netty.channel.Channel;
 
 /**
  * Represents connection to remote host
@@ -45,13 +46,15 @@ public abstract class RemoteConnection {
     public void onException(final Throwable cause) {
     }
 
-    public void onConnect() {
-        write(new HostIdMsg(localHost.getId()));
+    public void onConnect(Channel channel) {
+        write(channel, new HostIdMsg(localHost.getId()));
     }
 
     public void onDisconnect() {
         localHost.onDisconnect(host);
     }
+
+    public abstract void write(Channel channel, SerialMsg msg);
 
     public abstract void write(SerialMsg msg);
 

@@ -16,6 +16,7 @@
 
 package groovyx.gpars.remote.netty;
 
+import groovyx.gpars.remote.LocalHost;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -36,11 +37,14 @@ public class NettyServer {
     private EventLoopGroup workerGroup;
     private Channel channel;
 
+    private LocalHost localHost;
+
     /**
      * Creates a server listening on specified addresss.
      * @param address
      */
-    public NettyServer(String address) {
+    public NettyServer(LocalHost localHost, String address) {
+        this.localHost = localHost;
         this.address = address;
     }
 
@@ -56,7 +60,7 @@ public class NettyServer {
         ServerBootstrap bootstrap = new ServerBootstrap();
         bootstrap.group(bossGroup, workerGroup)
             .channel(NioServerSocketChannel.class)
-            .childHandler(new NettyChannelInitializer())
+            .childHandler(new NettyChannelInitializer(localHost))
             .childOption(ChannelOption.TCP_NODELAY, true)
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             .localAddress(new InetSocketAddress(address, 0));
@@ -66,7 +70,7 @@ public class NettyServer {
 
     /**
      * Stops the server.
-     * Note: method block untils server is stopped.
+     * Note: method block until server is stopped.
      * @throws InterruptedException
      */
     public void stop() throws InterruptedException {

@@ -40,7 +40,7 @@ public class RemoteObjectEncoder extends ObjectEncoder {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Serializable msg, ByteBuf out) throws Exception {
-        final RemoteHost remoteHost = null; //connection.getHost();
+        final RemoteHost remoteHost = connection.getHost();
 
         if (remoteHost != null) {
             remoteHost.enter();

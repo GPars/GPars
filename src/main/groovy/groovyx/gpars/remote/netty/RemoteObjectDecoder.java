@@ -39,7 +39,7 @@ public class RemoteObjectDecoder extends ObjectDecoder {
 
     @Override
     protected Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
-        final RemoteHost remoteHost = null; //connection.getHost();
+        final RemoteHost remoteHost = connection.getHost();
 
         if (remoteHost != null) {
             remoteHost.enter();

@@ -16,12 +16,17 @@
 
 package groovyx.gpars.remote.netty;
 
+import groovyx.gpars.remote.BroadcastDiscovery;
+import groovyx.gpars.remote.LocalHost;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents client that connects to server
@@ -34,12 +39,17 @@ public class NettyClient {
 
     private Channel channel;
 
+    private List<DisconnectListener> disconnectListeners = new ArrayList<>();
+
+    private LocalHost localHost;
+
     /**
      * Creates client that connect to server on specified host and port.
      * @param host the host where server listens on
      * @param port the port that server listens on
      */
-    public NettyClient(String host, int port) {
+    public NettyClient(LocalHost localHost, String host, int port) {
+        this.localHost = localHost;
         this.host = host;
         this.port = port;
     }
@@ -55,7 +65,7 @@ public class NettyClient {
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(workerGroup)
                 .channel(NioSocketChannel.class)
-                .handler(new NettyChannelInitializer())
+                .handler(new NettyChannelInitializer(localHost, disconnectListeners))
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .remoteAddress(host, port);
@@ -71,5 +81,14 @@ public class NettyClient {
     public void stop() throws InterruptedException {
         channel.close().sync();
         workerGroup.shutdownGracefully();
+    }
+
+    public void addDisconnectListener(DisconnectListener listener) {
+        disconnectListeners.add(listener);
+    }
+
+    @FunctionalInterface
+    public interface DisconnectListener {
+        public void onDisconnect();
     }
 }

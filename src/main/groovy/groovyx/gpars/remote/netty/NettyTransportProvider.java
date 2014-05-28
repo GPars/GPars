@@ -22,6 +22,9 @@ import groovyx.gpars.remote.LocalHost;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -32,32 +35,32 @@ import java.util.UUID;
  */
 public class NettyTransportProvider extends LocalHost {
 
-//    private final Map<UUID, Client> clients = new HashMap<UUID, Client>();
+    private final Map<UUID, NettyClient> clients = Collections.synchronizedMap(new HashMap<UUID, NettyClient>());
 
     final NettyServer server;
 
     final BroadcastDiscovery broadcastDiscovery;
 
     public NettyTransportProvider(String address) throws InterruptedException {
-        server = new NettyServer(address);
+        server = new NettyServer(this, address);
         server.start();
 
         System.err.printf("Server listens on: %s:%d%n", server.getAddress().getHostString(), server.getAddress().getPort());
 
         this.broadcastDiscovery = new BroadcastDiscovery(getId(), server.getAddress()) {
             @Override
-            protected void onDiscovery(final UUID uuid, final SocketAddress address) {
-                System.err.println("discovered");
-//                if (uuid.equals(getId())) {
-//                    return;
-//                }
-//
-//                synchronized (clients) {
-//                    final Client client = clients.get(uuid);
-//                    if (client == null) {
-//                        clients.put(uuid, new Client(NettyTransportProvider.this, address, uuid));
-//                    }
-//                }
+            protected void onDiscovery(final UUID uuid, final SocketAddress address) throws InterruptedException {
+                if (uuid.equals(getId())) {
+                    return;
+                }
+
+                NettyClient client = clients.get(uuid);
+                if (client == null) {
+                    client = new NettyClient(NettyTransportProvider.this, ((InetSocketAddress)address).getHostString(), ((InetSocketAddress)address).getPort());
+                    client.addDisconnectListener(() -> { System.out.println("Disconnected!"); clients.remove(uuid); });
+                    client.start();
+                    clients.put(uuid, client);
+                }
             }
         };
 
@@ -71,30 +74,8 @@ public class NettyTransportProvider extends LocalHost {
 
         server.stop();
 
-//        for (final Client client : clients.values()) {
-//            client.stop();
-//        }
+        for (final NettyClient client : clients.values()) {
+            client.stop();
+        }
     }
-
-
-//
-//    @ChannelHandler.Sharable
-//    public static class ClientHandler extends NettyHandler {
-//        private final UUID id;
-//
-//        private final NettyTransportProvider provider;
-//
-//        public ClientHandler(final NettyTransportProvider provider, final UUID id) {
-//            super(provider);
-//            this.id = id;
-//            this.provider = provider;
-//        }
-//
-//        @Override
-//        public void channelDisconnected(final ChannelHandlerContext ctx, final ChannelStateEvent e) throws Exception {
-//            provider.clients.remove(id);
-//            super.channelDisconnected(ctx, e);
-//        }
-//    }
-
 }
