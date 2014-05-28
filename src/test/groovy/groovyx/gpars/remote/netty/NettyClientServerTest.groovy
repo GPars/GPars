@@ -75,4 +75,39 @@ class NettyClientServerTest extends GroovyTestCase {
         // client sends message
         assert serverStarted && clientConnected
     }
+
+    public void testMultipleConnectionsLocal() {
+        // start server on localhost
+        NettyServer server = new NettyServer('localhost')
+        server.start()
+        println "Server ${server.channel} active=${server.channel.isActive()}"
+        def serverStarted = server.channel.isActive()
+        def client1Connected = false
+        def client2Connected = false
+
+        if (serverStarted) {
+            def serverPort = ((InetSocketAddress) server.channel.localAddress()).getPort()
+
+            //client1 connects to server
+            NettyClient client1 = new NettyClient('localhost', serverPort)
+            client1.start()
+            println "Client ${client1.channel} active=${client1.channel.isActive()}"
+            client1Connected = client1.channel.isActive()
+
+            //client2 connects to server
+            NettyClient client2 = new NettyClient('localhost', serverPort)
+            client2.start()
+            println "Client ${client2.channel} active=${client2.channel.isActive()}"
+            client2Connected = client2.channel.isActive()
+
+            // stop clients
+            client1.stop()
+            client2.stop()
+        }
+        // stop server
+        server.stop()
+
+        // client sends message
+        assert serverStarted && client1Connected && client2Connected
+    }
 }
