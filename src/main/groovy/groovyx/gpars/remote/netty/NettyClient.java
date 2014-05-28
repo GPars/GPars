@@ -23,6 +23,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+/**
+ * Represents client that connects to server
+ * @see NettyServer
+ */
 public class NettyClient {
     private final String host;
     private final int port;
@@ -30,11 +34,21 @@ public class NettyClient {
 
     private Channel channel;
 
+    /**
+     * Creates client that connect to server on specified host and port.
+     * @param host the host where server listens on
+     * @param port the port that server listens on
+     */
     public NettyClient(String host, int port) {
         this.host = host;
         this.port = port;
     }
 
+    /**
+     * Connects the client to server
+     * Note: method block until connection is established
+     * @throws InterruptedException
+     */
     public void start() throws InterruptedException {
         workerGroup = new NioEventLoopGroup();
 
@@ -49,6 +63,11 @@ public class NettyClient {
         channel = bootstrap.connect().sync().channel();
     }
 
+    /**
+     * Closes connection to server
+     * Note: method blocks until connection is closed
+     * @throws InterruptedException
+     */
     public void stop() throws InterruptedException {
         channel.close().sync();
         workerGroup.shutdownGracefully();
