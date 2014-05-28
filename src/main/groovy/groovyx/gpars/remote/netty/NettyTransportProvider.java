@@ -16,7 +16,13 @@
 
 package groovyx.gpars.remote.netty;
 
+import groovyx.gpars.remote.BroadcastDiscovery;
 import groovyx.gpars.remote.LocalHost;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.UUID;
 
 
 /**
@@ -28,17 +34,20 @@ public class NettyTransportProvider extends LocalHost {
 
 //    private final Map<UUID, Client> clients = new HashMap<UUID, Client>();
 
-    final NettyServer server = new NettyServer("localhost");
+    final NettyServer server;
 
-//    final BroadcastDiscovery broadcastDiscovery;
+    final BroadcastDiscovery broadcastDiscovery;
 
-    public NettyTransportProvider() {
-//        server.start(this);
-//        System.err.println(server.getAddress().getAddress().getHostAddress() + ":" + server.getAddress().getPort());
+    public NettyTransportProvider(String address) throws InterruptedException {
+        server = new NettyServer(address);
+        server.start();
 
-//        this.broadcastDiscovery = new BroadcastDiscovery(getId(), server.getAddress()) {
-//            @Override
-//            protected void onDiscovery(final UUID uuid, final SocketAddress address) {
+        System.err.printf("Server listens on: %s:%d%n", server.getAddress().getHostString(), server.getAddress().getPort());
+
+        this.broadcastDiscovery = new BroadcastDiscovery(getId(), server.getAddress()) {
+            @Override
+            protected void onDiscovery(final UUID uuid, final SocketAddress address) {
+                System.err.println("discovered");
 //                if (uuid.equals(getId())) {
 //                    return;
 //                }
@@ -49,74 +58,25 @@ public class NettyTransportProvider extends LocalHost {
 //                        clients.put(uuid, new Client(NettyTransportProvider.this, address, uuid));
 //                    }
 //                }
-//            }
-//        };
+            }
+        };
 
-//        broadcastDiscovery.start();
+       broadcastDiscovery.start();
     }
 
     @Override
-    public void disconnect() {
-//        broadcastDiscovery.stop();
-
+    public void disconnect() throws InterruptedException {
         super.disconnect();
+        broadcastDiscovery.stop();
 
-//        server.stop();
+        server.stop();
 
 //        for (final Client client : clients.values()) {
 //            client.stop();
 //        }
     }
 
-//    public static class Client {
-//        private final NettyTransportProvider provider;
-//
-//        final ChannelFuture channelFuture;
-//
-//        final ChannelFactory factory;
-//
-//        @SuppressWarnings({"UnnecessaryBoxing"})
-//        public Client(final NettyTransportProvider provider, final SocketAddress address, final UUID id) {
-//            this.provider = provider;
-//            factory = new NioClientSocketChannelFactory(
-//                    Executors.newCachedThreadPool(MyThreadFactory.instance),
-//                    Executors.newCachedThreadPool(MyThreadFactory.instance));
-//
-//            final ClientBootstrap bootstrap = new ClientBootstrap(factory);
-//
-//            final NettyHandler handler = new ClientHandler(this.provider, id);
-//
-//            bootstrap.getPipeline().addLast("handler", handler);
-//            bootstrap.setOption("tcpNoDelay", Boolean.valueOf(true));
-//            bootstrap.setOption("keepAlive", Boolean.valueOf(true));
-//
-//            channelFuture = bootstrap.connect(address);
-//        }
-//
-//        public void stop() {
-//            channelFuture.getChannel().close().addListener(new ChannelFutureListener() {
-//                @Override
-//                public void operationComplete(final ChannelFuture future) throws Exception {
-//                    factory.releaseExternalResources();
-//                }
-//            });
-//        }
-//    }
 
-//    public static class ServerPipelineFactory implements ChannelPipelineFactory {
-//        private final NettyTransportProvider provider;
-//
-//        public ServerPipelineFactory(final NettyTransportProvider provider) {
-//            this.provider = provider;
-//        }
-//
-//        @Override
-//        public ChannelPipeline getPipeline() throws Exception {
-//            final ChannelPipeline pipeline = Channels.pipeline();
-//            pipeline.addLast("handler", new NettyHandler(provider));
-//            return pipeline;
-//        }
-//    }
 //
 //    @ChannelHandler.Sharable
 //    public static class ClientHandler extends NettyHandler {
@@ -136,21 +96,5 @@ public class NettyTransportProvider extends LocalHost {
 //            super.channelDisconnected(ctx, e);
 //        }
 //    }
-//
-//    private static class MyThreadFactory implements ThreadFactory {
-//        static final MyThreadFactory instance = new MyThreadFactory();
-//
-//        @Override
-//        public Thread newThread(final Runnable r) {
-//            final Thread thread = new Thread(r);
-//            thread.setDaemon(true);
-//            thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-//                @Override
-//                public void uncaughtException(final Thread t, final Throwable e) {
-//                    e.printStackTrace();
-//                }
-//            });
-//            return thread;
-//        }
-//    }
+
 }

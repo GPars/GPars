@@ -28,13 +28,20 @@ Type '@kill <UUID of other node>' to stop it
 Type '@kill all' to stop all other nodes
 """
 
+def readAddress() {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in))
+    print 'Bind server to address: '
+    br.readLine()
+}
+
 // transport provider communicating over IP
 // it includes 4 functions in parallel
 // - multicast of own identity
 // - IP server accepting incoming connections from other nodes
 // - multicast listener listening for broadcasts sent by other nodes
 // - IP client connection to discovered nodes
-def transport = new NettyTransportProvider()
+def address = readAddress()
+def transport = new NettyTransportProvider(address)
 
 // Here we start new distributed node communicating over IP
 // and start actor on this node

@@ -111,7 +111,7 @@ public class LocalHost extends SerialHandles {
         }
     }
 
-    public void disconnect() {
+    public void disconnect() throws InterruptedException {
         synchronized (localNodes) {
             final Iterable<LocalNode> copy = new ArrayList<LocalNode>(localNodes.values());
             localNodes.clear();

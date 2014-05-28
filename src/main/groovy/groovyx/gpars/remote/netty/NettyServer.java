@@ -75,4 +75,8 @@ public class NettyServer {
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }
+
+    public InetSocketAddress getAddress() {
+        return (InetSocketAddress) channel.localAddress();
+    }
 }
