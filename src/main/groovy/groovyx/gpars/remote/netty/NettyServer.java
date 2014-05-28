@@ -25,6 +25,10 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.net.InetSocketAddress;
 
+/**
+ * Represents a server that waits for connections from clients.
+ * @see NettyClient
+ */
 public class NettyServer {
     private final String address;
 
@@ -32,10 +36,19 @@ public class NettyServer {
     private EventLoopGroup workerGroup;
     private Channel channel;
 
+    /**
+     * Creates a server listening on specified addresss.
+     * @param address
+     */
     public NettyServer(String address) {
         this.address = address;
     }
 
+    /**
+     * Starts the server.
+     * Note: method blocks until server is started.
+     * @throws InterruptedException
+     */
     public void start() throws InterruptedException {
         bossGroup = new NioEventLoopGroup();
         workerGroup = new NioEventLoopGroup();
@@ -51,6 +64,11 @@ public class NettyServer {
         channel = bootstrap.bind().sync().channel();
     }
 
+    /**
+     * Stops the server.
+     * Note: method block untils server is stopped.
+     * @throws InterruptedException
+     */
     public void stop() throws InterruptedException {
         channel.close().sync();
 
