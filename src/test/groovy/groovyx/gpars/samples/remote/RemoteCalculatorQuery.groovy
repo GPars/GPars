@@ -12,7 +12,7 @@ println "Remote Calculator"
 // - IP server accepting incoming connections from other nodes
 // - multicast listener listening for broadcasts sent by other nodes
 // - IP client connection to discovered nodes
-def transport = new NettyTransportProvider()
+def transport = new NettyTransportProvider("10.0.0.1")
 
 // Here we start new distributed node communicating over IP
 // and start actor on this node
