@@ -89,6 +89,6 @@ public class NettyClient {
 
     @FunctionalInterface
     public interface DisconnectListener {
-        public void onDisconnect();
+        public void onDisconnect() throws InterruptedException;
     }
 }

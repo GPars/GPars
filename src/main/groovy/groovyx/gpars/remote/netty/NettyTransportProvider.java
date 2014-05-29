@@ -57,7 +57,7 @@ public class NettyTransportProvider extends LocalHost {
                 NettyClient client = clients.get(uuid);
                 if (client == null) {
                     client = new NettyClient(NettyTransportProvider.this, ((InetSocketAddress)address).getHostString(), ((InetSocketAddress)address).getPort());
-                    client.addDisconnectListener(() -> { System.out.println("Disconnected!"); clients.remove(uuid); });
+                    client.addDisconnectListener(() -> { System.out.println("Client disconnected!"); clients.get(uuid).stop(); clients.remove(uuid); });
                     client.start();
                     clients.put(uuid, client);
                 }
