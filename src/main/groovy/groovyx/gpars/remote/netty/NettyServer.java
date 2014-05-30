@@ -32,6 +32,7 @@ import java.net.InetSocketAddress;
  */
 public class NettyServer {
     private final String address;
+    private final int port;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -43,9 +44,10 @@ public class NettyServer {
      * Creates a server listening on specified addresss.
      * @param address
      */
-    public NettyServer(LocalHost localHost, String address) {
+    public NettyServer(LocalHost localHost, String address, int port) {
         this.localHost = localHost;
         this.address = address;
+        this.port = port;
     }
 
     /**
@@ -63,7 +65,7 @@ public class NettyServer {
             .childHandler(new NettyChannelInitializer(localHost))
             .childOption(ChannelOption.TCP_NODELAY, true)
             .childOption(ChannelOption.SO_KEEPALIVE, true)
-            .localAddress(new InetSocketAddress(address, 0));
+            .localAddress(new InetSocketAddress(address, port));
 
         channel = bootstrap.bind().sync().channel();
     }

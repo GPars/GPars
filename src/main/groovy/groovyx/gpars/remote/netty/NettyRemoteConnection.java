@@ -34,58 +34,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Alex Tkachman
  */
 public class NettyRemoteConnection extends RemoteConnection {
-    private final NettyHandler handler;
-    private final MyChannelFutureListener writeListener = new MyChannelFutureListener();
+    private final Channel channel;
 
-    public NettyRemoteConnection(final LocalHost provider, final NettyHandler netHandler) {
+    public NettyRemoteConnection(final LocalHost provider, final Channel channel) {
         super(provider);
-        this.handler = netHandler;
-    }
-
-    @Override
-    public void write(Channel channel, final SerialMsg msg) {
-        if (channel.isActive() && channel.isOpen()) {
-            writeListener.incrementAndGet();
-            channel.writeAndFlush(msg).addListener(writeListener);
-        }
+        this.channel = channel;
     }
 
     @Override
     public void write(SerialMsg msg) {
-        write(handler.getChannel(), msg);
+        if (channel.isActive()) {
+            channel.writeAndFlush(msg);
+        }
     }
 
     @Override
     public void disconnect() {
-        writeListener.incrementAndGet();
-        writeListener.handler = handler;
-        try {
-            writeListener.operationComplete(null);
-        } catch (Exception ignored) {
-        }
-    }
-
-    private static class MyChannelFutureListener extends AtomicInteger implements ChannelFutureListener {
-        private static final long serialVersionUID = -3054880716233778157L;
-        public volatile NettyHandler handler;
-
-        @Override
-        public void operationComplete(final ChannelFuture future) throws Exception {
-            if (decrementAndGet() == 0 && handler != null) {
-                final CountDownLatch cdl = new CountDownLatch(1);
-                future.channel().close().addListener(new ChannelFutureListener() {
-                    @Override
-                    @SuppressWarnings({"AnonymousClassVariableHidesContainingMethodVariable"})
-                    public void operationComplete(final ChannelFuture future) throws Exception {
-                        cdl.countDown();
-                    }
-                });
-                try {
-                    cdl.await();
-                } catch (InterruptedException e) {//
-                    e.printStackTrace();
-                }
-            }
-        }
+        channel.close(); // TODO sync?
     }
 }

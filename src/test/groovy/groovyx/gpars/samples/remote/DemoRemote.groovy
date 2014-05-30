@@ -42,7 +42,7 @@ def readAddress() {
 // - multicast listener listening for broadcasts sent by other nodes
 // - IP client connection to discovered nodes
 def address = readAddress()
-def transport = new NettyTransportProvider(address)
+def transport = new NettyTransportProvider(address, 9000)
 
 // Here we start new distributed node communicating over IP
 // and start actor on this node

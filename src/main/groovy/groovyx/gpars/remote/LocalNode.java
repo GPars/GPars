@@ -51,20 +51,20 @@ public class LocalNode {
 
     private final LocalHost localHost;
 
-    public LocalNode() {
-        this(null, null);
-    }
+//    public LocalNode() {
+//        this(null, null);
+//    }
+//
+//    public LocalNode(final Runnable runnable) {
+//        this(null, runnable);
+//    }
+//
+//    public LocalNode(final LocalHost provider) {
+//        this(provider, null);
+//    }
 
-    public LocalNode(final Runnable runnable) {
-        this(null, runnable);
-    }
-
-    public LocalNode(final LocalHost provider) {
-        this(provider, null);
-    }
-
-    public LocalNode(final LocalHost provider, final Runnable runnable) {
-        this.scheduler = new ThreadPoolExecutor(1, Integer.MAX_VALUE,
+    public LocalNode(final LocalHost provider, final Runnable runnable) throws InterruptedException {
+        this.scheduler = new ThreadPoolExecutor(2, Integer.MAX_VALUE,
                 60L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>(100),
                 new ThreadFactory() {
@@ -104,7 +104,7 @@ public class LocalNode {
         }
     }
 
-    public void connect() {
+    public void connect() throws InterruptedException {
         if (localHost != null) {
             connect(localHost);
         } else {
@@ -112,11 +112,15 @@ public class LocalNode {
         }
     }
 
-    public void connect(final LocalHost provider) {
+    public void connect(final LocalHost provider) throws InterruptedException {
         scheduler.execute(new Runnable() {
             @Override
             public void run() {
-                provider.connect(LocalNode.this);
+                try {
+                    provider.connect(LocalNode.this);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

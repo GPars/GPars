@@ -33,7 +33,7 @@ public class LocalHostRegistry {
     private LocalHostRegistry() {
     }
 
-    public static synchronized void connect(final LocalNode node) {
+    public static synchronized void connect(final LocalNode node) throws InterruptedException {
         for (final LocalHost transportProvider : LocalHostRegistry.localHosts) {
             node.connect(transportProvider);
         }

@@ -39,8 +39,6 @@ public class NettyClient {
 
     private Channel channel;
 
-    private List<DisconnectListener> disconnectListeners = new ArrayList<>();
-
     private LocalHost localHost;
 
     /**
@@ -65,7 +63,7 @@ public class NettyClient {
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(workerGroup)
                 .channel(NioSocketChannel.class)
-                .handler(new NettyChannelInitializer(localHost, disconnectListeners))
+                .handler(new NettyChannelInitializer(localHost))
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .remoteAddress(host, port);
@@ -81,14 +79,5 @@ public class NettyClient {
     public void stop() throws InterruptedException {
         channel.close().sync();
         workerGroup.shutdownGracefully();
-    }
-
-    public void addDisconnectListener(DisconnectListener listener) {
-        disconnectListeners.add(listener);
-    }
-
-    @FunctionalInterface
-    public interface DisconnectListener {
-        public void onDisconnect() throws InterruptedException;
     }
 }

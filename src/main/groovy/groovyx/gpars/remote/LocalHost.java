@@ -66,7 +66,7 @@ public class LocalHost extends SerialHandles {
      *
      * @param node local node
      */
-    public void connect(final LocalNode node) {
+    public void connect(final LocalNode node) throws InterruptedException {
         synchronized (localNodes) {
             localNodes.put(node.getId(), node);
         }

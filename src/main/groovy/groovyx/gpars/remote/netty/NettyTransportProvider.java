@@ -39,43 +39,43 @@ public class NettyTransportProvider extends LocalHost {
 
     final NettyServer server;
 
-    final BroadcastDiscovery broadcastDiscovery;
+//    final BroadcastDiscovery broadcastDiscovery;
 
-    public NettyTransportProvider(String address) throws InterruptedException {
-        server = new NettyServer(this, address);
+    public NettyTransportProvider(String address, int port) throws InterruptedException {
+        server = new NettyServer(this, address, port);
         server.start();
 
         System.err.printf("Server listens on: %s:%d%n", server.getAddress().getHostString(), server.getAddress().getPort());
 
-        this.broadcastDiscovery = new BroadcastDiscovery(getId(), server.getAddress()) {
-            @Override
-            protected void onDiscovery(final UUID uuid, final SocketAddress address) throws InterruptedException {
-                if (uuid.equals(getId())) {
-                    return;
-                }
-
-                NettyClient client = clients.get(uuid);
-                if (client == null) {
-                    client = new NettyClient(NettyTransportProvider.this, ((InetSocketAddress)address).getHostString(), ((InetSocketAddress)address).getPort());
-                    client.addDisconnectListener(() -> { System.out.println("Client disconnected!"); clients.get(uuid).stop(); clients.remove(uuid); });
-                    client.start();
-                    clients.put(uuid, client);
-                }
-            }
-        };
-
-       broadcastDiscovery.start();
+//        this.broadcastDiscovery = new BroadcastDiscovery(getId(), server.getAddress()) {
+//            @Override
+//            protected void onDiscovery(final UUID uuid, final SocketAddress address) throws InterruptedException {
+//                if (uuid.equals(getId())) {
+//                    return;
+//                }
+//
+//                NettyClient client = clients.get(uuid);
+//                if (client == null) {
+//                    client = new NettyClient(NettyTransportProvider.this, ((InetSocketAddress)address).getHostString(), ((InetSocketAddress)address).getPort());
+//                    client.addDisconnectListener(() -> { System.out.println("Client disconnected!"); clients.get(uuid).stop(); clients.remove(uuid); });
+//                    client.start();
+//                    clients.put(uuid, client);
+//                }
+//            }
+//        };
+//
+//       broadcastDiscovery.start();
     }
 
     @Override
     public void disconnect() throws InterruptedException {
         super.disconnect();
-        broadcastDiscovery.stop();
+//        broadcastDiscovery.stop();
+
+//        for (final NettyClient client : clients.values()) {
+//            client.stop();
+//        }
 
         server.stop();
-
-        for (final NettyClient client : clients.values()) {
-            client.stop();
-        }
     }
 }

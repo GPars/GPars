@@ -26,29 +26,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
-    private final List<NettyClient.DisconnectListener> disconnectListeners;
 
     private final LocalHost localHost;
 
     public NettyChannelInitializer(LocalHost localHost) {
-        this(localHost, new ArrayList<>());
-    }
-
-    public NettyChannelInitializer(LocalHost localHost, List<NettyClient.DisconnectListener> disconnectListeners) {
-        this.disconnectListeners = disconnectListeners;
         this.localHost = localHost;
     }
 
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
+        RemoteConnection remoteConnection = new NettyRemoteConnection(localHost, socketChannel);
+
         ChannelPipeline pipeline = socketChannel.pipeline();
-
-        NettyHandler handler = new NettyHandler(localHost, disconnectListeners);
-        RemoteConnection remoteConnection = handler.getRemoteConnection();
-
         pipeline.addLast("decoder", new RemoteObjectDecoder(remoteConnection));
         pipeline.addLast("encoder", new RemoteObjectEncoder(remoteConnection));
 
-        pipeline.addLast("handler", handler);
+        pipeline.addLast("handler", new NettyHandler(remoteConnection));
     }
 }

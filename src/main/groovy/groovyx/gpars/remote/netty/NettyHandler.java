@@ -29,25 +29,18 @@ import java.util.List;
 /**
  * @author Alex Tkachman
  */
-@Sharable
 public class NettyHandler extends ChannelInboundHandlerAdapter {
-    private final List<NettyClient.DisconnectListener> disconnectListeners;
-
     private final RemoteConnection remoteConnection;
 
-    private Channel channel;
-
-    public NettyHandler(LocalHost localHost, final List<NettyClient.DisconnectListener> disconnectListeners) {
-        this.disconnectListeners = disconnectListeners;
-        remoteConnection = new NettyRemoteConnection(localHost, this);
+    public NettyHandler(RemoteConnection remoteConnection) {
+        this.remoteConnection = remoteConnection;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         System.err.println("connected");
-        remoteConnection.onConnect(ctx.channel());
-        channel = ctx.channel();
+        remoteConnection.onConnect();
     }
 
     @Override
@@ -55,9 +48,6 @@ public class NettyHandler extends ChannelInboundHandlerAdapter {
         super.channelInactive(ctx);
         System.err.println("disconnected");
         remoteConnection.onDisconnect();
-        for (NettyClient.DisconnectListener listener : disconnectListeners) {
-            listener.onDisconnect();
-        }
     }
 
     @Override
@@ -73,7 +63,4 @@ public class NettyHandler extends ChannelInboundHandlerAdapter {
         return remoteConnection;
     }
 
-    public Channel getChannel() {
-        return channel;
-    }
 }
