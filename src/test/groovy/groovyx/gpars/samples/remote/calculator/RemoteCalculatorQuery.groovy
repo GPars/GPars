@@ -8,7 +8,7 @@ import java.util.concurrent.CountDownLatch;
 
 println "Remote Calculator (Query)"
 
-def transport = new ClientNettyTransportProvider("10.0.0.1", 9000)
+def transport = new ClientNettyTransportProvider("localhost", 9000)
 
 def mainNode = new LocalNode(transport, {
     println "Hi, I am $id"

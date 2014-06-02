@@ -6,12 +6,10 @@ import groovyx.gpars.actor.remote.RemoteActors
 def pingActor = Actors.actor {
     println "Ping Actor"
 
+    // get remote pongActor
+    def remotePongActor = RemoteActors.get("localhost", 9000) // class? name?
+
     react { numberOfPings ->
-        println numberOfPings
-
-        // get remote pongActor
-        RemoteActors.get("localhost", 9000) // class? name?
-
         loop(numberOfPings) {
             println "PING"
             // remotePongActor << "PING"

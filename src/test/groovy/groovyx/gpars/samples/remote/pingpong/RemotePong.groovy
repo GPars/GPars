@@ -7,10 +7,15 @@ def pongActor = Actors.actor {
     println "Pong Actor"
 
     // handle incomming messages
-    // loop -> react
+    loop({true}) {
+        react {
+            println it
+        }
+    }
 }
 
 // register pongActor as a remote actor
 RemoteActors.register(pongActor)
 
 pongActor.join()
+RemoteActors.shutdown()

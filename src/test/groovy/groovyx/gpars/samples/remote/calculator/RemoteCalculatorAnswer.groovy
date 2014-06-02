@@ -6,7 +6,7 @@ import groovyx.gpars.remote.netty.NettyTransportProvider;
 
 println "Remote Calculator (Answer)"
 
-def transport = new NettyTransportProvider("10.0.0.1", 9000)
+def transport = new NettyTransportProvider("localhost", 9000)
 
 def mainNode = new LocalNode(transport, {
     println "HI, I am $id"
