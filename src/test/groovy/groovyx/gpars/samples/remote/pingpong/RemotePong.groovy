@@ -3,8 +3,6 @@ package groovyx.gpars.samples.remote.pingpong
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.remote.RemoteActors
 
-// --- conecpt ---
-
 def pongActor = Actors.actor {
     println "Pong Actor"
 

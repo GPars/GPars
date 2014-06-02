@@ -1,8 +1,7 @@
 package groovyx.gpars.samples.remote.pingpong
 
 import groovyx.gpars.actor.Actors
-
-// --- conecpt ---
+import groovyx.gpars.actor.remote.RemoteActors
 
 def pingActor = Actors.actor {
     println "Ping Actor"
@@ -10,8 +9,8 @@ def pingActor = Actors.actor {
     react { numberOfPings ->
         println numberOfPings
 
-        // get remote Pong Actor
-        // RemoteActors.get(host, port, class?)
+        // get remote pongActor
+        RemoteActors.get("localhost", 9000) // class? name?
 
         loop(numberOfPings) {
             println "PING"
