@@ -64,7 +64,7 @@ public class LocalNode {
 //    }
 
     public LocalNode(final LocalHost provider, final Runnable runnable, final Actor actor) throws InterruptedException {
-        this.scheduler = new ThreadPoolExecutor(2, Integer.MAX_VALUE,
+        this.scheduler = new ThreadPoolExecutor(3, Integer.MAX_VALUE,
                 60L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>(100),
                 new ThreadFactory() {
@@ -99,9 +99,7 @@ public class LocalNode {
         }
 
         localHost = provider;
-        if (runnable != null) {
-            connect(provider);
-        }
+        connect(provider);
     }
 
     public void connect() throws InterruptedException {
@@ -123,6 +121,7 @@ public class LocalNode {
                 }
             }
         });
+//        provider.connect(this);
     }
 
     public void disconnect() {

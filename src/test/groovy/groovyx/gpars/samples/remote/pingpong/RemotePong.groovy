@@ -10,6 +10,7 @@ def pongActor = Actors.actor {
     loop({true}) {
         react {
             println it
+            reply "PONG"
         }
     }
 }

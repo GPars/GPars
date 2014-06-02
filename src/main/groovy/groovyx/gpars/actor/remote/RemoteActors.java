@@ -6,7 +6,6 @@ import groovyx.gpars.remote.RemoteNode;
 import groovyx.gpars.remote.RemoteNodeDiscoveryListener;
 import groovyx.gpars.remote.netty.ClientNettyTransportProvider;
 import groovyx.gpars.remote.netty.NettyTransportProvider;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +24,11 @@ public final class RemoteActors {
             LocalNode node = new LocalNode(provider, new Runnable() {
                 @Override
                 public void run() {
-
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }, null);
             // TODO fix connection setup

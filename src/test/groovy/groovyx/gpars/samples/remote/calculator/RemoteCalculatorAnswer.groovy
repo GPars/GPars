@@ -16,7 +16,7 @@ def mainNode = new LocalNode(transport, {
             reply a + b
         }
     }
-})
+}, null)
 
 mainNode.mainActor.join()
 transport.disconnect()

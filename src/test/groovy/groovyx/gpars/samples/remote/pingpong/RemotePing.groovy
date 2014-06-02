@@ -12,8 +12,10 @@ def pingActor = Actors.actor {
     react { numberOfPings ->
         loop(numberOfPings) {
             println "PING"
-            // remotePongActor << "PING"
-            // react on reply
+            remotePongActor << "PING"
+            react {
+                println it
+            }
         }
     }
 }

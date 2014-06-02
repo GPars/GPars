@@ -30,7 +30,7 @@ def mainNode = new LocalNode(transport, {
     react {result ->
         println result
     }
-})
+}, null)
 
 mainNode.mainActor.join()
 transport.disconnect()
