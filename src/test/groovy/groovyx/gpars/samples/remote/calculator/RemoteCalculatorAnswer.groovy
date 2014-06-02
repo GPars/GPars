@@ -1,4 +1,4 @@
-package groovyx.gpars.samples.remote
+package groovyx.gpars.samples.remote.calculator
 
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.remote.LocalNode
