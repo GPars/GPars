@@ -1,17 +1,18 @@
 package groovyx.gpars.samples.remote.pingpong
 
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.remote.RemoteActors
 
 // --- conecpt ---
 
 def pongActor = Actors.actor {
     println "Pong Actor"
 
-    // register myself as remote actor
-    // RemoteActors.register(this, ...)
-
     // handle incomming messages
     // loop -> react
 }
+
+// register pongActor as a remote actor
+RemoteActors.register(pongActor)
 
 pongActor.join()
