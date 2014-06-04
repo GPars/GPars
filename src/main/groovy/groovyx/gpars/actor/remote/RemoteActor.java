@@ -60,8 +60,7 @@ public class RemoteActor extends Actor implements RemoteSerialized {
     @Override
     public MessageStream send(Object message) {
         if (!(message instanceof ActorMessage)) {
-            // message = new ActorMessage(message, Actor.threadBoundActor());
-            message = new ActorMessage(message, null);
+            message = new ActorMessage(message, Actor.threadBoundActor());
         }
         remoteHost.write(new MessageStream.SendTo(this, (ActorMessage) message));
         return this;

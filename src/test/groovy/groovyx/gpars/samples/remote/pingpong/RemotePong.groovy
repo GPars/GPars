@@ -6,11 +6,17 @@ import groovyx.gpars.actor.remote.RemoteActors
 def pongActor = Actors.actor {
     println "Pong Actor"
 
+    def stop = false
+
     // handle incomming messages
-    loop({true}) {
+    loop({ !stop }) {
         react {
             println it
-            // reply "PONG"
+            if (it.equals("STOP")) {
+                stop = true;
+            } else {
+                reply "PONG"
+            }
         }
     }
 }

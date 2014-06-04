@@ -3,19 +3,25 @@ package groovyx.gpars.samples.remote.pingpong
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.remote.RemoteActors
 
+import java.util.concurrent.CountDownLatch
+
 def pingActor = Actors.actor {
     println "Ping Actor"
 
     // get remote pongActor
     def remotePongActor = RemoteActors.get("localhost", 9000) // class? name?
 
+    def thankYou = {
+        remotePongActor << "STOP"
+    }
+
     react { numberOfPings ->
-        loop(numberOfPings) {
+        loop(numberOfPings, thankYou) {
             println "PING"
             remotePongActor << "PING"
-            // react {
-            //     println it
-            // }
+            react {
+                 println it
+            }
         }
     }
 }
