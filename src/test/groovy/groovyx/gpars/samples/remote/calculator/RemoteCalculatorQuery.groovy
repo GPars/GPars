@@ -1,36 +1,23 @@
 package groovyx.gpars.samples.remote.calculator
 
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.remote.RemoteActors
 import groovyx.gpars.remote.LocalNode
 import groovyx.gpars.remote.netty.ClientNettyTransportProvider
 
 import java.util.concurrent.CountDownLatch;
 
-println "Remote Calculator (Query)"
+def queryActor = Actors.actor {
+    println "Remote Calculator - Query"
 
-def transport = new ClientNettyTransportProvider("localhost", 9000)
+    def remoteCalculator = RemoteActors.get("10.0.0.1", 9000)
 
-def mainNode = new LocalNode(transport, {
-    println "Hi, I am $id"
+    remoteCalculator << 1
+    remoteCalculator << 2
 
-    def latch = new CountDownLatch(1)
+    react { println it }
 
-    def calculator
+    remoteCalculator.stop() // client never closes?
+}
 
-    addDiscoveryListener {node, operation ->
-        System.err.println "${node.id} $operation"
-        calculator = node.mainActor
-        latch.countDown()
-    }
-
-    latch.await()
-    calculator << 1
-    calculator << 2
-
-    react {result ->
-        println result
-    }
-}, null)
-
-mainNode.mainActor.join()
-transport.disconnect()
+queryActor.join()

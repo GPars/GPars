@@ -1,22 +1,20 @@
 package groovyx.gpars.samples.remote.calculator
 
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.remote.RemoteActors
 import groovyx.gpars.remote.LocalNode
 import groovyx.gpars.remote.netty.NettyTransportProvider;
 
-println "Remote Calculator (Answer)"
+def answerActor = Actors.actor {
+    println "Remote Calculator - Answer"
 
-def transport = new NettyTransportProvider("localhost", 9000)
+    RemoteActors.register(delegate)
 
-def mainNode = new LocalNode(transport, {
-    println "HI, I am $id"
-
-    react { a ->
-        react { b ->
+    react { a->
+        react { b->
             reply a + b
         }
     }
-}, null)
+}
 
-mainNode.mainActor.join()
-transport.disconnect()
+answerActor.join()

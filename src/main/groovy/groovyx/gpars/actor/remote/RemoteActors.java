@@ -41,6 +41,7 @@ public final class RemoteActors {
                 }
             });
             latch.await();
+            remoteActor[0].onStop(new StopClientProviderClosure(null, provider));
             return remoteActor[0];
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -50,7 +51,7 @@ public final class RemoteActors {
 
     public static void register(Actor actor) {
         try {
-            NettyTransportProvider provider = new NettyTransportProvider("localhost", 9000);
+            NettyTransportProvider provider = new NettyTransportProvider("10.0.0.1", 9000);
             provider.connect(actor);
             actor.onStop(new StopProviderClosure(null, provider));
         } catch (InterruptedException e) {
@@ -63,6 +64,27 @@ public final class RemoteActors {
         private final NettyTransportProvider provider;
 
         public StopProviderClosure(Object owner, NettyTransportProvider provider) {
+            super(owner);
+            this.provider = provider;
+        }
+
+        @Override
+        public Void call(Object... args) {
+            try {
+                provider.disconnect();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+    }
+
+    private static class StopClientProviderClosure extends Closure<Void> {
+
+        private final ClientNettyTransportProvider provider;
+
+        public StopClientProviderClosure(Object owner, ClientNettyTransportProvider provider) {
             super(owner);
             this.provider = provider;
         }
