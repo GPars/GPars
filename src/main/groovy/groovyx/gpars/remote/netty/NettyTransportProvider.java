@@ -77,5 +77,6 @@ public class NettyTransportProvider extends LocalHost {
 //        }
 
         server.stop();
+        System.err.println("Server stopped");
     }
 }

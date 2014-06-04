@@ -1,5 +1,6 @@
 package groovyx.gpars.actor.remote;
 
+import groovy.lang.Closure;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.remote.LocalNode;
 import groovyx.gpars.remote.RemoteNode;
@@ -12,7 +13,6 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 public final class RemoteActors {
-    private static Map<Actor, NettyTransportProvider> providers = new HashMap<>();
 
     private RemoteActors() {}
 
@@ -51,20 +51,31 @@ public final class RemoteActors {
     public static void register(Actor actor) {
         try {
             NettyTransportProvider provider = new NettyTransportProvider("localhost", 9000);
-            providers.put(actor, provider);
-            LocalNode node = new LocalNode(provider, null, actor);
+            provider.connect(actor);
+            actor.onStop(new StopProviderClosure(null, provider));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public static void shutdown() {
-        for (NettyTransportProvider provider : providers.values()) {
+    private static class StopProviderClosure extends Closure<Void> {
+
+        private final NettyTransportProvider provider;
+
+        public StopProviderClosure(Object owner, NettyTransportProvider provider) {
+            super(owner);
+            this.provider = provider;
+        }
+
+        @Override
+        public Void call(Object... args) {
             try {
                 provider.disconnect();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+            return null;
         }
     }
 }
