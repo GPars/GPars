@@ -44,6 +44,12 @@ public class NodeConnectedMsg extends SerialMsg {
         mainActor = node.getMainActor();
     }
 
+    public NodeConnectedMsg(final Actor actor) {
+        super();
+        nodeId = new UUID(1, 1);
+        mainActor = actor;
+    }
+
     @Override
     public void execute(final RemoteConnection conn) {
         conn.getHost().getLocalHost().connectRemoteNode(nodeId, conn.getHost(), mainActor);

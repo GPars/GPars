@@ -21,5 +21,6 @@ public class ClientNettyTransportProvider extends LocalHost {
     public void disconnect() throws InterruptedException {
         super.disconnect();
         client.stop();
+        System.err.println("Client stopped");
     }
 }

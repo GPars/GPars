@@ -16,12 +16,14 @@
 
 package groovyx.gpars.remote;
 
+import groovyx.gpars.actor.Actor;
 import groovyx.gpars.remote.message.NodeConnectedMsg;
 import groovyx.gpars.remote.message.NodeDisconnectedMsg;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialMsg;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -48,6 +50,10 @@ public final class RemoteHost extends SerialContext {
                     for (final LocalNode localNode : localNodes.values()) {
                         connection.write(new NodeConnectedMsg(localNode));
                     }
+                }
+                final List<Actor> localActors = ((LocalHost) localHost).localActors;
+                synchronized (localActors) {
+                    localActors.stream().forEach((actor) -> connection.write(new NodeConnectedMsg(actor)));
                 }
             }
         }
