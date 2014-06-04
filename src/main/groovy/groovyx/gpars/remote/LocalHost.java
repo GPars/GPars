@@ -20,11 +20,7 @@ import groovyx.gpars.actor.Actor;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandles;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Represents communication point with other local hosts.
@@ -61,6 +57,8 @@ public class LocalHost extends SerialHandles {
      */
     protected final Map<UUID, LocalNode> localNodes = new HashMap<UUID, LocalNode>();
 
+    protected final List<Actor> localActors = new ArrayList<>();
+
     /**
      * Connect local node to the provider
      *
@@ -84,6 +82,15 @@ public class LocalHost extends SerialHandles {
                 host.connect(node);
             }
         }
+    }
+
+    public void connect(final Actor actor) {
+        synchronized (localActors) {
+            localActors.add(actor);
+        }
+
+        // look at connected nodes?
+        // send our actor to all connected hosts?
     }
 
     /**
