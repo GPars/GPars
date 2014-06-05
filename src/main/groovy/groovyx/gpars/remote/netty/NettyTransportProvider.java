@@ -68,15 +68,19 @@ public class NettyTransportProvider extends LocalHost {
     }
 
     @Override
-    public void disconnect() throws InterruptedException {
+    public void disconnect() {
         super.disconnect();
 //        broadcastDiscovery.stop();
 
 //        for (final NettyClient client : clients.values()) {
 //            client.stop();
 //        }
-
-        server.stop();
-        System.err.println("Server stopped");
+        try {
+            server.stop();
+            System.err.println("Server stopped");
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

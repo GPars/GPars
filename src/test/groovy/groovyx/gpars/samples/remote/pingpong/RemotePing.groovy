@@ -28,3 +28,5 @@ def pingActor = Actors.actor {
 
 pingActor << 7
 pingActor.join()
+
+RemoteActors.shutdown()

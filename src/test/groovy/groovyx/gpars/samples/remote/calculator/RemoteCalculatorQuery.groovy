@@ -10,7 +10,7 @@ import java.util.concurrent.CountDownLatch;
 def queryActor = Actors.actor {
     println "Remote Calculator - Query"
 
-    def remoteCalculator = RemoteActors.get("10.0.0.1", 9000)
+    def remoteCalculator = RemoteActors.get("localhost", 9000)
 
     remoteCalculator << 1
     remoteCalculator << 2
@@ -21,3 +21,5 @@ def queryActor = Actors.actor {
 }
 
 queryActor.join()
+
+RemoteActors.shutdown()
