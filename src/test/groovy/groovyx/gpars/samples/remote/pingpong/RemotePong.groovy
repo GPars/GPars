@@ -22,6 +22,6 @@ def pongActor = Actors.actor {
 }
 
 // register pongActor as a remote actor
-RemoteActors.register(pongActor)
+RemoteActors.register(pongActor, "pong")
 
 pongActor.join()

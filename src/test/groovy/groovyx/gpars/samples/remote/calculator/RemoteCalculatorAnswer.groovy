@@ -8,7 +8,7 @@ import groovyx.gpars.remote.netty.NettyTransportProvider;
 def answerActor = Actors.actor {
     println "Remote Calculator - Answer"
 
-    RemoteActors.register(delegate)
+    RemoteActors.register(delegate, "remote-calculator")
 
     react { a->
         react { b->

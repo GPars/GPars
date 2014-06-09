@@ -9,7 +9,7 @@ def pingActor = Actors.actor {
     println "Ping Actor"
 
     // get remote pongActor
-    def remotePongActor = RemoteActors.get("localhost", 9000) // class? name?
+    def remotePongActor = RemoteActors.get("localhost", 9000, "pong")
 
     def thankYou = {
         remotePongActor << "STOP"

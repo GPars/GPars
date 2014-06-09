@@ -20,7 +20,7 @@ public final class RemoteActors {
 
     private static List<ClientNettyTransportProvider> providers = new ArrayList<>();
 
-    public static Actor get(String host, int port) {
+    public static Actor get(String host, int port, String actorName) {
         try {
             ClientNettyTransportProvider provider = new ClientNettyTransportProvider(host, port);
             providers.add(provider);
@@ -32,7 +32,7 @@ public final class RemoteActors {
         }
     }
 
-    public static void register(Actor actor) {
+    public static void register(Actor actor, String name) {
         try {
             NettyTransportProvider provider = new NettyTransportProvider("localhost", 9000);
             provider.connect(actor);
