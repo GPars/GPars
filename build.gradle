@@ -121,7 +121,7 @@ configurations {
 // symbol look up works correctly without qualification.
 
 dependencies {
-    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.2.2'
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.3.2'
     compile('org.multiverse:multiverse-core:0.7.0') { transitive = false }
     //compile group: 'org.jboss.netty', name: 'netty', version: project.hasProperty('gpars_nettyVersion') ? gpars_nettyVersion : '3.2.9.Final'
     compile group: 'io.netty', name: 'netty-all', version: project.hasProperty('gpars_nettyVersion') ? gpars_nettyVersion : '4.0.9.Final'
@@ -133,7 +133,7 @@ dependencies {
     testCompile fileTree(dir: 'lib', include: '*.jar')
     //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
     //  Grails, including all the SpringRoo stuff.
-    docs group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.2.2'
+    docs group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.3.2'
     docs 'org.yaml:snakeyaml:1.13'
     docs 'commons-lang:commons-lang:2.6'
     docs project.ext.grailsDocs
