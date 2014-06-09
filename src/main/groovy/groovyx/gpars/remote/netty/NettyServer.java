@@ -18,12 +18,13 @@ package groovyx.gpars.remote.netty;
 
 import groovyx.gpars.remote.LocalHost;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 
 /**
@@ -31,14 +32,13 @@ import java.net.InetSocketAddress;
  * @see NettyClient
  */
 public class NettyServer {
-    private final String address;
-    private final int port;
-
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-    private Channel channel;
+
+    private ServerBootstrap bootstrap;
 
     private LocalHost localHost;
+    private ChannelFuture channelFuture;
 
     /**
      * Creates a server listening on specified addresss.
@@ -46,28 +46,27 @@ public class NettyServer {
      */
     public NettyServer(LocalHost localHost, String address, int port) {
         this.localHost = localHost;
-        this.address = address;
-        this.port = port;
+
+        bossGroup = new NioEventLoopGroup();
+        workerGroup = new NioEventLoopGroup();
+
+        bootstrap = new ServerBootstrap();
+        bootstrap.group(bossGroup, workerGroup)
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new NettyChannelInitializer(localHost))
+                .childOption(ChannelOption.TCP_NODELAY, true)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .localAddress(new InetSocketAddress(address, port));
     }
 
     /**
      * Starts the server.
-     * Note: method blocks until server is started.
-     * @throws InterruptedException
+     * Note: this method does not block
      */
     public void start() throws InterruptedException {
-        bossGroup = new NioEventLoopGroup();
-        workerGroup = new NioEventLoopGroup();
-
-        ServerBootstrap bootstrap = new ServerBootstrap();
-        bootstrap.group(bossGroup, workerGroup)
-            .channel(NioServerSocketChannel.class)
-            .childHandler(new NettyChannelInitializer(localHost))
-            .childOption(ChannelOption.TCP_NODELAY, true)
-            .childOption(ChannelOption.SO_KEEPALIVE, true)
-            .localAddress(new InetSocketAddress(address, port));
-
-        channel = bootstrap.bind().sync().channel();
+        if (channelFuture == null) {
+            channelFuture = bootstrap.bind().addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+        }
     }
 
     /**
@@ -76,13 +75,13 @@ public class NettyServer {
      * @throws InterruptedException
      */
     public void stop() throws InterruptedException {
-        channel.close().sync();
+        channelFuture.channel().close().sync();
 
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }
 
     public InetSocketAddress getAddress() {
-        return (InetSocketAddress) channel.localAddress();
+        return (InetSocketAddress) channelFuture.channel().localAddress();
     }
 }

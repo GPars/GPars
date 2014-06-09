@@ -17,17 +17,30 @@
 package groovyx.gpars.remote.netty
 
 class NettyServerTest extends GroovyTestCase {
-    def static String ADDRESS_TO_BIND = '10.0.0.1'
+    def static String LOCALHOST_ADDRESS = 'localhost'
+    def static int LOCALHOST_PORT = 9000
 
-    public void testServer() {
-        // start server on localhost
-        NettyServer server = new NettyServer(ADDRESS_TO_BIND)
+    public void testServerStart() {
+        NettyServer server = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
         server.start()
+        println "a"
+        sleep 1000
+        println "b"
         println "Server ${server.channel} active=${server.channel.isActive()}"
 
-        sleep 30000
+        server.stop()
+    }
 
-        // stop server
+    public void testServerCannotStartMoreThanOnce() {
+        NettyServer server = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+        server.start()
+        println "a"
+        sleep 1000
+        println "b"
+        server.start()
+        println "a"
+        sleep 1000
+        println "b"
         server.stop()
     }
 }

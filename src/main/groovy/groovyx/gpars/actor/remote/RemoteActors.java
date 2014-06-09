@@ -2,6 +2,7 @@ package groovyx.gpars.actor.remote;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.Actor;
+import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.LocalNode;
 import groovyx.gpars.remote.RemoteNode;
 import groovyx.gpars.remote.RemoteNodeDiscoveryListener;
@@ -20,6 +21,8 @@ public final class RemoteActors {
 
     private static List<ClientNettyTransportProvider> providers = new ArrayList<>();
 
+    private static LocalHost localHost;
+
     public static Actor get(String host, int port, String actorName) {
         try {
             ClientNettyTransportProvider provider = new ClientNettyTransportProvider(host, port);
@@ -33,6 +36,10 @@ public final class RemoteActors {
     }
 
     public static void register(Actor actor, String name) {
+        if (localHost == null) {
+            localHost = new LocalHost();
+        }
+
         try {
             NettyTransportProvider provider = new NettyTransportProvider("localhost", 9000);
             provider.connect(actor);
