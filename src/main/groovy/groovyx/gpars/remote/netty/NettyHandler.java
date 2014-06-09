@@ -59,9 +59,4 @@ public class NettyHandler extends ChannelInboundHandlerAdapter {
             ((SerialMsg) msg).execute(remoteConnection);
         }
     }
-
-    public RemoteConnection getRemoteConnection() {
-        return remoteConnection;
-    }
-
 }

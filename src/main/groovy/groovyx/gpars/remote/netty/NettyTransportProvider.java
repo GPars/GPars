@@ -75,12 +75,7 @@ public class NettyTransportProvider extends LocalHost {
 //        for (final NettyClient client : clients.values()) {
 //            client.stop();
 //        }
-        try {
             server.stop();
             System.err.println("Server stopped");
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }
