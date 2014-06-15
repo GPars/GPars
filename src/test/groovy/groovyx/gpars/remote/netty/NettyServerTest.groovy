@@ -38,4 +38,18 @@ class NettyServerTest extends GroovyTestCase {
 
         assert message == "Server has not been started"
     }
+
+    public void testOnlyOneInstanceOfServerStarts() {
+        NettyServer server1 = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+        NettyServer server2 = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+
+        server1.start()
+        server2.start()
+
+        shouldFail(BindException, {
+            [server1.channelFuture, server2.channelFuture]*.sync()
+        })
+
+        [server1, server2]*.stop()
+    }
 }

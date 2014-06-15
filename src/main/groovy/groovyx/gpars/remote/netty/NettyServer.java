@@ -18,13 +18,13 @@ package groovyx.gpars.remote.netty;
 
 import groovyx.gpars.remote.LocalHost;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 
-import java.net.ConnectException;
 import java.net.InetSocketAddress;
 
 /**
@@ -32,21 +32,16 @@ import java.net.InetSocketAddress;
  * @see NettyClient
  */
 public class NettyServer {
-    private EventLoopGroup bossGroup;
-    private EventLoopGroup workerGroup;
+    private final EventLoopGroup bossGroup;
+    private final EventLoopGroup workerGroup;
+    private final ServerBootstrap bootstrap;
 
-    private ServerBootstrap bootstrap;
-
-    private LocalHost localHost;
     private ChannelFuture channelFuture;
 
     /**
-     * Creates a server listening on specified addresss.
-     * @param address
+     * Creates a server listening on specified address.
      */
     public NettyServer(LocalHost localHost, String address, int port) {
-        this.localHost = localHost;
-
         bossGroup = new NioEventLoopGroup();
         workerGroup = new NioEventLoopGroup();
 
@@ -65,7 +60,7 @@ public class NettyServer {
      */
     public void start() {
         if (channelFuture == null) {
-            channelFuture = bootstrap.bind().addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+            channelFuture = bootstrap.bind();
         }
     }
 
