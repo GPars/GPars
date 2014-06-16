@@ -16,14 +16,17 @@
 
 package groovyx.gpars.remote.netty
 
+import groovyx.gpars.remote.LocalHost
+
 class NettyClientServerTest extends GroovyTestCase implements NettyTest {
+    def static LocalHost LOCALHOST = new LocalHost()
 
     public void testConnectionLocal() {
-        NettyServer server = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+        NettyServer server = new NettyServer(LOCALHOST, LOCALHOST_ADDRESS, LOCALHOST_PORT)
         server.start()
         server.channelFuture.sync()
 
-        NettyClient client = new NettyClient(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+        NettyClient client = new NettyClient(LOCALHOST, LOCALHOST_ADDRESS, LOCALHOST_PORT)
         client.start()
         client.channelFuture.sync()
 
