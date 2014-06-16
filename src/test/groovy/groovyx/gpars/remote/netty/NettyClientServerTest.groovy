@@ -16,98 +16,20 @@
 
 package groovyx.gpars.remote.netty
 
-class NettyClientServerTest extends GroovyTestCase {
+class NettyClientServerTest extends GroovyTestCase implements NettyTest {
 
     public void testConnectionLocal() {
-        // start server on localhost
-        NettyServer server = new NettyServer('localhost')
+        NettyServer server = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
         server.start()
-        println "Server ${server.channel} active=${server.channel.isActive()}"
-        def serverStarted = server.channel.isActive()
-        def clientConnected = false
+        server.channelFuture.sync()
 
-        if (serverStarted) {
-            def serverPort = ((InetSocketAddress) server.channel.localAddress()).getPort()
+        NettyClient client = new NettyClient(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+        client.start()
+        client.channelFuture.sync()
 
-            //client connects to server
-            NettyClient client = new NettyClient('localhost', serverPort)
-            client.start()
-            println "Client ${client.channel} active=${client.channel.isActive()}"
-            clientConnected = client.channel.isActive()
+        assert client.channelFuture.isSuccess()
 
-            // stop client
-            client.stop()
-        }
-        // stop server
+        client.stop()
         server.stop()
-
-        // client sends message
-        assert serverStarted && clientConnected
-    }
-
-    public void testMessageLocal() {
-        // start server on localhost
-        NettyServer server = new NettyServer('localhost')
-        server.start()
-        println "Server ${server.channel} active=${server.channel.isActive()}"
-        def serverStarted = server.channel.isActive()
-        def clientConnected = false
-
-        if (serverStarted) {
-            def serverPort = ((InetSocketAddress) server.channel.localAddress()).getPort()
-
-            //start client on localhost
-            NettyClient client = new NettyClient('localhost', serverPort)
-
-            // client connects to server
-            client.start()
-            println "Client ${client.channel} active=${client.channel.isActive()}"
-            clientConnected = client.channel.isActive()
-
-            client.channel.writeAndFlush("Hi, I'm client!").sync()
-
-            // stop client
-            client.stop()
-        }
-        // stop server
-        server.stop()
-
-        // client sends message
-        assert serverStarted && clientConnected
-    }
-
-    public void testMultipleConnectionsLocal() {
-        // start server on localhost
-        NettyServer server = new NettyServer('localhost')
-        server.start()
-        println "Server ${server.channel} active=${server.channel.isActive()}"
-        def serverStarted = server.channel.isActive()
-        def client1Connected = false
-        def client2Connected = false
-
-        if (serverStarted) {
-            def serverPort = ((InetSocketAddress) server.channel.localAddress()).getPort()
-
-            //client1 connects to server
-            NettyClient client1 = new NettyClient('localhost', serverPort)
-            client1.start()
-            println "Client ${client1.channel} active=${client1.channel.isActive()}"
-            client1Connected = client1.channel.isActive()
-
-            //client2 connects to server
-            NettyClient client2 = new NettyClient('localhost', serverPort)
-            client2.start()
-            println "Client ${client2.channel} active=${client2.channel.isActive()}"
-            client2Connected = client2.channel.isActive()
-
-            // stop clients
-            client1.stop()
-            client2.stop()
-        }
-        // stop server
-        server.stop()
-
-        // client sends message
-        assert serverStarted && client1Connected && client2Connected
     }
 }

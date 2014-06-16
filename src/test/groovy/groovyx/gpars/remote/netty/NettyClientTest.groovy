@@ -16,17 +16,29 @@
 
 package groovyx.gpars.remote.netty
 
-class NettyClientTest extends GroovyTestCase {
-    public void testClient() {
-        // client connects to server
-        NettyClient client = new NettyClient(NettyServerTest.ADDRESS_TO_BIND, 63607) // change port number!
+class NettyClientTest extends GroovyTestCase implements NettyTest {
+    public void testClientStartNoServer() {
+        NettyClient client = new NettyClient(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
         client.start()
-        println "Client ${client.channel} active=${client.channel.isActive()}"
 
-        // send message
-        client.channel.writeAndFlush new TestSerialMsg()
+        shouldFail(ConnectException.class, {
+            client.channelFuture.sync()
+        })
 
-        // stop client
         client.stop()
+    }
+
+    public void testClientStart() {
+
+    }
+
+    public void testClientCannotBeStoppedIfNotRunning() {
+        NettyClient client = new NettyClient(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+
+        def message = shouldFail(IllegalStateException.class, {
+            client.stop()
+        })
+
+        assert message == "Client has not been started"
     }
 }

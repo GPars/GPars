@@ -19,9 +19,7 @@ package groovyx.gpars.remote.netty;
 import groovyx.gpars.remote.BroadcastDiscovery;
 import groovyx.gpars.remote.LocalHost;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
@@ -33,13 +31,10 @@ import java.util.List;
  * @see NettyServer
  */
 public class NettyClient {
-    private final String host;
-    private final int port;
-    private EventLoopGroup workerGroup;
+    private final EventLoopGroup workerGroup;
+    private final Bootstrap bootstrap;
 
-    private Channel channel;
-
-    private LocalHost localHost;
+    private ChannelFuture channelFuture;
 
     /**
      * Creates client that connect to server on specified host and port.
@@ -47,37 +42,42 @@ public class NettyClient {
      * @param port the port that server listens on
      */
     public NettyClient(LocalHost localHost, String host, int port) {
-        this.localHost = localHost;
-        this.host = host;
-        this.port = port;
-    }
-
-    /**
-     * Connects the client to server
-     * Note: method block until connection is established
-     * @throws InterruptedException
-     */
-    public void start() throws InterruptedException {
         workerGroup = new NioEventLoopGroup();
 
-        Bootstrap bootstrap = new Bootstrap();
+        bootstrap = new Bootstrap();
         bootstrap.group(workerGroup)
                 .channel(NioSocketChannel.class)
                 .handler(new NettyChannelInitializer(localHost))
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .remoteAddress(host, port);
+    }
 
-        channel = bootstrap.connect().sync().channel();
+    /**
+     * Connects the client to server
+     * Note: method does not block
+     */
+    public void start() {
+        if (channelFuture == null) {
+            channelFuture = bootstrap.connect();
+        }
     }
 
     /**
      * Closes connection to server
-     * Note: method blocks until connection is closed
-     * @throws InterruptedException
+     * Note: method does not block
      */
     public void stop() throws InterruptedException {
-        channel.close().sync();
-        workerGroup.shutdownGracefully();
+        if (channelFuture == null) {
+            throw new IllegalStateException("Client has not been started");
+        }
+        channelFuture.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                future.channel().close().addListener(feature -> {
+                    workerGroup.shutdownGracefully();
+                });
+            }
+        });
     }
 }
