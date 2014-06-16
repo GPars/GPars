@@ -53,10 +53,11 @@ public class NettyTransportProvider {
     }
 
     public static Future<Actor> get(String host, int port, String name) {
-        NettyClient client = new NettyClient(localHost, host, port);
+        NettyClient client = new NettyClient(localHost, host, port, name);
         client.start();
 
-        RemoteActorFuture future = new RemoteActorFuture(name);
+        RemoteActorFuture future = new RemoteActorFuture(localHost, name);
+        localHost.addRemoteActorFuture(future);
         return future;
     }
 

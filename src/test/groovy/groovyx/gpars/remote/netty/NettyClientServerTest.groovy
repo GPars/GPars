@@ -32,7 +32,7 @@ class NettyClientServerTest extends GroovyTestCase implements NettyTest {
         server.start()
         server.channelFuture.sync()
 
-        client = new NettyClient(LOCALHOST, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+        client = new NettyClient(LOCALHOST, LOCALHOST_ADDRESS, LOCALHOST_PORT, null)
         client.start()
         client.channelFuture.sync()
     }

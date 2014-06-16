@@ -18,7 +18,7 @@ package groovyx.gpars.remote.netty
 
 class NettyClientTest extends GroovyTestCase implements NettyTest {
     public void testClientStartNoServer() {
-        NettyClient client = new NettyClient(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+        NettyClient client = new NettyClient(null, LOCALHOST_ADDRESS, LOCALHOST_PORT, null)
         client.start()
 
         shouldFail(ConnectException.class, {
@@ -33,7 +33,7 @@ class NettyClientTest extends GroovyTestCase implements NettyTest {
     }
 
     public void testClientCannotBeStoppedIfNotRunning() {
-        NettyClient client = new NettyClient(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+        NettyClient client = new NettyClient(null, LOCALHOST_ADDRESS, LOCALHOST_PORT, null)
 
         def message = shouldFail(IllegalStateException.class, {
             client.stop()

@@ -1,6 +1,7 @@
 package groovyx.gpars.actor.remote;
 
 import groovyx.gpars.actor.Actor;
+import groovyx.gpars.remote.LocalHost;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -8,8 +9,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class RemoteActorFuture implements Future<Actor> {
-    public RemoteActorFuture(String name) {
+    private final LocalHost localHost;
+    private final String name;
 
+    public RemoteActorFuture(LocalHost localHost, String name) {
+        this.localHost = localHost;
+        this.name = name;
     }
 
     @Override
@@ -24,16 +29,23 @@ public class RemoteActorFuture implements Future<Actor> {
 
     @Override
     public boolean isDone() {
-        return false;
+        return localHost.getRemoteActor(name) != null;
     }
 
     @Override
     public Actor get() throws InterruptedException, ExecutionException {
-        return null;
+        synchronized (this) {
+            while (!isDone()) {
+                wait();
+            }
+        }
+        return localHost.getRemoteActor(name);
     }
 
     @Override
     public Actor get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        return null;
+        throw new UnsupportedOperationException("not yet implemented");
     }
+
+
 }

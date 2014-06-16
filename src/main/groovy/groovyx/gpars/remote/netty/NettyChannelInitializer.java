@@ -18,6 +18,7 @@ package groovyx.gpars.remote.netty;
 
 import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.RemoteConnection;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -28,7 +29,7 @@ import java.util.List;
 
 public class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
 
-    private final LocalHost localHost;
+    protected final LocalHost localHost;
 
     public NettyChannelInitializer(LocalHost localHost) {
         this.localHost = localHost;
@@ -36,12 +37,16 @@ public class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
     protected void initChannel(SocketChannel channel) throws Exception {
-        RemoteConnection remoteConnection = new NettyRemoteConnection(localHost, channel);
+        RemoteConnection remoteConnection = getRemoteConnection(channel);
 
         ChannelPipeline pipeline = channel.pipeline();
         pipeline.addLast("decoder", new RemoteObjectDecoder(remoteConnection));
         pipeline.addLast("encoder", new RemoteObjectEncoder(remoteConnection));
 
         pipeline.addLast("handler", new NettyHandler(remoteConnection));
+    }
+
+    protected RemoteConnection getRemoteConnection(Channel channel) {
+        return new NettyRemoteConnection(localHost, channel);
     }
 }

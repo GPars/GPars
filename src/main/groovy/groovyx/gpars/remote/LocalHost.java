@@ -17,6 +17,7 @@
 package groovyx.gpars.remote;
 
 import groovyx.gpars.actor.Actor;
+import groovyx.gpars.actor.remote.RemoteActorFuture;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandles;
 
@@ -46,6 +47,10 @@ public class LocalHost extends SerialHandles {
     protected final Map<UUID, RemoteHost> remoteHosts = new HashMap<UUID, RemoteHost>();
 
     protected final Map<String, Actor> localActors = new HashMap<>();
+
+    protected final Map<String, Actor> remoteActors = new HashMap<>();
+
+    private List<RemoteActorFuture> remoteActorFutures = new ArrayList<>();
 
     /**
      * Registers actor under specific name
@@ -83,6 +88,10 @@ public class LocalHost extends SerialHandles {
             }
             return host;
         }
+    }
+
+    public Actor getActor(String name) {
+        return localActors.get(name);
     }
 
     public void connectRemoteNode(final UUID nodeId, final SerialContext host, final Actor mainActor) {
@@ -133,5 +142,30 @@ public class LocalHost extends SerialHandles {
 //                onDisconnectForLocalNodes(t);
 //            }
 //        }
+    }
+
+    public void registerRemote(String name, Actor actor) {
+        synchronized (remoteActors) {
+            remoteActors.put(name, actor);
+        }
+        synchronized (remoteActorFutures) {
+            remoteActorFutures.stream().forEach(future -> {
+                synchronized (future) {
+                    future.notifyAll();
+                }
+            });
+        }
+    }
+
+    public Actor getRemoteActor(String name) {
+        synchronized (remoteActors) {
+            return remoteActors.get(name);
+        }
+    }
+
+    public void addRemoteActorFuture(RemoteActorFuture future) {
+        synchronized (remoteActorFutures) {
+            remoteActorFutures.add(future);
+        }
     }
 }

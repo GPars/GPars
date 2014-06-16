@@ -41,13 +41,13 @@ public class NettyClient {
      * @param host the host where server listens on
      * @param port the port that server listens on
      */
-    public NettyClient(LocalHost localHost, String host, int port) {
+    public NettyClient(LocalHost localHost, String host, int port, String actorName) {
         workerGroup = new NioEventLoopGroup();
 
         bootstrap = new Bootstrap();
         bootstrap.group(workerGroup)
                 .channel(NioSocketChannel.class)
-                .handler(new NettyChannelInitializer(localHost))
+                .handler(new NettyClientChannelInitializer(localHost, actorName))
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .remoteAddress(host, port);
@@ -60,6 +60,14 @@ public class NettyClient {
     public void start() {
         if (channelFuture == null) {
             channelFuture = bootstrap.connect();
+            channelFuture.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    future.channel().closeFuture().addListener(f -> {
+                        workerGroup.shutdownGracefully();
+                    });
+                }
+            });
         }
     }
 
@@ -74,9 +82,7 @@ public class NettyClient {
         channelFuture.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
-                future.channel().close().addListener(feature -> {
-                    workerGroup.shutdownGracefully();
-                });
+                future.channel().close();
             }
         });
     }

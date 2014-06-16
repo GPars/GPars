@@ -61,6 +61,15 @@ public class NettyServer {
     public void start() {
         if (channelFuture == null) {
             channelFuture = bootstrap.bind();
+            channelFuture.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    future.channel().closeFuture().addListener(f -> {
+                        bossGroup.shutdownGracefully();
+                        workerGroup.shutdownGracefully();
+                    });
+                }
+            });
         }
     }
 
@@ -75,10 +84,7 @@ public class NettyServer {
         channelFuture.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
-                future.channel().close().addListener(feature -> {
-                    bossGroup.shutdownGracefully();
-                    workerGroup.shutdownGracefully();
-                });
+                future.channel().close();
             }
         });
     }
