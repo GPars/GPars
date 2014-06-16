@@ -5,6 +5,7 @@ import spock.lang.Specification
 
 class NettyTransportProviderTest extends Specification {
     def "Register"() {
+        setup:
         def actor = Actors.actor {
             println "actor"
         }

@@ -35,10 +35,10 @@ public class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
     }
 
     @Override
-    protected void initChannel(SocketChannel socketChannel) throws Exception {
-        RemoteConnection remoteConnection = new NettyRemoteConnection(localHost, socketChannel);
+    protected void initChannel(SocketChannel channel) throws Exception {
+        RemoteConnection remoteConnection = new NettyRemoteConnection(localHost, channel);
 
-        ChannelPipeline pipeline = socketChannel.pipeline();
+        ChannelPipeline pipeline = channel.pipeline();
         pipeline.addLast("decoder", new RemoteObjectDecoder(remoteConnection));
         pipeline.addLast("encoder", new RemoteObjectEncoder(remoteConnection));
 

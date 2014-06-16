@@ -16,7 +16,7 @@
 
 package groovyx.gpars.remote.message;
 
-import groovyx.gpars.remote.LocalNode;
+//import groovyx.gpars.remote.LocalNode;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
@@ -33,12 +33,12 @@ public class NodeDisconnectedMsg extends SerialMsg {
     /**
      * Id of node disconnected
      */
-    public final UUID nodeId;
+    public final UUID nodeId = UUID.randomUUID();
 
-    public NodeDisconnectedMsg(final LocalNode node) {
-        super();
-        nodeId = node.getId();
-    }
+//    public NodeDisconnectedMsg(final LocalNode node) {
+//        super();
+//        nodeId = node.getId();
+//    }
 
     @Override
     public void execute(final RemoteConnection conn) {

@@ -18,7 +18,7 @@ package groovyx.gpars.integration
 
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.dataflow.Dataflows
-import groovyx.gpars.remote.LocalNode
+//import groovyx.gpars.remote.LocalNode
 import groovyx.gpars.remote.netty.NettyTransportProvider
 import java.util.concurrent.TimeUnit
 
@@ -28,42 +28,42 @@ public class DistributedDataflowTest extends GroovyTestCase {
 
         def results = [one: new DataflowVariable(), two: new DataflowVariable()]
         def nodes = ["one", "two"].collect {node ->
-            new LocalNode(new NettyTransportProvider(), {
-                addDiscoveryListener {anotherNode, op ->
-                    if (op == "connected") {
-                        delegate.send([command: "connected", actor: anotherNode.mainActor])
-                    }
-                }
-
-                def dataflow = new DataflowVariable();
-
-                loop {
-                    react {msg ->
-                        switch (msg.command) {
-
-                            case "connected": // 1
-                                msg.actor << [command: "getDataflow", to: delegate]
-                                break
-
-                            case "getDataflow":  // 2
-                                msg.to << [command: "dataflow", dataflow: dataflow, actor: delegate]
-                                break
-
-                            case "dataflow":  // 1
-                                msg.actor << [command: "setDataflow", dataflow: msg.dataflow, value: node]
-                                msg.dataflow.whenBound {v ->
-                                    df."$node" = v
-                                }
-                                msg.dataflow << node
-                                break
-
-                            case "setDataflow": // 2
-                                results[node] << msg.dataflow.val
-                                break
-                        }
-                    }
-                }
-            })
+//            new LocalNode(new NettyTransportProvider(), {
+//                addDiscoveryListener {anotherNode, op ->
+//                    if (op == "connected") {
+//                        delegate.send([command: "connected", actor: anotherNode.mainActor])
+//                    }
+//                }
+//
+//                def dataflow = new DataflowVariable();
+//
+//                loop {
+//                    react {msg ->
+//                        switch (msg.command) {
+//
+//                            case "connected": // 1
+//                                msg.actor << [command: "getDataflow", to: delegate]
+//                                break
+//
+//                            case "getDataflow":  // 2
+//                                msg.to << [command: "dataflow", dataflow: dataflow, actor: delegate]
+//                                break
+//
+//                            case "dataflow":  // 1
+//                                msg.actor << [command: "setDataflow", dataflow: msg.dataflow, value: node]
+//                                msg.dataflow.whenBound {v ->
+//                                    df."$node" = v
+//                                }
+//                                msg.dataflow << node
+//                                break
+//
+//                            case "setDataflow": // 2
+//                                results[node] << msg.dataflow.val
+//                                break
+//                        }
+//                    }
+//                }
+//            })
         }
 
         results.one.whenBound {

@@ -34,55 +34,18 @@ import java.util.*;
  * </p>
  * <ul>
  *   <li>remote hosts connected with this one</li>
- *   <li>remote nodes known to this host</li>
- *   <li>local nodes available on this host</li>
+ *   <li>local actors available on this host</li>
  * </ul>
  *
  * @author Alex Tkachman
  */
 public class LocalHost extends SerialHandles {
-
-    /**
-     * Registry of remote nodes known to the provider
-     */
-    protected final HashMap<UUID, RemoteNode> remoteNodes = new HashMap<UUID, RemoteNode>();
-
     /**
      * Hosts known to the provider
      */
     protected final Map<UUID, RemoteHost> remoteHosts = new HashMap<UUID, RemoteHost>();
 
-    /**
-     * Local nodes known to the provider
-     */
-    protected final Map<UUID, LocalNode> localNodes = new HashMap<UUID, LocalNode>();
-
     protected final Map<String, Actor> localActors = new HashMap<>();
-
-    /**
-     * Connect local node to the provider
-     *
-     * @param node local node
-     */
-    public void connect(final LocalNode node) throws InterruptedException {
-        synchronized (localNodes) {
-            localNodes.put(node.getId(), node);
-        }
-
-        synchronized (remoteNodes) {
-            for (final RemoteNode remoteNode : remoteNodes.values()) {
-                if (!remoteNode.getId().equals(node.getId())) {
-                    node.onConnect(remoteNode);
-                }
-            }
-        }
-
-        synchronized (remoteHosts) {
-            for (final RemoteHost host : remoteHosts.values()) {
-                host.connect(node);
-            }
-        }
-    }
 
     /**
      * Registers actor under specific name
@@ -95,40 +58,7 @@ public class LocalHost extends SerialHandles {
         }
     }
 
-    /**
-     * Disconnect local node from the provider
-     *
-     * @param node local node
-     */
-    public void disconnect(final LocalNode node) {
-        synchronized (remoteHosts) {
-            for (final RemoteHost host : remoteHosts.values()) {
-                host.disconnect(node);
-            }
-        }
-
-        synchronized (remoteNodes) {
-            for (final RemoteNode remoteNode : remoteNodes.values()) {
-                if (!remoteNode.getId().equals(node.getId())) {
-                    node.onDisconnect(remoteNode);
-                }
-            }
-        }
-
-        synchronized (localNodes) {
-            localNodes.remove(node.getId());
-        }
-    }
-
     public void disconnect() {
-        synchronized (localNodes) {
-            final Iterable<LocalNode> copy = new ArrayList<LocalNode>(localNodes.values());
-            localNodes.clear();
-            for (final LocalNode localNode : copy) {
-                disconnect(localNode);
-            }
-        }
-
         synchronized (remoteHosts) {
             final Iterable<RemoteHost> copy = new ArrayList<RemoteHost>(remoteHosts.values());
             remoteHosts.clear();
@@ -136,8 +66,6 @@ public class LocalHost extends SerialHandles {
                 remoteHost.disconnect();
             }
         }
-
-        LocalHostRegistry.removeLocalHost(this);
     }
 
     @Override
@@ -158,58 +86,52 @@ public class LocalHost extends SerialHandles {
     }
 
     public void connectRemoteNode(final UUID nodeId, final SerialContext host, final Actor mainActor) {
-        RemoteNode node;
-        synchronized (remoteNodes) {
-            node = remoteNodes.get(nodeId);
-            if (node == null) {
-                node = new RemoteNode(nodeId, host, mainActor);
-                remoteNodes.put(nodeId, node);
-            }
-        }
-
-        synchronized (localNodes) {
-            for (final LocalNode localNode : localNodes.values()) {
-                localNode.onConnect(node);
-            }
-        }
+//        RemoteNode node;
+//        synchronized (remoteNodes) {
+//            node = remoteNodes.get(nodeId);
+//            if (node == null) {
+//                node = new RemoteNode(nodeId, host, mainActor);
+//                remoteNodes.put(nodeId, node);
+//            }
+//        }
+//
+//        synchronized (localNodes) {
+//            for (final LocalNode localNode : localNodes.values()) {
+//                localNode.onConnect(node);
+//            }
+//        }
     }
 
     public void disconnectRemoteNode(final UUID nodeId) {
-        final RemoteNode node;
-        synchronized (remoteNodes) {
-            node = remoteNodes.remove(nodeId);
-        }
-
-        if (node != null) {
-            synchronized (localNodes) {
-                onDisconnectForLocalNodes(node);
-            }
-        }
+//        final RemoteNode node;
+//        synchronized (remoteNodes) {
+//            node = remoteNodes.remove(nodeId);
+//        }
+//
+//        if (node != null) {
+//            synchronized (localNodes) {
+//                onDisconnectForLocalNodes(node);
+//            }
+//        }
     }
 
     public void onDisconnect(final SerialContext host) {
-        final Collection<RemoteNode> toRemove = new ArrayList<RemoteNode>();
-        synchronized (remoteNodes) {
-            for (final RemoteNode t : remoteNodes.values()) {
-                if (t.getRemoteHost() == host) {
-                    toRemove.add(t);
-                }
-            }
-            for (final RemoteNode t : toRemove) {
-                remoteNodes.remove(t.getId());
-            }
-        }
-
-        synchronized (localNodes) {  //todo consider moving the synchronized block inside the onDisconnectForLocalNodes() method
-            for (final RemoteNode t : toRemove) {
-                onDisconnectForLocalNodes(t);
-            }
-        }
-    }
-
-    private void onDisconnectForLocalNodes(final RemoteNode t) {
-        for (final LocalNode localNode : localNodes.values()) {
-            localNode.onDisconnect(t);
-        }
+//        final Collection<RemoteNode> toRemove = new ArrayList<RemoteNode>();
+//        synchronized (remoteNodes) {
+//            for (final RemoteNode t : remoteNodes.values()) {
+//                if (t.getRemoteHost() == host) {
+//                    toRemove.add(t);
+//                }
+//            }
+//            for (final RemoteNode t : toRemove) {
+//                remoteNodes.remove(t.getId());
+//            }
+//        }
+//
+//        synchronized (localNodes) {  //todo consider moving the synchronized block inside the onDisconnectForLocalNodes() method
+//            for (final RemoteNode t : toRemove) {
+//                onDisconnectForLocalNodes(t);
+//            }
+//        }
     }
 }

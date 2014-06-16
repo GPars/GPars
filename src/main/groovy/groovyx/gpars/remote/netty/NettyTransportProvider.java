@@ -42,8 +42,6 @@ public class NettyTransportProvider {
 
     private static NettyServer server;
 
-//    final NettyServer server;
-
 //    final BroadcastDiscovery broadcastDiscovery;
 
     public NettyTransportProvider(String address, int port) throws InterruptedException {
@@ -80,6 +78,21 @@ public class NettyTransportProvider {
     }
 
     public static Future<Actor> get(String host, int port, String name) {
+        NettyClient client = new NettyClient(localHost, host, port);
+
+        //    private static List<ClientNettyTransportProvider> providers = new ArrayList<>();
+
+//    public static Actor get(String host, int port, String actorName) {
+//        try {
+//            ClientNettyTransportProvider provider = new ClientNettyTransportProvider(host, port);
+//            providers.add(provider);
+//            Actor remoteActor = provider.register();
+//            return remoteActor;
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
         throw new UnsupportedOperationException();
     }
 
@@ -87,4 +100,24 @@ public class NettyTransportProvider {
         server = new NettyServer(localHost, "localhost", 9000);
         server.start();
     }
+
+    //    private static class StopProviderClosure extends Closure<Void> {
+//
+//        private final NettyTransportProvider provider;
+//
+//        public StopProviderClosure(Object owner, NettyTransportProvider provider) {
+//            super(owner);
+//            this.provider = provider;
+//        }
+//
+//        @Override
+//        public Void call(Object... args) {
+//            provider.disconnect();
+//            return null;
+//        }
+//    }
+
+//    public static void shutdown() {
+//        providers.stream().forEach(ClientNettyTransportProvider::disconnect);
+//    }
 }

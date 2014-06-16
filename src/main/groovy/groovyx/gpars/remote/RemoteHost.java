@@ -44,13 +44,13 @@ public final class RemoteHost extends SerialContext {
             final boolean wasConnected = isConnected();
             connections.add(connection);
             if (wasConnected != isConnected()) {
-                final Map<UUID, LocalNode> localNodes = ((LocalHost) localHost).localNodes;
-                //noinspection SynchronizationOnLocalVariableOrMethodParameter
-                synchronized (localNodes) {
-                    for (final LocalNode localNode : localNodes.values()) {
-                        connection.write(new NodeConnectedMsg(localNode));
-                    }
-                }
+//                final Map<UUID, LocalNode> localNodes = ((LocalHost) localHost).localNodes;
+//                //noinspection SynchronizationOnLocalVariableOrMethodParameter
+//                synchronized (localNodes) {
+//                    for (final LocalNode localNode : localNodes.values()) {
+//                        connection.write(new NodeConnectedMsg(localNode));
+//                    }
+//                }
 //                final List<Actor> localActors = ((LocalHost) localHost).localActors;
 //                synchronized (localActors) {
 //                    localActors.stream().forEach((actor) -> connection.write(new NodeConnectedMsg(actor)));
@@ -89,13 +89,13 @@ public final class RemoteHost extends SerialContext {
         return connections.get(0);
     }
 
-    public void connect(final LocalNode node) {
-        write(new NodeConnectedMsg(node));
-    }
-
-    public void disconnect(final LocalNode node) {
-        write(new NodeDisconnectedMsg(node));
-    }
+//    public void connect(final LocalNode node) {
+//        write(new NodeConnectedMsg(node));
+//    }
+//
+//    public void disconnect(final LocalNode node) {
+//        write(new NodeDisconnectedMsg(node));
+//    }
 
     public LocalHost getLocalHost() {
         return (LocalHost) localHost;
