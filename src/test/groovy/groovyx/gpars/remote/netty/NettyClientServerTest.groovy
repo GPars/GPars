@@ -19,20 +19,33 @@ package groovyx.gpars.remote.netty
 import groovyx.gpars.remote.LocalHost
 
 class NettyClientServerTest extends GroovyTestCase implements NettyTest {
-    def static LocalHost LOCALHOST = new LocalHost()
+    static LocalHost LOCALHOST = new LocalHost()
 
-    public void testConnectionLocal() {
-        NettyServer server = new NettyServer(LOCALHOST, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+    NettyServer server;
+    NettyClient client;
+
+    @Override
+    void setUp() {
+        super.setUp();
+
+        server = new NettyServer(LOCALHOST, LOCALHOST_ADDRESS, LOCALHOST_PORT)
         server.start()
         server.channelFuture.sync()
 
-        NettyClient client = new NettyClient(LOCALHOST, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+        client = new NettyClient(LOCALHOST, LOCALHOST_ADDRESS, LOCALHOST_PORT)
         client.start()
         client.channelFuture.sync()
+    }
 
-        assert client.channelFuture.isSuccess()
+    @Override
+    void tearDown() {
+        super.tearDown();
 
         client.stop()
         server.stop()
+    }
+
+    public void testConnectionLocal() {
+        assert client.channelFuture.isSuccess()
     }
 }
