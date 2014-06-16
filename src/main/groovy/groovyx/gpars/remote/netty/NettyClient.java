@@ -67,7 +67,7 @@ public class NettyClient {
      * Closes connection to server
      * Note: method does not block
      */
-    public void stop() throws InterruptedException {
+    public void stop() {
         if (channelFuture == null) {
             throw new IllegalStateException("Client has not been started");
         }

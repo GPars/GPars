@@ -37,7 +37,5 @@ public abstract class SerialMsg implements Serializable {
         this.hostId = hostId;
     }
 
-    public void execute(final RemoteConnection conn) {
-        conn.onMessage(this);
-    }
+    public abstract void execute(final RemoteConnection conn);
 }

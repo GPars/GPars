@@ -17,6 +17,7 @@
 package groovyx.gpars.remote.netty;
 
 import groovyx.gpars.actor.Actor;
+import groovyx.gpars.actor.remote.RemoteActorFuture;
 import groovyx.gpars.remote.BroadcastDiscovery;
 import groovyx.gpars.remote.LocalHost;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -42,33 +43,7 @@ public class NettyTransportProvider {
 
     private static NettyServer server;
 
-//    final BroadcastDiscovery broadcastDiscovery;
-
-    public NettyTransportProvider(String address, int port) throws InterruptedException {
-//        server = new NettyServer(this, address, port);
-//        server.start();
-//
-//        System.err.printf("Server listens on: %s:%d%n", server.getAddress().getHostString(), server.getAddress().getPort());
-
-//        this.broadcastDiscovery = new BroadcastDiscovery(getId(), server.getAddress()) {
-//            @Override
-//            protected void onDiscovery(final UUID uuid, final SocketAddress address) throws InterruptedException {
-//                if (uuid.equals(getId())) {
-//                    return;
-//                }
-//
-//                NettyClient client = clients.get(uuid);
-//                if (client == null) {
-//                    client = new NettyClient(NettyTransportProvider.this, ((InetSocketAddress)address).getHostString(), ((InetSocketAddress)address).getPort());
-//                    client.addDisconnectListener(() -> { System.out.println("Client disconnected!"); clients.get(uuid).stop(); clients.remove(uuid); });
-//                    client.start();
-//                    clients.put(uuid, client);
-//                }
-//            }
-//        };
-//
-//       broadcastDiscovery.start();
-    }
+    // final BroadcastDiscovery broadcastDiscovery;
 
     public static void register(Actor actor, String name) {
         if (server == null) {
@@ -79,45 +54,14 @@ public class NettyTransportProvider {
 
     public static Future<Actor> get(String host, int port, String name) {
         NettyClient client = new NettyClient(localHost, host, port);
+        client.start();
 
-        //    private static List<ClientNettyTransportProvider> providers = new ArrayList<>();
-
-//    public static Actor get(String host, int port, String actorName) {
-//        try {
-//            ClientNettyTransportProvider provider = new ClientNettyTransportProvider(host, port);
-//            providers.add(provider);
-//            Actor remoteActor = provider.register();
-//            return remoteActor;
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-        throw new UnsupportedOperationException();
+        RemoteActorFuture future = new RemoteActorFuture(name);
+        return future;
     }
 
     private static void startServer() {
         server = new NettyServer(localHost, "localhost", 9000);
         server.start();
     }
-
-    //    private static class StopProviderClosure extends Closure<Void> {
-//
-//        private final NettyTransportProvider provider;
-//
-//        public StopProviderClosure(Object owner, NettyTransportProvider provider) {
-//            super(owner);
-//            this.provider = provider;
-//        }
-//
-//        @Override
-//        public Void call(Object... args) {
-//            provider.disconnect();
-//            return null;
-//        }
-//    }
-
-//    public static void shutdown() {
-//        providers.stream().forEach(ClientNettyTransportProvider::disconnect);
-//    }
 }

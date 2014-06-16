@@ -8,7 +8,7 @@ def pongActor = Actors.actor {
 
     def stop = false
 
-    // handle incomming messages
+    // handle incoming messages
     loop({ !stop }) {
         react {
             println it

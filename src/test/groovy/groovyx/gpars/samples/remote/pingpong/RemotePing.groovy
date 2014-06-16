@@ -9,7 +9,8 @@ def pingActor = Actors.actor {
     println "Ping Actor"
 
     // get remote pongActor
-    def remotePongActor = RemoteActors.get("localhost", 9000, "pong")
+    def remotePongActorFuture = RemoteActors.get("localhost", 9000, "pong")
+    def remotePongActor = remotePongActorFuture.get()
 
     def thankYou = {
         remotePongActor << "STOP"
@@ -28,5 +29,3 @@ def pingActor = Actors.actor {
 
 pingActor << 7
 pingActor.join()
-
-RemoteActors.shutdown()

@@ -16,6 +16,8 @@
 
 package groovyx.gpars.remote.message;
 
+import groovyx.gpars.remote.RemoteConnection;
+import groovyx.gpars.remote.RemoteHost;
 import groovyx.gpars.serial.SerialMsg;
 
 import java.util.UUID;
@@ -34,5 +36,10 @@ public class HostIdMsg extends SerialMsg {
      */
     public HostIdMsg(final UUID id) {
         super(id);
+    }
+
+    @Override
+    public void execute(RemoteConnection conn) {
+        conn.setHost((RemoteHost) conn.getLocalHost().getSerialHost(hostId, conn));
     }
 }

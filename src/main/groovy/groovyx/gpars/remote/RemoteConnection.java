@@ -34,14 +34,6 @@ public abstract class RemoteConnection {
         this.localHost = provider;
     }
 
-    public void onMessage(final SerialMsg msg) {
-        if (host == null) {
-            host = (RemoteHost) localHost.getSerialHost(msg.hostId, this);
-        } else {
-            throw new IllegalStateException("Unexpected message: " + msg);
-        }
-    }
-
     @SuppressWarnings({"EmptyMethod"})
     public void onException(final Throwable cause) {
     }
@@ -62,6 +54,10 @@ public abstract class RemoteConnection {
 
     public void setHost(final RemoteHost host) {
         this.host = host;
+    }
+
+    public LocalHost getLocalHost() {
+        return localHost;
     }
 
     public abstract void disconnect();
