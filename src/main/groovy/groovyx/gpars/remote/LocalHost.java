@@ -57,7 +57,7 @@ public class LocalHost extends SerialHandles {
      */
     protected final Map<UUID, LocalNode> localNodes = new HashMap<UUID, LocalNode>();
 
-    protected final List<Actor> localActors = new ArrayList<>();
+    protected final Map<String, Actor> localActors = new HashMap<>();
 
     /**
      * Connect local node to the provider
@@ -84,13 +84,15 @@ public class LocalHost extends SerialHandles {
         }
     }
 
-    public void connect(final Actor actor) {
+    /**
+     * Registers actor under specific name
+     * @param name
+     * @param actor
+     */
+    public void register(String name, final Actor actor) {
         synchronized (localActors) {
-            localActors.add(actor);
+            localActors.put(name, actor);
         }
-
-        // look at connected nodes?
-        // send our actor to all connected hosts?
     }
 
     /**

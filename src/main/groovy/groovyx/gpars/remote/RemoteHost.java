@@ -51,10 +51,10 @@ public final class RemoteHost extends SerialContext {
                         connection.write(new NodeConnectedMsg(localNode));
                     }
                 }
-                final List<Actor> localActors = ((LocalHost) localHost).localActors;
-                synchronized (localActors) {
-                    localActors.stream().forEach((actor) -> connection.write(new NodeConnectedMsg(actor)));
-                }
+//                final List<Actor> localActors = ((LocalHost) localHost).localActors;
+//                synchronized (localActors) {
+//                    localActors.stream().forEach((actor) -> connection.write(new NodeConnectedMsg(actor)));
+//                }
             }
         }
     }

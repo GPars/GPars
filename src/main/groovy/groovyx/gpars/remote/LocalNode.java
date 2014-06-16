@@ -121,7 +121,7 @@ public class LocalNode {
                 }
             }
         });
-//        provider.connect(this);
+//        provider.register(this);
     }
 
     public void disconnect() {

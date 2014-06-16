@@ -16,8 +16,10 @@
 
 package groovyx.gpars.remote.netty;
 
+import groovyx.gpars.actor.Actor;
 import groovyx.gpars.remote.BroadcastDiscovery;
 import groovyx.gpars.remote.LocalHost;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -26,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Future;
 
 
 /**
@@ -33,19 +36,21 @@ import java.util.UUID;
  *
  * @author Alex Tkachman
  */
-public class NettyTransportProvider extends LocalHost {
+public class NettyTransportProvider {
 
-    private final Map<UUID, NettyClient> clients = Collections.synchronizedMap(new HashMap<UUID, NettyClient>());
+    private final static LocalHost localHost = new LocalHost();
 
-    final NettyServer server;
+    private static NettyServer server;
+
+//    final NettyServer server;
 
 //    final BroadcastDiscovery broadcastDiscovery;
 
     public NettyTransportProvider(String address, int port) throws InterruptedException {
-        server = new NettyServer(this, address, port);
-        server.start();
-
-        System.err.printf("Server listens on: %s:%d%n", server.getAddress().getHostString(), server.getAddress().getPort());
+//        server = new NettyServer(this, address, port);
+//        server.start();
+//
+//        System.err.printf("Server listens on: %s:%d%n", server.getAddress().getHostString(), server.getAddress().getPort());
 
 //        this.broadcastDiscovery = new BroadcastDiscovery(getId(), server.getAddress()) {
 //            @Override
@@ -67,15 +72,19 @@ public class NettyTransportProvider extends LocalHost {
 //       broadcastDiscovery.start();
     }
 
-    @Override
-    public void disconnect() {
-        super.disconnect();
-//        broadcastDiscovery.stop();
+    public static void register(Actor actor, String name) {
+        if (server == null) {
+            startServer();
+        }
+        localHost.register(name, actor);
+    }
 
-//        for (final NettyClient client : clients.values()) {
-//            client.stop();
-//        }
-            server.stop();
-            System.err.println("Server stopped");
+    public static Future<Actor> get(String host, int port, String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    private static void startServer() {
+        server = new NettyServer(localHost, "localhost", 9000);
+        server.start();
     }
 }
