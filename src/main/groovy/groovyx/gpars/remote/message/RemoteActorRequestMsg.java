@@ -5,10 +5,13 @@ import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;
 import groovyx.gpars.serial.SerialMsg;
 
+import java.util.UUID;
+
 public class RemoteActorRequestMsg extends SerialMsg {
     private final String actorName;
 
-    public RemoteActorRequestMsg(String actorName) {
+    public RemoteActorRequestMsg(UUID hostId, String actorName) {
+        super(hostId);
         this.actorName = actorName;
     }
 

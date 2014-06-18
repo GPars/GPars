@@ -27,5 +27,7 @@ def pingActor = Actors.actor {
     }
 }
 
-pingActor << 7
+pingActor << 1
 pingActor.join()
+
+println "done"
