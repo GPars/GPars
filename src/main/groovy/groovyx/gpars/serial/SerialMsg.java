@@ -17,6 +17,7 @@
 package groovyx.gpars.serial;
 
 import groovyx.gpars.remote.RemoteConnection;
+import groovyx.gpars.remote.RemoteHost;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -38,4 +39,10 @@ public abstract class SerialMsg implements Serializable {
     }
 
     public abstract void execute(final RemoteConnection conn);
+
+    protected void updateRemoteHost(RemoteConnection connection) {
+        if (connection.getHost() == null) {
+            connection.setHost((RemoteHost) connection.getLocalHost().getSerialHost(hostId, connection));
+        }
+    }
 }

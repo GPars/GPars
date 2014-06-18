@@ -38,11 +38,10 @@ public abstract class RemoteConnection {
     public void onException(final Throwable cause) {
     }
 
-    public void onConnect() {
-        write(new HostIdMsg(localHost.getId()));
-    }
+    abstract public void onConnect();
 
     public void onDisconnect() {
+        System.err.println(this + ".onDisconnect()");
         localHost.onDisconnect(host);
     }
 

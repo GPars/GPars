@@ -15,6 +15,8 @@ public class RemoteActorReplyMsg extends SerialMsg {
 
     @Override
     public void execute(RemoteConnection conn) {
+        updateRemoteHost(conn);
+
         conn.getLocalHost().registerRemote(name, actor);
     }
 }

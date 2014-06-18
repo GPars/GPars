@@ -18,6 +18,7 @@ package groovyx.gpars.remote.netty;
 
 import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.RemoteConnection;
+import groovyx.gpars.remote.message.HostIdMsg;
 import groovyx.gpars.serial.SerialMsg;
 
 import io.netty.channel.Channel;
@@ -51,5 +52,11 @@ public class NettyRemoteConnection extends RemoteConnection {
     @Override
     public void disconnect() {
         channel.close(); // TODO sync?
+    }
+
+    @Override
+    public void onConnect() {
+        write(new HostIdMsg(getLocalHost().getId()));
+        System.err.println(this + ".onConnect()");
     }
 }

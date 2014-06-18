@@ -15,5 +15,6 @@ public class NettyClientRemoteConnection extends NettyRemoteConnection {
     @Override
     public void onConnect() {
         write(new RemoteActorRequestMsg(getLocalHost().getId(), actorName));
+        System.err.println(this + ".onConnect()");
     }
 }

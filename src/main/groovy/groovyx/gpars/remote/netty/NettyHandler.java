@@ -39,14 +39,12 @@ public class NettyHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
-        System.err.println("connected");
         remoteConnection.onConnect();
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        System.err.println("disconnected");
         remoteConnection.onDisconnect();
     }
 
