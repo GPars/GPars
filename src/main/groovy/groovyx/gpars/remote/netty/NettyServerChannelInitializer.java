@@ -27,11 +27,11 @@ import io.netty.channel.socket.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
+public class NettyServerChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     protected final LocalHost localHost;
 
-    public NettyChannelInitializer(LocalHost localHost) {
+    public NettyServerChannelInitializer(LocalHost localHost) {
         this.localHost = localHost;
     }
 

@@ -5,7 +5,7 @@ import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.RemoteConnection;
 import io.netty.channel.Channel;
 
-public class NettyClientChannelInitializer extends NettyChannelInitializer {
+public class NettyClientChannelInitializer extends NettyServerChannelInitializer {
     private String actorName;
 
     public NettyClientChannelInitializer(LocalHost localHost, String actorName) {

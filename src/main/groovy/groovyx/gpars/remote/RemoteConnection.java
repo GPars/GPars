@@ -30,8 +30,8 @@ public abstract class RemoteConnection {
 
     private RemoteHost host;
 
-    protected RemoteConnection(final LocalHost provider) {
-        this.localHost = provider;
+    protected RemoteConnection(final LocalHost localHost) {
+        this.localHost = localHost;
     }
 
     @SuppressWarnings({"EmptyMethod"})
