@@ -41,14 +41,14 @@ public class NettyTransportProvider {
 
     private final static LocalHost localHost = new LocalHost();
 
-    private static NettyServer server;
+    private static NettyServer server = new NettyServer(localHost, "localhost", 9000);
 
+    static {
+        server.start();
+    }
     // final BroadcastDiscovery broadcastDiscovery;
 
     public static void register(Actor actor, String name) {
-        if (server == null) {
-            startServer();
-        }
         localHost.register(name, actor);
     }
 
@@ -59,10 +59,5 @@ public class NettyTransportProvider {
         RemoteActorFuture future = new RemoteActorFuture(localHost, name);
         localHost.addRemoteActorFuture(future);
         return future;
-    }
-
-    private static void startServer() {
-        server = new NettyServer(localHost, "localhost", 9000);
-        server.start();
     }
 }
