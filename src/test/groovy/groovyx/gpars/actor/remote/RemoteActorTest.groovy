@@ -13,7 +13,7 @@ class RemoteActorTest extends Specification {
         def testActor = Actors.actor {
             for (i in 1..3) {
                 println i
-                sleep 200
+                sleep 1000
             }
             done = true
         }
