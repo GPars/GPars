@@ -27,12 +27,13 @@ import io.netty.channel.socket.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NettyServerChannelInitializer extends ChannelInitializer<SocketChannel> {
-
+public class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
     protected final LocalHost localHost;
+    protected final ConnectListener connectListener;
 
-    public NettyServerChannelInitializer(LocalHost localHost) {
+    public NettyChannelInitializer(LocalHost localHost, ConnectListener connectListener) {
         this.localHost = localHost;
+        this.connectListener = connectListener;
     }
 
     @Override
@@ -47,6 +48,6 @@ public class NettyServerChannelInitializer extends ChannelInitializer<SocketChan
     }
 
     protected RemoteConnection getRemoteConnection(Channel channel) {
-        return new NettyRemoteConnection(localHost, channel);
+        return new NettyRemoteConnection(localHost, channel, connectListener);
     }
 }

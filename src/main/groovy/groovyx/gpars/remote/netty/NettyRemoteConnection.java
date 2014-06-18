@@ -36,10 +36,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class NettyRemoteConnection extends RemoteConnection {
     private final Channel channel;
+    private final ConnectListener connectListener;
 
-    public NettyRemoteConnection(final LocalHost provider, final Channel channel) {
+    public NettyRemoteConnection(final LocalHost provider, final Channel channel, ConnectListener connectListener) {
         super(provider);
         this.channel = channel;
+        this.connectListener = connectListener;
     }
 
     @Override
@@ -56,7 +58,9 @@ public class NettyRemoteConnection extends RemoteConnection {
 
     @Override
     public void onConnect() {
-        write(new HostIdMsg(getLocalHost().getId()));
         System.err.println(this + ".onConnect()");
+        if (connectListener != null) {
+            connectListener.onConnect(this);
+        }
     }
 }

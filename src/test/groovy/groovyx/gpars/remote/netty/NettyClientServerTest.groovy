@@ -24,28 +24,22 @@ class NettyClientServerTest extends GroovyTestCase implements NettyTest {
     NettyServer server;
     NettyClient client;
 
-    @Override
-    void setUp() {
-        super.setUp();
-
-        server = new NettyServer(LOCALHOST, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+    public void testConnectionLocal() {
+        def serverConnected = false
+        server = new NettyServer(LOCALHOST, LOCALHOST_ADDRESS, LOCALHOST_PORT, {serverConnected = true} as ConnectListener)
         server.start()
         server.channelFuture.sync()
 
-        client = new NettyClient(LOCALHOST, LOCALHOST_ADDRESS, LOCALHOST_PORT, null)
+        def clientConnected = false
+        client = new NettyClient(LOCALHOST, LOCALHOST_ADDRESS, LOCALHOST_PORT, {clientConnected = true} as ConnectListener)
         client.start()
         client.channelFuture.sync()
-    }
 
-    @Override
-    void tearDown() {
-        super.tearDown();
+        assert client.channelFuture.isSuccess()
+        assert serverConnected
+        assert clientConnected
 
         client.stop()
         server.stop()
-    }
-
-    public void testConnectionLocal() {
-        assert client.channelFuture.isSuccess()
     }
 }

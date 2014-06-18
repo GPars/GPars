@@ -20,6 +20,8 @@ import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.remote.RemoteActorFuture;
 import groovyx.gpars.remote.BroadcastDiscovery;
 import groovyx.gpars.remote.LocalHost;
+import groovyx.gpars.remote.message.HostIdMsg;
+import groovyx.gpars.remote.message.RemoteActorRequestMsg;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.net.InetAddress;
@@ -41,7 +43,7 @@ public class NettyTransportProvider {
 
     private final static LocalHost localHost = new LocalHost();
 
-    private static NettyServer server = new NettyServer(localHost, "localhost", 9000);
+    private static NettyServer server = new NettyServer(localHost, "localhost", 9000, connection -> connection.write(new HostIdMsg(localHost.getId())));
 
     static {
         server.start();
@@ -53,7 +55,7 @@ public class NettyTransportProvider {
     }
 
     public static Future<Actor> get(String host, int port, String name) {
-        NettyClient client = new NettyClient(localHost, host, port, name);
+        NettyClient client = new NettyClient(localHost, host, port, connection -> connection.write(new RemoteActorRequestMsg(localHost.getId(), name)));
         client.start();
 
         RemoteActorFuture future = new RemoteActorFuture(localHost, name);

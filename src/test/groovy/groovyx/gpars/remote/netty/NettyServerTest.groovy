@@ -18,7 +18,7 @@ package groovyx.gpars.remote.netty
 
 class NettyServerTest extends GroovyTestCase implements NettyTest {
     public void testServerStart() {
-        NettyServer server = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+        NettyServer server = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT, null)
         server.start()
         server.channelFuture.sync()
 
@@ -28,7 +28,7 @@ class NettyServerTest extends GroovyTestCase implements NettyTest {
     }
 
     public void testServerCannotBeStoppedIfNotRunning() {
-        NettyServer server = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+        NettyServer server = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT, null)
 
         def message = shouldFail(IllegalStateException.class, {
             server.stop()
@@ -38,8 +38,8 @@ class NettyServerTest extends GroovyTestCase implements NettyTest {
     }
 
     public void testOnlyOneInstanceOfServerStarts() {
-        NettyServer server1 = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
-        NettyServer server2 = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT)
+        NettyServer server1 = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT, null)
+        NettyServer server2 = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT, null)
 
         server1.start()
         server2.start()

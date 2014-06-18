@@ -41,13 +41,13 @@ public class NettyClient {
      * @param host the host where server listens on
      * @param port the port that server listens on
      */
-    public NettyClient(LocalHost localHost, String host, int port, String actorName) {
+    public NettyClient(LocalHost localHost, String host, int port, ConnectListener connectListener) {
         workerGroup = new NioEventLoopGroup();
 
         bootstrap = new Bootstrap();
         bootstrap.group(workerGroup)
                 .channel(NioSocketChannel.class)
-                .handler(new NettyClientChannelInitializer(localHost, actorName))
+                .handler(new NettyChannelInitializer(localHost, connectListener))
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .remoteAddress(host, port);

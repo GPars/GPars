@@ -41,14 +41,14 @@ public class NettyServer {
     /**
      * Creates a server listening on specified address.
      */
-    public NettyServer(LocalHost localHost, String address, int port) {
+    public NettyServer(LocalHost localHost, String address, int port, ConnectListener connectListener) {
         bossGroup = new NioEventLoopGroup();
         workerGroup = new NioEventLoopGroup();
 
         bootstrap = new ServerBootstrap();
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
-                .childHandler(new NettyServerChannelInitializer(localHost))
+                .childHandler(new NettyChannelInitializer(localHost, connectListener))
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
                 .localAddress(new InetSocketAddress(address, port));
