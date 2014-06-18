@@ -88,8 +88,4 @@ public class NettyServer {
             }
         });
     }
-
-    public InetSocketAddress getAddress() {
-        return (InetSocketAddress) channelFuture.channel().localAddress();
-    }
 }
