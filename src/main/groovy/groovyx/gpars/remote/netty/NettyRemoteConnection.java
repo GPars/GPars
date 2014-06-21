@@ -53,7 +53,7 @@ public class NettyRemoteConnection extends RemoteConnection {
 
     @Override
     public void disconnect() {
-        channel.close(); // TODO sync?
+        channel.close();
     }
 
     @Override
