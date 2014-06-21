@@ -67,6 +67,7 @@ class RemoteActorTest extends Specification {
                 replyMessage = it
             }
         }
+        sleep 500
 
         then:
         replyMessage == "test reply"
