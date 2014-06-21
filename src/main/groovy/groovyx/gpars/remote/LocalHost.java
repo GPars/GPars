@@ -18,6 +18,7 @@ package groovyx.gpars.remote;
 
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.remote.RemoteActorFuture;
+import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandles;
 
@@ -50,7 +51,7 @@ public class LocalHost extends SerialHandles {
 
     protected final Map<String, Actor> remoteActors = new HashMap<>();
 
-    private List<RemoteActorFuture> remoteActorFutures = new ArrayList<>();
+    private Map<String, List<DataflowVariable<Actor>>> remoteActorFutures = new HashMap<>();
 
     /**
      * Registers actor under specific name
@@ -149,11 +150,11 @@ public class LocalHost extends SerialHandles {
             remoteActors.put(name, actor);
         }
         synchronized (remoteActorFutures) {
-            remoteActorFutures.stream().forEach(future -> {
-                synchronized (future) {
-                    future.notifyAll();
-                }
-            });
+            List<DataflowVariable<Actor>> futures = remoteActorFutures.get(name);
+            if (futures != null) {
+                futures.stream().forEach(var -> var.bindUnique(actor));
+            }
+            remoteActorFutures.remove(name);
         }
     }
 
@@ -163,9 +164,16 @@ public class LocalHost extends SerialHandles {
         }
     }
 
-    public void addRemoteActorFuture(RemoteActorFuture future) {
+    public void addRemoteActorFuture(String name, DataflowVariable<Actor> var) {
         synchronized (remoteActorFutures) {
-            remoteActorFutures.add(future);
+            List<DataflowVariable<Actor>> futures = remoteActorFutures.get(name);
+            if (futures == null) {
+                futures = new ArrayList<>();
+                futures.add(var);
+                remoteActorFutures.put(name, futures);
+            } else {
+                futures.add(var);
+            }
         }
     }
 }

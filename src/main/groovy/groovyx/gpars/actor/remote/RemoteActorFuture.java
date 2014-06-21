@@ -1,6 +1,7 @@
 package groovyx.gpars.actor.remote;
 
 import groovyx.gpars.actor.Actor;
+import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.remote.LocalHost;
 
 import java.util.concurrent.ExecutionException;
@@ -9,12 +10,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class RemoteActorFuture implements Future<Actor> {
-    private final LocalHost localHost;
-    private final String name;
+    private final DataflowVariable<Actor> actor;
 
-    public RemoteActorFuture(LocalHost localHost, String name) {
-        this.localHost = localHost;
-        this.name = name;
+    public RemoteActorFuture(DataflowVariable<Actor> actor) {
+        this.actor = actor;
     }
 
     @Override
@@ -29,17 +28,16 @@ public class RemoteActorFuture implements Future<Actor> {
 
     @Override
     public boolean isDone() {
-        return localHost.getRemoteActor(name) != null;
+        return actor.isBound();
     }
 
     @Override
     public Actor get() throws InterruptedException, ExecutionException {
-        synchronized (this) {
-            while (!isDone()) {
-                wait();
-            }
+        try {
+            return actor.get();
+        } catch (Throwable throwable) {
+            throw new ExecutionException(throwable);
         }
-        return localHost.getRemoteActor(name);
     }
 
     @Override

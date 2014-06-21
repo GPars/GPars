@@ -18,6 +18,7 @@ package groovyx.gpars.remote.netty;
 
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.remote.RemoteActorFuture;
+import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.remote.BroadcastDiscovery;
 import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.message.HostIdMsg;
@@ -58,8 +59,8 @@ public class NettyTransportProvider {
         NettyClient client = new NettyClient(localHost, host, port, connection -> connection.write(new RemoteActorRequestMsg(localHost.getId(), name)));
         client.start();
 
-        RemoteActorFuture future = new RemoteActorFuture(localHost, name);
-        localHost.addRemoteActorFuture(future);
-        return future;
+        DataflowVariable<Actor> remoteActor = new DataflowVariable<>();
+        localHost.addRemoteActorFuture(name, remoteActor);
+        return new RemoteActorFuture(remoteActor);
     }
 }
