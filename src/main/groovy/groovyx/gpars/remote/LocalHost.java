@@ -158,12 +158,6 @@ public class LocalHost extends SerialHandles {
         }
     }
 
-    public Actor getRemoteActor(String name) {
-        synchronized (remoteActors) {
-            return remoteActors.get(name);
-        }
-    }
-
     public void addRemoteActorFuture(String name, DataflowVariable<Actor> var) {
         synchronized (remoteActorFutures) {
             List<DataflowVariable<Actor>> futures = remoteActorFutures.get(name);

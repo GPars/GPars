@@ -42,7 +42,14 @@ public class RemoteActorFuture implements Future<Actor> {
 
     @Override
     public Actor get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        throw new UnsupportedOperationException("not yet implemented");
+        try {
+            return actor.get(timeout, unit);
+        } catch (Throwable throwable) {
+            if (throwable instanceof TimeoutException) {
+                throw (TimeoutException) throwable;
+            }
+            throw new ExecutionException(throwable);
+        }
     }
 
 
