@@ -1,9 +1,5 @@
 package groovyx.gpars.samples.remote.chat
 
-import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.DefaultActor
-import groovyx.gpars.actor.remote.RemoteActors
-
 def HOST = "localhost"
 def PORT = 9000
 
@@ -12,6 +8,8 @@ def reader = new BufferedReader(new InputStreamReader(System.in))
 println """Welcome to chat!
 
 Type @exit to quit
+Type @show to see list of clients connected to server
+Type message to send to other connected clients
 """
 
 println "Enter client name:"

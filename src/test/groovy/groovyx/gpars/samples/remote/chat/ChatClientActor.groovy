@@ -8,8 +8,12 @@ class ChatClientActor extends DefaultActor {
     String name
     def serverFuture
 
-    def consoleActor = Actors.reactor { ChatMessage message ->
-        println "${message.sender}: ${message.message}"
+    def consoleActor = Actors.actor {
+        loop {
+            react { ChatMessage message ->
+                println "${message.sender}: ${message.message}"
+            }
+        }
     }
 
     ChatClientActor(String host, int port, String name) {
@@ -26,7 +30,12 @@ class ChatClientActor extends DefaultActor {
 
         loop {
             react { line ->
-                server << new ChatMessage(action: "say", sender: name, message: line)
+                if (line == "@show") {
+                    server << new ChatMessage(action: "show", sender: name)
+                }
+                else {
+                    server << new ChatMessage(action: "say", sender: name, message: line)
+                }
             }
         }
     }

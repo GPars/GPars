@@ -9,21 +9,18 @@ class ChatServerActor extends DefaultActor {
     @Override
     protected void act() {
         loop {
-            react { message ->
-                println message
-                if (message instanceof ChatMessage) {
-                    if (message.action == "say") {
-                        connectedClients.each { name, client ->
-                            if (name != message.sender) {
-                                client << message
-                            }
-                        }
-                    } else if (message.action == "register") {
-                        connectedClients.each { name, client ->
-                            client << new ChatMessage(action: "say", sender: "server", message: "${message.sender} has joined")
-                        }
+            react { ChatMessage message ->
+                switch (message.action) {
+                    case "say":
+                        def otherClients = connectedClients.findResults { name, client -> name != message.sender ? client : null }
+                        otherClients.each { it << message }
+                        break
+                    case "register":
+                        connectedClients.each { name, client -> client << new ChatMessage(action: "say", sender: "server", message: "${message.sender} has joined") }
                         connectedClients.put(message.sender, message.message)
-                    }
+                        break
+                    case "show":
+                        connectedClients[message.sender] << new ChatMessage(action: "show", sender: "server", message: connectedClients.keySet().toListString())
                 }
             }
         }
