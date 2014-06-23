@@ -66,7 +66,11 @@ public class NettyTransportProvider {
     }
 
     public static Future<Actor> get(String host, int port, String name) {
-        NettyClient client = new NettyClient(localHost, host, port, connection -> connection.write(new RemoteActorRequestMsg(localHost.getId(), name)));
+        NettyClient client = new NettyClient(localHost, host, port, connection -> {
+            if (connection.getHost() != null) {
+                connection.write(new RemoteActorRequestMsg(localHost.getId(), name));
+            }
+        });
         client.start();
 
         DataflowVariable<Actor> remoteActor = new DataflowVariable<>();

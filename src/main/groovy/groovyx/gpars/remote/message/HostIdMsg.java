@@ -41,5 +41,6 @@ public class HostIdMsg extends SerialMsg {
     @Override
     public void execute(RemoteConnection conn) {
         conn.setHost((RemoteHost) conn.getLocalHost().getSerialHost(hostId, conn));
+        conn.onConnect();
     }
 }

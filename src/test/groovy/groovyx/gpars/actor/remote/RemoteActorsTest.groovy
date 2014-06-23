@@ -2,13 +2,24 @@ package groovyx.gpars.actor.remote
 
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.DefaultActor
+import groovyx.gpars.remote.netty.NettyTransportProvider
 import junit.framework.Test
 import spock.lang.Specification
 
+import java.util.concurrent.CountDownLatch
+
 
 class RemoteActorsTest extends Specification {
-    def HOST = "localhost"
-    def PORT = 9000
+    def static HOST = "localhost"
+    def static PORT = 9000
+
+    def setupSpec() {
+        NettyTransportProvider.startServer(HOST, PORT)
+    }
+
+    def cleanupSpec() {
+        NettyTransportProvider.stopServer()
+    }
 
     def "Register and get actor"() {
         setup:
@@ -23,6 +34,7 @@ class RemoteActorsTest extends Specification {
         remoteActor << testMessage
 
         then:
+        testActor.messageLatch.await()
         remoteActor != null;
         testActor.lastMessage == testMessage
 
@@ -53,7 +65,9 @@ class RemoteActorsTest extends Specification {
         then:
         remoteActor1 != null
         remoteActor2 != null
+        testActor1.messageLatch.await()
         testActor1.lastMessage == testMessage + "1"
+        testActor2.messageLatch.await()
         testActor2.lastMessage == testMessage + "2"
 
         testActor1.stop()
@@ -61,13 +75,20 @@ class RemoteActorsTest extends Specification {
     }
 
     class TestActor extends DefaultActor {
-        def lastMessage;
+        def lastMessage
+        def messageLatch
+
+        TestActor() {
+            messageLatch = new CountDownLatch(1)
+        }
 
         @Override
         protected void act() {
             loop {
                 react {
+                    println "message"
                     lastMessage = it
+                    messageLatch.countDown()
                 }
             }
         }
