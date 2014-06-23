@@ -1350,7 +1350,6 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         @SuppressWarnings("unchecked")
         public void execute(final RemoteConnection conn) {
             expr.doBindRemote(hostId, message);
-            // conn.disconnect(); // TODO binding should end the connection
         }
     }
 

@@ -17,6 +17,7 @@
 package groovyx.gpars.remote;
 
 import groovyx.gpars.actor.Actor;
+import groovyx.gpars.remote.message.CloseConnectionMsg;
 import groovyx.gpars.remote.message.NodeConnectedMsg;
 import groovyx.gpars.remote.message.NodeDisconnectedMsg;
 import groovyx.gpars.serial.SerialContext;
@@ -71,7 +72,8 @@ public final class RemoteHost extends SerialContext {
 
     public void disconnect() {
         for (final RemoteConnection connection : connections) {
-            connection.disconnect();
+            // connection.disconnect();
+            connection.write(new CloseConnectionMsg());
         }
     }
 

@@ -21,6 +21,11 @@ class ChatClientActor extends DefaultActor {
         serverFuture = RemoteActors.get(host, port, "chat-server")
     }
 
+    public afterStop(List<Object> messages) {
+        def server = serverFuture.get()
+        server << new ChatMessage(action: "unregister", sender: name)
+    }
+
     @Override
     protected void act() {
         def server = serverFuture.get()

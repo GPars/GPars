@@ -1,5 +1,7 @@
 package groovyx.gpars.samples.remote.chat
 
+import groovyx.gpars.remote.netty.NettyTransportProvider
+
 def HOST = "localhost"
 def PORT = 9000
 
@@ -28,3 +30,5 @@ while (true) {
 
     client << line
 }
+
+NettyTransportProvider.stopClients()

@@ -42,14 +42,24 @@ import java.util.concurrent.Future;
  */
 public class NettyTransportProvider {
 
+    // final BroadcastDiscovery broadcastDiscovery;
+
     private final static LocalHost localHost = new LocalHost();
 
-    private static NettyServer server = new NettyServer(localHost, "localhost", 9000, connection -> connection.write(new HostIdMsg(localHost.getId())));
+    private static NettyServer server;
 
-    static {
+    public static void startServer(String host, int port) {
+        server = new NettyServer(localHost, host, port, connection -> connection.write(new HostIdMsg(localHost.getId())));
         server.start();
     }
-    // final BroadcastDiscovery broadcastDiscovery;
+
+    public static void stopServer() {
+        server.stop();
+    }
+
+    public static void stopClients() {
+        localHost.disconnect();
+    }
 
     public static void register(Actor actor, String name) {
         localHost.register(name, actor);

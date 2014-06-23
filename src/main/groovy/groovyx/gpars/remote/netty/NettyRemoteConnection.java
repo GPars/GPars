@@ -18,6 +18,7 @@ package groovyx.gpars.remote.netty;
 
 import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.RemoteConnection;
+import groovyx.gpars.remote.message.CloseConnectionMsg;
 import groovyx.gpars.remote.message.HostIdMsg;
 import groovyx.gpars.serial.SerialMsg;
 

@@ -53,7 +53,6 @@ public class NettyHandler extends ChannelInboundHandlerAdapter {
         super.channelRead(ctx, msg);
         System.err.println("Message received: " + msg);
         if (msg instanceof SerialMsg) {
-            Thread.sleep(500); // TODO DIRTY HACK
             ((SerialMsg) msg).execute(remoteConnection);
         }
     }
