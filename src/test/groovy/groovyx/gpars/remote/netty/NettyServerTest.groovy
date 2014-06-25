@@ -16,38 +16,52 @@
 
 package groovyx.gpars.remote.netty
 
-class NettyServerTest extends GroovyTestCase implements NettyTest {
-    public void testServerStart() {
-        NettyServer server = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT, null)
+import spock.lang.Specification
+import spock.lang.Timeout
+
+class NettyServerTest extends Specification {
+    def static HOST = "localhost"
+    def static PORT = 9001
+
+    @Timeout(5)
+    def "test if NettyServer starts"() {
+        setup:
+        NettyServer server = new NettyServer(null, HOST, PORT, null)
+
+        when:
         server.start()
         server.channelFuture.sync()
 
-        assert server.channelFuture.isSuccess()
+        then:
+        server.channelFuture.isSuccess()
 
         server.stop()
     }
 
-    public void testServerCannotBeStoppedIfNotRunning() {
-        NettyServer server = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT, null)
+    def "test if stopping server fails when server is not running"() {
+        setup:
+        NettyServer server = new NettyServer(null, HOST, PORT, null)
 
-        def message = shouldFail(IllegalStateException.class, {
-            server.stop()
-        })
+        when:
+        server.stop()
 
-        assert message == "Server has not been started"
+        then:
+        IllegalStateException e = thrown()
+        e.message == "Server has not been started"
     }
 
-    public void testOnlyOneInstanceOfServerStarts() {
-        NettyServer server1 = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT, null)
-        NettyServer server2 = new NettyServer(null, LOCALHOST_ADDRESS, LOCALHOST_PORT, null)
+    @Timeout(5)
+    def "test if only one server instance starts at given host:port"() {
+        setup:
+        def servers = [new NettyServer(null, HOST, PORT, null), new NettyServer(null, HOST, PORT, null)]
 
-        server1.start()
-        server2.start()
+        when:
+        servers*.start()
+        servers*.channelFuture*.sync()
 
-        shouldFail(BindException, {
-            [server1.channelFuture, server2.channelFuture]*.sync()
-        })
+        then:
+        thrown(BindException)
 
-        [server1, server2]*.stop()
+        servers*.stop()
     }
 }
