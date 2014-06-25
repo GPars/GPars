@@ -17,6 +17,31 @@
 package groovyx.gpars.remote.netty
 
 import groovyx.gpars.remote.LocalHost
+import spock.lang.Specification
+
+class NettyClientServerTest extends Specification {
+    def static HOST = "localhost"
+    def static PORT = 9003
+
+    def "test connection locally"() {
+        setup:
+        LocalHost localHost = null // TODO
+        NettyServer server = new NettyServer(localHost, HOST, PORT, null)
+        NettyClient client = new NettyClient(localHost, HOST, PORT, null)
+
+        when:
+        server.start()
+        client.start()
+
+        then:
+        client.channelFuture.isSuccess()
+
+        client.stop()
+        server.stop()
+    }
+}
+
+/*import groovyx.gpars.remote.LocalHost
 
 class NettyClientServerTest extends GroovyTestCase implements NettyTest {
     static LocalHost LOCALHOST = new LocalHost()
@@ -42,4 +67,4 @@ class NettyClientServerTest extends GroovyTestCase implements NettyTest {
         client.stop()
         server.stop()
     }
-}
+}*/
