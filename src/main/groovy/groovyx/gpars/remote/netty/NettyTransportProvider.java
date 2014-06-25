@@ -44,11 +44,12 @@ public class NettyTransportProvider {
 
     // final BroadcastDiscovery broadcastDiscovery;
 
-    private final static LocalHost localHost = new LocalHost();
+    private static LocalHost localHost;
 
     private static NettyServer server;
 
     public static void startServer(String host, int port) {
+        localHost = new LocalHost();
         server = new NettyServer(localHost, host, port, connection -> connection.write(new HostIdMsg(localHost.getId())));
         server.start();
     }

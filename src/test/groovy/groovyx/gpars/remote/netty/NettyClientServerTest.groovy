@@ -20,6 +20,8 @@ import groovyx.gpars.remote.LocalHost
 import spock.lang.Specification
 import spock.lang.Timeout
 
+import java.util.concurrent.CountDownLatch
+
 class NettyClientServerTest extends Specification {
     def static HOST = "localhost"
     def static PORT = 9003
@@ -29,10 +31,11 @@ class NettyClientServerTest extends Specification {
         setup:
         def serverConnected = false
         def clientConnected = false
+        def connectedLatch = new CountDownLatch(2)
 
         LocalHost localHost = new LocalHost() // TODO change to mock
-        NettyServer server = new NettyServer(localHost, HOST, PORT, { serverConnected = true} as ConnectListener)
-        NettyClient client = new NettyClient(localHost, HOST, PORT, { clientConnected = true} as ConnectListener)
+        NettyServer server = new NettyServer(localHost, HOST, PORT, { serverConnected = true; connectedLatch.countDown() } as ConnectListener)
+        NettyClient client = new NettyClient(localHost, HOST, PORT, { clientConnected = true; connectedLatch.countDown() } as ConnectListener)
 
         when:
         server.start()
@@ -42,6 +45,7 @@ class NettyClientServerTest extends Specification {
 
         then:
         client.channelFuture.isSuccess()
+        connectedLatch.await()
         serverConnected
         clientConnected
 
