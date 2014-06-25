@@ -7,17 +7,11 @@ import groovyx.gpars.remote.netty.NettyTransportProvider
 def pongActor = Actors.actor {
     println "Pong Actor"
 
-    def stop = false
-
     // handle incoming messages
-    loop({ !stop }) {
+    loop {
         react {
             println it
-            if (it.equals("STOP")) {
-                stop = true;
-            } else {
-                reply "PONG"
-            }
+            reply "PONG"
         }
     }
 }

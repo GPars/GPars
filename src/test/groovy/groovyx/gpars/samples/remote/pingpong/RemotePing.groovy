@@ -10,15 +10,10 @@ def pingActor = Actors.actor {
     println "Ping Actor"
 
     // get remote pongActor
-    def remotePongActorFuture = RemoteActors.get("localhost", 9000, "pong")
-    def remotePongActor = remotePongActorFuture.get()
-
-    def thankYou = {
-        remotePongActor << "STOP"
-    }
+    def remotePongActor = RemoteActors.get("localhost", 9000, "pong").get()
 
     react { numberOfPings ->
-        loop(numberOfPings, thankYou) {
+        loop(numberOfPings) {
             println "PING"
             remotePongActor << "PING"
             react {
@@ -28,7 +23,7 @@ def pingActor = Actors.actor {
     }
 }
 
-pingActor << 1
+pingActor << 3
 pingActor.join()
 
 NettyTransportProvider.stopClients()
