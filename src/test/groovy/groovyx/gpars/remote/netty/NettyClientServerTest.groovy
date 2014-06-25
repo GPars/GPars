@@ -25,7 +25,7 @@ class NettyClientServerTest extends Specification {
 
     def "test connection locally"() {
         setup:
-        LocalHost localHost = null // TODO
+        LocalHost localHost = new LocalHost() // TODO change to mock
         NettyServer server = new NettyServer(localHost, HOST, PORT, null)
         NettyClient client = new NettyClient(localHost, HOST, PORT, null)
 
