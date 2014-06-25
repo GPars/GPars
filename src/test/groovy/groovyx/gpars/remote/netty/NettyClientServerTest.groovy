@@ -18,53 +18,34 @@ package groovyx.gpars.remote.netty
 
 import groovyx.gpars.remote.LocalHost
 import spock.lang.Specification
+import spock.lang.Timeout
 
 class NettyClientServerTest extends Specification {
     def static HOST = "localhost"
     def static PORT = 9003
 
+    @Timeout(5)
     def "test connection locally"() {
         setup:
+        def serverConnected = false
+        def clientConnected = false
+
         LocalHost localHost = new LocalHost() // TODO change to mock
-        NettyServer server = new NettyServer(localHost, HOST, PORT, null)
-        NettyClient client = new NettyClient(localHost, HOST, PORT, null)
+        NettyServer server = new NettyServer(localHost, HOST, PORT, { serverConnected = true} as ConnectListener)
+        NettyClient client = new NettyClient(localHost, HOST, PORT, { clientConnected = true} as ConnectListener)
 
         when:
         server.start()
+        server.channelFuture.sync()
         client.start()
+        client.channelFuture.sync()
 
         then:
         client.channelFuture.isSuccess()
+        serverConnected
+        clientConnected
 
         client.stop()
         server.stop()
     }
 }
-
-/*import groovyx.gpars.remote.LocalHost
-
-class NettyClientServerTest extends GroovyTestCase implements NettyTest {
-    static LocalHost LOCALHOST = new LocalHost()
-
-    NettyServer server;
-    NettyClient client;
-
-    public void testConnectionLocal() {
-        def serverConnected = false
-        server = new NettyServer(LOCALHOST, LOCALHOST_ADDRESS, LOCALHOST_PORT, {serverConnected = true} as ConnectListener)
-        server.start()
-        server.channelFuture.sync()
-
-        def clientConnected = false
-        client = new NettyClient(LOCALHOST, LOCALHOST_ADDRESS, LOCALHOST_PORT, {clientConnected = true} as ConnectListener)
-        client.start()
-        client.channelFuture.sync()
-
-        assert client.channelFuture.isSuccess()
-        assert serverConnected
-        assert clientConnected
-
-        client.stop()
-        server.stop()
-    }
-}*/
