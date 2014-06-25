@@ -1,17 +1,16 @@
 package groovyx.gpars.actor.remote
 
-import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.remote.netty.NettyTransportProvider
-import junit.framework.Test
 import spock.lang.Specification
+import spock.lang.Timeout
 
 import java.util.concurrent.CountDownLatch
 
 
 class RemoteActorsTest extends Specification {
     def static HOST = "localhost"
-    def static PORT = 9000
+    def static PORT = 9011
 
     def setupSpec() {
         NettyTransportProvider.startServer(HOST, PORT)
@@ -21,6 +20,7 @@ class RemoteActorsTest extends Specification {
         NettyTransportProvider.stopServer()
     }
 
+    @Timeout(5)
     def "Register and get actor"() {
         setup:
         def testActor = new TestActor()
@@ -30,17 +30,17 @@ class RemoteActorsTest extends Specification {
         testActor.start()
         RemoteActors.register(testActor, "testActor")
         def remoteActor = RemoteActors.get(HOST, PORT, "testActor").get()
-
         remoteActor << testMessage
 
         then:
-        testActor.messageLatch.await()
         remoteActor != null;
+        testActor.lastMessageLatch.await()
         testActor.lastMessage == testMessage
 
         testActor.stop()
     }
 
+    @Timeout(5)
     def "Register and get two actors"() {
         setup:
         def testActor1 = new TestActor()
@@ -65,9 +65,9 @@ class RemoteActorsTest extends Specification {
         then:
         remoteActor1 != null
         remoteActor2 != null
-        testActor1.messageLatch.await()
+        testActor1.lastMessageLatch.await()
         testActor1.lastMessage == testMessage + "1"
-        testActor2.messageLatch.await()
+        testActor2.lastMessageLatch.await()
         testActor2.lastMessage == testMessage + "2"
 
         testActor1.stop()
@@ -76,10 +76,10 @@ class RemoteActorsTest extends Specification {
 
     class TestActor extends DefaultActor {
         def lastMessage
-        def messageLatch
+        def lastMessageLatch
 
         TestActor() {
-            messageLatch = new CountDownLatch(1)
+            lastMessageLatch = new CountDownLatch(1)
         }
 
         @Override
@@ -88,7 +88,7 @@ class RemoteActorsTest extends Specification {
                 react {
                     println "message"
                     lastMessage = it
-                    messageLatch.countDown()
+                    lastMessageLatch.countDown()
                 }
             }
         }
