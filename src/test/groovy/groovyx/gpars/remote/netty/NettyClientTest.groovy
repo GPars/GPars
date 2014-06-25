@@ -16,21 +16,43 @@
 
 package groovyx.gpars.remote.netty
 
-class NettyClientTest extends GroovyTestCase implements NettyTest {
-    public void testClientStartNoServer() {
-        NettyClient client = new NettyClient(null, LOCALHOST_ADDRESS, LOCALHOST_PORT, null)
-        client.start()
+import spock.lang.Specification
+import spock.lang.Timeout
 
-        shouldFail(ConnectException.class, {
-            client.channelFuture.sync()
-        })
+class NettyClientTest extends Specification {
+    def static HOST = "localhost"
+    def static PORT = 9002
+
+    @Timeout(5)
+    def "test if client throws an exception when it is unable to connect"() {
+        setup:
+        NettyClient client = new NettyClient(null, HOST, PORT, null)
+
+        when:
+        client.start()
+        client.channelFuture.sync()
+
+        then:
+        thrown(ConnectException)
 
         client.stop()
     }
 
-    public void testClientStart() {
+    def "test if client cannot be stopped if not running"() {
+        setup:
+        NettyClient client = new NettyClient(null, HOST, PORT, null)
 
+        when:
+        client.stop()
+
+        then:
+        IllegalStateException e = thrown()
+        e.message == "Client has not been started"
     }
+}
+
+/*class NettyClientTest extends GroovyTestCase implements NettyTest {
+
 
     public void testClientCannotBeStoppedIfNotRunning() {
         NettyClient client = new NettyClient(null, LOCALHOST_ADDRESS, LOCALHOST_PORT, null)
@@ -41,4 +63,4 @@ class NettyClientTest extends GroovyTestCase implements NettyTest {
 
         assert message == "Client has not been started"
     }
-}
+}*/
