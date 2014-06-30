@@ -9,7 +9,6 @@ import groovyx.gpars.serial.RemoteSerialized;
 public final class RemoteDataflowVariable<T> extends DataflowVariable<T> implements RemoteSerialized {
     private static final long serialVersionUID = -420013188758006693L;
     private final RemoteHost remoteHost;
-    private boolean disconnected;
 
     public RemoteDataflowVariable(final RemoteHost host) {
         remoteHost = host;
@@ -19,9 +18,7 @@ public final class RemoteDataflowVariable<T> extends DataflowVariable<T> impleme
             @SuppressWarnings({"unchecked"})
             @Override
             public MessageStream send(final Object message) {
-                if (!disconnected) {
-                    remoteHost.write(new DataflowExpression.BindDataflow(RemoteDataflowVariable.this, message, remoteHost.getHostId()));
-                }
+                remoteHost.write(new DataflowExpression.BindDataflow(RemoteDataflowVariable.this, message, remoteHost.getHostId()));
                 return this;
             }
         });
