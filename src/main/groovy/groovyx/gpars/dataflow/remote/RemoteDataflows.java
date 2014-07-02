@@ -4,6 +4,7 @@ import groovyx.gpars.dataflow.DataflowVariable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 
 public final class RemoteDataflows {
     private static Map<String, DataflowVariable<?>> publishedVariables = new ConcurrentHashMap<>();
@@ -37,7 +38,7 @@ public final class RemoteDataflows {
      * @return future of {@link groovyx.gpars.dataflow.remote.RemoteDataflowVariable}
      * @see groovyx.gpars.dataflow.remote.RemoteDataflowVariableFuture
      */
-    public static RemoteDataflowVariableFuture get(String host, int port, String name) {
+    public static Future<DataflowVariable> get(String host, int port, String name) {
         return new RemoteDataflowVariableFuture();
     }
 }
