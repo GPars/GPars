@@ -19,11 +19,23 @@ public class RemoteDataflows {
     }
 
     /**
-     * Retrieves variable published under specified name (locally).
+     * Retrieves {@link groovyx.gpars.dataflow.DataflowVariable} published under specified name (locally).
      * @param name the name under which variable was published
      * @return the variable registered under specified name or <code>null</code> if none variable is registered under that name
      */
     public static DataflowVariable<?> get(String name) {
         return publishedVariables.get(name);
+    }
+
+    /**
+     * Retrieves {@link groovyx.gpars.dataflow.DataflowVariable} published under specified name on remote host.
+     * @param host the address of remote host
+     * @param port the the port of remote host
+     * @param name the name under which variable was published
+     * @return future of {@link groovyx.gpars.dataflow.remote.RemoteDataflowVariable}
+     * @see groovyx.gpars.dataflow.remote.RemoteDataflowVariableFuture
+     */
+    public static RemoteDataflowVariableFuture get(String host, int port, String name) {
+        return new RemoteDataflowVariableFuture();
     }
 }

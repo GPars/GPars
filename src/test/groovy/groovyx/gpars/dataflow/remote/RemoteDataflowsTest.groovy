@@ -5,7 +5,7 @@ import spock.lang.Specification
 
 class RemoteDataflowsTest extends Specification {
 
-    def "retrieving not published DataflowVariable return null"() {
+    def "retrieving not published DataflowVariable returns null"() {
         when:
         def var = RemoteDataflows.get "test-variable"
 
@@ -23,5 +23,19 @@ class RemoteDataflowsTest extends Specification {
 
         then:
         RemoteDataflows.get varName
+    }
+
+    def "retrieving DataflowVariable from remote host returns Future"() {
+        setup:
+        def host = "dummy-host"
+        def port = 12345 // dummy port
+        def varName = "test-variable"
+
+        when:
+        def varFuture = RemoteDataflows.get host, port, varName
+
+        then:
+        varFuture != null
+        varFuture instanceof RemoteDataflowVariableFuture
     }
 }
