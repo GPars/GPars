@@ -5,8 +5,10 @@ import groovyx.gpars.dataflow.DataflowVariable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class RemoteDataflows {
+public final class RemoteDataflows {
     private static Map<String, DataflowVariable<?>> publishedVariables = new ConcurrentHashMap<>();
+
+    private RemoteDataflows() {}
 
     /**
      * Publishes {@link groovyx.gpars.dataflow.DataflowVariable} under chosen name.
