@@ -23,6 +23,7 @@ import groovyx.gpars.remote.BroadcastDiscovery;
 import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.message.HostIdMsg;
 import groovyx.gpars.remote.message.RemoteActorRequestMsg;
+import groovyx.gpars.remote.message.RemoteDataflowVariableRequestMsg;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.net.InetAddress;
@@ -80,5 +81,16 @@ public class NettyTransportProvider {
         DataflowVariable<Actor> remoteActor = new DataflowVariable<>();
         localHost.addRemoteActorFuture(name, remoteActor);
         return new RemoteActorFuture(remoteActor);
+    }
+
+    public static void getDataflowVariable(String host, int port, String name) {
+        if (localHost == null) {
+            localHost = new LocalHost();
+        }
+        NettyClient client = new NettyClient(localHost, host, port, connection -> {
+            if (connection.getHost() != null)
+                connection.write(new RemoteDataflowVariableRequestMsg(localHost.getId(), name));
+        });
+        client.start();
     }
 }

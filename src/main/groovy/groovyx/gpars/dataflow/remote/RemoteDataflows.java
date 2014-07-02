@@ -1,6 +1,7 @@
 package groovyx.gpars.dataflow.remote;
 
 import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.remote.netty.NettyTransportProvider;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,6 +40,7 @@ public final class RemoteDataflows {
      * @see groovyx.gpars.dataflow.remote.RemoteDataflowVariableFuture
      */
     public static Future<DataflowVariable> get(String host, int port, String name) {
+        NettyTransportProvider.getDataflowVariable(host, port, name);
         return new RemoteDataflowVariableFuture();
     }
 }
