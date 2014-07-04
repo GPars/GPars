@@ -38,4 +38,20 @@ class RemoteDataflowsTest extends Specification {
         varFuture != null
         varFuture instanceof RemoteDataflowVariableFuture
     }
+
+    def "retrieving DataflowVariable from remote host returns Future based on the same inner variable"() {
+        setup:
+        def host = "dummy-host"
+        def port = 12345 // dummy port
+        def varName = "test-variable"
+
+        when:
+        def varFuture1 = RemoteDataflows.get host, port, varName
+        def varFuture2 = RemoteDataflows.get host, port, varName
+
+        then:
+        varFuture1 != varFuture2
+        varFuture1.remoteVariable != null
+        varFuture1.remoteVariable == varFuture2.remoteVariable
+    }
 }

@@ -16,5 +16,5 @@ sleep 10000
 
 var << "test"
 
-NettyTransportProvider.stopServer()
+// NettyTransportProvider.stopServer()
 
