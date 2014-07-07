@@ -76,4 +76,48 @@ class RemoteDataflowsTest extends Specification {
         then:
         remoteVariable.val == testValue
     }
+
+    @Timeout(5)
+    def "can retrieve published bound DataflowVariable"() {
+        setup:
+        def variableName = "test-variable"
+        def variable = new DataflowVariable<String>()
+        def testValue = "test DataflowVariable"
+
+        when:
+        NettyTransportProvider.startServer HOST, PORT
+        variable << testValue
+
+        RemoteDataflows.publish variable, variableName
+        def remoteVariable = RemoteDataflows.get HOST, PORT, variableName get()
+
+        sleep 1000
+        NettyTransportProvider.stopServer()
+        NettyTransportProvider.stopClients()
+
+        then:
+        remoteVariable.val == testValue
+    }
+
+    @Timeout(5)
+    def "can retrieve published DataflowVariable and bind it remotely"() {
+        setup:
+        def variableName = "test-variable"
+        def variable = new DataflowVariable<String>()
+        def testValue = "test DataflowVariable"
+
+        when:
+        NettyTransportProvider.startServer HOST, PORT
+        RemoteDataflows.publish variable, variableName
+        def remoteVariable = RemoteDataflows.get HOST, PORT, variableName get()
+
+        remoteVariable << testValue
+
+        sleep 1000
+        NettyTransportProvider.stopServer()
+        NettyTransportProvider.stopClients()
+
+        then:
+        variable.val == testValue
+    }
 }
