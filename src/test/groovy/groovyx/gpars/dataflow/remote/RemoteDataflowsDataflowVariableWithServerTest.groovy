@@ -5,54 +5,17 @@ import groovyx.gpars.remote.netty.NettyTransportProvider
 import spock.lang.Specification
 import spock.lang.Timeout
 
-class RemoteDataflowsTest extends Specification {
+
+class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
     def static HOST = "localhost"
     def static PORT = 9021
 
-    def "retrieving not published DataflowVariable returns null"() {
-        when:
-        def var = RemoteDataflows.get "test-variable"
-
-        then:
-        var == null
+    def setupSpec() {
+        NettyTransportProvider.startServer HOST, PORT
     }
 
-    def "can publish DataflowVariable"() {
-        setup:
-        DataflowVariable<String> var = new DataflowVariable<>()
-        def varName = "test-variable"
-
-        when:
-        RemoteDataflows.publish var, varName
-
-        then:
-        RemoteDataflows.get varName
-    }
-
-    def "retrieving DataflowVariable from remote host returns Future"() {
-        setup:
-        def varName = "test-variable"
-
-        when:
-        def varFuture = RemoteDataflows.get HOST, PORT, varName
-
-        then:
-        varFuture != null
-        varFuture instanceof RemoteDataflowVariableFuture
-    }
-
-    def "retrieving DataflowVariable from remote host returns Future based on the same inner variable"() {
-        setup:
-        def varName = "test-variable"
-
-        when:
-        def varFuture1 = RemoteDataflows.get HOST, PORT, varName
-        def varFuture2 = RemoteDataflows.get HOST, PORT, varName
-
-        then:
-        varFuture1 != varFuture2
-        varFuture1.remoteVariable != null
-        varFuture1.remoteVariable == varFuture2.remoteVariable
+    def cleanupSpec() {
+        NettyTransportProvider.stopServer()
     }
 
     @Timeout(5)
@@ -63,14 +26,12 @@ class RemoteDataflowsTest extends Specification {
         def testValue = "test DataflowVariable"
 
         when:
-        NettyTransportProvider.startServer HOST, PORT
         RemoteDataflows.publish variable, variableName
         def remoteVariable = RemoteDataflows.get HOST, PORT, variableName get()
 
         variable << testValue
 
         sleep 1000
-        NettyTransportProvider.stopServer()
         NettyTransportProvider.stopClients()
 
         then:
@@ -85,14 +46,12 @@ class RemoteDataflowsTest extends Specification {
         def testValue = "test DataflowVariable"
 
         when:
-        NettyTransportProvider.startServer HOST, PORT
         variable << testValue
 
         RemoteDataflows.publish variable, variableName
         def remoteVariable = RemoteDataflows.get HOST, PORT, variableName get()
 
         sleep 1000
-        NettyTransportProvider.stopServer()
         NettyTransportProvider.stopClients()
 
         then:
@@ -107,14 +66,12 @@ class RemoteDataflowsTest extends Specification {
         def testValue = "test DataflowVariable"
 
         when:
-        NettyTransportProvider.startServer HOST, PORT
         RemoteDataflows.publish variable, variableName
         def remoteVariable = RemoteDataflows.get HOST, PORT, variableName get()
 
         remoteVariable << testValue
 
         sleep 1000
-        NettyTransportProvider.stopServer()
         NettyTransportProvider.stopClients()
 
         then:
