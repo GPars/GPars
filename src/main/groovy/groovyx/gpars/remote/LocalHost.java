@@ -19,6 +19,7 @@ package groovyx.gpars.remote;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.remote.RemoteActorFuture;
 import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.remote.RemoteDataflowVariable;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandles;
 
@@ -52,6 +53,8 @@ public class LocalHost extends SerialHandles {
     protected final Map<String, Actor> remoteActors = new HashMap<>();
 
     private Map<String, List<DataflowVariable<Actor>>> remoteActorFutures = new HashMap<>();
+
+    private Map<String, DataflowVariable<?>> remoteDataflows;
 
     /**
      * Registers actor under specific name
@@ -169,5 +172,16 @@ public class LocalHost extends SerialHandles {
                 futures.add(var);
             }
         }
+    }
+
+    public void setRemoteDataflowsRegistry(Map<String, DataflowVariable<?>> registry) {
+        if (remoteDataflows != null) {
+            throw new IllegalStateException("Remote dataflows registry is already set");
+        }
+        remoteDataflows = registry;
+    }
+
+    public Map<String, DataflowVariable<?>> getRemoteDataflowsRegistry() {
+        return remoteDataflows;
     }
 }

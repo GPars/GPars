@@ -1,6 +1,7 @@
 package groovyx.gpars.remote.message;
 
 import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.remote.RemoteDataflows;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
@@ -16,7 +17,8 @@ public class RemoteDataflowVariableReplyMsg extends SerialMsg {
 
     @Override
     public void execute(RemoteConnection conn) {
-        System.err.println(variable);
+        DataflowVariable remoteVariable = conn.getLocalHost().getRemoteDataflowsRegistry().get(name);
+        remoteVariable.bindUnique(variable);
     }
 
 }

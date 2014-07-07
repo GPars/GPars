@@ -93,4 +93,13 @@ public class NettyTransportProvider {
         });
         client.start();
     }
+
+    public static void setRemoteDataflowsRegistry(Map<String, DataflowVariable<?>> registry) {
+        if (localHost == null) {
+            localHost = new LocalHost();
+        }
+        if (localHost.getRemoteDataflowsRegistry() == null) {
+            localHost.setRemoteDataflowsRegistry(registry);
+        }
+    }
 }

@@ -10,7 +10,7 @@ import java.util.concurrent.Future;
 public final class RemoteDataflows {
     private static Map<String, DataflowVariable<?>> publishedVariables = new ConcurrentHashMap<>();
 
-    private static Map<String, DataflowVariable<DataflowVariable>> remoteVariables = new ConcurrentHashMap<>();
+    private static Map<String, DataflowVariable<?>> remoteVariables = new ConcurrentHashMap<>();
 
     private RemoteDataflows() {}
 
@@ -42,7 +42,9 @@ public final class RemoteDataflows {
      * @see groovyx.gpars.dataflow.remote.RemoteDataflowVariableFuture
      */
     public static Future<DataflowVariable> get(String host, int port, String name) {
-        DataflowVariable<DataflowVariable> remoteVariable = remoteVariables.get(name);
+        NettyTransportProvider.setRemoteDataflowsRegistry(remoteVariables);
+
+        DataflowVariable remoteVariable = remoteVariables.get(name);
         if (remoteVariable == null) {
             remoteVariable = new DataflowVariable<>();
             remoteVariables.put(name, remoteVariable);
