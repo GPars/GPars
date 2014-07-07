@@ -69,6 +69,10 @@ class RemoteDataflowsTest extends Specification {
 
         variable << testValue
 
+        sleep 1000
+        NettyTransportProvider.stopServer()
+        NettyTransportProvider.stopClients()
+
         then:
         remoteVariable.val == testValue
     }
