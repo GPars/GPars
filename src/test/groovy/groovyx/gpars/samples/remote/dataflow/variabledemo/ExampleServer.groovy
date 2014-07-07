@@ -1,4 +1,4 @@
-package groovyx.gpars.samples.remote.dataflow.example
+package groovyx.gpars.samples.remote.dataflow.variabledemo
 
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.dataflow.remote.RemoteDataflows
@@ -9,12 +9,16 @@ def PORT = 9009
 
 NettyTransportProvider.startServer HOST, PORT
 
-def var = new DataflowVariable()
-RemoteDataflows.publish var, "example-var"
+def var1 = new DataflowVariable()
+def var2 = new DataflowVariable()
+
+RemoteDataflows.publish var1, "variabledemo-var-GPars"
+RemoteDataflows.publish var2, "variabledemo-var-Dataflows"
 
 sleep 10000
 
-var << "test"
+var1 << "GPars"
+var2 << "Remote Dataflows"
 
 // NettyTransportProvider.stopServer()
 
