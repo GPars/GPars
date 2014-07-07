@@ -68,4 +68,8 @@ public final class RemoteDataflows {
         }
         return broadcastStream.createReadChannel();
     }
+
+    public static Future<DataflowReadChannel> getReadChannel(String host, int port, String name) {
+        return null;
+    }
 }

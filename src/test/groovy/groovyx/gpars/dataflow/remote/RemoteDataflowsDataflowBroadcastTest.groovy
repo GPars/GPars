@@ -30,4 +30,18 @@ class RemoteDataflowsDataflowBroadcastTest extends Specification {
         then:
         publishedStream.val == testMessage
     }
+
+    def "retrieving ReadChannel from remote host returns future"() {
+        setup:
+        def HOST = "dummy-host"
+        def PORT = 9077 // dummy port
+        def broadcastName = "test-broadcast"
+
+        when:
+        def streamFuture = RemoteDataflows.getReadChannel HOST, PORT, broadcastName
+
+        then:
+        streamFuture != null
+        streamFuture instanceof RemoteDataflowReadChannelFuture
+    }
 }
