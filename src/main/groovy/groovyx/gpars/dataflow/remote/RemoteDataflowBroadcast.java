@@ -1,7 +1,5 @@
 package groovyx.gpars.dataflow.remote;
 
-
-import groovyx.gpars.dataflow.DataflowBroadcast;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.stream.DataflowStream;
 import groovyx.gpars.dataflow.stream.DataflowStreamReadAdapter;
