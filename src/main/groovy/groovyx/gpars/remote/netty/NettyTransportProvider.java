@@ -19,6 +19,7 @@ package groovyx.gpars.remote.netty;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.remote.RemoteActorFuture;
 import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.remote.RemoteDataflowBroadcast;
 import groovyx.gpars.remote.BroadcastDiscovery;
 import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.message.HostIdMsg;
@@ -114,5 +115,15 @@ public class NettyTransportProvider {
                 connection.write(new RemoteDataflowReadChannelRequestMsg(localHost.getId(), name));
         });
         client.start();
+    }
+
+    public static void setRemoteBroadcastsRegistry(Map<String, DataflowVariable<RemoteDataflowBroadcast>> remoteBroadcasts) {
+        if (localHost == null) {
+            localHost = new LocalHost();
+        }
+
+        if (localHost.getRemoteBroadcastsRegistry() == null) {
+            localHost.setRemoteBroadcastsRegistry(remoteBroadcasts);
+        }
     }
 }

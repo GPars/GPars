@@ -70,6 +70,7 @@ public final class RemoteDataflows {
     }
 
     public static Future<DataflowReadChannel> getReadChannel(String host, int port, String name) {
+        NettyTransportProvider.setRemoteBroadcastsRegistry(remoteBroadcasts);
 
         DataflowVariable<RemoteDataflowBroadcast> remoteStreamVariable = remoteBroadcasts.get(name);
         if (remoteStreamVariable == null) {
