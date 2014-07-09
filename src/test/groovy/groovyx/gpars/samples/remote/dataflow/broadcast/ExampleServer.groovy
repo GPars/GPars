@@ -15,6 +15,7 @@ RemoteDataflows.publish broadcastStream, "broadcast"
 
 sleep 10000
 
+println "Sending..."
 broadcastStream << "Message 1"
 broadcastStream << "Message 2"
 broadcastStream << "Message 3"
