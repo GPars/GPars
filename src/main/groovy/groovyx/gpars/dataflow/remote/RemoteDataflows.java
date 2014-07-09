@@ -70,6 +70,8 @@ public final class RemoteDataflows {
     }
 
     public static Future<DataflowReadChannel> getReadChannel(String host, int port, String name) {
-        return null;
+        DataflowVariable<DataflowReadChannel> remoteChannel = new DataflowVariable<>();
+        NettyTransportProvider.getDataflowReadChannel(host, port, name);
+        return new RemoteDataflowReadChannelFuture(remoteChannel);
     }
 }
