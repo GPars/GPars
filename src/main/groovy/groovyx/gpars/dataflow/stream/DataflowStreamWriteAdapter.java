@@ -18,6 +18,9 @@ package groovyx.gpars.dataflow.stream;
 
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowWriteChannel;
+import groovyx.gpars.dataflow.remote.RemoteDataflowStreamWriteAdapter;
+import groovyx.gpars.serial.RemoteSerialized;
+import groovyx.gpars.serial.WithSerialId;
 
 /**
  * Adapts a DataflowStream to accommodate for the DataflowWriteChannel interface.
@@ -27,7 +30,7 @@ import groovyx.gpars.dataflow.DataflowWriteChannel;
  * @author Vaclav Pech
  */
 @SuppressWarnings({"SynchronizedMethod"})
-public class DataflowStreamWriteAdapter<T> implements DataflowWriteChannel<T> {
+public class DataflowStreamWriteAdapter<T> extends WithSerialId implements DataflowWriteChannel<T> {
 
     private StreamCore<T> head;
 

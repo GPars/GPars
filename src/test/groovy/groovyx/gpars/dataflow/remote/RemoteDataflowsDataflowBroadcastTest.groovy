@@ -8,7 +8,7 @@ class RemoteDataflowsDataflowBroadcastTest extends Specification {
 
     def "retrieving ReadChannel of not published DataflowBroadcast returns null"() {
         when:
-        def stream = RemoteDataflows.getReadChannel "test-broadcast"
+        def stream = RemoteDataflows.getBroadcastStream "test-broadcast"
 
         then:
         stream == null
@@ -19,16 +19,13 @@ class RemoteDataflowsDataflowBroadcastTest extends Specification {
         setup:
         DataflowBroadcast broadcastStream = new DataflowBroadcast()
         def broadcastName = "test-broadcast"
-        def testMessage = "test message"
 
         when:
         RemoteDataflows.publish broadcastStream, broadcastName
-        def publishedStream = RemoteDataflows.getReadChannel broadcastName
-
-        broadcastStream << testMessage
+        def publishedStream = RemoteDataflows.getBroadcastStream broadcastName
 
         then:
-        publishedStream.val == testMessage
+        publishedStream == broadcastStream
     }
 
     def "retrieving ReadChannel from remote host returns future"() {

@@ -1,18 +1,17 @@
 package groovyx.gpars.remote.message;
 
-import groovyx.gpars.dataflow.DataflowReadChannel;
+import groovyx.gpars.dataflow.DataflowBroadcast;
+import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
-import java.util.UUID;
-
 public class RemoteDataflowReadChannelReplyMsg extends SerialMsg {
     private final String name;
-    private final DataflowReadChannel channel;
+    private final DataflowStreamWriteAdapter stream;
 
-    public RemoteDataflowReadChannelReplyMsg(String name, DataflowReadChannel channel) {
+    public RemoteDataflowReadChannelReplyMsg(String name, DataflowBroadcast stream) {
         this.name = name;
-        this.channel = channel;
+        this.stream = stream;
     }
 
     @Override
