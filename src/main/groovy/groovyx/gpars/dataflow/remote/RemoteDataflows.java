@@ -3,6 +3,7 @@ package groovyx.gpars.dataflow.remote;
 import groovyx.gpars.dataflow.DataflowBroadcast;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
 import groovyx.gpars.remote.netty.NettyTransportProvider;
 
 import java.util.Map;
@@ -15,6 +16,8 @@ public final class RemoteDataflows {
     private static Map<String, DataflowVariable<?>> remoteVariables = new ConcurrentHashMap<>();
 
     private static Map<String, DataflowBroadcast> publishedBroadcasts = new ConcurrentHashMap<>();
+
+    private static Map<String, DataflowVariable<RemoteDataflowBroadcast>> remoteBroadcasts = new ConcurrentHashMap<>();
 
     private RemoteDataflows() {}
 
@@ -67,8 +70,14 @@ public final class RemoteDataflows {
     }
 
     public static Future<DataflowReadChannel> getReadChannel(String host, int port, String name) {
-        DataflowVariable<DataflowReadChannel> remoteChannel = new DataflowVariable<>();
-        NettyTransportProvider.getDataflowReadChannel(host, port, name);
-        return new RemoteDataflowReadChannelFuture(remoteChannel);
+
+        DataflowVariable<RemoteDataflowBroadcast> remoteStreamVariable = remoteBroadcasts.get(name);
+        if (remoteStreamVariable == null) {
+            remoteStreamVariable = new DataflowVariable<>();
+            remoteBroadcasts.put(name, remoteStreamVariable);
+            NettyTransportProvider.getDataflowReadChannel(host, port, name);
+        }
+
+        return new RemoteDataflowReadChannelFuture(remoteStreamVariable);
     }
 }

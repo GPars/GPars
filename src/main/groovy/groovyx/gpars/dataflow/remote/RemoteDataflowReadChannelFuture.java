@@ -9,9 +9,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class RemoteDataflowReadChannelFuture implements Future<DataflowReadChannel> {
-    private DataflowVariable<DataflowReadChannel> remoteChannel;
+    private DataflowVariable<RemoteDataflowBroadcast> remoteChannel;
 
-    public RemoteDataflowReadChannelFuture(DataflowVariable<DataflowReadChannel> remoteChannel) {
+    public RemoteDataflowReadChannelFuture(DataflowVariable<RemoteDataflowBroadcast> remoteChannel) {
         this.remoteChannel = remoteChannel;
     }
 
@@ -33,7 +33,7 @@ public class RemoteDataflowReadChannelFuture implements Future<DataflowReadChann
     @Override
     public DataflowReadChannel get() throws InterruptedException, ExecutionException {
         try {
-            return remoteChannel.get();
+            return remoteChannel.get().createReadChannel();
         } catch (Throwable throwable) {
             throw new ExecutionException(throwable);
         }
@@ -42,7 +42,7 @@ public class RemoteDataflowReadChannelFuture implements Future<DataflowReadChann
     @Override
     public DataflowReadChannel get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         try {
-            return remoteChannel.get(timeout, unit);
+            return remoteChannel.get(timeout, unit).createReadChannel();
         } catch (Throwable throwable) {
             throw new ExecutionException(throwable);
         }
