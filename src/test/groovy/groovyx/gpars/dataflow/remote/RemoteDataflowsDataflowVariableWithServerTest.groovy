@@ -21,7 +21,7 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
     @Timeout(5)
     def "can retrieve published DataflowVariable"() {
         setup:
-        def variableName = "test-variable"
+        def variableName = "test-variable-1"
         def variable = new DataflowVariable<String>()
         def testValue = "test DataflowVariable"
 
@@ -41,7 +41,7 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
     @Timeout(5)
     def "can retrieve published bound DataflowVariable"() {
         setup:
-        def variableName = "test-variable"
+        def variableName = "test-variable-2"
         def variable = new DataflowVariable<String>()
         def testValue = "test DataflowVariable"
 
@@ -61,7 +61,7 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
     @Timeout(5)
     def "can retrieve published DataflowVariable and bind it remotely"() {
         setup:
-        def variableName = "test-variable"
+        def variableName = "test-variable-3"
         def variable = new DataflowVariable<String>()
         def testValue = "test DataflowVariable"
 
