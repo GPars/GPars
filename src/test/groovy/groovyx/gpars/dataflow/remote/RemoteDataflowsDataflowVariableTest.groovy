@@ -43,6 +43,7 @@ class RemoteDataflowsDataflowVariableTest extends Specification {
     }
 
     def "retrieving DataflowVariable from remote host returns Future based on the same inner variable"() {
+        // TODO don't use private fields
         setup:
         def varName = "test-variable"
 

@@ -1,6 +1,7 @@
 package groovyx.gpars.dataflow.remote;
 
 import groovyx.gpars.dataflow.DataflowBroadcast;
+import groovyx.gpars.dataflow.DataflowQueue;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
@@ -18,6 +19,10 @@ public final class RemoteDataflows {
     private static Map<String, DataflowBroadcast> publishedBroadcasts = new ConcurrentHashMap<>();
 
     private static Map<String, DataflowVariable<RemoteDataflowBroadcast>> remoteBroadcasts = new ConcurrentHashMap<>();
+
+    private static Map<String, DataflowQueue<?>> publishedQueues = new ConcurrentHashMap<>();
+
+    private static Map<String, DataflowVariable<DataflowQueue<?>>> remoteQueues = new ConcurrentHashMap<>();
 
     private RemoteDataflows() {}
 
@@ -80,5 +85,17 @@ public final class RemoteDataflows {
         }
 
         return new RemoteDataflowReadChannelFuture(remoteStreamVariable);
+    }
+
+    public static DataflowQueue<?> getDataflowQueue(String name) {
+        return publishedQueues.get(name);
+    }
+
+    public static void publish(DataflowQueue<?> queue, String name) {
+        publishedQueues.put(name, queue);
+    }
+
+    public static Future<DataflowQueue<?>> getDataflowQueue(String host, int port, String name) {
+        return new RemoteDataflowQueueFuture(null);
     }
 }
