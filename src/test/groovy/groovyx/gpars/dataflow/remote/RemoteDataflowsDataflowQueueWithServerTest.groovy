@@ -17,19 +17,56 @@ class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
         NettyTransportProvider.stopServer()
     }
 
+    RemoteDataflowQueueFuture publishNewQueueAndGetRemotely(DataflowQueue queue, String queueName) {
+        RemoteDataflows.publish queue, queueName
+        RemoteDataflows.getDataflowQueue HOST, PORT, queueName
+    }
+
     @Timeout(5)
     def "can retrieve published DataflowQueue"() {
         setup:
-        def queueName = "test-queue-1"
         def queue = new DataflowQueue()
-        def testValue = "test-value-1"
+        def queueName = "test-queue-0"
 
         when:
-        RemoteDataflows.publish queue, queueName
-        def remoteQueue = RemoteDataflows.get HOST, PORT, queueName get()
+        def remoteQueue = publishNewQueueAndGetRemotely(queue, queueName) get()
+
+        then:
+        remoteQueue != null
+    }
+
+    @Timeout(5)
+    def "can get item from queue"() {
+        setup:
+        def queue = new DataflowQueue()
+        def queueName = "test-queue-1"
+        def testValue = "test-value"
+
+        when:
+        def remoteQueue = publishNewQueueAndGetRemotely(queue, queueName) get()
 
         queue << testValue
         def receivedTestValue = remoteQueue.val
+
+        sleep 500
+        NettyTransportProvider.stopClients()
+
+        then:
+        receivedTestValue == testValue
+    }
+
+    @Timeout(5)
+    def "can put item to queue"() {
+        setup:
+        def queue = new DataflowQueue()
+        def queueName = "test-queue-2"
+        def testValue = "test-value"
+
+        when:
+        def remoteQueue = publishNewQueueAndGetRemotely(queue, queueName) get()
+
+        remoteQueue << testValue
+        def receivedTestValue = queue.val
 
         sleep 500
         NettyTransportProvider.stopClients()

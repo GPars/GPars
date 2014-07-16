@@ -18,14 +18,12 @@ package groovyx.gpars.remote.netty;
 
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.remote.RemoteActorFuture;
+import groovyx.gpars.dataflow.DataflowQueue;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.remote.RemoteDataflowBroadcast;
 import groovyx.gpars.remote.BroadcastDiscovery;
 import groovyx.gpars.remote.LocalHost;
-import groovyx.gpars.remote.message.HostIdMsg;
-import groovyx.gpars.remote.message.RemoteActorRequestMsg;
-import groovyx.gpars.remote.message.RemoteDataflowReadChannelRequestMsg;
-import groovyx.gpars.remote.message.RemoteDataflowVariableRequestMsg;
+import groovyx.gpars.remote.message.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.net.InetAddress;
@@ -125,5 +123,27 @@ public class NettyTransportProvider {
         if (localHost.getRemoteBroadcastsRegistry() == null) {
             localHost.setRemoteBroadcastsRegistry(remoteBroadcasts);
         }
+    }
+
+    public static void setRemoteDataflowQueuesRegistry(Map<String, DataflowVariable<DataflowQueue<?>>> remoteDataflowQueuesRegistry) {
+        if (localHost == null) {
+            localHost = new LocalHost();
+        }
+        if (localHost.getRemoteDataflowQueueRegistry() == null) {
+            localHost.setRemoteDataflowQueueRegistry(remoteDataflowQueuesRegistry);
+        }
+    }
+
+    public static void getDataflowQueue(String host, int port, String name) {
+        if (localHost == null) {
+            localHost = new LocalHost();
+        }
+
+        NettyClient client = new NettyClient(localHost, host, port, connection -> {
+            if (connection.getHost() != null) {
+                connection.write(new RemoteDataflowQueueRequestMsg(localHost.getId(), name));
+            }
+        });
+        client.start();
     }
 }

@@ -54,6 +54,7 @@ public final class RemoteDataflows {
      * @see groovyx.gpars.dataflow.remote.RemoteDataflowVariableFuture
      */
     public static Future<DataflowVariable> get(String host, int port, String name) {
+        // TODO wrong use of concurent map
         NettyTransportProvider.setRemoteDataflowsRegistry(remoteVariables);
 
         DataflowVariable remoteVariable = remoteVariables.get(name);
@@ -75,6 +76,7 @@ public final class RemoteDataflows {
     }
 
     public static Future<DataflowReadChannel> getReadChannel(String host, int port, String name) {
+        // TODO wrong use of concurent map
         NettyTransportProvider.setRemoteBroadcastsRegistry(remoteBroadcasts);
 
         DataflowVariable<RemoteDataflowBroadcast> remoteStreamVariable = remoteBroadcasts.get(name);
@@ -96,6 +98,16 @@ public final class RemoteDataflows {
     }
 
     public static Future<DataflowQueue<?>> getDataflowQueue(String host, int port, String name) {
-        return new RemoteDataflowQueueFuture(null);
+        // TODO wrong use of concurent map
+        NettyTransportProvider.setRemoteDataflowQueuesRegistry(remoteQueues);
+
+        DataflowVariable<DataflowQueue<?>> remoteQueueVariable = remoteQueues.get(name);
+        if (remoteQueueVariable == null) {
+            remoteQueueVariable = new DataflowVariable<>();
+            remoteQueues.put(name, remoteQueueVariable);
+            NettyTransportProvider.getDataflowQueue(host, port, name);
+        }
+
+        return new RemoteDataflowQueueFuture(remoteQueueVariable);
     }
 }
