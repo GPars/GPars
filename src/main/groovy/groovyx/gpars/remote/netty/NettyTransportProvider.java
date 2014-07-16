@@ -135,10 +135,11 @@ public class NettyTransportProvider {
     }
 
     public static void getDataflowQueue(String host, int port, String name) {
-        if (localHost == null) {
-            localHost = new LocalHost();
-        }
+        // if (localHost == null) {
+        //     localHost = new LocalHost();
+        // }
 
+        LocalHost localHost = new LocalHost();
         NettyClient client = new NettyClient(localHost, host, port, connection -> {
             if (connection.getHost() != null) {
                 connection.write(new RemoteDataflowQueueRequestMsg(localHost.getId(), name));
