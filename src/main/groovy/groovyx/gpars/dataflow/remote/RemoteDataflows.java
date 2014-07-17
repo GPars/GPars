@@ -58,13 +58,13 @@ public final class RemoteDataflows {
      */
     public static Future<DataflowVariable> get(String host, int port, String name) {
         // TODO wrong use of concurent map
-        NettyTransportProvider.setRemoteDataflowsRegistry(remoteVariables);
+        clientLocalHost.setRemoteDataflowsRegistry(remoteVariables);
 
         DataflowVariable remoteVariable = remoteVariables.get(name);
         if (remoteVariable == null) {
             remoteVariable = new DataflowVariable<>();
             remoteVariables.put(name, remoteVariable);
-            NettyTransportProvider.getDataflowVariable(host, port, name);
+            NettyTransportProvider.getDataflowVariable(host, port, name, clientLocalHost);
         }
         return new RemoteDataflowVariableFuture(remoteVariable);
     }

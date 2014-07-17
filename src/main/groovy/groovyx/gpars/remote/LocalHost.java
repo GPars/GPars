@@ -180,9 +180,6 @@ public class LocalHost extends SerialHandles {
     }
 
     public void setRemoteDataflowsRegistry(Map<String, DataflowVariable<?>> registry) {
-        if (remoteDataflows != null) {
-            throw new IllegalStateException("Remote dataflows registry is already set");
-        }
         remoteDataflows = registry;
     }
 

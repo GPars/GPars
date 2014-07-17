@@ -84,24 +84,12 @@ public class NettyTransportProvider {
         return new RemoteActorFuture(remoteActor);
     }
 
-    public static void getDataflowVariable(String host, int port, String name) {
-        if (localHost == null) {
-            localHost = new LocalHost();
-        }
+    public static void getDataflowVariable(String host, int port, String name, LocalHost localHost) {
         NettyClient client = new NettyClient(localHost, host, port, connection -> {
             if (connection.getHost() != null)
                 connection.write(new RemoteDataflowVariableRequestMsg(localHost.getId(), name));
         });
         client.start();
-    }
-
-    public static void setRemoteDataflowsRegistry(Map<String, DataflowVariable<?>> registry) {
-        if (localHost == null) {
-            localHost = new LocalHost();
-        }
-        if (localHost.getRemoteDataflowsRegistry() == null) {
-            localHost.setRemoteDataflowsRegistry(registry);
-        }
     }
 
     public static void getDataflowReadChannel(String host, int port, String name) {

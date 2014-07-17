@@ -1,6 +1,7 @@
 package groovyx.gpars.dataflow.remote
 
 import groovyx.gpars.dataflow.DataflowVariable
+import groovyx.gpars.remote.LocalHost
 import groovyx.gpars.remote.netty.NettyTransportProvider
 import spock.lang.Specification
 import spock.lang.Timeout
@@ -11,7 +12,8 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
     def static PORT = 9021
 
     def setupSpec() {
-        NettyTransportProvider.startServer HOST, PORT
+        LocalHost host = new LocalHost()
+        NettyTransportProvider.startServer HOST, PORT, host
     }
 
     def cleanupSpec() {
@@ -31,9 +33,6 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
 
         variable << testValue
 
-        sleep 1000
-        NettyTransportProvider.stopClients()
-
         then:
         remoteVariable.val == testValue
     }
@@ -51,9 +50,6 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
         RemoteDataflows.publish variable, variableName
         def remoteVariable = RemoteDataflows.get HOST, PORT, variableName get()
 
-        sleep 1000
-        NettyTransportProvider.stopClients()
-
         then:
         remoteVariable.val == testValue
     }
@@ -70,9 +66,6 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
         def remoteVariable = RemoteDataflows.get HOST, PORT, variableName get()
 
         remoteVariable << testValue
-
-        sleep 1000
-        NettyTransportProvider.stopClients()
 
         then:
         variable.val == testValue
