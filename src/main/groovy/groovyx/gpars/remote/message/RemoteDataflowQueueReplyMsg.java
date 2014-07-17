@@ -19,6 +19,8 @@ public class RemoteDataflowQueueReplyMsg extends SerialMsg {
     @Override
     public void execute(RemoteConnection conn) {
         DataflowVariable<RemoteDataflowQueue<?>> remoteQueueVariable = conn.getLocalHost().getRemoteDataflowQueueRegistry().get(name);
-        remoteQueueVariable.bindUnique((RemoteDataflowQueue)queue);
+        RemoteDataflowQueue<?> remoteQueue = (RemoteDataflowQueue)queue;
+        remoteQueue.setQueueName(name);
+        remoteQueueVariable.bindUnique(remoteQueue);
     }
 }

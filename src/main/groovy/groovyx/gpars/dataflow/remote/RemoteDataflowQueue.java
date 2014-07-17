@@ -3,14 +3,12 @@ package groovyx.gpars.dataflow.remote;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
-import groovyx.gpars.dataflow.DataflowChannel;
-import groovyx.gpars.dataflow.DataflowReadChannel;
-import groovyx.gpars.dataflow.DataflowWriteChannel;
-import groovyx.gpars.dataflow.Promise;
+import groovyx.gpars.dataflow.*;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.dataflow.impl.DataflowChannelEventListenerManager;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.remote.RemoteHost;
+import groovyx.gpars.remote.message.RemoteDataflowQueueValueRequestMsg;
 import groovyx.gpars.scheduler.Pool;
 import groovyx.gpars.serial.RemoteSerialized;
 import groovyx.gpars.serial.WithSerialId;
@@ -20,8 +18,15 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChannel<T>, RemoteSerialized {
+    private RemoteHost remoteHost;
+    private String queueName;
+
     public RemoteDataflowQueue(RemoteHost host) {
-        System.err.println("RemoteDataflowQueue");
+        this.remoteHost = host;
+    }
+
+    public RemoteDataflowQueue(String queueName) {
+        this.queueName = queueName;
     }
 
     @Override
@@ -36,7 +41,9 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public T getVal() throws InterruptedException {
-        throw new UnsupportedOperationException();
+        DataflowVariable<T> value = new DataflowVariable<>();
+        remoteHost.write(new RemoteDataflowQueueValueRequestMsg(queueName, value));
+        return value.getVal();
     }
 
     @Override
@@ -467,5 +474,9 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
     @Override
     public DataflowExpression<T> poll() throws InterruptedException {
         throw new UnsupportedOperationException();
+    }
+
+    public void setQueueName(String queueName) {
+        this.queueName = queueName;
     }
 }
