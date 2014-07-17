@@ -21,6 +21,7 @@ import groovyx.gpars.actor.remote.RemoteActorFuture;
 import groovyx.gpars.dataflow.DataflowQueue;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.remote.RemoteDataflowBroadcast;
+import groovyx.gpars.dataflow.remote.RemoteDataflowQueue;
 import groovyx.gpars.dataflow.remote.RemoteDataflowVariable;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandles;
@@ -58,7 +59,7 @@ public class LocalHost extends SerialHandles {
 
     private Map<String, DataflowVariable<?>> remoteDataflows;
     private Map<String, DataflowVariable<RemoteDataflowBroadcast>> remoteBroadcastsRegistry;
-    private Map<String, DataflowVariable<DataflowQueue<?>>> remoteDataflowQueueRegistry;
+    private Map<String, DataflowVariable<RemoteDataflowQueue<?>>> remoteDataflowQueueRegistry;
 
     /**
      * Registers actor under specific name
@@ -197,11 +198,11 @@ public class LocalHost extends SerialHandles {
         this.remoteBroadcastsRegistry = remoteBroadcastsRegistry;
     }
 
-    public Map<String, DataflowVariable<DataflowQueue<?>>> getRemoteDataflowQueueRegistry() {
+    public Map<String, DataflowVariable<RemoteDataflowQueue<?>>> getRemoteDataflowQueueRegistry() {
         return remoteDataflowQueueRegistry;
     }
 
-    public void setRemoteDataflowQueueRegistry(Map<String, DataflowVariable<DataflowQueue<?>>> remoteDataflowQueueRegistry) {
+    public void setRemoteDataflowQueueRegistry(Map<String, DataflowVariable<RemoteDataflowQueue<?>>> remoteDataflowQueueRegistry) {
         this.remoteDataflowQueueRegistry = remoteDataflowQueueRegistry;
     }
 }

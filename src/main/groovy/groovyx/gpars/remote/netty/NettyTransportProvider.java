@@ -21,6 +21,7 @@ import groovyx.gpars.actor.remote.RemoteActorFuture;
 import groovyx.gpars.dataflow.DataflowQueue;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.remote.RemoteDataflowBroadcast;
+import groovyx.gpars.dataflow.remote.RemoteDataflowQueue;
 import groovyx.gpars.remote.BroadcastDiscovery;
 import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.message.*;
@@ -125,7 +126,7 @@ public class NettyTransportProvider {
         }
     }
 
-    public static void setRemoteDataflowQueuesRegistry(Map<String, DataflowVariable<DataflowQueue<?>>> remoteDataflowQueuesRegistry) {
+    public static void setRemoteDataflowQueuesRegistry(Map<String, DataflowVariable<RemoteDataflowQueue<?>>> remoteDataflowQueuesRegistry) {
         if (localHost == null) {
             localHost = new LocalHost();
         }

@@ -8,10 +8,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class RemoteDataflowQueueFuture implements Future<DataflowQueue<?>> {
-    private final DataflowVariable<DataflowQueue<?>> remoteQueue;
+public class RemoteDataflowQueueFuture implements Future<RemoteDataflowQueue<?>> {
+    private final DataflowVariable<RemoteDataflowQueue<?>> remoteQueue;
 
-    public RemoteDataflowQueueFuture(DataflowVariable<DataflowQueue<?>> remoteQueue) {
+    public RemoteDataflowQueueFuture(DataflowVariable<RemoteDataflowQueue<?>> remoteQueue) {
         this.remoteQueue = remoteQueue;
     }
 
@@ -31,7 +31,7 @@ public class RemoteDataflowQueueFuture implements Future<DataflowQueue<?>> {
     }
 
     @Override
-    public DataflowQueue<?> get() throws InterruptedException, ExecutionException {
+    public RemoteDataflowQueue<?> get() throws InterruptedException, ExecutionException {
         try {
             return remoteQueue.get();
         } catch (Throwable throwable) {
@@ -40,7 +40,7 @@ public class RemoteDataflowQueueFuture implements Future<DataflowQueue<?>> {
     }
 
     @Override
-    public DataflowQueue<?> get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public RemoteDataflowQueue<?> get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         try {
             return remoteQueue.get(timeout, unit);
         } catch (Throwable throwable) {

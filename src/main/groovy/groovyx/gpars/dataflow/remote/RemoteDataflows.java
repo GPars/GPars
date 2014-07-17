@@ -22,7 +22,7 @@ public final class RemoteDataflows {
 
     private static Map<String, DataflowQueue<?>> publishedQueues = new ConcurrentHashMap<>();
 
-    private static Map<String, DataflowVariable<DataflowQueue<?>>> remoteQueues = new ConcurrentHashMap<>();
+    private static Map<String, DataflowVariable<RemoteDataflowQueue<?>>> remoteQueues = new ConcurrentHashMap<>();
 
     private RemoteDataflows() {}
 
@@ -97,11 +97,11 @@ public final class RemoteDataflows {
         publishedQueues.put(name, queue);
     }
 
-    public static Future<DataflowQueue<?>> getDataflowQueue(String host, int port, String name) {
+    public static Future<RemoteDataflowQueue<?>> getDataflowQueue(String host, int port, String name) {
         // TODO wrong use of concurent map
         NettyTransportProvider.setRemoteDataflowQueuesRegistry(remoteQueues);
 
-        DataflowVariable<DataflowQueue<?>> remoteQueueVariable = remoteQueues.get(name);
+        DataflowVariable<RemoteDataflowQueue<?>> remoteQueueVariable = remoteQueues.get(name);
         if (remoteQueueVariable == null) {
             remoteQueueVariable = new DataflowVariable<>();
             remoteQueues.put(name, remoteQueueVariable);
