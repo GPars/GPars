@@ -8,6 +8,7 @@ import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.dataflow.impl.DataflowChannelEventListenerManager;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.remote.RemoteHost;
+import groovyx.gpars.remote.message.RemoteDataflowQueueEnqueueValueMsg;
 import groovyx.gpars.remote.message.RemoteDataflowQueueValueRequestMsg;
 import groovyx.gpars.scheduler.Pool;
 import groovyx.gpars.serial.RemoteSerialized;
@@ -448,7 +449,8 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public DataflowWriteChannel<T> leftShift(T value) {
-        throw new UnsupportedOperationException();
+        remoteHost.write(new RemoteDataflowQueueEnqueueValueMsg<T>(queueName, value));
+        return this;
     }
 
     @Override
