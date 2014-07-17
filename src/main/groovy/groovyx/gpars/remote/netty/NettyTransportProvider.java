@@ -50,8 +50,8 @@ public class NettyTransportProvider {
 
     private static NettyServer server;
 
-    public static void startServer(String host, int port) {
-        localHost = new LocalHost();
+    public static void startServer(String host, int port, LocalHost localHost) {
+        //localHost = new LocalHost();
         server = new NettyServer(localHost, host, port, connection -> connection.write(new HostIdMsg(localHost.getId())));
         server.start();
     }
@@ -126,21 +126,7 @@ public class NettyTransportProvider {
         }
     }
 
-    public static void setRemoteDataflowQueuesRegistry(Map<String, DataflowVariable<RemoteDataflowQueue<?>>> remoteDataflowQueuesRegistry) {
-        if (localHost == null) {
-            localHost = new LocalHost();
-        }
-        if (localHost.getRemoteDataflowQueueRegistry() == null) {
-            localHost.setRemoteDataflowQueueRegistry(remoteDataflowQueuesRegistry);
-        }
-    }
-
-    public static void getDataflowQueue(String host, int port, String name) {
-        // if (localHost == null) {
-        //     localHost = new LocalHost();
-        // }
-
-        LocalHost localHost = new LocalHost();
+    public static void getDataflowQueue(String host, int port, String name, LocalHost localHost) {
         NettyClient client = new NettyClient(localHost, host, port, connection -> {
             if (connection.getHost() != null) {
                 connection.write(new RemoteDataflowQueueRequestMsg(localHost.getId(), name));

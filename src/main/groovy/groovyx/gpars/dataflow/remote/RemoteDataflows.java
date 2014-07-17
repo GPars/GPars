@@ -5,6 +5,7 @@ import groovyx.gpars.dataflow.DataflowQueue;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
+import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.netty.NettyTransportProvider;
 
 import java.util.Map;
@@ -23,6 +24,8 @@ public final class RemoteDataflows {
     private static Map<String, DataflowQueue<?>> publishedQueues = new ConcurrentHashMap<>();
 
     private static Map<String, DataflowVariable<RemoteDataflowQueue<?>>> remoteQueues = new ConcurrentHashMap<>();
+
+    private static LocalHost clientLocalHost = new LocalHost(); // TODO what about server?
 
     private RemoteDataflows() {}
 
@@ -99,13 +102,13 @@ public final class RemoteDataflows {
 
     public static Future<RemoteDataflowQueue<?>> getDataflowQueue(String host, int port, String name) {
         // TODO wrong use of concurent map
-        NettyTransportProvider.setRemoteDataflowQueuesRegistry(remoteQueues);
+        clientLocalHost.setRemoteDataflowQueueRegistry(remoteQueues);
 
         DataflowVariable<RemoteDataflowQueue<?>> remoteQueueVariable = remoteQueues.get(name);
         if (remoteQueueVariable == null) {
             remoteQueueVariable = new DataflowVariable<>();
             remoteQueues.put(name, remoteQueueVariable);
-            NettyTransportProvider.getDataflowQueue(host, port, name);
+            NettyTransportProvider.getDataflowQueue(host, port, name, clientLocalHost);
         }
 
         return new RemoteDataflowQueueFuture(remoteQueueVariable);

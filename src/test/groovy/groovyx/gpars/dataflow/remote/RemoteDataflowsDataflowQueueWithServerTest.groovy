@@ -1,6 +1,7 @@
 package groovyx.gpars.dataflow.remote
 
 import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.remote.LocalHost
 import groovyx.gpars.remote.netty.NettyTransportProvider
 import spock.lang.Specification
 import spock.lang.Timeout
@@ -10,7 +11,8 @@ class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
     def static PORT = 9031
 
     def setupSpec() {
-        NettyTransportProvider.startServer(HOST, PORT)
+        def serverLocalHost = new LocalHost()
+        NettyTransportProvider.startServer HOST, PORT, serverLocalHost
     }
 
     def cleanupSpec() {
@@ -48,9 +50,6 @@ class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
         queue << testValue
         def receivedTestValue = remoteQueue.val
 
-        sleep 500
-        NettyTransportProvider.stopClients()
-
         then:
         receivedTestValue == testValue
     }
@@ -67,9 +66,6 @@ class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
 
         remoteQueue << testValue
         def receivedTestValue = queue.val
-
-        sleep 500
-        NettyTransportProvider.stopClients()
 
         then:
         receivedTestValue == testValue
