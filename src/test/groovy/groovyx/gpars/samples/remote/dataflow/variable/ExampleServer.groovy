@@ -2,12 +2,14 @@ package groovyx.gpars.samples.remote.dataflow.variabledemo
 
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.dataflow.remote.RemoteDataflows
+import groovyx.gpars.remote.LocalHost
 import groovyx.gpars.remote.netty.NettyTransportProvider
 
 def HOST = "localhost"
 def PORT = 9009
 
-NettyTransportProvider.startServer HOST, PORT
+LocalHost localHost = new LocalHost()
+NettyTransportProvider.startServer HOST, PORT, localHost
 
 def var1 = new DataflowVariable()
 def var2 = new DataflowVariable()

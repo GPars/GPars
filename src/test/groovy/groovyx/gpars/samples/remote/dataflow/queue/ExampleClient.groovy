@@ -9,4 +9,8 @@ def stream = RemoteDataflows.getDataflowQueue HOST, PORT, "queue" get()
 
 println stream.val
 println stream.val
+
+stream << "xyz"
+
+println stream.val
 println stream.val

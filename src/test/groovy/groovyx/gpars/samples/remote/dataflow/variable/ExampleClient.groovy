@@ -13,5 +13,3 @@ def var1 = var1Future.get()
 def var2 = var2Future.get()
 
 println "${var1.val} supports ${var2.val}"
-
-NettyTransportProvider.stopClients()
