@@ -23,6 +23,16 @@ import org.apache.tools.ant.taskdefs.Javadoc
 //  Author: Rene Groeschke
 //  Author: Hamlet D'Arcy - Updated OSGi configuration
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:0.7.1'
+    }
+}
+
 final userPropertiesAreSet = {
     project.hasProperty('codehausUsername') && project.hasProperty('codehausPassword')
 }
@@ -34,6 +44,8 @@ final signingPropertiesAreSet = {
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'osgi'
+apply plugin: 'org.asciidoctor.gradle.asciidoctor'
+
 if (signingPropertiesAreSet()) {
     apply plugin: 'signing'
 }
@@ -293,6 +305,25 @@ groovydoc {
     footer = copyrightString
     include 'groovyx/gpars/**'
     overview = new File('overview.html')
+}
+
+asciidoctor {
+    baseDir = project.file('src/asciidoc')
+    sourceDocumentName = project.file('src/asciidoc/index.adoc')
+    options = [
+            attributes: [
+                    toc                 : 'left',
+                    doctype             : 'book',
+                    icons               : 'font',
+                    sectlink            : true,
+                    sectanchors         : true,
+                    numbered            : true,
+                    linkattrs           : true,
+                    imagesdir           : 'images',
+                    'source-highlighter': 'coderay',
+                    stylesheet          : 'src/asciidoc-resources/css/style.css'
+            ]
+    ]
 }
 
 task documentation(dependsOn: ['javadoc', 'groovydoc', 'buildGuide', 'pdfGuide'], description: 'Create the API documentation.')
