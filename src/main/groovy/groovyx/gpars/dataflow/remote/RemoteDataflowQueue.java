@@ -42,8 +42,7 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public T getVal() throws InterruptedException {
-        DataflowVariable<T> value = new DataflowVariable<>();
-        remoteHost.write(new RemoteDataflowQueueValueRequestMsg(queueName, value));
+        DataflowVariable<T> value = createRequestVariable();
         return value.getVal();
     }
 
@@ -449,7 +448,7 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public DataflowWriteChannel<T> leftShift(T value) {
-        remoteHost.write(new RemoteDataflowQueueEnqueueValueMsg<T>(queueName, value));
+        enqueueValue(value);
         return this;
     }
 
@@ -460,7 +459,14 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public DataflowWriteChannel<T> leftShift(DataflowReadChannel<T> ref) {
-        throw new UnsupportedOperationException();
+        ref.getValAsync(new MessageStream() {
+            @Override
+            public MessageStream send(Object message) {
+                enqueueValue((T) message);
+                return this;
+            }
+        });
+        return this;
     }
 
     @Override
@@ -475,10 +481,25 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public DataflowExpression<T> poll() throws InterruptedException {
-        throw new UnsupportedOperationException();
+        // there is no buffer
+        return null;
     }
 
     public void setQueueName(String queueName) {
         this.queueName = queueName;
+    }
+
+    /**
+     * Creates a new variable and sends request to remote host asking for value
+     * @return The newly created DataflowVariable instance
+     */
+    private DataflowVariable<T> createRequestVariable() {
+        DataflowVariable<T> value = new DataflowVariable<>();
+        remoteHost.write(new RemoteDataflowQueueValueRequestMsg(queueName, value));
+        return value;
+    }
+
+    private void enqueueValue(T value) {
+        remoteHost.write(new RemoteDataflowQueueEnqueueValueMsg<T>(queueName, value));
     }
 }
