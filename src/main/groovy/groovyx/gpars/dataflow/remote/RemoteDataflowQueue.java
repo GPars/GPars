@@ -6,6 +6,9 @@ import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.*;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.dataflow.impl.DataflowChannelEventListenerManager;
+import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
+import groovyx.gpars.dataflow.operator.ChainWithClosure;
+import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.remote.RemoteHost;
 import groovyx.gpars.remote.message.RemoteDataflowQueueEnqueueValueMsg;
@@ -22,6 +25,7 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
     private RemoteHost remoteHost;
     private String queueName;
 
+    // TODO combine constructors
     public RemoteDataflowQueue(RemoteHost host) {
         this.remoteHost = host;
     }
@@ -32,12 +36,13 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public void getValAsync(MessageStream callback) {
-        throw new UnsupportedOperationException();
+        getValAsync(null, callback);
     }
 
     @Override
     public void getValAsync(Object attachment, MessageStream callback) {
-        throw new UnsupportedOperationException();
+        DataflowVariable<T> value = createRequestVariable();
+        value.getValAsync(attachment, callback);
     }
 
     @Override
@@ -48,62 +53,71 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public T getVal(long timeout, TimeUnit units) throws InterruptedException {
-        throw new UnsupportedOperationException();
+        final DataflowVariable<T> value = createRequestVariable();
+        return value.getVal(timeout, units);
     }
 
     @Override
     public <V> Promise<V> rightShift(Closure<V> closure) {
-        throw new UnsupportedOperationException();
+        return then(closure);
     }
 
     @Override
     public <V> void whenBound(Closure<V> closure) {
-        throw new UnsupportedOperationException();
+        getValAsync(new DataCallback(closure, Dataflow.retrieveCurrentDFPGroup()));
     }
 
     @Override
     public <V> void whenBound(Pool pool, Closure<V> closure) {
-        throw new UnsupportedOperationException();
+        getValAsync(new DataCallbackWithPool(pool, closure));
     }
 
     @Override
     public <V> void whenBound(PGroup group, Closure<V> closure) {
-        throw new UnsupportedOperationException();
+        getValAsync(new DataCallback(closure, group));
     }
 
     @Override
     public void whenBound(MessageStream stream) {
-        throw new UnsupportedOperationException();
+        getValAsync(stream);
     }
 
     @Override
     public <V> Promise<V> then(Closure<V> closure) {
-        throw new UnsupportedOperationException();
+        final DataflowVariable<V> result = new DataflowVariable<>();
+        whenBound(new ThenMessagingRunnable<>(result, closure));
+        return result;
     }
 
     @Override
     public <V> Promise<V> then(Pool pool, Closure<V> closure) {
-        throw new UnsupportedOperationException();
+        final DataflowVariable<V> result = new DataflowVariable<>();
+        whenBound(pool, new ThenMessagingRunnable<>(result, closure));
+        return result;
     }
 
     @Override
     public <V> Promise<V> then(PGroup group, Closure<V> closure) {
-        throw new UnsupportedOperationException();
+        final DataflowVariable<V> result = new DataflowVariable<>();
+        whenBound(group, new ThenMessagingRunnable<>(result, closure));
+        return result;
     }
 
     @Override
     public <V> DataflowReadChannel<V> chainWith(Closure<V> closure) {
-        throw new UnsupportedOperationException();
+        return chainWith(Dataflow.retrieveCurrentDFPGroup(), closure);
     }
 
     @Override
     public <V> DataflowReadChannel<V> chainWith(Pool pool, Closure<V> closure) {
-        throw new UnsupportedOperationException();
+        return chainWith(new DefaultPGroup(pool), closure);
     }
 
     @Override
     public <V> DataflowReadChannel<V> chainWith(PGroup group, Closure<V> closure) {
-        throw new UnsupportedOperationException();
+        final DataflowQueue<V> result = new DataflowQueue<>();
+        group.operator(this, result, new ChainWithClosure<V>(closure));
+        return result;
     }
 
     @Override
@@ -446,6 +460,11 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Sends passed in value to queue on remote host.
+     * @param value The value to enqueue
+     * @return this
+     */
     @Override
     public DataflowWriteChannel<T> leftShift(T value) {
         enqueueValue(value);
@@ -485,12 +504,13 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
         return null;
     }
 
+    // TODO should be set by contructor
     public void setQueueName(String queueName) {
         this.queueName = queueName;
     }
 
     /**
-     * Creates a new variable and sends request to remote host asking for value
+     * Creates a new variable and sends request to queue on remote host asking for value
      * @return The newly created DataflowVariable instance
      */
     private DataflowVariable<T> createRequestVariable() {
@@ -499,6 +519,10 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
         return value;
     }
 
+    /**
+     * Sends value to queue on remote host
+     * @param value
+     */
     private void enqueueValue(T value) {
         remoteHost.write(new RemoteDataflowQueueEnqueueValueMsg<T>(queueName, value));
     }
