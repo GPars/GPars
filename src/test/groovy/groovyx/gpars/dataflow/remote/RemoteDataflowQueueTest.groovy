@@ -7,8 +7,6 @@ import groovyx.gpars.remote.netty.NettyTransportProvider
 import spock.lang.Specification
 import spock.lang.Timeout
 
-import java.util.concurrent.CountDownLatch
-
 class RemoteDataflowQueueTest extends Specification {
     def static HOST = "localhost"
     def static PORT = 9201
