@@ -46,7 +46,6 @@ import groovyx.gpars.dataflow.remote.RemoteDataflowQueue;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
-import groovyx.gpars.serial.RemoteSerialized;
 import groovyx.gpars.serial.WithSerialId;
 
 /**
