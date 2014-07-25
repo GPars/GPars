@@ -67,17 +67,10 @@ targetCompatibility = 7
 def theVendor = 'gpars.org'
 def theTitle = 'GPars: Groovy Parallel Systems'
 
-//  The "apply {}" form was broken between Gradle 1.11 and Gradle 1.12 but is fixed again in Gradle 2.0.
-//  See http://forums.gradle.org/gradle/topics/groovyfx_build_fails_with_gradle_1_12_but_succeeds_with_1_11 and
-//  http://issues.gradle.org/browse/GRADLE-3082
-/*
 apply {
     from 'gradle/docs.gradle'
     from 'gradle/docsDependencies.gradle'
 }
-*/
-apply from: 'gradle/docs.gradle'
-apply from: 'gradle/docsDependencies.gradle'
 
 task copyDSLDefinitions(type: Copy) {
     into "$buildDir/classes/main"
@@ -137,7 +130,7 @@ configurations {
 // symbol look up works correctly without qualification.
 
 dependencies {
-    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.2.2'
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.3.4'
     compile('org.multiverse:multiverse-core:0.7.0') { transitive = false }
     compile group: 'org.jboss.netty', name: 'netty', version: project.hasProperty('gpars_nettyVersion') ? gpars_nettyVersion : '3.2.9.Final'
     compile 'org.codehaus.jcsp:jcsp:1.1-rc5'
@@ -148,7 +141,7 @@ dependencies {
     testCompile fileTree(dir: 'lib', include: '*.jar')
     //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
     //  Grails, including all the SpringRoo stuff.
-    docs group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.2.2'
+    docs group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.3.4'
     docs 'org.yaml:snakeyaml:1.13'
     docs 'commons-lang:commons-lang:2.6'
     docs project.ext.grailsDocs
@@ -374,7 +367,7 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.12'
+    gradleVersion = '2.0'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
