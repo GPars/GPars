@@ -24,15 +24,9 @@ import java.util.concurrent.TimeUnit;
 
 public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChannel<T>, RemoteSerialized {
     private RemoteHost remoteHost;
-    private String queueName;
 
-    // TODO combine constructors
     public RemoteDataflowQueue(RemoteHost host) {
         this.remoteHost = host;
-    }
-
-    public RemoteDataflowQueue(String queueName) {
-        this.queueName = queueName;
     }
 
     @Override
@@ -546,18 +540,13 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
         return null;
     }
 
-    // TODO should be set by contructor
-    public void setQueueName(String queueName) {
-        this.queueName = queueName;
-    }
-
     /**
      * Creates a new variable and sends request to queue on remote host asking for value
      * @return The newly created DataflowVariable instance
      */
     private DataflowVariable<T> createRequestVariable() {
         DataflowVariable<T> value = new DataflowVariable<>();
-        remoteHost.write(new RemoteDataflowQueueValueRequestMsg(queueName, value));
+        remoteHost.write(new RemoteDataflowQueueValueRequestMsg<>(this, value));
         return value;
     }
 
@@ -566,6 +555,6 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
      * @param value
      */
     private void enqueueValue(T value) {
-        remoteHost.write(new RemoteDataflowQueueEnqueueValueMsg<T>(queueName, value));
+        remoteHost.write(new RemoteDataflowQueueEnqueueValueMsg<T>(this, value));
     }
 }
