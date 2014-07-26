@@ -23,6 +23,20 @@ import org.apache.tools.ant.taskdefs.Javadoc
 //  Author: Rene Groeschke
 //  Author: Hamlet D'Arcy - Updated OSGi configuration
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:0.7.1'
+    }
+}
+
+final userPropertiesAreSet = {
+    project.hasProperty('codehausUsername') && project.hasProperty('codehausPassword')
+}
+
 final signingPropertiesAreSet = {
     project.hasProperty('signing.keyId') && project.hasProperty('signing.password') && project.hasProperty('signing.secretKeyRingFile')
 }
@@ -30,6 +44,8 @@ final signingPropertiesAreSet = {
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'osgi'
+apply plugin: 'org.asciidoctor.gradle.asciidoctor'
+
 if (signingPropertiesAreSet()) {
     apply plugin: 'signing'
 }
@@ -51,17 +67,10 @@ targetCompatibility = 8
 def theVendor = 'gpars.org'
 def theTitle = 'GPars: Groovy Parallel Systems'
 
-//  The "apply {}" form was broken between Gradle 1.11 and Gradle 1.12 but is fixed again in Gradle 2.0.
-//  See http://forums.gradle.org/gradle/topics/groovyfx_build_fails_with_gradle_1_12_but_succeeds_with_1_11 and
-//  http://issues.gradle.org/browse/GRADLE-3082
-/*
 apply {
     from 'gradle/docs.gradle'
     from 'gradle/docsDependencies.gradle'
 }
-*/
-apply from: 'gradle/docs.gradle'
-apply from: 'gradle/docsDependencies.gradle'
 
 task copyDSLDefinitions(type: Copy) {
     into "$buildDir/classes/main"
@@ -121,9 +130,9 @@ configurations {
 // symbol look up works correctly without qualification.
 
 dependencies {
-    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.3.3'
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.3.5'
     compile('org.multiverse:multiverse-core:0.7.0') { transitive = false }
-    compile group: 'io.netty', name: 'netty-all', version: project.hasProperty('gpars_nettyVersion') ? gpars_nettyVersion : '4.0.20.Final'
+    compile group: 'io.netty', name: 'netty-all', version: project.hasProperty('gpars_nettyVersion') ? gpars_nettyVersion : '4.0.21.Final'
     compile 'org.codehaus.jcsp:jcsp:1.1-rc5'
     testCompile group: 'junit', name: 'junit', version: project.hasProperty('gpars_junitVersion') ? gpars_junitVersion : '4.11'
     testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.7-groovy-2.0'
@@ -132,7 +141,7 @@ dependencies {
     testCompile fileTree(dir: 'lib', include: '*.jar')
     //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
     //  Grails, including all the SpringRoo stuff.
-    docs group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.3.3'
+    docs group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.3.5'
     docs 'org.yaml:snakeyaml:1.13'
     docs 'commons-lang:commons-lang:2.6'
     docs project.ext.grailsDocs
@@ -206,19 +215,16 @@ if (signingPropertiesAreSet()) {
 
 gradle.taskGraph.whenReady { taskGraph ->
     if (taskGraph.hasTask(uploadArchives)) {
-        if (!(project.hasProperty('codehausUsername') && project.hasProperty('codehausPassword'))) {
-            throw new RuntimeException('Must define both codehausUsername and codehausPassword to upload archives.')
-        }
-        if (!signingPropertiesAreSet()) {
-            throw new RuntimeException('Must define signing.keyId, signing.password, and signing.secretKeyRingFile to upload signed archives.')
+        if (!(userPropertiesAreSet() && signingPropertiesAreSet())) {
+            throw new RuntimeException('Must define both codehausUsername, codehausPassword, signing.keyId, signing.password, and signing.secretKeyRingFile to upload signed archives.')
         }
         project.ext.deployer = uploadArchives.repositories.mavenDeployer {
             uniqueVersion = false
             configuration = configurations.deployerJars
-            repository(url: 'https://dav.codehaus.org/repository/gpars/') {
+            repository(url: 'https://nexus.codehaus.org/service/local/staging/deploy/maven2') {
                 authentication(userName: codehausUsername, password: codehausPassword)
             }
-            snapshotRepository(url: 'https://dav.codehaus.org/snapshots.repository/gpars/') {
+            snapshotRepository(url: 'https://nexus.codehaus.org/content/repositories/snapshots') {
                 authentication(userName: codehausUsername, password: codehausPassword)
             }
             pom.project {
@@ -294,6 +300,25 @@ groovydoc {
     overview = new File('overview.html')
 }
 
+asciidoctor {
+    baseDir = project.file('src/asciidoc')
+    sourceDocumentName = project.file('src/asciidoc/index.adoc')
+    options = [
+            attributes: [
+                    toc                 : 'left',
+                    doctype             : 'book',
+                    icons               : 'font',
+                    sectlink            : true,
+                    sectanchors         : true,
+                    numbered            : true,
+                    linkattrs           : true,
+                    imagesdir           : 'images',
+                    'source-highlighter': 'coderay',
+                    stylesheet          : 'src/asciidoc-resources/css/style.css'
+            ]
+    ]
+}
+
 task documentation(dependsOn: ['javadoc', 'groovydoc', 'buildGuide', 'pdfGuide'], description: 'Create the API documentation.')
 
 task zipDoc(type: Jar, dependsOn: 'documentation') {
@@ -342,7 +367,7 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.12'
+    gradleVersion = '2.0'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
