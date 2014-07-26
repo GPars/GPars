@@ -67,17 +67,10 @@ targetCompatibility = 8
 def theVendor = 'gpars.org'
 def theTitle = 'GPars: Groovy Parallel Systems'
 
-//  The "apply {}" form was broken between Gradle 1.11 and Gradle 1.12 but is fixed again in Gradle 2.0.
-//  See http://forums.gradle.org/gradle/topics/groovyfx_build_fails_with_gradle_1_12_but_succeeds_with_1_11 and
-//  http://issues.gradle.org/browse/GRADLE-3082
-/*
 apply {
     from 'gradle/docs.gradle'
     from 'gradle/docsDependencies.gradle'
 }
-*/
-apply from: 'gradle/docs.gradle'
-apply from: 'gradle/docsDependencies.gradle'
 
 task copyDSLDefinitions(type: Copy) {
     into "$buildDir/classes/main"
@@ -162,24 +155,10 @@ dependencies {
 }
 
 task runBenchmarks(type: JavaExec) {
-  /*
-   *  Java 8 had the G1 garbage collector so no need for additional parameters.
-   *
-    def gcArg = "-XX:+UseParallelGC"
-
-    // On Windows, calling the JVM with extended params requires multiple levels of quoting
-    if (System.getProperty('os.name').matches(".*Windows.*")) {
-        gcArg = '"""-XX:+UseParallelGC"""'
-    }
-  */
     description = 'Runs benchmarks measuring the throughput and latency of actors in GPars'
     main = 'groovyx.gpars.benchmark.caliper.BenchmarkRunner'
     classpath = sourceSets.test.runtimeClasspath
-    /*
-     *  Java 8 had the G1 garbage collector so no need for additional parameters.
-     *
-    args = ["-Jgc=${gcArg}", '-Jxms=-Xms512M', '-Jxmx=-Xmx1024M', '-Jserver=-server']
-     */
+    args = ['-Jxms=-Xms512M', '-Jxmx=-Xmx1024M', '-Jserver=-server']
 }
 
 //  To get the details of the "unchecked" issues.
