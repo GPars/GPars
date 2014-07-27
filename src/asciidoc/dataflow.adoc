@@ -2179,7 +2179,7 @@ op3.join()
 Shutting down the whole JVM through _System.exit()_ will also obviously shutdown the dataflow network, however, no lifecycle listeners will be invoked in such cases.
 ****
 
-===== Stopping operators gently
+==== Stopping operators gently
 
 Operators handle incoming messages repeatedly. The only safe moment for stopping an operator without the
 risk of loosing any messages is right after the operator has finished processing messages and is just about
@@ -2906,7 +2906,8 @@ the _doubler_ actor.
 
 The _DataflowVariable_ as well as the _DataflowQueue_ classes can obviously be used from any thread of your
 application, not only from the tasks created by _Dataflow.task()_ . Consider the following example:
-----import groovyx.gpars.dataflow.DataflowVariable
+----
+import groovyx.gpars.dataflow.DataflowVariable
 
 final DataflowVariable a = new DataflowVariable<String>()
 final DataflowVariable b = new DataflowVariable<String>()
