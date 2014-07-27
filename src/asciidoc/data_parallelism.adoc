@@ -655,8 +655,8 @@ accumulator = {ShoppingCart cart, Item value -> cart.addItem(value)} initialValu
 ----
 
 The return type is a map.
-E.g. [['he', 1], ['she', 2], ['he', 2], ['me', 1], ['she', 5], ['he', 1] with the initial value provided a 0 will be combined into
-['he' : 4, 'she' : 7, 'he', : 2, 'me' : 1]
+E.g. [['he', 1], ['she', 2], ['he', 2], ['me', 1], ['she', 5], ['he', 1]] with the initial value provided a 0
+will be combined into ['he' : 4, 'she' : 7, 'me' : 1]
 
 ****
 The keys will be mutually compared using their equals and hashCode methods. Consider using _\@Canonical_ or _\@EqualsAndHashCode_
