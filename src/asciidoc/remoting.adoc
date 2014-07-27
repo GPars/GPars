@@ -1,0 +1,10 @@
+
+= Remoting
+
+Remoting for GPars was a project in Google Summer of Code 2014.
+
+GPars received remoting for:
+
+* Actors
+* Dataflow
+* Agents (?)
