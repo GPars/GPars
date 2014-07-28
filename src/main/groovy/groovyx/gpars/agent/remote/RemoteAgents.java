@@ -2,6 +2,7 @@ package groovyx.gpars.agent.remote;
 
 import groovyx.gpars.agent.Agent;
 import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.remote.LocalHost;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +15,8 @@ public final class RemoteAgents {
 
     private static final Map<String, DataflowVariable<Agent<?>>> remoteAgents = new ConcurrentHashMap<>();
 
+    private static final LocalHost clientLocalHost = new LocalHost(); // TODO server localhost
+
     public static void publish(Agent<?> agent, String name) {
         publishedAgents.put(name, agent);
     }
@@ -24,6 +27,7 @@ public final class RemoteAgents {
 
     public static Future<Agent<?>> get(String host, int port, String name, ClojureExecutionPolicy policy) {
         // TODO wrong use of concurrent map
+        clientLocalHost.setRemoteAgentsRegistry(remoteAgents);
 
         DataflowVariable<Agent<?>> agentVariable = remoteAgents.get(name);
         if (agentVariable == null) {
