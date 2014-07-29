@@ -18,6 +18,8 @@ package groovyx.gpars.agent;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.Actors;
+import groovyx.gpars.agent.remote.RemoteAgent;
+import groovyx.gpars.serial.RemoteSerialized;
 import org.codehaus.groovy.runtime.NullObject;
 
 /**
@@ -135,5 +137,10 @@ public class Agent<T> extends AgentBase<T> {
     @SuppressWarnings({"unchecked"})
     public static <T> Agent<T> fairAgent(final T state, final Closure copy) {
         return Actors.defaultActorPGroup.fairAgent(state, copy);
+    }
+
+    @Override
+    public Class<RemoteAgent> getRemoteClass() {
+        return RemoteAgent.class;
     }
 }

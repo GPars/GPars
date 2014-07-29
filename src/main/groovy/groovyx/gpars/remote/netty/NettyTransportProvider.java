@@ -18,22 +18,12 @@ package groovyx.gpars.remote.netty;
 
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.remote.RemoteActorFuture;
-import groovyx.gpars.dataflow.DataflowQueue;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.remote.RemoteDataflowBroadcast;
-import groovyx.gpars.dataflow.remote.RemoteDataflowQueue;
-import groovyx.gpars.remote.BroadcastDiscovery;
 import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.message.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.Future;
 
 
@@ -126,7 +116,7 @@ public class NettyTransportProvider {
     public static void getAgentWithRemoteExecutionPolicy(String host, int port, String name, LocalHost localHost) {
         NettyClient client = new NettyClient(localHost, host, port, connection -> {
             if (connection.getHost() != null) {
-                connection.write(new RemoteAgentWithRemoteExectionPolicyRequestMsg(localHost.getId(), name));
+                connection.write(new RemoteAgentWithRemoteExecutionPolicyRequestMsg(localHost.getId(), name));
             }
         });
         client.start();

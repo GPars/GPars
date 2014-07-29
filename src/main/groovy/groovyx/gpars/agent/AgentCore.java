@@ -19,6 +19,7 @@ package groovyx.gpars.agent;
 import groovyx.gpars.actor.Actors;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
+import groovyx.gpars.serial.WithSerialId;
 import groovyx.gpars.util.AsyncMessagingCore;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import java.util.List;
  *         Date: 13.4.2010
  */
 @SuppressWarnings({"UnqualifiedStaticUsage"})
-public abstract class AgentCore {
+public abstract class AgentCore extends WithSerialId {
 
     private final AsyncMessagingCore core;
 

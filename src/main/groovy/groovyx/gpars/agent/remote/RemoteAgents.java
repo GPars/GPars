@@ -3,6 +3,7 @@ package groovyx.gpars.agent.remote;
 import groovyx.gpars.agent.Agent;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.remote.LocalHost;
+import groovyx.gpars.remote.netty.NettyTransportProvider;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,6 +34,8 @@ public final class RemoteAgents {
         if (agentVariable == null) {
             agentVariable = new DataflowVariable<>();
             remoteAgents.put(name, agentVariable);
+            // TODO ignores policy
+            NettyTransportProvider.getAgentWithRemoteExecutionPolicy(host, port, name, clientLocalHost);
         }
         return new RemoteAgentFuture(agentVariable);
     }
