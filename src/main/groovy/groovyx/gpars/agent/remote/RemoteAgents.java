@@ -14,7 +14,7 @@ public final class RemoteAgents {
 
     private static final Map<String, Agent<?>> publishedAgents = new ConcurrentHashMap<>();
 
-    private static final Map<String, DataflowVariable<Agent<?>>> remoteAgents = new ConcurrentHashMap<>();
+    private static final Map<String, DataflowVariable<RemoteAgent<?>>> remoteAgents = new ConcurrentHashMap<>();
 
     private static final LocalHost clientLocalHost = new LocalHost(); // TODO server localhost
 
@@ -26,11 +26,11 @@ public final class RemoteAgents {
         return publishedAgents.get(name);
     }
 
-    public static Future<Agent<?>> get(String host, int port, String name, ClojureExecutionPolicy policy) {
+    public static Future<RemoteAgent<?>> get(String host, int port, String name, AgentClosureExecutionPolicy policy) {
         // TODO wrong use of concurrent map
         clientLocalHost.setRemoteAgentsRegistry(remoteAgents);
 
-        DataflowVariable<Agent<?>> agentVariable = remoteAgents.get(name);
+        DataflowVariable<RemoteAgent<?>> agentVariable = remoteAgents.get(name);
         if (agentVariable == null) {
             agentVariable = new DataflowVariable<>();
             remoteAgents.put(name, agentVariable);

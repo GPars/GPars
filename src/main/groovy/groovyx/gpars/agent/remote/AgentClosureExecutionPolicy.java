@@ -1,6 +1,6 @@
 package groovyx.gpars.agent.remote;
 
-public enum ClojureExecutionPolicy {
+public enum AgentClosureExecutionPolicy {
     LOCAL,
     REMOTE
 }

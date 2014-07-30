@@ -144,7 +144,7 @@ public abstract class AgentCore extends WithSerialId {
      *
      * @param message A value or a closure
      */
-    abstract void handleMessage(final Object message);
+    public abstract void handleMessage(final Object message);
 
     /**
      * Adds the exception to the list of thrown exceptions

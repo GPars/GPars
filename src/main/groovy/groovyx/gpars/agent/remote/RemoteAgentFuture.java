@@ -8,10 +8,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class RemoteAgentFuture implements Future<Agent<?>> {
-    private final DataflowVariable<Agent<?>> agentVariable;
+public class RemoteAgentFuture implements Future<RemoteAgent<?>> {
+    private final DataflowVariable<RemoteAgent<?>> agentVariable;
 
-    public RemoteAgentFuture(DataflowVariable<Agent<?>> agentVariable) {
+    public RemoteAgentFuture(DataflowVariable<RemoteAgent<?>> agentVariable) {
         this.agentVariable = agentVariable;
     }
 
@@ -31,7 +31,7 @@ public class RemoteAgentFuture implements Future<Agent<?>> {
     }
 
     @Override
-    public Agent<?> get() throws InterruptedException, ExecutionException {
+    public RemoteAgent<?> get() throws InterruptedException, ExecutionException {
         try {
             return agentVariable.get();
         } catch (Throwable throwable) {
@@ -40,7 +40,7 @@ public class RemoteAgentFuture implements Future<Agent<?>> {
     }
 
     @Override
-    public Agent<?> get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public RemoteAgent<?> get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         try {
             return agentVariable.get(timeout, unit);
         } catch (Throwable throwable) {

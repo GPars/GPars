@@ -40,6 +40,6 @@ class RemoteAgentsTest extends Specification {
         agentFuture instanceof RemoteAgentFuture
 
         where:
-        policy << ClojureExecutionPolicy.values()
+        policy << AgentClosureExecutionPolicy.values()
     }
 }

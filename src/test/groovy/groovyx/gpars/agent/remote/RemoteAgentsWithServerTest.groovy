@@ -19,18 +19,56 @@ class RemoteAgentsWithServerTest extends Specification {
         NettyTransportProvider.stopServer()
     }
 
+    RemoteAgent publishAndRetrieveRemoteAgent(Agent agent, String name, AgentClosureExecutionPolicy policy) {
+        RemoteAgents.publish agent, name
+        RemoteAgents.get HOST, PORT, name, policy get()
+    }
+
     @Timeout(5)
-    def "can retrieve published Agent with remote closure execution policy"() {
+    def "can retrieve published Agent with remote closure execution policy and retrieve state"() {
         setup:
-        Agent<String> agent = new Agent<>("test-agent")
+        def agentState = "test-agent-state"
+        Agent<String> agent = new Agent<>(agentState)
         def agentName = "test-agent-1"
 
         when:
-        RemoteAgents.publish agent, agentName
-
-        def remoteAgent = RemoteAgents.get HOST, PORT, agentName, ClojureExecutionPolicy.REMOTE get()
+        def remoteAgent = publishAndRetrieveRemoteAgent agent, agentName, AgentClosureExecutionPolicy.REMOTE
 
         then:
         remoteAgent != null
+
+        when:
+        def remoteState = remoteAgent.val
+
+        then:
+        remoteState == agentState
+    }
+
+    @Timeout(5)
+    def "can send update state of Agent with remote closure execution policy"() {
+        setup:
+        def agentState = "test-agent-state"
+        Agent<String> agent = new Agent<>(agentState)
+        def agentName = "test-agent-2"
+
+        when:
+        def remoteAgent = publishAndRetrieveRemoteAgent agent, agentName, AgentClosureExecutionPolicy.REMOTE
+
+        then:
+        remoteAgent != null
+
+        when:
+        remoteAgent << { updateValue "test-agent-state-update-1" }
+        sleep 500
+
+        then:
+        agent.val == "test-agent-state-update-1"
+
+        when:
+        remoteAgent << "test-agent-state-update-2"
+        sleep 500
+
+        then:
+        agent.val == "test-agent-state-update-2"
     }
 }

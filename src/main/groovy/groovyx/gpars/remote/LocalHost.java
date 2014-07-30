@@ -19,6 +19,7 @@ package groovyx.gpars.remote;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.remote.RemoteActorFuture;
 import groovyx.gpars.agent.Agent;
+import groovyx.gpars.agent.remote.RemoteAgent;
 import groovyx.gpars.dataflow.DataflowQueue;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.remote.RemoteDataflowBroadcast;
@@ -61,7 +62,7 @@ public class LocalHost extends SerialHandles {
     private Map<String, DataflowVariable<?>> remoteDataflows;
     private Map<String, DataflowVariable<RemoteDataflowBroadcast>> remoteBroadcastsRegistry;
     private Map<String, DataflowVariable<RemoteDataflowQueue<?>>> remoteDataflowQueueRegistry;
-    private Map<String, DataflowVariable<Agent<?>>> remoteAgentsRegistry;
+    private Map<String, DataflowVariable<RemoteAgent<?>>> remoteAgentsRegistry;
 
     /**
      * Registers actor under specific name
@@ -205,11 +206,11 @@ public class LocalHost extends SerialHandles {
         this.remoteDataflowQueueRegistry = remoteDataflowQueueRegistry;
     }
 
-    public void setRemoteAgentsRegistry(Map<String, DataflowVariable<Agent<?>>> remoteAgentsRegistry) {
+    public void setRemoteAgentsRegistry(Map<String, DataflowVariable<RemoteAgent<?>>> remoteAgentsRegistry) {
         this.remoteAgentsRegistry = remoteAgentsRegistry;
     }
 
-    public Map<String, DataflowVariable<Agent<?>>> getRemoteAgentsRegistry() {
+    public Map<String, DataflowVariable<RemoteAgent<?>>> getRemoteAgentsRegistry() {
         return remoteAgentsRegistry;
     }
 }
