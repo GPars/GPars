@@ -1,4 +1,4 @@
-= The Gpars Guide
+= The GPars Guide
 
 :leveloffset: 1
 include::introduction.adoc[]
@@ -12,4 +12,3 @@ include::stm.adoc[]
 include::google_app_engine_integration.adoc[]
 include::tips.adoc[]
 include::conclusion.adoc[]
-
