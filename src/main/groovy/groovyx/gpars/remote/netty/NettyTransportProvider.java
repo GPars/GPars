@@ -116,7 +116,7 @@ public class NettyTransportProvider {
     public static void getAgentWithRemoteExecutionPolicy(String host, int port, String name, LocalHost localHost) {
         NettyClient client = new NettyClient(localHost, host, port, connection -> {
             if (connection.getHost() != null) {
-                connection.write(new RemoteAgentWithRemoteExecutionPolicyRequestMsg(localHost.getId(), name));
+                connection.write(new RemoteAgentRequestMsg(localHost.getId(), name));
             }
         });
         client.start();

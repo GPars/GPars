@@ -7,10 +7,10 @@ import groovyx.gpars.serial.SerialMsg;
 
 import java.util.UUID;
 
-public class RemoteAgentWithRemoteExecutionPolicyRequestMsg extends SerialMsg {
+public class RemoteAgentRequestMsg extends SerialMsg {
     private final String name;
 
-    public RemoteAgentWithRemoteExecutionPolicyRequestMsg(UUID id, String name) {
+    public RemoteAgentRequestMsg(UUID id, String name) {
         super(id);
         this.name = name;
     }
@@ -20,6 +20,6 @@ public class RemoteAgentWithRemoteExecutionPolicyRequestMsg extends SerialMsg {
         updateRemoteHost(conn);
 
         Agent<?> agent = RemoteAgents.get(name);
-        conn.write(new RemoteAgentWithRemoteExecutionPolicyReplyMsg(name, agent));
+        conn.write(new RemoteAgentReplyMsg(name, agent));
     }
 }

@@ -45,30 +45,35 @@ class RemoteAgentsWithServerTest extends Specification {
     }
 
     @Timeout(5)
-    def "can send update state of Agent with remote closure execution policy"() {
+    def "can send update state of Agent"() {
         setup:
         def agentState = "test-agent-state"
         Agent<String> agent = new Agent<>(agentState)
         def agentName = "test-agent-2"
+        def updateState1 = "test-agent-state-update-1"
+        def updateState2 = "test-agent-state-update-2"
 
         when:
-        def remoteAgent = publishAndRetrieveRemoteAgent agent, agentName, AgentClosureExecutionPolicy.REMOTE
+        def remoteAgent = publishAndRetrieveRemoteAgent agent, agentName, executionPolicy
 
         then:
         remoteAgent != null
 
         when:
-        remoteAgent << { updateValue "test-agent-state-update-1" }
+        remoteAgent << { updateValue updateState1 }
         sleep 500
 
         then:
-        agent.val == "test-agent-state-update-1"
+        agent.val == updateState1
 
         when:
-        remoteAgent << "test-agent-state-update-2"
+        remoteAgent << updateState2
         sleep 500
 
         then:
-        agent.val == "test-agent-state-update-2"
+        agent.val == updateState2
+
+        where:
+        executionPolicy << AgentClosureExecutionPolicy.values()
     }
 }

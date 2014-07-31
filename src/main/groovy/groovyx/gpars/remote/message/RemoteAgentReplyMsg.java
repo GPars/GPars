@@ -7,11 +7,11 @@ import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
-public class RemoteAgentWithRemoteExecutionPolicyReplyMsg extends SerialMsg {
+public class RemoteAgentReplyMsg extends SerialMsg {
     private final String name;
     private final AgentCore agent;
 
-    public RemoteAgentWithRemoteExecutionPolicyReplyMsg(String name, Agent<?> agent) {
+    public RemoteAgentReplyMsg(String name, Agent<?> agent) {
         this.name = name;
         this.agent = agent;
     }
