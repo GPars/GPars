@@ -1,10 +1,53 @@
 
 = Remoting
 
-Remoting for GPars was a project in Google Summer of Code 2014.
+Concepts like Actors, Dataflows and Agents are not restricted just to single VM,
+where they provide an abstraction layer for concurrent programming
+that allows to separate logic from low level synchronization code.
+These concepts can be easly extended to multiple nodes in a network.
+Following chapter describes remoting in GPars.
 
-GPars received remoting for:
+*Remark*: Remoting for GPars was a _Google Summer of Code 2014_ project.
 
-* Actors
-* Dataflow
-* Agents (?)
+== Introduction
+
+For each structure(?) a new remote proxy object was introduced (with _Remote_ prefix).
+This proxy object usually has the same interface as its local counterpart.
+Under the hood it just sends messages to original instance.
+To transport messages across the network http://netty.io[Netty] library was used.
+
+Acquiring a remote proxy is done in following way:
+
+. Original instance is published on _hostA:port_ under a specified _name_.
+. _hostB_ asks _hostA:port_ for an instance with specified _name_.
+. Promise is returned. It will eventually hold a proxy object instance.
+
+To create a proxy-object instance serialization mechanism is used (more <<remote-serialization>>).
+
+At this moment a new connection is created for each request.
+
+[#remote-serialization]
+=== Serialization
+
+Following mechanism was used to create proxy objects:
+
+object <-(serialization)-> handle ---(network)--- handle <-(serialization)-> proxy-object
+
+One of the main advantages of this mechanism is
+that sending proxy-object reference back is deserialized to original instance.
+
+== Dataflows
+
+about dataflows
+
+=== DataflowVariable
+
+what can be done with variables
+
+== Actors
+
+about actors
+
+== Agents
+
+work in progress
