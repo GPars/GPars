@@ -6,6 +6,9 @@ import groovyx.gpars.remote.netty.NettyTransportProvider
 import spock.lang.Specification
 import spock.lang.Timeout
 
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.CyclicBarrier
+
 class RemoteAgentsWithServerTest extends Specification {
     def static HOST = "localhost"
     def static PORT = 9677
@@ -21,7 +24,9 @@ class RemoteAgentsWithServerTest extends Specification {
 
     RemoteAgent publishAndRetrieveRemoteAgent(Agent agent, String name, AgentClosureExecutionPolicy policy) {
         RemoteAgents.publish agent, name
-        RemoteAgents.get HOST, PORT, name, policy get()
+        def remoteAgent = RemoteAgents.get HOST, PORT, name get()
+        remoteAgent.executionPolicy = policy
+        return remoteAgent
     }
 
     @Timeout(5)
@@ -45,35 +50,64 @@ class RemoteAgentsWithServerTest extends Specification {
     }
 
     @Timeout(5)
-    def "can send update state of Agent"() {
+    def "can update state of Agent with remote closure execution"() {
         setup:
         def agentState = "test-agent-state"
         Agent<String> agent = new Agent<>(agentState)
         def agentName = "test-agent-2"
         def updateState1 = "test-agent-state-update-1"
         def updateState2 = "test-agent-state-update-2"
+        def barrier = new CyclicBarrier(2)
+        agent.addListener { oldVal, newVal ->
+            barrier.await()
+        }
 
         when:
-        def remoteAgent = publishAndRetrieveRemoteAgent agent, agentName, executionPolicy
+        def remoteAgent = publishAndRetrieveRemoteAgent agent, agentName, AgentClosureExecutionPolicy.REMOTE
 
         then:
         remoteAgent != null
 
         when:
+        barrier.reset()
         remoteAgent << { updateValue updateState1 }
-        sleep 500
 
         then:
+        barrier.await()
         agent.val == updateState1
 
         when:
+        barrier.reset()
         remoteAgent << updateState2
-        sleep 500
 
         then:
+        barrier.await()
         agent.val == updateState2
+    }
 
-        where:
-        executionPolicy << AgentClosureExecutionPolicy.values()
+    @Timeout(5)
+    def "can update state of Agent with local closure execution"() {
+        setup:
+        def agentState = "test-agent-state"
+        Agent<String> agent = new Agent<>(agentState)
+        def agentName = "test-agent-3"
+        def updateState = "test-agent-state-update"
+        def latch = new CountDownLatch(1)
+        agent.addListener { oldVal, newVal ->
+            latch.countDown()
+        }
+
+        when:
+        def remoteAgent = publishAndRetrieveRemoteAgent agent, agentName, AgentClosureExecutionPolicy.LOCAL
+
+        then:
+        remoteAgent != null
+
+        when:
+        remoteAgent << { updateValue updateState }
+
+        then:
+        latch.await()
+        agent.val == updateState
     }
 }

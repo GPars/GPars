@@ -26,7 +26,7 @@ public final class RemoteAgents {
         return publishedAgents.get(name);
     }
 
-    public static Future<RemoteAgent<?>> get(String host, int port, String name, AgentClosureExecutionPolicy policy) {
+    public static Future<RemoteAgent<?>> get(String host, int port, String name) {
         // TODO wrong use of concurrent map
         clientLocalHost.setRemoteAgentsRegistry(remoteAgents);
 
@@ -34,8 +34,7 @@ public final class RemoteAgents {
         if (agentVariable == null) {
             agentVariable = new DataflowVariable<>();
             remoteAgents.put(name, agentVariable);
-            // TODO ignores policy
-            NettyTransportProvider.getAgentWithRemoteExecutionPolicy(host, port, name, clientLocalHost);
+            NettyTransportProvider.getAgent(host, port, name, clientLocalHost);
         }
         return new RemoteAgentFuture(agentVariable);
     }

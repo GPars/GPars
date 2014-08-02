@@ -8,10 +8,8 @@ println "Remote Agent - remote"
 def HOST = "localhost"
 def PORT = 9577
 
-def executionPolicy = AgentClosureExecutionPolicy.REMOTE
-// def executionPolicy = AgentClosureExecutionPolicy.LOCAL
-
-def remoteAgent = RemoteAgents.get HOST, PORT, "agent", executionPolicy get()
+def remoteAgent = RemoteAgents.get HOST, PORT, "agent" get()
+remoteAgent.executionPolicy = AgentClosureExecutionPolicy.LOCAL
 
 println "Agent value: ${remoteAgent.val}"
 

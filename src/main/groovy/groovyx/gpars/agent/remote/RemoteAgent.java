@@ -19,6 +19,10 @@ public class RemoteAgent<T> extends AgentCore implements RemoteSerialized{
         executionPolicy = AgentClosureExecutionPolicy.REMOTE;
     }
 
+    public void setExecutionPolicy(AgentClosureExecutionPolicy executionPolicy) {
+        this.executionPolicy = executionPolicy;
+    }
+
     @Override
     public void handleMessage(Object message) {
         remoteHost.write(executionPolicy.prepareMessage(this, message));
