@@ -1,4 +1,4 @@
-package groovyx.gpars.samples.remote.dataflow.variabledemo
+package groovyx.gpars.samples.remote.dataflow.variable
 
 import groovyx.gpars.dataflow.remote.RemoteDataflows
 import groovyx.gpars.remote.netty.NettyTransportProvider
