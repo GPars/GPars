@@ -6,7 +6,7 @@ import groovyx.gpars.actor.remote.RemoteActors
 
 class ChatClientActor extends DefaultActor {
     String name
-    def serverFuture
+    def serverPromise
 
     def consoleActor = Actors.actor {
         loop {
@@ -16,19 +16,19 @@ class ChatClientActor extends DefaultActor {
         }
     }
 
-    ChatClientActor(String host, int port, String name) {
+    ChatClientActor(def serverPromise, String name) {
+        this.serverPromise = serverPromise
         this.name = name
-        serverFuture = RemoteActors.get(host, port, "chat-server")
     }
 
     public afterStop(List<Object> messages) {
-        def server = serverFuture.get()
+        def server = serverPromise.get()
         server << new ChatMessage(action: "unregister", sender: name)
     }
 
     @Override
     protected void act() {
-        def server = serverFuture.get()
+        def server = serverPromise.get()
 
         // register
         server << new ChatMessage(action: "register", sender: name, message: consoleActor)

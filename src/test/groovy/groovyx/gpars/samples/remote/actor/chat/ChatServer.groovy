@@ -1,18 +1,18 @@
 package groovyx.gpars.samples.remote.actor.chat
 
 import groovyx.gpars.actor.remote.RemoteActors
-import groovyx.gpars.remote.netty.NettyTransportProvider
 
 def HOST = "localhost"
 def PORT = 9000
 
-NettyTransportProvider.startServer(HOST, PORT)
+def remoteActors = RemoteActors.create()
+remoteActors.startServer HOST, PORT
 
 println "Chat server"
 
 server = new ChatServerActor()
 server.start()
 
-RemoteActors.register(server, "chat-server")
+remoteActors.publish server, "chat-server"
 
 server.join()
