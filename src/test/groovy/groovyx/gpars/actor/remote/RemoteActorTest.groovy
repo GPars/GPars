@@ -2,6 +2,7 @@ package groovyx.gpars.actor.remote
 
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.remote.netty.NettyTransportProvider
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
 
@@ -11,34 +12,44 @@ class RemoteActorTest extends Specification {
     def static HOST = "localhost"
     def static PORT = 9012
 
+    @Shared
+    RemoteActors serverRemoteActors
+
+    @Shared
+    RemoteActors clientRemoteActors
+
     def setupSpec() {
-        NettyTransportProvider.startServer(HOST, PORT)
+        serverRemoteActors = RemoteActors.create()
+        serverRemoteActors.startServer HOST, PORT
+
+        clientRemoteActors = RemoteActors.create()
     }
 
     def cleanupSpec() {
-        NettyTransportProvider.stopServer()
+        serverRemoteActors.stopServer()
     }
 
     @Timeout(5)
     def "join RemoteActor"() {
         setup:
-        def done = false
+        def latch = new CountDownLatch(1)
         def testActor = Actors.actor {
             for (i in 1..3) {
                 println i
                 sleep 200
             }
-            done = true
+            latch.countDown()
         }
+        def actorName = "testActor-1"
 
-        RemoteActors.register(testActor, "testActor")
-        def remoteActor = RemoteActors.get(HOST, PORT, "testActor").get()
+        serverRemoteActors.publish testActor, actorName
+        def remoteActor = clientRemoteActors.get HOST, PORT, actorName get()
 
         when:
         remoteActor.join()
 
         then:
-        done
+        latch.await()
     }
 
     @Timeout(5)
@@ -50,9 +61,10 @@ class RemoteActorTest extends Specification {
                 message = it
             }
         }
+        def actorName = "testActor-2"
 
-        RemoteActors.register(testActor, "testActor")
-        def remoteActor = RemoteActors.get(HOST, PORT, "testActor").get()
+        serverRemoteActors.publish testActor, actorName
+        def remoteActor = clientRemoteActors.get HOST, PORT, actorName get()
 
         when:
         remoteActor << "test message"
@@ -72,9 +84,10 @@ class RemoteActorTest extends Specification {
                 reply "test reply"
             }
         }
+        def actorName = "testActor-3"
 
-        RemoteActors.register(testActor, "testActor")
-        def remoteActor = RemoteActors.get(HOST, PORT, "testActor").get()
+        serverRemoteActors.publish testActor, actorName
+        def remoteActor = clientRemoteActors.get HOST, PORT, actorName get()
 
         when:
         Actors.actor {
