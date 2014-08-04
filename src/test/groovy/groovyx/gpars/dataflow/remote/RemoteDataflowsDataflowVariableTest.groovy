@@ -9,9 +9,15 @@ class RemoteDataflowsDataflowVariableTest extends Specification {
     def static HOST = "localhost"
     def static PORT = 9020
 
+    RemoteDataflows remoteDataflows
+
+    void setup() {
+        remoteDataflows = RemoteDataflows.create()
+    }
+
     def "retrieving not published DataflowVariable returns null"() {
         when:
-        def var = RemoteDataflows.get "test-variable"
+        def var = remoteDataflows.get DataflowVariable, "test-variable"
 
         then:
         var == null
@@ -23,38 +29,35 @@ class RemoteDataflowsDataflowVariableTest extends Specification {
         def varName = "test-variable"
 
         when:
-        RemoteDataflows.publish var, varName
-        def publishedVar = RemoteDataflows.get varName
+        remoteDataflows.publish var, varName
+        def publishedVar = remoteDataflows.get DataflowVariable, varName
 
         then:
         publishedVar == var
     }
 
-    def "retrieving DataflowVariable from remote host returns Future"() {
+    def "retrieving DataflowVariable from remote host returns Promise"() {
         setup:
         def varName = "test-variable"
 
         when:
-        def varFuture = RemoteDataflows.get HOST, PORT, varName
+        def varFuture = remoteDataflows.getVariable HOST, PORT, varName
 
         then:
         varFuture != null
-        varFuture instanceof RemoteDataflowVariableFuture
+        varFuture instanceof DataflowVariable
     }
 
-    def "retrieving DataflowVariable from remote host returns Future based on the same inner variable"() {
-        // TODO don't use private fields
+    def "retrieving DataflowVariable from remote host returns the same Promise"() {
         setup:
         def varName = "test-variable"
 
         when:
-        def varFuture1 = RemoteDataflows.get HOST, PORT, varName
-        def varFuture2 = RemoteDataflows.get HOST, PORT, varName
+        def varFuture1 = remoteDataflows.getVariable HOST, PORT, varName
+        def varFuture2 = remoteDataflows.getVariable HOST, PORT, varName
 
         then:
-        varFuture1 != varFuture2
-        varFuture1.remoteVariable != null
-        varFuture1.remoteVariable == varFuture2.remoteVariable
+        varFuture1.is(varFuture2)
     }
 
 }
