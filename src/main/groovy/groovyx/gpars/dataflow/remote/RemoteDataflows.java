@@ -1,21 +1,27 @@
 package groovyx.gpars.dataflow.remote;
 
-import groovyx.gpars.dataflow.DataflowBroadcast;
-import groovyx.gpars.dataflow.DataflowQueue;
-import groovyx.gpars.dataflow.DataflowReadChannel;
-import groovyx.gpars.dataflow.DataflowVariable;
-import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
+import groovyx.gpars.dataflow.*;
 import groovyx.gpars.remote.LocalHost;
+import groovyx.gpars.remote.message.RemoteDataflowVariableRequestMsg;
+import groovyx.gpars.remote.netty.NettyClient;
+import groovyx.gpars.remote.netty.NettyServer;
 import groovyx.gpars.remote.netty.NettyTransportProvider;
+import groovyx.gpars.serial.SerialMsg;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
-public final class RemoteDataflows {
-    private static Map<String, DataflowVariable<?>> publishedVariables = new ConcurrentHashMap<>();
+public final class RemoteDataflows extends LocalHost {
+    /**
+     * Stores DataflowVariables published in context of this instance of RemoteDataflows.
+     */
+    private final Map<String, DataflowVariable<?>> publishedVariables;
 
-    private static Map<String, DataflowVariable<?>> remoteVariables = new ConcurrentHashMap<>();
+    /**
+     * Stores promises to remote instances of DataflowVariables.
+     */
+    private final Map<String, DataflowVariable<?>> remoteVariables;
 
     private static Map<String, DataflowBroadcast> publishedBroadcasts = new ConcurrentHashMap<>();
 
@@ -27,25 +33,24 @@ public final class RemoteDataflows {
 
     private static LocalHost clientLocalHost = new LocalHost(); // TODO what about server?
 
-    private RemoteDataflows() {}
-
     /**
-     * Publishes {@link groovyx.gpars.dataflow.DataflowVariable} under chosen name.
-     * @param variable the variable to be published
-     * @param name the name under which variable is published
-     * @param <T> type of variable
+     * Server for current instance of RemoteDataflows.
      */
-    public static <T> void publish(DataflowVariable<T> variable, String name) {
-        publishedVariables.put(name, variable);
+    private NettyServer server;
+
+    RemoteDataflows() {
+        publishedVariables = new ConcurrentHashMap<>();
+        remoteVariables = new ConcurrentHashMap<>();
     }
 
     /**
-     * Retrieves {@link groovyx.gpars.dataflow.DataflowVariable} published under specified name (locally).
-     * @param name the name under which variable was published
-     * @return the variable registered under specified name or <code>null</code> if none variable is registered under that name
+     * Publishes {@link groovyx.gpars.dataflow.DataflowVariable} under given name.
+     * It overrides previously published variable if the same name is given.
+     * @param variable the variable to be published
+     * @param name the name under which variable is published
      */
-    public static DataflowVariable<?> get(String name) {
-        return publishedVariables.get(name);
+    public void publish(DataflowVariable<?> variable, String name) {
+        publishedVariables.put(name, variable);
     }
 
     /**
@@ -53,20 +58,20 @@ public final class RemoteDataflows {
      * @param host the address of remote host
      * @param port the the port of remote host
      * @param name the name under which variable was published
-     * @return future of {@link groovyx.gpars.dataflow.remote.RemoteDataflowVariable}
-     * @see groovyx.gpars.dataflow.remote.RemoteDataflowVariableFuture
+     * @return promise of {@link groovyx.gpars.dataflow.remote.RemoteDataflowVariable}
      */
-    public static Future<DataflowVariable> get(String host, int port, String name) {
-        // TODO wrong use of concurent map
-        clientLocalHost.setRemoteDataflowsRegistry(remoteVariables);
-
+    public Promise<DataflowVariable> getVariable(String host, int port, String name) {
         DataflowVariable remoteVariable = remoteVariables.get(name);
         if (remoteVariable == null) {
-            remoteVariable = new DataflowVariable<>();
-            remoteVariables.put(name, remoteVariable);
-            NettyTransportProvider.getDataflowVariable(host, port, name, clientLocalHost);
+            DataflowVariable newRemoteVariable = new DataflowVariable<>();
+            remoteVariable = remoteVariables.putIfAbsent(name, newRemoteVariable);
+            if (remoteVariable == null) {
+                createRequest(host, port, new RemoteDataflowVariableRequestMsg(this.getId(), name));
+                remoteVariable = newRemoteVariable;
+            }
+
         }
-        return new RemoteDataflowVariableFuture(remoteVariable);
+        return remoteVariable;
     }
 
     public static void publish(DataflowBroadcast broadcastStream, String name) {
@@ -80,13 +85,13 @@ public final class RemoteDataflows {
 
     public static Future<DataflowReadChannel> getReadChannel(String host, int port, String name) {
         // TODO wrong use of concurent map
-        NettyTransportProvider.setRemoteBroadcastsRegistry(remoteBroadcasts);
+        // NettyTransportProvider.setRemoteBroadcastsRegistry(remoteBroadcasts);
 
         DataflowVariable<RemoteDataflowBroadcast> remoteStreamVariable = remoteBroadcasts.get(name);
         if (remoteStreamVariable == null) {
             remoteStreamVariable = new DataflowVariable<>();
             remoteBroadcasts.put(name, remoteStreamVariable);
-            NettyTransportProvider.getDataflowReadChannel(host, port, name);
+            //NettyTransportProvider.getDataflowReadChannel(host, port, name);
         }
 
         return new RemoteDataflowReadChannelFuture(remoteStreamVariable);
@@ -102,15 +107,111 @@ public final class RemoteDataflows {
 
     public static Future<RemoteDataflowQueue<?>> getDataflowQueue(String host, int port, String name) {
         // TODO wrong use of concurent map
-        clientLocalHost.setRemoteDataflowQueueRegistry(remoteQueues);
+        // clientLocalHost.setRemoteDataflowQueueRegistry(remoteQueues);
 
         DataflowVariable<RemoteDataflowQueue<?>> remoteQueueVariable = remoteQueues.get(name);
         if (remoteQueueVariable == null) {
             remoteQueueVariable = new DataflowVariable<>();
             remoteQueues.put(name, remoteQueueVariable);
-            NettyTransportProvider.getDataflowQueue(host, port, name, clientLocalHost);
+            //NettyTransportProvider.getDataflowQueue(host, port, name, clientLocalHost);
         }
 
         return new RemoteDataflowQueueFuture(remoteQueueVariable);
     }
+
+    public static RemoteDataflows create() {
+        return new RemoteDataflows();
+    }
+
+    public void startServer(String host, int port) {
+        if (server != null) {
+            throw new IllegalStateException("Server is already started");
+        }
+
+        server = NettyTransportProvider.createServer(host, port, this);
+        server.start();
+    }
+
+    public void stopServer() {
+        if (server == null) {
+            throw new IllegalStateException("Server has not been started");
+        }
+
+        server.stop();
+    }
+
+    @Override
+    public <T> void registerProxy(Class<T> klass, String name, T object) {
+        System.err.println("register proxy");
+        System.err.println(klass);
+        System.err.println(name);
+        System.err.println(object);
+        // TODO
+        if (klass == DataflowVariable.class) {
+            DataflowVariable remoteVar = remoteVariables.get(name);
+            remoteVar.bindUnique(object);
+        }
+    }
+
+    @Override
+    public <T> T get(Class<T> klass, String name) {
+        System.err.println("get");
+        System.err.println(klass);
+        System.err.println(name);
+
+        if (klass == DataflowVariable.class) {
+            return klass.cast(publishedVariables.get(name));
+        }
+
+        return null;
+    }
+
+    private void createRequest(String host, int port, SerialMsg msg) {
+        NettyClient client = NettyTransportProvider.createClient(host, port, this, connection -> {
+            if (connection.getHost() != null)
+                connection.write(msg);
+        });
+        client.start();
+    }
+
+    /*
+        public static void getDataflowVariable(String host, int port, String name, LocalHost localHost) {
+        NettyClient client = new NettyClient(localHost, host, port, connection -> {
+            if (connection.getHost() != null)
+                connection.write(new RemoteDataflowVariableRequestMsg(localHost.getId(), name));
+        });
+        client.start();
+    }
+
+    public static void getDataflowReadChannel(String host, int port, String name) {
+        if (localHost == null) {
+            localHost = new LocalHost();
+        }
+
+        NettyClient client = new NettyClient(localHost, host, port, connection -> {
+            if (connection.getHost() != null)
+                connection.write(new RemoteDataflowReadChannelRequestMsg(localHost.getId(), name));
+        });
+        client.start();
+    }
+
+    public static void setRemoteBroadcastsRegistry(Map<String, DataflowVariable<RemoteDataflowBroadcast>> remoteBroadcasts) {
+        if (localHost == null) {
+            localHost = new LocalHost();
+        }
+
+        if (localHost.getRemoteBroadcastsRegistry() == null) {
+            localHost.setRemoteBroadcastsRegistry(remoteBroadcasts);
+        }
+    }
+
+    public static void getDataflowQueue(String host, int port, String name, LocalHost localHost) {
+        NettyClient client = new NettyClient(localHost, host, port, connection -> {
+            if (connection.getHost() != null) {
+                connection.write(new RemoteDataflowQueueRequestMsg(localHost.getId(), name));
+            }
+        });
+        client.start();
+    }
+     */
 }

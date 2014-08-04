@@ -40,7 +40,7 @@ import java.util.*;
  * </p>
  * <ul>
  *   <li>remote hosts connected with this one</li>
- *   <li>local actors available on this host</li>
+ *   <li>local actors available on this host</li> // TODO
  * </ul>
  *
  * @author Alex Tkachman
@@ -51,15 +51,12 @@ public class LocalHost extends SerialHandles {
      */
     protected final Map<UUID, RemoteHost> remoteHosts = new HashMap<UUID, RemoteHost>();
 
+    // TODO move actors to ActorsLocalHost similarly to DataflowsLocalHost
     protected final Map<String, Actor> localActors = new HashMap<>();
 
     protected final Map<String, Actor> remoteActors = new HashMap<>();
 
     private Map<String, List<DataflowVariable<Actor>>> remoteActorFutures = new HashMap<>();
-
-    private Map<String, DataflowVariable<?>> remoteDataflows;
-    private Map<String, DataflowVariable<RemoteDataflowBroadcast>> remoteBroadcastsRegistry;
-    private Map<String, DataflowVariable<RemoteDataflowQueue<?>>> remoteDataflowQueueRegistry;
 
     /**
      * Registers actor under specific name
@@ -179,27 +176,13 @@ public class LocalHost extends SerialHandles {
         }
     }
 
-    public void setRemoteDataflowsRegistry(Map<String, DataflowVariable<?>> registry) {
-        remoteDataflows = registry;
+    // TODO make abstract
+    public <T> void registerProxy(Class<T> klass, String name, T object) {
+        throw new UnsupportedOperationException("TODO make it abstract");
     }
 
-    public Map<String, DataflowVariable<?>> getRemoteDataflowsRegistry() {
-        return remoteDataflows;
-    }
-
-    public Map<String, DataflowVariable<RemoteDataflowBroadcast>> getRemoteBroadcastsRegistry() {
-        return remoteBroadcastsRegistry;
-    }
-
-    public void setRemoteBroadcastsRegistry(Map<String, DataflowVariable<RemoteDataflowBroadcast>> remoteBroadcastsRegistry) {
-        this.remoteBroadcastsRegistry = remoteBroadcastsRegistry;
-    }
-
-    public Map<String, DataflowVariable<RemoteDataflowQueue<?>>> getRemoteDataflowQueueRegistry() {
-        return remoteDataflowQueueRegistry;
-    }
-
-    public void setRemoteDataflowQueueRegistry(Map<String, DataflowVariable<RemoteDataflowQueue<?>>> remoteDataflowQueueRegistry) {
-        this.remoteDataflowQueueRegistry = remoteDataflowQueueRegistry;
+    // TODO make abstract
+    public <T> T get(Class<T> klass, String name) {
+        throw new UnsupportedOperationException("TODO make it abstract");
     }
 }

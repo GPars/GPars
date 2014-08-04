@@ -9,12 +9,14 @@ public class RemoteDataflowVariableReplyMsg extends SerialMsg {
 
     private final String name;
     private final DataflowVariable variable;
+    private final boolean bound;
     private Object value;
 
     public RemoteDataflowVariableReplyMsg(String name, DataflowVariable variable) {
         this.name = name;
         this.variable = variable;
-        if (variable.isBound()) {
+        this.bound = variable.isBound();
+        if (bound) {
             try {
                 value = variable.getVal();
             } catch (InterruptedException e) {
@@ -25,10 +27,9 @@ public class RemoteDataflowVariableReplyMsg extends SerialMsg {
 
     @Override
     public void execute(RemoteConnection conn) {
-        DataflowVariable remoteVariable = conn.getLocalHost().getRemoteDataflowsRegistry().get(name);
-        remoteVariable.bindUnique(variable);
-        if (value != null) {
-            variable.bindUnique(value);
+        conn.getLocalHost().registerProxy(DataflowVariable.class, name, variable);
+        if (bound) {
+            variable.bind(value);
         }
     }
 

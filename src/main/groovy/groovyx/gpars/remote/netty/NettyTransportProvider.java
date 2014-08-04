@@ -46,28 +46,43 @@ public class NettyTransportProvider {
 
     // final BroadcastDiscovery broadcastDiscovery;
 
+    // remove
     private static LocalHost localHost;
 
+    // remove
     private static NettyServer server;
 
+    public static NettyServer createServer(String host, int port, LocalHost localHost) {
+        return new NettyServer(localHost, host, port, connection -> connection.write(new HostIdMsg(localHost.getId())));
+    }
+
+    public static NettyClient createClient(String host, int port, LocalHost localHost, ConnectListener listener) {
+        return new NettyClient(localHost, host, port, listener);
+    }
+
+    // remove
     public static void startServer(String host, int port, LocalHost localHost) {
         //localHost = new LocalHost();
         server = new NettyServer(localHost, host, port, connection -> connection.write(new HostIdMsg(localHost.getId())));
         server.start();
     }
 
+    // remove
     public static void stopServer() {
         server.stop();
     }
 
+    // remove
     public static void stopClients() {
         localHost.disconnect();
     }
 
+    // remove
     public static void register(Actor actor, String name) {
         localHost.register(name, actor);
     }
 
+    // remove
     public static Future<Actor> get(String host, int port, String name) {
         if (localHost == null) {
             localHost = new LocalHost();
@@ -82,44 +97,5 @@ public class NettyTransportProvider {
         DataflowVariable<Actor> remoteActor = new DataflowVariable<>();
         localHost.addRemoteActorFuture(name, remoteActor);
         return new RemoteActorFuture(remoteActor);
-    }
-
-    public static void getDataflowVariable(String host, int port, String name, LocalHost localHost) {
-        NettyClient client = new NettyClient(localHost, host, port, connection -> {
-            if (connection.getHost() != null)
-                connection.write(new RemoteDataflowVariableRequestMsg(localHost.getId(), name));
-        });
-        client.start();
-    }
-
-    public static void getDataflowReadChannel(String host, int port, String name) {
-        if (localHost == null) {
-            localHost = new LocalHost();
-        }
-
-        NettyClient client = new NettyClient(localHost, host, port, connection -> {
-            if (connection.getHost() != null)
-                connection.write(new RemoteDataflowReadChannelRequestMsg(localHost.getId(), name));
-        });
-        client.start();
-    }
-
-    public static void setRemoteBroadcastsRegistry(Map<String, DataflowVariable<RemoteDataflowBroadcast>> remoteBroadcasts) {
-        if (localHost == null) {
-            localHost = new LocalHost();
-        }
-
-        if (localHost.getRemoteBroadcastsRegistry() == null) {
-            localHost.setRemoteBroadcastsRegistry(remoteBroadcasts);
-        }
-    }
-
-    public static void getDataflowQueue(String host, int port, String name, LocalHost localHost) {
-        NettyClient client = new NettyClient(localHost, host, port, connection -> {
-            if (connection.getHost() != null) {
-                connection.write(new RemoteDataflowQueueRequestMsg(localHost.getId(), name));
-            }
-        });
-        client.start();
     }
 }

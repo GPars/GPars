@@ -282,18 +282,6 @@ public class DataflowQueueTest extends GroovyTestCase {
         assert 40 == stream.getVal(10, TimeUnit.MILLISECONDS)
     }
 
-    public void testMissedTimeoutDisappearingValues() {
-        final DataflowQueue stream = new DataflowQueue()
-        final DataflowVariable variable = new DataflowVariable()
-
-        stream << variable
-
-        def value = stream.getVal 20, TimeUnit.MILLISECONDS
-        assert value == null
-        variable << "test"
-        assert "test" == stream.getVal(10, TimeUnit.MILLISECONDS)
-    }
-
     public void testMissedTimeoutWithNull() {
         final DataflowQueue stream = new DataflowQueue()
         assertNull stream.getVal(10, TimeUnit.MILLISECONDS)
