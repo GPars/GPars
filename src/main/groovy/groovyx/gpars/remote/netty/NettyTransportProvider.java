@@ -84,9 +84,9 @@ public class NettyTransportProvider {
 
     // remove
     public static Future<Actor> get(String host, int port, String name) {
-        if (localHost == null) {
-            localHost = new LocalHost();
-        }
+//        if (localHost == null) {
+//            localHost = new LocalHost();
+//        }
         NettyClient client = new NettyClient(localHost, host, port, connection -> {
             if (connection.getHost() != null) {
                 connection.write(new RemoteActorRequestMsg(localHost.getId(), name));

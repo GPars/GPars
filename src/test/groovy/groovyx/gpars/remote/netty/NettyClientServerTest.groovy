@@ -33,7 +33,7 @@ class NettyClientServerTest extends Specification {
         def clientConnected = false
         def connectedLatch = new CountDownLatch(2)
 
-        LocalHost localHost = new LocalHost() // TODO change to mock
+        LocalHost localHost = null //new LocalHost() // TODO change to mock
         NettyServer server = new NettyServer(localHost, HOST, PORT, { serverConnected = true; connectedLatch.countDown() } as ConnectListener)
         NettyClient client = new NettyClient(localHost, HOST, PORT, { clientConnected = true; connectedLatch.countDown() } as ConnectListener)
 

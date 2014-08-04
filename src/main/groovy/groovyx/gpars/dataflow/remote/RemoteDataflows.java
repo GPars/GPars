@@ -45,11 +45,6 @@ public final class RemoteDataflows extends LocalHost {
      */
     private final Map<String, DataflowVariable<RemoteDataflowQueue<?>>> remoteQueues;
 
-    /**
-     * Server for current instance of RemoteDataflows.
-     */
-    private NettyServer server;
-
     RemoteDataflows() {
         publishedVariables = new ConcurrentHashMap<>();
         remoteVariables = new ConcurrentHashMap<>();
@@ -140,23 +135,6 @@ public final class RemoteDataflows extends LocalHost {
      */
     public static RemoteDataflows create() {
         return new RemoteDataflows();
-    }
-
-    public void startServer(String host, int port) {
-        if (server != null) {
-            throw new IllegalStateException("Server is already started");
-        }
-
-        server = NettyTransportProvider.createServer(host, port, this);
-        server.start();
-    }
-
-    public void stopServer() {
-        if (server == null) {
-            throw new IllegalStateException("Server has not been started");
-        }
-
-        server.stop();
     }
 
     @Override

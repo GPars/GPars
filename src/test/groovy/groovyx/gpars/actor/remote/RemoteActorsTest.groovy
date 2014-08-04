@@ -14,7 +14,7 @@ class RemoteActorsTest extends Specification {
     def static PORT = 9011
 
     def setupSpec() {
-        LocalHost localHost = new LocalHost()
+        LocalHost localHost = null //new LocalHost()
         NettyTransportProvider.startServer HOST, PORT, localHost
     }
 

@@ -23,6 +23,8 @@ import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.remote.RemoteDataflowBroadcast;
 import groovyx.gpars.dataflow.remote.RemoteDataflowQueue;
 import groovyx.gpars.dataflow.remote.RemoteDataflowVariable;
+import groovyx.gpars.remote.netty.NettyServer;
+import groovyx.gpars.remote.netty.NettyTransportProvider;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandles;
 
@@ -45,11 +47,16 @@ import java.util.*;
  *
  * @author Alex Tkachman
  */
-public class LocalHost extends SerialHandles {
+public abstract class LocalHost extends SerialHandles {
     /**
      * Hosts known to the provider
      */
     protected final Map<UUID, RemoteHost> remoteHosts = new HashMap<UUID, RemoteHost>();
+
+    /**
+     * Server for current instance of LocalHost
+     */
+    private NettyServer server;
 
     // TODO move actors to ActorsLocalHost similarly to DataflowsLocalHost
     protected final Map<String, Actor> localActors = new HashMap<>();
@@ -176,13 +183,24 @@ public class LocalHost extends SerialHandles {
         }
     }
 
-    // TODO make abstract
-    public <T> void registerProxy(Class<T> klass, String name, T object) {
-        throw new UnsupportedOperationException("TODO make it abstract");
+    public abstract <T> void registerProxy(Class<T> klass, String name, T object);
+
+    public abstract <T> T get(Class<T> klass, String name);
+
+    public void startServer(String host, int port) {
+        if (server != null) {
+            throw new IllegalStateException("Server is already started");
+        }
+
+        server = NettyTransportProvider.createServer(host, port, this);
+        server.start();
     }
 
-    // TODO make abstract
-    public <T> T get(Class<T> klass, String name) {
-        throw new UnsupportedOperationException("TODO make it abstract");
+    public void stopServer() {
+        if (server == null) {
+            throw new IllegalStateException("Server has not been started");
+        }
+
+        server.stop();
     }
 }
