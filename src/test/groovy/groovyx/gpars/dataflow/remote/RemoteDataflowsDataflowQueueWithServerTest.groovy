@@ -3,6 +3,7 @@ package groovyx.gpars.dataflow.remote
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.remote.LocalHost
 import groovyx.gpars.remote.netty.NettyTransportProvider
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
 
@@ -10,18 +11,26 @@ class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
     def static HOST = "localhost"
     def static PORT = 9031
 
+    @Shared
+    RemoteDataflows serverRemoteDataflows
+
+    @Shared
+    RemoteDataflows clientRemoteDataflows
+
     def setupSpec() {
-        def serverLocalHost = new LocalHost()
-        NettyTransportProvider.startServer HOST, PORT, serverLocalHost
+        serverRemoteDataflows = RemoteDataflows.create()
+        serverRemoteDataflows.startServer HOST, PORT
+
+        clientRemoteDataflows = RemoteDataflows.create()
     }
 
     def cleanupSpec() {
-        NettyTransportProvider.stopServer()
+        serverRemoteDataflows.stopServer()
     }
 
-    RemoteDataflowQueueFuture publishNewQueueAndGetRemotely(DataflowQueue queue, String queueName) {
-        RemoteDataflows.publish queue, queueName
-        RemoteDataflows.getDataflowQueue HOST, PORT, queueName
+    RemoteDataflowQueue publishNewQueueAndGetRemotely(DataflowQueue queue, String queueName) {
+        serverRemoteDataflows.publish queue, queueName
+        clientRemoteDataflows.getDataflowQueue HOST, PORT, queueName get()
     }
 
     @Timeout(5)
@@ -31,7 +40,7 @@ class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
         def queueName = "test-queue-0"
 
         when:
-        def remoteQueue = publishNewQueueAndGetRemotely(queue, queueName) get()
+        def remoteQueue = publishNewQueueAndGetRemotely(queue, queueName)
 
         then:
         remoteQueue != null
@@ -45,7 +54,7 @@ class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
         def testValue = "test-value"
 
         when:
-        def remoteQueue = publishNewQueueAndGetRemotely(queue, queueName) get()
+        def remoteQueue = publishNewQueueAndGetRemotely(queue, queueName)
 
         queue << testValue
         def receivedTestValue = remoteQueue.val
@@ -62,7 +71,7 @@ class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
         def testValue = "test-value"
 
         when:
-        def remoteQueue = publishNewQueueAndGetRemotely(queue, queueName) get()
+        def remoteQueue = publishNewQueueAndGetRemotely(queue, queueName)
 
         remoteQueue << testValue
         def receivedTestValue = queue.val

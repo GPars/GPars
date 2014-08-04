@@ -2,21 +2,21 @@ package groovyx.gpars.samples.remote.dataflow.queue
 
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.remote.RemoteDataflows
-import groovyx.gpars.remote.LocalHost
-import groovyx.gpars.remote.netty.NettyTransportProvider
 
 def HOST = "localhost"
 def PORT = 9101
 
-LocalHost localHost = new LocalHost()
-NettyTransportProvider.startServer HOST, PORT, localHost
+println "Example: DataflowQueue"
+
+def remoteDataflows = RemoteDataflows.create()
+remoteDataflows.startServer HOST, PORT
 
 def queue = new DataflowQueue()
 
-RemoteDataflows.publish queue, "queue"
+remoteDataflows.publish queue, "queue"
 
+println "Waiting..."
 sleep 10000
-
 println "Sending..."
 queue << "a"
 queue << "b"

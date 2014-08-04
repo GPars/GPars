@@ -20,7 +20,7 @@ public class RemoteDataflowQueueRequestMsg extends SerialMsg {
     public void execute(RemoteConnection conn) {
         updateRemoteHost(conn);
 
-        DataflowQueue<?> queue = RemoteDataflows.getDataflowQueue(name);
+        DataflowQueue<?> queue = conn.getLocalHost().get(DataflowQueue.class, name);
         conn.write(new RemoteDataflowQueueReplyMsg(name, queue));
     }
 }
