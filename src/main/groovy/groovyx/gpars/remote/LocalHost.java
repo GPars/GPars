@@ -17,14 +17,13 @@
 package groovyx.gpars.remote;
 
 import groovyx.gpars.actor.Actor;
-import groovyx.gpars.actor.remote.RemoteActorFuture;
-import groovyx.gpars.dataflow.DataflowQueue;
 import groovyx.gpars.dataflow.DataflowVariable;
-import groovyx.gpars.dataflow.remote.RemoteDataflowBroadcast;
-import groovyx.gpars.dataflow.remote.RemoteDataflowQueue;
-import groovyx.gpars.dataflow.remote.RemoteDataflowVariable;
+import groovyx.gpars.remote.netty.NettyClient;
+import groovyx.gpars.remote.netty.NettyServer;
+import groovyx.gpars.remote.netty.NettyTransportProvider;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandles;
+import groovyx.gpars.serial.SerialMsg;
 
 import java.util.*;
 
@@ -36,38 +35,21 @@ import java.util.*;
  * but sometimes several can be useful as well.
  * </p>
  * <p>
- * Local host contains
+ * Local host contains: remote hosts connected with this one
  * </p>
- * <ul>
- *   <li>remote hosts connected with this one</li>
- *   <li>local actors available on this host</li> // TODO
- * </ul>
  *
  * @author Alex Tkachman
  */
-public class LocalHost extends SerialHandles {
+public abstract class LocalHost extends SerialHandles {
     /**
      * Hosts known to the provider
      */
     protected final Map<UUID, RemoteHost> remoteHosts = new HashMap<UUID, RemoteHost>();
 
-    // TODO move actors to ActorsLocalHost similarly to DataflowsLocalHost
-    protected final Map<String, Actor> localActors = new HashMap<>();
-
-    protected final Map<String, Actor> remoteActors = new HashMap<>();
-
-    private Map<String, List<DataflowVariable<Actor>>> remoteActorFutures = new HashMap<>();
-
     /**
-     * Registers actor under specific name
-     * @param name
-     * @param actor
+     * Server for current instance of LocalHost
      */
-    public void register(String name, final Actor actor) {
-        synchronized (localActors) {
-            localActors.put(name, actor);
-        }
-    }
+    private NettyServer server;
 
     public void disconnect() {
         synchronized (remoteHosts) {
@@ -94,10 +76,6 @@ public class LocalHost extends SerialHandles {
             }
             return host;
         }
-    }
-
-    public Actor getActor(String name) {
-        return localActors.get(name);
     }
 
     public void connectRemoteNode(final UUID nodeId, final SerialContext host, final Actor mainActor) {
@@ -150,39 +128,46 @@ public class LocalHost extends SerialHandles {
 //        }
     }
 
-    public void registerRemote(String name, Actor actor) {
-        synchronized (remoteActors) {
-            remoteActors.put(name, actor);
+    public abstract <T> void registerProxy(Class<T> klass, String name, T object);
+
+    public abstract <T> T get(Class<T> klass, String name);
+
+    public void startServer(String host, int port) {
+        if (server != null) {
+            throw new IllegalStateException("Server is already started");
         }
-        synchronized (remoteActorFutures) {
-            List<DataflowVariable<Actor>> futures = remoteActorFutures.get(name);
-            if (futures != null) {
-                futures.stream().forEach(var -> var.bindUnique(actor));
+
+        server = NettyTransportProvider.createServer(host, port, this);
+        server.start();
+    }
+
+    public void stopServer() {
+        if (server == null) {
+            throw new IllegalStateException("Server has not been started");
+        }
+
+        server.stop();
+    }
+
+    private void createRequest(String host, int port, SerialMsg msg) {
+        NettyClient client = NettyTransportProvider.createClient(host, port, this, connection -> {
+            if (connection.getHost() != null)
+                connection.write(msg);
+        });
+        client.start();
+    }
+
+    protected <T> DataflowVariable<T> getPromise(Map<String, DataflowVariable<T>> registry, String name, String host, int port, SerialMsg requestMsg) {
+        DataflowVariable remoteVariable = registry.get(name);
+        if (remoteVariable == null) {
+            DataflowVariable newRemoteVariable = new DataflowVariable<>();
+            remoteVariable = registry.putIfAbsent(name, newRemoteVariable);
+            if (remoteVariable == null) {
+                createRequest(host, port, requestMsg);
+                remoteVariable = newRemoteVariable;
             }
-            remoteActorFutures.remove(name);
+
         }
-    }
-
-    public void addRemoteActorFuture(String name, DataflowVariable<Actor> var) {
-        synchronized (remoteActorFutures) {
-            List<DataflowVariable<Actor>> futures = remoteActorFutures.get(name);
-            if (futures == null) {
-                futures = new ArrayList<>();
-                futures.add(var);
-                remoteActorFutures.put(name, futures);
-            } else {
-                futures.add(var);
-            }
-        }
-    }
-
-    // TODO make abstract
-    public <T> void registerProxy(Class<T> klass, String name, T object) {
-        throw new UnsupportedOperationException("TODO make it abstract");
-    }
-
-    // TODO make abstract
-    public <T> T get(Class<T> klass, String name) {
-        throw new UnsupportedOperationException("TODO make it abstract");
+        return remoteVariable;
     }
 }

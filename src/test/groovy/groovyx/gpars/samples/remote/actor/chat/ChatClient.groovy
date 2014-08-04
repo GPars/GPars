@@ -1,5 +1,6 @@
-package groovyx.gpars.samples.remote.chat
+package groovyx.gpars.samples.remote.actor.chat
 
+import groovyx.gpars.actor.remote.RemoteActors
 import groovyx.gpars.remote.netty.NettyTransportProvider
 
 def HOST = "localhost"
@@ -17,7 +18,9 @@ Type message to send to other connected clients
 println "Enter client name:"
 def name = reader.readLine()
 
-def client = new ChatClientActor(HOST, PORT, name)
+def remoteActors = RemoteActors.create()
+def serverPromise = remoteActors.get HOST, PORT, "chat-server"
+def client = new ChatClientActor(serverPromise, name)
 client.start()
 
 while (true) {
@@ -30,5 +33,3 @@ while (true) {
 
     client << line
 }
-
-NettyTransportProvider.stopClients()

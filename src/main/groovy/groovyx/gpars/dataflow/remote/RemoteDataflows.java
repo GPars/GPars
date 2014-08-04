@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class RemoteDataflows extends LocalHost {
+
     /**
      * Stores DataflowVariables published in context of this instance of RemoteDataflows.
      */
@@ -44,11 +45,6 @@ public final class RemoteDataflows extends LocalHost {
      * Stores promises to remote instances of DataflowQueues.
      */
     private final Map<String, DataflowVariable<RemoteDataflowQueue<?>>> remoteQueues;
-
-    /**
-     * Server for current instance of RemoteDataflows.
-     */
-    private NettyServer server;
 
     RemoteDataflows() {
         publishedVariables = new ConcurrentHashMap<>();
@@ -142,23 +138,6 @@ public final class RemoteDataflows extends LocalHost {
         return new RemoteDataflows();
     }
 
-    public void startServer(String host, int port) {
-        if (server != null) {
-            throw new IllegalStateException("Server is already started");
-        }
-
-        server = NettyTransportProvider.createServer(host, port, this);
-        server.start();
-    }
-
-    public void stopServer() {
-        if (server == null) {
-            throw new IllegalStateException("Server has not been started");
-        }
-
-        server.stop();
-    }
-
     @Override
     public <T> void registerProxy(Class<T> klass, String name, T object) {
         if (klass == RemoteDataflowVariable.class) {
@@ -188,27 +167,5 @@ public final class RemoteDataflows extends LocalHost {
             return klass.cast(publishedQueues.get(name));
         }
         throw new IllegalArgumentException("Unsupported type");
-    }
-
-    private void createRequest(String host, int port, SerialMsg msg) {
-        NettyClient client = NettyTransportProvider.createClient(host, port, this, connection -> {
-            if (connection.getHost() != null)
-                connection.write(msg);
-        });
-        client.start();
-    }
-
-    private <T> DataflowVariable<T> getPromise(Map<String, DataflowVariable<T>> registry, String name, String host, int port, SerialMsg requestMsg) {
-        DataflowVariable remoteVariable = registry.get(name);
-        if (remoteVariable == null) {
-            DataflowVariable newRemoteVariable = new DataflowVariable<>();
-            remoteVariable = registry.putIfAbsent(name, newRemoteVariable);
-            if (remoteVariable == null) {
-                createRequest(host, port, requestMsg);
-                remoteVariable = newRemoteVariable;
-            }
-
-        }
-        return remoteVariable;
     }
 }

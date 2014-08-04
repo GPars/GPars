@@ -1,4 +1,4 @@
-package groovyx.gpars.samples.remote.chat
+package groovyx.gpars.samples.remote.actor.chat
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.DefaultActor

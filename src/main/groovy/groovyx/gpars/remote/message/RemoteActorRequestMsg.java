@@ -19,7 +19,7 @@ public class RemoteActorRequestMsg extends SerialMsg {
     public void execute(RemoteConnection conn) {
         updateRemoteHost(conn);
 
-        Actor actor = conn.getLocalHost().getActor(actorName);
+        Actor actor = conn.getLocalHost().get(Actor.class, actorName);
         conn.getHost().write(new RemoteActorReplyMsg(actorName, actor));
     }
 }

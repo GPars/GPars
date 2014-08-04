@@ -3,6 +3,7 @@ package groovyx.gpars.actor.remote
 import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.remote.LocalHost
 import groovyx.gpars.remote.netty.NettyTransportProvider
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
 
@@ -13,13 +14,21 @@ class RemoteActorsTest extends Specification {
     def static HOST = "localhost"
     def static PORT = 9011
 
+    @Shared
+    RemoteActors serverRemoteActors
+
+    @Shared
+    RemoteActors clientRemoteActors
+
     def setupSpec() {
-        LocalHost localHost = new LocalHost()
-        NettyTransportProvider.startServer HOST, PORT, localHost
+        serverRemoteActors = RemoteActors.create()
+        serverRemoteActors.startServer HOST, PORT
+
+        clientRemoteActors = RemoteActors.create()
     }
 
     def cleanupSpec() {
-        NettyTransportProvider.stopServer()
+        serverRemoteActors.stopServer()
     }
 
     @Timeout(5)
@@ -30,8 +39,8 @@ class RemoteActorsTest extends Specification {
 
         when:
         testActor.start()
-        RemoteActors.register(testActor, "testActor")
-        def remoteActor = RemoteActors.get(HOST, PORT, "testActor").get()
+        serverRemoteActors.publish testActor, "testActor"
+        def remoteActor = clientRemoteActors.get HOST, PORT, "testActor" get()
         remoteActor << testMessage
 
         then:
@@ -52,14 +61,14 @@ class RemoteActorsTest extends Specification {
         when:
         testActor1.start()
         testActor2.start()
-        RemoteActors.register(testActor1, "testActor1")
-        RemoteActors.register(testActor2, "testActor2")
+        serverRemoteActors.publish testActor1, "testActor1"
+        serverRemoteActors.publish testActor2, "testActor2"
 
-        def remoteActor1Future = RemoteActors.get(HOST, PORT, "testActor1")
-        def remoteActor2Future = RemoteActors.get(HOST, PORT, "testActor2")
+        def remoteActor1Promise = clientRemoteActors.get HOST, PORT, "testActor1"
+        def remoteActor2Promise = clientRemoteActors.get HOST, PORT, "testActor2"
 
-        def remoteActor1 = remoteActor1Future.get()
-        def remoteActor2 = remoteActor2Future.get()
+        def remoteActor1 = remoteActor1Promise.get()
+        def remoteActor2 = remoteActor2Promise.get()
 
         remoteActor1 << testMessage + "1"
         remoteActor2 << testMessage + "2"
