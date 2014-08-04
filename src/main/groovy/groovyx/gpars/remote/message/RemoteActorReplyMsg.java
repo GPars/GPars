@@ -1,6 +1,7 @@
 package groovyx.gpars.remote.message;
 
 import groovyx.gpars.actor.Actor;
+import groovyx.gpars.actor.remote.RemoteActor;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
@@ -16,7 +17,6 @@ public class RemoteActorReplyMsg extends SerialMsg {
     @Override
     public void execute(RemoteConnection conn) {
         updateRemoteHost(conn);
-
-        conn.getLocalHost().registerRemote(name, actor);
+        conn.getLocalHost().registerProxy(RemoteActor.class, name, ((RemoteActor) actor));
     }
 }

@@ -56,11 +56,18 @@ public final class RemoteActors extends LocalHost {
 
     @Override
     public <T> void registerProxy(Class<T> klass, String name, T object) {
-        throw new UnsupportedOperationException("TODO");
+        if (klass == RemoteActor.class) {
+            remoteActors.get(name).bind(((Actor) object));
+            return;
+        }
+        throw new IllegalArgumentException("Unsupported proxy type");
     }
 
     @Override
     public <T> T get(Class<T> klass, String name) {
-        throw new UnsupportedOperationException("TODO");
+        if (klass == Actor.class) {
+            return klass.cast(publishedActors.get(name));
+        }
+        throw new IllegalArgumentException("Unsupported type");
     }
 }
