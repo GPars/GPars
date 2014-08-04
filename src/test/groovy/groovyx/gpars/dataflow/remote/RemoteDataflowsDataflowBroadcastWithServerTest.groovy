@@ -2,30 +2,34 @@ package groovyx.gpars.dataflow.remote
 
 import groovyx.gpars.dataflow.DataflowBroadcast
 import groovyx.gpars.dataflow.DataflowReadChannel
-import groovyx.gpars.dataflow.Dataflows
-import groovyx.gpars.remote.LocalHost
-import groovyx.gpars.remote.netty.NettyTransportProvider
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
-
-import javax.xml.crypto.Data
 
 class RemoteDataflowsDataflowBroadcastWithServerTest extends Specification {
     def static HOST = "localhost"
     def static PORT = 9177
 
+    @Shared
+    RemoteDataflows serverRemoteDataflows
+
+    @Shared
+    RemoteDataflows clientRemoteDataflows
+
     def setupSpec() {
-        def serverLocalHost = new LocalHost()
-        NettyTransportProvider.startServer HOST, PORT, serverLocalHost
+        serverRemoteDataflows = RemoteDataflows.create()
+        serverRemoteDataflows.startServer HOST, PORT
+
+        clientRemoteDataflows = RemoteDataflows.create()
     }
 
     def cleanupSpec() {
-        NettyTransportProvider.stopServer()
+        serverRemoteDataflows.stopServer()
     }
 
     DataflowReadChannel publishNewBroadcastAndGetRemotely(DataflowBroadcast broadcast, String broadcastName) {
-        RemoteDataflows.publish broadcast, broadcastName
-        RemoteDataflows.getReadChannel HOST, PORT, broadcastName get()
+        serverRemoteDataflows.publish broadcast, broadcastName
+        clientRemoteDataflows.getReadChannel HOST, PORT, broadcastName get()
     }
 
     @Timeout(5)

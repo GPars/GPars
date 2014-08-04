@@ -6,9 +6,6 @@ import spock.lang.Specification
 import spock.lang.Timeout
 
 class RemoteDataflowsDataflowVariableTest extends Specification {
-    def static HOST = "localhost"
-    def static PORT = 9020
-
     RemoteDataflows remoteDataflows
 
     void setup() {
@@ -38,6 +35,8 @@ class RemoteDataflowsDataflowVariableTest extends Specification {
 
     def "retrieving DataflowVariable from remote host returns Promise"() {
         setup:
+        def HOST = "localhost"
+        def PORT = 9020
         def varName = "test-variable"
 
         when:
@@ -50,6 +49,8 @@ class RemoteDataflowsDataflowVariableTest extends Specification {
 
     def "retrieving DataflowVariable from remote host returns the same Promise"() {
         setup:
+        def HOST = "localhost"
+        def PORT = 9020
         def varName = "test-variable"
 
         when:

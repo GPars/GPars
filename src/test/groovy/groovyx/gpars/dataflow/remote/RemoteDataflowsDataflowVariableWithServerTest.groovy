@@ -1,8 +1,6 @@
 package groovyx.gpars.dataflow.remote
 
 import groovyx.gpars.dataflow.DataflowVariable
-import groovyx.gpars.remote.LocalHost
-import groovyx.gpars.remote.netty.NettyTransportProvider
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
@@ -13,15 +11,20 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
     def static PORT = 9021
 
     @Shared
-    RemoteDataflows remoteDataflows
+    RemoteDataflows serverRemoteDataflows
+
+    @Shared
+    RemoteDataflows clientRemoteDataflows
 
     def setupSpec() {
-        remoteDataflows = RemoteDataflows.create()
-        remoteDataflows.startServer HOST, PORT
+        serverRemoteDataflows = RemoteDataflows.create()
+        serverRemoteDataflows.startServer HOST, PORT
+
+        clientRemoteDataflows = RemoteDataflows.create()
     }
 
     def cleanupSpec() {
-        remoteDataflows.stopServer()
+        serverRemoteDataflows.stopServer()
     }
 
     @Timeout(5)
@@ -32,8 +35,8 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
         def testValue = "test DataflowVariable"
 
         when:
-        remoteDataflows.publish variable, variableName
-        def remoteVariable = remoteDataflows.getVariable HOST, PORT, variableName get()
+        serverRemoteDataflows.publish variable, variableName
+        def remoteVariable = clientRemoteDataflows.getVariable HOST, PORT, variableName get()
 
         variable << testValue
 
@@ -49,8 +52,8 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
         when:
         variable << testValue
 
-        remoteDataflows.publish variable, variableName
-        def remoteVariable = remoteDataflows.getVariable HOST, PORT, variableName get()
+        serverRemoteDataflows.publish variable, variableName
+        def remoteVariable = clientRemoteDataflows.getVariable HOST, PORT, variableName get()
 
         then:
         remoteVariable.val == testValue
@@ -66,8 +69,8 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
         def variable = new DataflowVariable()
 
         when:
-        remoteDataflows.publish variable, variableName
-        def remoteVariable = remoteDataflows.getVariable HOST, PORT, variableName get()
+        serverRemoteDataflows.publish variable, variableName
+        def remoteVariable = clientRemoteDataflows.getVariable HOST, PORT, variableName get()
 
         remoteVariable << testValue
 
