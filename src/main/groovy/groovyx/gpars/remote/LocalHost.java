@@ -18,7 +18,11 @@ package groovyx.gpars.remote;
 
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.remote.RemoteActorFuture;
+import groovyx.gpars.dataflow.DataflowQueue;
 import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.remote.RemoteDataflowBroadcast;
+import groovyx.gpars.dataflow.remote.RemoteDataflowQueue;
+import groovyx.gpars.dataflow.remote.RemoteDataflowVariable;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandles;
 
@@ -36,7 +40,7 @@ import java.util.*;
  * </p>
  * <ul>
  *   <li>remote hosts connected with this one</li>
- *   <li>local actors available on this host</li>
+ *   <li>local actors available on this host</li> // TODO
  * </ul>
  *
  * @author Alex Tkachman
@@ -47,6 +51,7 @@ public class LocalHost extends SerialHandles {
      */
     protected final Map<UUID, RemoteHost> remoteHosts = new HashMap<UUID, RemoteHost>();
 
+    // TODO move actors to ActorsLocalHost similarly to DataflowsLocalHost
     protected final Map<String, Actor> localActors = new HashMap<>();
 
     protected final Map<String, Actor> remoteActors = new HashMap<>();
@@ -169,5 +174,15 @@ public class LocalHost extends SerialHandles {
                 futures.add(var);
             }
         }
+    }
+
+    // TODO make abstract
+    public <T> void registerProxy(Class<T> klass, String name, T object) {
+        throw new UnsupportedOperationException("TODO make it abstract");
+    }
+
+    // TODO make abstract
+    public <T> T get(Class<T> klass, String name) {
+        throw new UnsupportedOperationException("TODO make it abstract");
     }
 }

@@ -49,6 +49,7 @@ public class RemoteObjectEncoder extends ObjectEncoder {
             super.encode(ctx, msg, out);
         }
         catch (Exception e) {
+            e.printStackTrace();
             throw e;
         }
         finally {

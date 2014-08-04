@@ -1,6 +1,7 @@
 package groovyx.gpars.actor.remote
 
 import groovyx.gpars.actor.DefaultActor
+import groovyx.gpars.remote.LocalHost
 import groovyx.gpars.remote.netty.NettyTransportProvider
 import spock.lang.Specification
 import spock.lang.Timeout
@@ -13,7 +14,8 @@ class RemoteActorsTest extends Specification {
     def static PORT = 9011
 
     def setupSpec() {
-        NettyTransportProvider.startServer(HOST, PORT)
+        LocalHost localHost = new LocalHost()
+        NettyTransportProvider.startServer HOST, PORT, localHost
     }
 
     def cleanupSpec() {
