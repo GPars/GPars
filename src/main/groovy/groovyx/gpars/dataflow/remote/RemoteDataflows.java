@@ -13,7 +13,6 @@ import groovyx.gpars.serial.SerialMsg;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 
 public final class RemoteDataflows extends LocalHost {
     /**
@@ -162,31 +161,18 @@ public final class RemoteDataflows extends LocalHost {
 
     @Override
     public <T> void registerProxy(Class<T> klass, String name, T object) {
-        // TODO
-        System.err.println("register proxy");
-        System.err.println(klass);
-        System.err.println(name);
-        System.err.println(object);
-        // TODO
-        if (klass == DataflowVariable.class) {
-            DataflowVariable remoteVar = remoteVariables.get(name);
-            remoteVar.bindUnique(object);
+        if (klass == RemoteDataflowVariable.class) {
+            remoteVariables.get(name).bind((DataflowVariable) object);
         } else if (klass == RemoteDataflowBroadcast.class) {
-            DataflowVariable remoteVar = remoteBroadcasts.get(name);
-            remoteVar.bindUnique(object);
+            remoteBroadcasts.get(name).bind((RemoteDataflowBroadcast) object);
         } else if (klass == RemoteDataflowQueue.class) {
-            DataflowVariable remoteVar = remoteQueues.get(name);
-            remoteVar.bindUnique(object);
+            remoteQueues.get(name).bind((RemoteDataflowQueue) object);
         }
+        throw new IllegalArgumentException("Unsupported proxy type");
     }
 
     @Override
     public <T> T get(Class<T> klass, String name) {
-        // TODO
-        System.err.println("get");
-        System.err.println(klass);
-        System.err.println(name);
-
         if (klass == DataflowVariable.class) {
             return klass.cast(publishedVariables.get(name));
         }
@@ -196,8 +182,7 @@ public final class RemoteDataflows extends LocalHost {
         if (klass == DataflowQueue.class) {
             return klass.cast(publishedQueues.get(name));
         }
-
-        return null;
+        throw new IllegalArgumentException("Unsupported type");
     }
 
     private void createRequest(String host, int port, SerialMsg msg) {
@@ -221,15 +206,4 @@ public final class RemoteDataflows extends LocalHost {
         }
         return remoteVariable;
     }
-
-    /*
-    public static void getDataflowQueue(String host, int port, String name, LocalHost localHost) {
-        NettyClient client = new NettyClient(localHost, host, port, connection -> {
-            if (connection.getHost() != null) {
-                connection.write(new RemoteDataflowQueueRequestMsg(localHost.getId(), name));
-            }
-        });
-        client.start();
-    }
-     */
 }
