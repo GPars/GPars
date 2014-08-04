@@ -16,12 +16,8 @@
 
 package groovyx.gpars.remote.netty;
 
-import groovyx.gpars.actor.Actor;
-
 import groovyx.gpars.remote.LocalHost;
-import groovyx.gpars.remote.message.*;
-
-import java.util.concurrent.Future;
+import groovyx.gpars.remote.message.HostIdMsg;
 
 
 /**
@@ -29,29 +25,26 @@ import java.util.concurrent.Future;
  */
 public class NettyTransportProvider {
 
+    /**
+     * Factory method for creating server instances.
+     * @param host
+     * @param port
+     * @param localHost the serialization context for connection
+     * @return new instance of {@link groovyx.gpars.remote.netty.NettyServer}
+     */
     public static NettyServer createServer(String host, int port, LocalHost localHost) {
         return new NettyServer(localHost, host, port, connection -> connection.write(new HostIdMsg(localHost.getId())));
     }
 
+    /**
+     * Factory method for creating client instances.
+     * @param host the address of host to connect
+     * @param port the destination port
+     * @param localHost the serialization context for connection
+     * @param listener the action performed on connect
+     * @return new instance of {@link groovyx.gpars.remote.netty.NettyClient}
+     */
     public static NettyClient createClient(String host, int port, LocalHost localHost, ConnectListener listener) {
         return new NettyClient(localHost, host, port, listener);
-    }
-
-    // remove
-    public static Future<Actor> get(String host, int port, String name) {
-        return null;
-//        if (localHost == null) {
-//            localHost = new LocalHost();
-//        }
-//        NettyClient client = new NettyClient(localHost, host, port, connection -> {
-//            if (connection.getHost() != null) {
-//                connection.write(new RemoteActorRequestMsg(localHost.getId(), name));
-//            }
-//        });
-//        client.start();
-//
-//        DataflowVariable<Actor> remoteActor = new DataflowVariable<>();
-//        localHost.addRemoteActorFuture(name, remoteActor);
-//        return new RemoteActorFuture(remoteActor);
     }
 }

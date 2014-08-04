@@ -4,6 +4,7 @@ import groovyx.gpars.actor.Actor;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.Promise;
 import groovyx.gpars.remote.LocalHost;
+import groovyx.gpars.remote.message.RemoteActorRequestMsg;
 import groovyx.gpars.remote.netty.NettyServer;
 import groovyx.gpars.remote.netty.NettyTransportProvider;
 
@@ -46,7 +47,7 @@ public final class RemoteActors extends LocalHost {
      * @return promise of {@link groovyx.gpars.actor.remote.RemoteActor}
      */
     public Promise<Actor> get(String host, int port, String name) {
-        return getPromise(remoteActors, name, host, port, null);
+        return getPromise(remoteActors, name, host, port, new RemoteActorRequestMsg(this.getId(), name));
     }
 
     public static RemoteActors create() {
