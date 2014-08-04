@@ -21,12 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.MulticastSocket;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.UUID;
 
 @SuppressWarnings({"MagicNumber"})
@@ -117,7 +112,7 @@ public class BroadcastDiscovery {
                                     onDiscovery(uuid, new InetSocketAddress(InetAddress.getByAddress(addrBuf6), port));
                                 }
                             }
-                        } catch (IOException e) {
+                        } catch (IOException | InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
@@ -149,6 +144,6 @@ public class BroadcastDiscovery {
         }
     }
 
-    protected void onDiscovery(final UUID uuid, final SocketAddress address) {
+    protected void onDiscovery(final UUID uuid, final SocketAddress address) throws InterruptedException {
     }
 }

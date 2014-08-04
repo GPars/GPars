@@ -17,7 +17,7 @@
 package groovyx.gpars.remote.message;
 
 import groovyx.gpars.actor.Actor;
-import groovyx.gpars.remote.LocalNode;
+//import groovyx.gpars.remote.LocalNode;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
@@ -38,10 +38,16 @@ public class NodeConnectedMsg extends SerialMsg {
 
     public final Actor mainActor;
 
-    public NodeConnectedMsg(final LocalNode node) {
+//    public NodeConnectedMsg(final LocalNode node) {
+//        super();
+//        nodeId = node.getId();
+//        mainActor = node.getMainActor();
+//    }
+
+    public NodeConnectedMsg(final Actor actor) {
         super();
-        nodeId = node.getId();
-        mainActor = node.getMainActor();
+        nodeId = UUID.randomUUID();
+        mainActor = actor;
     }
 
     @Override

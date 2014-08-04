@@ -42,9 +42,11 @@ import groovyx.gpars.dataflow.operator.ChoiceClosure;
 import groovyx.gpars.dataflow.operator.CopyChannelsClosure;
 import groovyx.gpars.dataflow.operator.FilterClosure;
 import groovyx.gpars.dataflow.operator.SeparationClosure;
+import groovyx.gpars.dataflow.remote.RemoteDataflowQueue;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
+import groovyx.gpars.serial.WithSerialId;
 
 /**
  * Represents a thread-safe data flow stream. Values or DataflowVariables are added using the '&lt;&lt;' operator
@@ -58,7 +60,7 @@ import groovyx.gpars.scheduler.Pool;
  *         Date: Jun 5, 2009
  */
 @SuppressWarnings({"ClassWithTooManyMethods", "unchecked"})
-public class DataflowQueue<T> implements DataflowChannel<T> {
+public class DataflowQueue<T> extends WithSerialId implements DataflowChannel<T> {
 
     /**
      * Internal lock
@@ -841,5 +843,10 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     @Override
     public String toString() {
         return "DataflowQueue(queue=" + new ArrayList<DataflowVariable<T>>(queue).toString() + ')';
+    }
+
+    @Override
+    public Class<RemoteDataflowQueue> getRemoteClass() {
+        return RemoteDataflowQueue.class;
     }
 }

@@ -16,12 +16,15 @@
 
 package groovyx.gpars.remote;
 
+import groovyx.gpars.actor.Actor;
+import groovyx.gpars.remote.message.CloseConnectionMsg;
 import groovyx.gpars.remote.message.NodeConnectedMsg;
 import groovyx.gpars.remote.message.NodeDisconnectedMsg;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialMsg;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -31,7 +34,7 @@ import java.util.UUID;
  * @author Alex Tkachman
  */
 public final class RemoteHost extends SerialContext {
-    private final ArrayList<RemoteConnection> connections = new ArrayList<RemoteConnection>();
+    private final ArrayList<RemoteConnection> connections = new ArrayList<>();
 
     public RemoteHost(final LocalHost localHost, final UUID hostId) {
         super(localHost, hostId);
@@ -42,13 +45,17 @@ public final class RemoteHost extends SerialContext {
             final boolean wasConnected = isConnected();
             connections.add(connection);
             if (wasConnected != isConnected()) {
-                final Map<UUID, LocalNode> localNodes = ((LocalHost) localHost).localNodes;
-                //noinspection SynchronizationOnLocalVariableOrMethodParameter
-                synchronized (localNodes) {
-                    for (final LocalNode localNode : localNodes.values()) {
-                        connection.write(new NodeConnectedMsg(localNode));
-                    }
-                }
+//                final Map<UUID, LocalNode> localNodes = ((LocalHost) localHost).localNodes;
+//                //noinspection SynchronizationOnLocalVariableOrMethodParameter
+//                synchronized (localNodes) {
+//                    for (final LocalNode localNode : localNodes.values()) {
+//                        connection.write(new NodeConnectedMsg(localNode));
+//                    }
+//                }
+//                final List<Actor> localActors = ((LocalHost) localHost).localActors;
+//                synchronized (localActors) {
+//                    localActors.stream().forEach((actor) -> connection.write(new NodeConnectedMsg(actor)));
+//                }
             }
         }
     }
@@ -65,7 +72,8 @@ public final class RemoteHost extends SerialContext {
 
     public void disconnect() {
         for (final RemoteConnection connection : connections) {
-            connection.disconnect();
+            // connection.disconnect();
+            connection.write(new CloseConnectionMsg());
         }
     }
 
@@ -83,13 +91,13 @@ public final class RemoteHost extends SerialContext {
         return connections.get(0);
     }
 
-    public void connect(final LocalNode node) {
-        write(new NodeConnectedMsg(node));
-    }
-
-    public void disconnect(final LocalNode node) {
-        write(new NodeDisconnectedMsg(node));
-    }
+//    public void connect(final LocalNode node) {
+//        write(new NodeConnectedMsg(node));
+//    }
+//
+//    public void disconnect(final LocalNode node) {
+//        write(new NodeDisconnectedMsg(node));
+//    }
 
     public LocalHost getLocalHost() {
         return (LocalHost) localHost;

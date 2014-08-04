@@ -17,14 +17,16 @@
 package groovyx.gpars.remote;
 
 import groovyx.gpars.actor.Actor;
+import groovyx.gpars.actor.remote.RemoteActorFuture;
+import groovyx.gpars.dataflow.DataflowQueue;
+import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.remote.RemoteDataflowBroadcast;
+import groovyx.gpars.dataflow.remote.RemoteDataflowQueue;
+import groovyx.gpars.dataflow.remote.RemoteDataflowVariable;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandles;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Represents communication point with other local hosts.
@@ -38,88 +40,36 @@ import java.util.UUID;
  * </p>
  * <ul>
  *   <li>remote hosts connected with this one</li>
- *   <li>remote nodes known to this host</li>
- *   <li>local nodes available on this host</li>
+ *   <li>local actors available on this host</li> // TODO
  * </ul>
  *
  * @author Alex Tkachman
  */
 public class LocalHost extends SerialHandles {
-
-    /**
-     * Registry of remote nodes known to the provider
-     */
-    protected final HashMap<UUID, RemoteNode> remoteNodes = new HashMap<UUID, RemoteNode>();
-
     /**
      * Hosts known to the provider
      */
     protected final Map<UUID, RemoteHost> remoteHosts = new HashMap<UUID, RemoteHost>();
 
-    /**
-     * Local nodes known to the provider
-     */
-    protected final Map<UUID, LocalNode> localNodes = new HashMap<UUID, LocalNode>();
+    // TODO move actors to ActorsLocalHost similarly to DataflowsLocalHost
+    protected final Map<String, Actor> localActors = new HashMap<>();
+
+    protected final Map<String, Actor> remoteActors = new HashMap<>();
+
+    private Map<String, List<DataflowVariable<Actor>>> remoteActorFutures = new HashMap<>();
 
     /**
-     * Connect local node to the provider
-     *
-     * @param node local node
+     * Registers actor under specific name
+     * @param name
+     * @param actor
      */
-    public void connect(final LocalNode node) {
-        synchronized (localNodes) {
-            localNodes.put(node.getId(), node);
-        }
-
-        synchronized (remoteNodes) {
-            for (final RemoteNode remoteNode : remoteNodes.values()) {
-                if (!remoteNode.getId().equals(node.getId())) {
-                    node.onConnect(remoteNode);
-                }
-            }
-        }
-
-        synchronized (remoteHosts) {
-            for (final RemoteHost host : remoteHosts.values()) {
-                host.connect(node);
-            }
-        }
-    }
-
-    /**
-     * Disconnect local node from the provider
-     *
-     * @param node local node
-     */
-    public void disconnect(final LocalNode node) {
-        synchronized (remoteHosts) {
-            for (final RemoteHost host : remoteHosts.values()) {
-                host.disconnect(node);
-            }
-        }
-
-        synchronized (remoteNodes) {
-            for (final RemoteNode remoteNode : remoteNodes.values()) {
-                if (!remoteNode.getId().equals(node.getId())) {
-                    node.onDisconnect(remoteNode);
-                }
-            }
-        }
-
-        synchronized (localNodes) {
-            localNodes.remove(node.getId());
+    public void register(String name, final Actor actor) {
+        synchronized (localActors) {
+            localActors.put(name, actor);
         }
     }
 
     public void disconnect() {
-        synchronized (localNodes) {
-            final Iterable<LocalNode> copy = new ArrayList<LocalNode>(localNodes.values());
-            localNodes.clear();
-            for (final LocalNode localNode : copy) {
-                disconnect(localNode);
-            }
-        }
-
         synchronized (remoteHosts) {
             final Iterable<RemoteHost> copy = new ArrayList<RemoteHost>(remoteHosts.values());
             remoteHosts.clear();
@@ -127,8 +77,6 @@ public class LocalHost extends SerialHandles {
                 remoteHost.disconnect();
             }
         }
-
-        LocalHostRegistry.removeLocalHost(this);
     }
 
     @Override
@@ -148,63 +96,93 @@ public class LocalHost extends SerialHandles {
         }
     }
 
-    public void connectRemoteNode(final UUID nodeId, final SerialContext host, final Actor mainActor) {
-        RemoteNode node;
-        synchronized (remoteNodes) {
-            node = remoteNodes.get(nodeId);
-            if (node == null) {
-                node = new RemoteNode(nodeId, host, mainActor);
-                remoteNodes.put(nodeId, node);
-            }
-        }
+    public Actor getActor(String name) {
+        return localActors.get(name);
+    }
 
-        synchronized (localNodes) {
-            for (final LocalNode localNode : localNodes.values()) {
-                localNode.onConnect(node);
-            }
-        }
+    public void connectRemoteNode(final UUID nodeId, final SerialContext host, final Actor mainActor) {
+//        RemoteNode node;
+//        synchronized (remoteNodes) {
+//            node = remoteNodes.get(nodeId);
+//            if (node == null) {
+//                node = new RemoteNode(nodeId, host, mainActor);
+//                remoteNodes.put(nodeId, node);
+//            }
+//        }
+//
+//        synchronized (localNodes) {
+//            for (final LocalNode localNode : localNodes.values()) {
+//                localNode.onConnect(node);
+//            }
+//        }
     }
 
     public void disconnectRemoteNode(final UUID nodeId) {
-        final RemoteNode node;
-        synchronized (remoteNodes) {
-            node = remoteNodes.remove(nodeId);
-        }
-
-        if (node != null) {
-            synchronized (localNodes) {
-                onDisconnectForLocalNodes(node);
-            }
-        }
+//        final RemoteNode node;
+//        synchronized (remoteNodes) {
+//            node = remoteNodes.remove(nodeId);
+//        }
+//
+//        if (node != null) {
+//            synchronized (localNodes) {
+//                onDisconnectForLocalNodes(node);
+//            }
+//        }
     }
 
     public void onDisconnect(final SerialContext host) {
-        final Collection<RemoteNode> toRemove = new ArrayList<RemoteNode>();
-        synchronized (remoteNodes) {
-            for (final RemoteNode t : remoteNodes.values()) {
-                if (t.getRemoteHost() == host) {
-                    toRemove.add(t);
-                }
-            }
-            for (final RemoteNode t : toRemove) {
-                remoteNodes.remove(t.getId());
-            }
-        }
+//        final Collection<RemoteNode> toRemove = new ArrayList<RemoteNode>();
+//        synchronized (remoteNodes) {
+//            for (final RemoteNode t : remoteNodes.values()) {
+//                if (t.getRemoteHost() == host) {
+//                    toRemove.add(t);
+//                }
+//            }
+//            for (final RemoteNode t : toRemove) {
+//                remoteNodes.remove(t.getId());
+//            }
+//        }
+//
+//        synchronized (localNodes) {  //todo consider moving the synchronized block inside the onDisconnectForLocalNodes() method
+//            for (final RemoteNode t : toRemove) {
+//                onDisconnectForLocalNodes(t);
+//            }
+//        }
+    }
 
-        synchronized (localNodes) {  //todo consider moving the synchronized block inside the onDisconnectForLocalNodes() method
-            for (final RemoteNode t : toRemove) {
-                onDisconnectForLocalNodes(t);
+    public void registerRemote(String name, Actor actor) {
+        synchronized (remoteActors) {
+            remoteActors.put(name, actor);
+        }
+        synchronized (remoteActorFutures) {
+            List<DataflowVariable<Actor>> futures = remoteActorFutures.get(name);
+            if (futures != null) {
+                futures.stream().forEach(var -> var.bindUnique(actor));
+            }
+            remoteActorFutures.remove(name);
+        }
+    }
+
+    public void addRemoteActorFuture(String name, DataflowVariable<Actor> var) {
+        synchronized (remoteActorFutures) {
+            List<DataflowVariable<Actor>> futures = remoteActorFutures.get(name);
+            if (futures == null) {
+                futures = new ArrayList<>();
+                futures.add(var);
+                remoteActorFutures.put(name, futures);
+            } else {
+                futures.add(var);
             }
         }
     }
 
-    private void onDisconnectForLocalNodes(final RemoteNode t) {
-        for (final LocalNode localNode : localNodes.values()) {
-            localNode.onDisconnect(t);
-        }
+    // TODO make abstract
+    public <T> void registerProxy(Class<T> klass, String name, T object) {
+        throw new UnsupportedOperationException("TODO make it abstract");
     }
 
-    public LocalNode getLocalNode() {
-        return localNodes.values().iterator().next();
+    // TODO make abstract
+    public <T> T get(Class<T> klass, String name) {
+        throw new UnsupportedOperationException("TODO make it abstract");
     }
 }
