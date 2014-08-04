@@ -1,10 +1,8 @@
-package groovyx.gpars.samples.remote.pingpong
+package groovyx.gpars.samples.remote.actor.pingpong
 
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.remote.RemoteActors
 import groovyx.gpars.remote.netty.NettyTransportProvider
-
-import java.util.concurrent.CountDownLatch
 
 def pingActor = Actors.actor {
     println "Ping Actor"

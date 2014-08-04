@@ -1,4 +1,4 @@
-package groovyx.gpars.samples.remote.chat
+package groovyx.gpars.samples.remote.actor.chat
 
 import groovyx.gpars.remote.netty.NettyTransportProvider
 
