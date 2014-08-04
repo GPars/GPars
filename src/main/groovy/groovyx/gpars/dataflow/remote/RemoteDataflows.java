@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class RemoteDataflows extends LocalHost {
+
     /**
      * Stores DataflowVariables published in context of this instance of RemoteDataflows.
      */
@@ -166,27 +167,5 @@ public final class RemoteDataflows extends LocalHost {
             return klass.cast(publishedQueues.get(name));
         }
         throw new IllegalArgumentException("Unsupported type");
-    }
-
-    private void createRequest(String host, int port, SerialMsg msg) {
-        NettyClient client = NettyTransportProvider.createClient(host, port, this, connection -> {
-            if (connection.getHost() != null)
-                connection.write(msg);
-        });
-        client.start();
-    }
-
-    private <T> DataflowVariable<T> getPromise(Map<String, DataflowVariable<T>> registry, String name, String host, int port, SerialMsg requestMsg) {
-        DataflowVariable remoteVariable = registry.get(name);
-        if (remoteVariable == null) {
-            DataflowVariable newRemoteVariable = new DataflowVariable<>();
-            remoteVariable = registry.putIfAbsent(name, newRemoteVariable);
-            if (remoteVariable == null) {
-                createRequest(host, port, requestMsg);
-                remoteVariable = newRemoteVariable;
-            }
-
-        }
-        return remoteVariable;
     }
 }

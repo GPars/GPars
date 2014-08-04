@@ -23,10 +23,12 @@ import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.remote.RemoteDataflowBroadcast;
 import groovyx.gpars.dataflow.remote.RemoteDataflowQueue;
 import groovyx.gpars.dataflow.remote.RemoteDataflowVariable;
+import groovyx.gpars.remote.netty.NettyClient;
 import groovyx.gpars.remote.netty.NettyServer;
 import groovyx.gpars.remote.netty.NettyTransportProvider;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandles;
+import groovyx.gpars.serial.SerialMsg;
 
 import java.util.*;
 
@@ -38,12 +40,8 @@ import java.util.*;
  * but sometimes several can be useful as well.
  * </p>
  * <p>
- * Local host contains
+ * Local host contains: remote hosts connected with this one
  * </p>
- * <ul>
- *   <li>remote hosts connected with this one</li>
- *   <li>local actors available on this host</li> // TODO
- * </ul>
  *
  * @author Alex Tkachman
  */
@@ -57,24 +55,6 @@ public abstract class LocalHost extends SerialHandles {
      * Server for current instance of LocalHost
      */
     private NettyServer server;
-
-    // TODO move actors to ActorsLocalHost similarly to DataflowsLocalHost
-    protected final Map<String, Actor> localActors = new HashMap<>();
-
-    protected final Map<String, Actor> remoteActors = new HashMap<>();
-
-    private Map<String, List<DataflowVariable<Actor>>> remoteActorFutures = new HashMap<>();
-
-    /**
-     * Registers actor under specific name
-     * @param name
-     * @param actor
-     */
-    public void register(String name, final Actor actor) {
-        synchronized (localActors) {
-            localActors.put(name, actor);
-        }
-    }
 
     public void disconnect() {
         synchronized (remoteHosts) {
@@ -101,10 +81,6 @@ public abstract class LocalHost extends SerialHandles {
             }
             return host;
         }
-    }
-
-    public Actor getActor(String name) {
-        return localActors.get(name);
     }
 
     public void connectRemoteNode(final UUID nodeId, final SerialContext host, final Actor mainActor) {
@@ -157,32 +133,6 @@ public abstract class LocalHost extends SerialHandles {
 //        }
     }
 
-    public void registerRemote(String name, Actor actor) {
-        synchronized (remoteActors) {
-            remoteActors.put(name, actor);
-        }
-        synchronized (remoteActorFutures) {
-            List<DataflowVariable<Actor>> futures = remoteActorFutures.get(name);
-            if (futures != null) {
-                futures.stream().forEach(var -> var.bindUnique(actor));
-            }
-            remoteActorFutures.remove(name);
-        }
-    }
-
-    public void addRemoteActorFuture(String name, DataflowVariable<Actor> var) {
-        synchronized (remoteActorFutures) {
-            List<DataflowVariable<Actor>> futures = remoteActorFutures.get(name);
-            if (futures == null) {
-                futures = new ArrayList<>();
-                futures.add(var);
-                remoteActorFutures.put(name, futures);
-            } else {
-                futures.add(var);
-            }
-        }
-    }
-
     public abstract <T> void registerProxy(Class<T> klass, String name, T object);
 
     public abstract <T> T get(Class<T> klass, String name);
@@ -202,5 +152,27 @@ public abstract class LocalHost extends SerialHandles {
         }
 
         server.stop();
+    }
+
+    private void createRequest(String host, int port, SerialMsg msg) {
+        NettyClient client = NettyTransportProvider.createClient(host, port, this, connection -> {
+            if (connection.getHost() != null)
+                connection.write(msg);
+        });
+        client.start();
+    }
+
+    protected <T> DataflowVariable<T> getPromise(Map<String, DataflowVariable<T>> registry, String name, String host, int port, SerialMsg requestMsg) {
+        DataflowVariable remoteVariable = registry.get(name);
+        if (remoteVariable == null) {
+            DataflowVariable newRemoteVariable = new DataflowVariable<>();
+            remoteVariable = registry.putIfAbsent(name, newRemoteVariable);
+            if (remoteVariable == null) {
+                createRequest(host, port, requestMsg);
+                remoteVariable = newRemoteVariable;
+            }
+
+        }
+        return remoteVariable;
     }
 }
