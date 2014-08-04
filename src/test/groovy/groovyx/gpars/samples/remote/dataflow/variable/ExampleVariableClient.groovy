@@ -5,6 +5,8 @@ import groovyx.gpars.dataflow.remote.RemoteDataflows
 def HOST = "localhost"
 def PORT = 9009
 
+println "Example: DataflowVariable"
+
 def remoteDataflows = RemoteDataflows.create()
 
 def var1Promise = remoteDataflows.getVariable HOST, PORT, "variabledemo-var-GPars"
