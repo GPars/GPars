@@ -163,10 +163,15 @@ public final class RemoteDataflows extends LocalHost {
     public <T> void registerProxy(Class<T> klass, String name, T object) {
         if (klass == RemoteDataflowVariable.class) {
             remoteVariables.get(name).bind((DataflowVariable) object);
-        } else if (klass == RemoteDataflowBroadcast.class) {
+            return;
+        }
+        if (klass == RemoteDataflowBroadcast.class) {
             remoteBroadcasts.get(name).bind((RemoteDataflowBroadcast) object);
-        } else if (klass == RemoteDataflowQueue.class) {
+            return;
+        }
+        if (klass == RemoteDataflowQueue.class) {
             remoteQueues.get(name).bind((RemoteDataflowQueue) object);
+            return;
         }
         throw new IllegalArgumentException("Unsupported proxy type");
     }

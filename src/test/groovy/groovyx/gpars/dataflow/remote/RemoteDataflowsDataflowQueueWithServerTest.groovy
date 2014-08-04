@@ -1,6 +1,7 @@
 package groovyx.gpars.dataflow.remote
 
 import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.remote.LocalHost
 import groovyx.gpars.remote.netty.NettyTransportProvider
 import spock.lang.Shared
@@ -78,5 +79,28 @@ class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
 
         then:
         receivedTestValue == testValue
+    }
+
+    @Timeout(5)
+    def "test if not bounded DataflowVariable can be pushed into DataflowQueue and become bounded later"() {
+        setup:
+        def queue = new DataflowQueue()
+        def queueName = "test-queue-3"
+        def remoteQueue = publishNewQueueAndGetRemotely queue, queueName
+        def testVariable = new DataflowVariable()
+
+        when:
+        remoteQueue << testVariable
+
+        def resultVariable = new DataflowVariable()
+        queue.whenBound {
+            resultVariable << it
+        }
+
+        testVariable << queueName
+
+
+        then:
+        resultVariable.val == queueName
     }
 }
