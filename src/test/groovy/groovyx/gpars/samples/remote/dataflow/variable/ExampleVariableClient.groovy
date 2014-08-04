@@ -1,15 +1,16 @@
 package groovyx.gpars.samples.remote.dataflow.variable
 
 import groovyx.gpars.dataflow.remote.RemoteDataflows
-import groovyx.gpars.remote.netty.NettyTransportProvider
 
 def HOST = "localhost"
 def PORT = 9009
 
-def var1Future = RemoteDataflows.get HOST, PORT, "variabledemo-var-GPars"
-def var2Future = RemoteDataflows.get HOST, PORT, "variabledemo-var-Dataflows"
+def remoteDataflows = RemoteDataflows.create()
 
-def var1 = var1Future.get()
-def var2 = var2Future.get()
+def var1Promise = remoteDataflows.getVariable HOST, PORT, "variabledemo-var-GPars"
+def var2Promise = remoteDataflows.getVariable HOST, PORT, "variabledemo-var-Dataflows"
+
+def var1 = var1Promise.get()
+def var2 = var2Promise.get()
 
 println "${var1.val} supports ${var2.val}"
