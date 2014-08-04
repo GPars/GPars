@@ -1,8 +1,7 @@
 package groovyx.gpars.dataflow.remote
 
 import groovyx.gpars.dataflow.DataflowVariable
-import groovyx.gpars.remote.LocalHost
-import groovyx.gpars.remote.netty.NettyTransportProvider
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
 
@@ -11,13 +10,21 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
     def static HOST = "localhost"
     def static PORT = 9021
 
+    @Shared
+    RemoteDataflows serverRemoteDataflows
+
+    @Shared
+    RemoteDataflows clientRemoteDataflows
+
     def setupSpec() {
-        LocalHost host = new LocalHost()
-        NettyTransportProvider.startServer HOST, PORT, host
+        serverRemoteDataflows = RemoteDataflows.create()
+        serverRemoteDataflows.startServer HOST, PORT
+
+        clientRemoteDataflows = RemoteDataflows.create()
     }
 
     def cleanupSpec() {
-        NettyTransportProvider.stopServer()
+        serverRemoteDataflows.stopServer()
     }
 
     @Timeout(5)
@@ -28,8 +35,8 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
         def testValue = "test DataflowVariable"
 
         when:
-        RemoteDataflows.publish variable, variableName
-        def remoteVariable = RemoteDataflows.get HOST, PORT, variableName get()
+        serverRemoteDataflows.publish variable, variableName
+        def remoteVariable = clientRemoteDataflows.getVariable HOST, PORT, variableName get()
 
         variable << testValue
 
@@ -37,37 +44,41 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
         remoteVariable.val == testValue
     }
 
-    /*@Timeout(5)
+    @Timeout(5)
     def "can retrieve published bound DataflowVariable"() {
         setup:
-        def variableName = "test-variable-2"
-        def variable = new DataflowVariable<String>()
-        def testValue = "test DataflowVariable"
+        def variable = new DataflowVariable()
 
         when:
         variable << testValue
 
-        RemoteDataflows.publish variable, variableName
-        def remoteVariable = RemoteDataflows.get HOST, PORT, variableName get()
+        serverRemoteDataflows.publish variable, variableName
+        def remoteVariable = clientRemoteDataflows.getVariable HOST, PORT, variableName get()
 
         then:
         remoteVariable.val == testValue
-    }*/
+
+        where:
+        variableName << ["test-variable-2a", "test-variable-2b"]
+        testValue << ["test DataflowVariable", null]
+    }
 
     @Timeout(5)
     def "can retrieve published DataflowVariable and bind it remotely"() {
         setup:
-        def variableName = "test-variable-3"
-        def variable = new DataflowVariable<String>()
-        def testValue = "test DataflowVariable"
+        def variable = new DataflowVariable()
 
         when:
-        RemoteDataflows.publish variable, variableName
-        def remoteVariable = RemoteDataflows.get HOST, PORT, variableName get()
+        serverRemoteDataflows.publish variable, variableName
+        def remoteVariable = clientRemoteDataflows.getVariable HOST, PORT, variableName get()
 
         remoteVariable << testValue
 
         then:
         variable.val == testValue
+
+        where:
+        variableName << ["test-variable-3a", "test-variable-3b"]
+        testValue << ["test DataflowVariable", null]
     }
 }

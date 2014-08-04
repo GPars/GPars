@@ -20,7 +20,7 @@ public class RemoteDataflowVariableRequestMsg extends SerialMsg {
     public void execute(RemoteConnection conn) {
         updateRemoteHost(conn);
 
-        DataflowVariable<?> var = RemoteDataflows.get(name);
+        DataflowVariable<?> var = conn.getLocalHost().get(DataflowVariable.class, name);
         conn.write(new RemoteDataflowVariableReplyMsg(name, var));
     }
 

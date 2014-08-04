@@ -9,12 +9,14 @@ def HOST = "localhost"
 def PORT = 9111
 def NUMBER_OF_TASKS = 100
 
-LocalHost localHost = new LocalHost()
-NettyTransportProvider.startServer HOST, PORT, localHost
+println "Example: DataflowQueue load balancer"
+
+def remoteDataflows = RemoteDataflows.create()
+remoteDataflows.startServer HOST, PORT
 
 def queue = new DataflowQueue()
 
-RemoteDataflows.publish queue, "queue-balancer"
+remoteDataflows.publish queue, "queue-balancer"
 
 println "Press any key to start..."
 System.in.read()

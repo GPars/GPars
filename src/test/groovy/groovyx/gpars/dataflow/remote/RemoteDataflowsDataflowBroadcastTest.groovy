@@ -1,14 +1,20 @@
 package groovyx.gpars.dataflow.remote
 
 import groovyx.gpars.dataflow.DataflowBroadcast
+import groovyx.gpars.dataflow.DataflowVariable
 import spock.lang.Specification
 import spock.lang.Timeout
 
 class RemoteDataflowsDataflowBroadcastTest extends Specification {
+    RemoteDataflows remoteDataflows
 
-    def "retrieving ReadChannel of not published DataflowBroadcast returns null"() {
+    void setup() {
+        remoteDataflows = RemoteDataflows.create()
+    }
+
+    def "retrieving not published DataflowBroadcast returns null"() {
         when:
-        def stream = RemoteDataflows.getBroadcastStream "test-broadcast"
+        def stream = remoteDataflows.get DataflowBroadcast, "test-broadcast"
 
         then:
         stream == null
@@ -20,8 +26,8 @@ class RemoteDataflowsDataflowBroadcastTest extends Specification {
         def broadcastName = "test-broadcast"
 
         when:
-        RemoteDataflows.publish broadcastStream, broadcastName
-        def publishedStream = RemoteDataflows.getBroadcastStream broadcastName
+        remoteDataflows.publish broadcastStream, broadcastName
+        def publishedStream = remoteDataflows.get DataflowBroadcast, broadcastName
 
         then:
         publishedStream == broadcastStream
@@ -34,10 +40,10 @@ class RemoteDataflowsDataflowBroadcastTest extends Specification {
         def broadcastName = "test-broadcast"
 
         when:
-        def streamFuture = RemoteDataflows.getReadChannel HOST, PORT, broadcastName
+        def streamFuture = remoteDataflows.getReadChannel HOST, PORT, broadcastName
 
         then:
         streamFuture != null
-        streamFuture instanceof RemoteDataflowReadChannelFuture
+        streamFuture instanceof DataflowVariable
     }
 }
