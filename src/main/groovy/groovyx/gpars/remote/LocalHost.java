@@ -17,12 +17,7 @@
 package groovyx.gpars.remote;
 
 import groovyx.gpars.actor.Actor;
-import groovyx.gpars.actor.remote.RemoteActorFuture;
-import groovyx.gpars.dataflow.DataflowQueue;
 import groovyx.gpars.dataflow.DataflowVariable;
-import groovyx.gpars.dataflow.remote.RemoteDataflowBroadcast;
-import groovyx.gpars.dataflow.remote.RemoteDataflowQueue;
-import groovyx.gpars.dataflow.remote.RemoteDataflowVariable;
 import groovyx.gpars.remote.netty.NettyClient;
 import groovyx.gpars.remote.netty.NettyServer;
 import groovyx.gpars.remote.netty.NettyTransportProvider;
