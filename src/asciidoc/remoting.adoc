@@ -38,15 +38,109 @@ that sending proxy-object reference back is deserialized to original instance.
 
 == Dataflows
 
-about dataflows
+In order to use remoting for Dataflows, a context (_RemoteDataflows_ class) has to be created.
+Within this conext dataflows are published and retrieved from remote hosts.
+
+[source,groovy]
+----
+def remoteDataflows = RemoteDataflows.create()
+----
+
+When the context is created, if you want to able other hosts to retrieve published dataflows,
+you need to start server. You need to provied address and port to listen on (eq. _localhost_:11222,
+10.0.0.123:11333).
+
+[source,groovy]
+----
+remoteDataflows.startServer HOST PORT
+----
+
+To stop the server, there is _stopServer()_ method. Note that both method are asynchronous,
+they don't block - server is started/stopped in background.
+
+*Remark*: To only retrieve instances from remote hosts starting a server is not necessary.
 
 === DataflowVariable
 
-what can be done with variables
+DataflowVariable is a core part of Dataflows that received remoting abilities.
+Other structures(?) depend on it.
+
+When the context is created, publishing a variable is done simply by:
+
+[source,groovy]
+----
+def variable = new DataflowVariable()
+remoteDataflows.publish variable "my-first-variable"
+----
+
+It registers the variable under given name, so when a request for variable with name _my-first-variable_ comes,
+it can be sent to remote host.
+It's important to remember, that publishing another variable under the same name,
+will override the provious one and subsequent requests will send newly published one.
+
+Retrieving of a variable is done by:
+
+[source,groovy]
+----
+def remoteVariablePromise = remoteDataflows.getVariable HOST, PORT, "my-first-variable"
+def remoteVariable = remoteVariablePromise.get()
+----
+
+The _getVariable_ method is non-blocking and returns promise, that will eventually hold a proxy to variable.
+This proxy has the same interface as DataflowVariable and can be used seemlessly as regular variable.
+
+To explore a full example see: _..._
+
+=== DataflowBroadcast
+
+It's possible to subscribe to DataflowBroadcast on remote host.
+To do this, one had to publish it first (assuming that context is already created):
+
+[source,groovy]
+----
+def stream = new DataflowBroadcast()
+remoteDataflows.publish stream "my-first-broadcast"
+----
+
+Then on other host it can be retrieved:
+
+[source,groovy]
+----
+def readChannelPromise = remoteDataflows.getReadChannel HOST, PORT, "my-first-broadcast"
+def readChannel = readChannelPromise.get()
+----
+
+Obtainted proxy object has the same interface as ReadChannel
+and can be used in same fashion as ReadChannel of regular DataflowBroadcast.
+
+To explore a full example see: _..._
+
+=== DataflowQueue
+
+DataflowQueue received similar functionality. It can be published:
+
+[source,groovy]
+----
+def queue = new DataflowQueue()
+remoteDataflows.publish queue, "my-first-queue"
+----
+
+and in similar way retrieved on remote host:
+
+[source,groovy]
+----
+def queuePromise = remoteDataflows.getQueue HOST, PORT, "my-first-queue"
+def queue = queuePromise.get()
+----
+
+Pushing into this queue will push into its original instance.
+Retrieval work exactly like on single machine.
+
+To explore a full example see: _..._ or _..._
 
 == Actors
 
-about actors
+TBD
 
 == Agents
 
