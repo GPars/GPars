@@ -36,6 +36,12 @@ object <-(serialization)-> handle ---(network)--- handle <-(serialization)-> pro
 One of the main advantages of this mechanism is
 that sending proxy-object reference back is deserialized to original instance.
 
+As all messages are seralized before sending over a wire,
+they must implement _Serializable_ interface.
+This is a consequence of using build-in Java serialization mechanism and Netty's _ObjectDecoder/ObjectEncoder_.
+On the other hand it allows flexibility to send any custom object as a message to Actor
+or to use DataflowVariable of any type.
+
 == Dataflows
 
 In order to use remoting for Dataflows, a context (_RemoteDataflows_ class) has to be created.
