@@ -146,7 +146,30 @@ To explore a full example see: _..._ or _..._
 
 == Actors
 
-TBD
+Remote Actors subsystem is designed in similar way.
+To start, a context (_RemoteActors_ class) has to be created.
+Within the context Actors instances can be published or retrieved from remote hosts.
+
+[source,groovy]
+----
+def remoteActors = RemoteActors.create()
+----
+
+Publishing:
+
+[source, groovy]
+----
+def actor = ...
+remoteActors.publish actor, "name of actor"
+----
+
+Retrieving:
+
+[source,groovy]
+----
+def actorPromise = remoteActors.get HOST, PORT, "name of actor"
+def remoteActor = actorPromise.get()
+----
 
 == Agents
 
