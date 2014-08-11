@@ -11,20 +11,27 @@ Following chapter describes remoting in GPars.
 
 == Introduction
 
-For each structure(?) a new remote proxy object was introduced (with _Remote_ prefix).
-This proxy object usually has the same interface as its local counterpart.
-Under the hood it just sends messages to original instance.
+To use Actors, Dataflows or Agent remotely a new remote proxy object was introduced (with _Remote_ prefix).
+The proxy object usually has the same interface as its local counterpart,
+which allows to use it in place of local counterpart.
+Under the hood proxy object just sends messages over a wire to original instance.
 To transport messages across the network http://netty.io[Netty] library was used.
+To create a proxy-object instance serialization mechanism is used (more in <<remote-serialization>>).
 
-Acquiring a remote proxy is done in following way:
+General scheme of using remote is as follows (details can be found in section below):
 
-. Original instance is published on _hostA:port_ under a specified _name_.
-. _hostB_ asks _hostA:port_ for an instance with specified _name_.
-. Promise is returned. It will eventually hold a proxy object instance.
+At _host A_:
 
-To create a proxy-object instance serialization mechanism is used (more <<remote-serialization>>).
+. Create remoting context and start a server to handle incomming requests.
+. Publish an instance under specified _name_
 
-At this moment a new connection is created for each request.
+At _host B_:
+
+. Create remoting context
+. Ask for an instance with specified _name_ from _hostA:port_. A promise is returned.
+. Get a proxy object from the promise.
+
+*Note*: At this moment a new connection is created for each request.
 
 [#remote-serialization]
 === Serialization
