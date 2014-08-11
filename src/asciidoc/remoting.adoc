@@ -11,20 +11,27 @@ Following chapter describes remoting in GPars.
 
 == Introduction
 
-For each structure(?) a new remote proxy object was introduced (with _Remote_ prefix).
-This proxy object usually has the same interface as its local counterpart.
-Under the hood it just sends messages to original instance.
+To use Actors, Dataflows or Agent remotely a new remote proxy object was introduced (with _Remote_ prefix).
+The proxy object usually has the same interface as its local counterpart,
+which allows to use it in place of local counterpart.
+Under the hood proxy object just sends messages over a wire to original instance.
 To transport messages across the network http://netty.io[Netty] library was used.
+To create a proxy-object instance serialization mechanism is used (more in <<remote-serialization>>).
 
-Acquiring a remote proxy is done in following way:
+General scheme of using remote is as follows (details can be found in section below):
 
-. Original instance is published on _hostA:port_ under a specified _name_.
-. _hostB_ asks _hostA:port_ for an instance with specified _name_.
-. Promise is returned. It will eventually hold a proxy object instance.
+At _host A_:
 
-To create a proxy-object instance serialization mechanism is used (more <<remote-serialization>>).
+. Create remoting context and start a server to handle incomming requests.
+. Publish an instance under specified _name_
 
-At this moment a new connection is created for each request.
+At _host B_:
+
+. Create remoting context
+. Ask for an instance with specified _name_ from _hostA:port_. A promise is returned.
+. Get a proxy object from the promise.
+
+*Note*: At this moment a new connection is created for each request.
 
 [#remote-serialization]
 === Serialization
@@ -36,18 +43,26 @@ object <-(serialization)-> handle ---(network)--- handle <-(serialization)-> pro
 One of the main advantages of this mechanism is
 that sending proxy-object reference back is deserialized to original instance.
 
+As all messages are seralized before sending over a wire,
+they must implement _Serializable_ interface.
+This is a consequence of using build-in Java serialization mechanism and Netty's _ObjectDecoder/ObjectEncoder_.
+On the other hand it allows flexibility to send any custom object as a message to Actor
+or to use DataflowVariable of any type.
+
 == Dataflows
 
 In order to use remoting for Dataflows, a context (_RemoteDataflows_ class) has to be created.
-Within this conext dataflows are published and retrieved from remote hosts.
+Within this context dataflows can be published and retrieved from remote hosts.
 
 [source,groovy]
 ----
 def remoteDataflows = RemoteDataflows.create()
 ----
 
-When the context is created, if you want to able other hosts to retrieve published dataflows,
-you need to start server. You need to provied address and port to listen on (eq. _localhost_:11222,
+*Note*: In all subsections we assume that context is already created as shown above.
+
+After creating context, if you want to allow other hosts to retrieve published dataflows,
+you need to start a server. You need to provied address and port to listen on (eq. _localhost_:11222,
 10.0.0.123:11333).
 
 [source,groovy]
@@ -57,15 +72,16 @@ remoteDataflows.startServer HOST PORT
 
 To stop the server, there is _stopServer()_ method. Note that both method are asynchronous,
 they don't block - server is started/stopped in background.
+Multiple execution of these methods or executing them in wrong order results in exception.
 
 *Remark*: To only retrieve instances from remote hosts starting a server is not necessary.
 
 === DataflowVariable
 
-DataflowVariable is a core part of Dataflows that received remoting abilities.
-Other structures(?) depend on it.
+DataflowVariable is a core part of Dataflows subsystem that received remoting abilities.
+Other structures(?) and subsystems depend on it.
 
-When the context is created, publishing a variable is done simply by:
+Publishing a variable within context is done simply by:
 
 [source,groovy]
 ----
@@ -74,7 +90,7 @@ remoteDataflows.publish variable "my-first-variable"
 ----
 
 It registers the variable under given name, so when a request for variable with name _my-first-variable_ comes,
-it can be sent to remote host.
+variable can be sent to remote host.
 It's important to remember, that publishing another variable under the same name,
 will override the provious one and subsequent requests will send newly published one.
 
@@ -86,10 +102,10 @@ def remoteVariablePromise = remoteDataflows.getVariable HOST, PORT, "my-first-va
 def remoteVariable = remoteVariablePromise.get()
 ----
 
-The _getVariable_ method is non-blocking and returns promise, that will eventually hold a proxy to variable.
+The _getVariable_ method is non-blocking and returns promise, that will eventually hold a proxy object to variable.
 This proxy has the same interface as DataflowVariable and can be used seemlessly as regular variable.
 
-To explore a full example see: _..._
+To explore a full example see: _groovyx.gpars.samples.remote.dataflow.variable_
 
 === DataflowBroadcast
 
@@ -113,7 +129,7 @@ def readChannel = readChannelPromise.get()
 Obtainted proxy object has the same interface as ReadChannel
 and can be used in same fashion as ReadChannel of regular DataflowBroadcast.
 
-To explore a full example see: _..._
+To explore a full example see: _groovyx.gpars.samples.remote.dataflow.broadcast_
 
 === DataflowQueue
 
@@ -133,14 +149,41 @@ def queuePromise = remoteDataflows.getQueue HOST, PORT, "my-first-queue"
 def queue = queuePromise.get()
 ----
 
-Pushing into this queue will push into its original instance.
-Retrieval work exactly like on single machine.
+New items can be pushed into remote proxy of queue.
+Such elements are sent over a wire to original instance and pushed into it.
+Retrieval sends a request for an element to original instance.
+Conceptually remote proxy is an interface -
+it just sends request to original instance.
 
-To explore a full example see: _..._ or _..._
+To explore a full example see:
+_groovyx.gpars.samples.remote.dataflow.queue_ or _groovyx.gpars.samples.remote.dataflow.queuebalancer_
 
 == Actors
 
-TBD
+Remote Actors subsystem is designed in similar way.
+To start, a context (_RemoteActors_ class) has to be created.
+Within the context Actors instances can be published or retrieved from remote hosts.
+
+[source,groovy]
+----
+def remoteActors = RemoteActors.create()
+----
+
+Publishing:
+
+[source, groovy]
+----
+def actor = ...
+remoteActors.publish actor, "name of actor"
+----
+
+Retrieving:
+
+[source,groovy]
+----
+def actorPromise = remoteActors.get HOST, PORT, "name of actor"
+def remoteActor = actorPromise.get()
+----
 
 == Agents
 
