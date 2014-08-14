@@ -1,7 +1,6 @@
 package groovyx.gpars.actor.remote
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.remote.netty.NettyTransportProvider
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
@@ -101,5 +100,28 @@ class RemoteActorTest extends Specification {
         then:
         replyMessageLatch.await()
         replyMessage == "test reply"
+    }
+
+    @Timeout(5)
+    def "test sendAndWait on RemoteActor"() {
+        setup:
+        def message = "message"
+        def messageTest = "test"
+
+        def testActor = Actors.reactor {
+            message + it
+        }
+        def actorName = "testActor-4"
+
+        serverRemoteActors.publish testActor, actorName
+        def remoteActor = clientRemoteActors.get HOST, PORT, actorName get()
+
+        when:
+        def receivedMessage = remoteActor.sendAndWait(messageTest)
+
+        then:
+        receivedMessage.length() == message.length() + messageTest.length()
+        receivedMessage.startsWith message
+        receivedMessage.endsWith messageTest
     }
 }
