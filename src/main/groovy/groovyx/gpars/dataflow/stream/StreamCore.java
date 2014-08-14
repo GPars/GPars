@@ -246,11 +246,11 @@ public abstract class StreamCore<T> implements FList<T> {
         StreamCore<Object> recurResult = result;
         while (true) {
             if (recurRest.isEmpty()) {
-                recurResult.leftShift((Object)StreamCore.eos());
+                recurResult.leftShift((Object)StreamCore.eos()); // explicit casting to make tests pass (Java8 related)
                 return;
             }
             final Object mapped = mapClosure.call(new Object[]{recurRest.getFirst()});
-            recurResult = recurResult.leftShift((Object)eval(mapped));
+            recurResult = recurResult.leftShift((Object)eval(mapped)); // explicit casting to make tests pass (Java8 related)
             recurRest = recurRest.getRest();
         }
     }

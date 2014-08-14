@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-10, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,16 +16,11 @@
 
 package groovyx.gpars.remote;
 
-import groovyx.gpars.actor.Actor;
 import groovyx.gpars.remote.message.CloseConnectionMsg;
-import groovyx.gpars.remote.message.NodeConnectedMsg;
-import groovyx.gpars.remote.message.NodeDisconnectedMsg;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialMsg;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -42,37 +37,18 @@ public final class RemoteHost extends SerialContext {
 
     public void addConnection(final RemoteConnection connection) {
         synchronized (connections) {
-            final boolean wasConnected = isConnected();
             connections.add(connection);
-            if (wasConnected != isConnected()) {
-//                final Map<UUID, LocalNode> localNodes = ((LocalHost) localHost).localNodes;
-//                //noinspection SynchronizationOnLocalVariableOrMethodParameter
-//                synchronized (localNodes) {
-//                    for (final LocalNode localNode : localNodes.values()) {
-//                        connection.write(new NodeConnectedMsg(localNode));
-//                    }
-//                }
-//                final List<Actor> localActors = ((LocalHost) localHost).localActors;
-//                synchronized (localActors) {
-//                    localActors.stream().forEach((actor) -> connection.write(new NodeConnectedMsg(actor)));
-//                }
-            }
         }
     }
 
     public void removeConnection(final RemoteConnection connection) {
         synchronized (connections) {
-            final boolean wasConnected = isConnected();
             connections.remove(connection);
-            if (wasConnected != isConnected()) {
-//            sendLocalNodes();
-            }
         }
     }
 
     public void disconnect() {
         for (final RemoteConnection connection : connections) {
-            // connection.disconnect();
             connection.write(new CloseConnectionMsg());
         }
     }
@@ -90,14 +66,6 @@ public final class RemoteHost extends SerialContext {
     public RemoteConnection getConnection() {
         return connections.get(0);
     }
-
-//    public void connect(final LocalNode node) {
-//        write(new NodeConnectedMsg(node));
-//    }
-//
-//    public void disconnect(final LocalNode node) {
-//        write(new NodeDisconnectedMsg(node));
-//    }
 
     public LocalHost getLocalHost() {
         return (LocalHost) localHost;

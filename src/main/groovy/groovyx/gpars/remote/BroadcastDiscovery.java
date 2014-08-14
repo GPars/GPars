@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.net.*;
 import java.util.UUID;
 
+/**
+ * <b>Not used</b> Local network discovery service.
+ */
 @SuppressWarnings({"MagicNumber"})
 public class BroadcastDiscovery {
     @SuppressWarnings({"StaticNonFinalField"})
@@ -112,7 +115,7 @@ public class BroadcastDiscovery {
                                     onDiscovery(uuid, new InetSocketAddress(InetAddress.getByAddress(addrBuf6), port));
                                 }
                             }
-                        } catch (IOException | InterruptedException e) {
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
@@ -144,6 +147,6 @@ public class BroadcastDiscovery {
         }
     }
 
-    protected void onDiscovery(final UUID uuid, final SocketAddress address) throws InterruptedException {
+    protected void onDiscovery(final UUID uuid, final SocketAddress address) {
     }
 }

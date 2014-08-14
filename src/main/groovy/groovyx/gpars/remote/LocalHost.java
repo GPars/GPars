@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2010, 2013  The original author or authors
+// Copyright © 2008-2010, 2013, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -78,54 +78,7 @@ public abstract class LocalHost extends SerialHandles {
         }
     }
 
-    public void connectRemoteNode(final UUID nodeId, final SerialContext host, final Actor mainActor) {
-//        RemoteNode node;
-//        synchronized (remoteNodes) {
-//            node = remoteNodes.get(nodeId);
-//            if (node == null) {
-//                node = new RemoteNode(nodeId, host, mainActor);
-//                remoteNodes.put(nodeId, node);
-//            }
-//        }
-//
-//        synchronized (localNodes) {
-//            for (final LocalNode localNode : localNodes.values()) {
-//                localNode.onConnect(node);
-//            }
-//        }
-    }
-
-    public void disconnectRemoteNode(final UUID nodeId) {
-//        final RemoteNode node;
-//        synchronized (remoteNodes) {
-//            node = remoteNodes.remove(nodeId);
-//        }
-//
-//        if (node != null) {
-//            synchronized (localNodes) {
-//                onDisconnectForLocalNodes(node);
-//            }
-//        }
-    }
-
     public void onDisconnect(final SerialContext host) {
-//        final Collection<RemoteNode> toRemove = new ArrayList<RemoteNode>();
-//        synchronized (remoteNodes) {
-//            for (final RemoteNode t : remoteNodes.values()) {
-//                if (t.getRemoteHost() == host) {
-//                    toRemove.add(t);
-//                }
-//            }
-//            for (final RemoteNode t : toRemove) {
-//                remoteNodes.remove(t.getId());
-//            }
-//        }
-//
-//        synchronized (localNodes) {  //todo consider moving the synchronized block inside the onDisconnectForLocalNodes() method
-//            for (final RemoteNode t : toRemove) {
-//                onDisconnectForLocalNodes(t);
-//            }
-//        }
     }
 
     public abstract <T> void registerProxy(Class<T> klass, String name, T object);
