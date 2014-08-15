@@ -3,6 +3,7 @@ package groovyx.gpars.agent.remote
 import groovyx.gpars.agent.Agent
 import groovyx.gpars.remote.LocalHost
 import groovyx.gpars.remote.netty.NettyTransportProvider
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
 
@@ -13,18 +14,26 @@ class RemoteAgentsWithServerTest extends Specification {
     def static HOST = "localhost"
     def static PORT = 9677
 
+    @Shared
+    RemoteAgents serverRemoteAgents
+
+    @Shared
+    RemoteAgents clientRemoteAgents
+
     def setupSpec() {
-        def serverLocalHost = new LocalHost()
-        NettyTransportProvider.startServer HOST, PORT, serverLocalHost
+        serverRemoteAgents = RemoteAgents.create()
+        serverRemoteAgents.startServer HOST, PORT
+
+        clientRemoteAgents = RemoteAgents.create()
     }
 
     def cleanupSpec() {
-        NettyTransportProvider.stopServer()
+        serverRemoteAgents.stopServer()
     }
 
     RemoteAgent publishAndRetrieveRemoteAgent(Agent agent, String name, AgentClosureExecutionPolicy policy) {
-        RemoteAgents.publish agent, name
-        def remoteAgent = RemoteAgents.get HOST, PORT, name get()
+        serverRemoteAgents.publish agent, name
+        def remoteAgent = clientRemoteAgents.get HOST, PORT, name get()
         remoteAgent.executionPolicy = policy
         return remoteAgent
     }

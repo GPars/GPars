@@ -1,15 +1,15 @@
 package groovyx.gpars.agent.remote
 
 import groovyx.gpars.agent.Agent
+import groovyx.gpars.dataflow.DataflowVariable
 import spock.lang.Specification
 
 class RemoteAgentsTest extends Specification {
-    def static HOST = "localhost"
-    def static PORT = 9555
+    RemoteAgents remoteAgents = RemoteAgents.create()
 
     def "retrieving not published Agent returns null"() {
         when:
-        def agent = RemoteAgents.get "test-agent"
+        def agent = remoteAgents.get Agent, "test-agent"
 
         then:
         agent == null
@@ -21,8 +21,8 @@ class RemoteAgentsTest extends Specification {
         def name = "test-agent"
 
         when:
-        RemoteAgents.publish agent, name
-        def retrievedAgent = RemoteAgents.get name
+        remoteAgents.publish agent, name
+        def retrievedAgent = remoteAgents.get Agent, name
 
         then:
         retrievedAgent == agent
@@ -30,16 +30,15 @@ class RemoteAgentsTest extends Specification {
 
     def "retrieving an Agent from remote host returns Future"() {
         setup:
+        def HOST = "localhost"
+        def PORT = 9555
         def name = "test-agent"
 
         when:
-        def agentFuture = RemoteAgents.get HOST, PORT, name, policy
+        def agentFuture = remoteAgents.get HOST, PORT, name
 
         then:
         agentFuture != null
-        agentFuture instanceof RemoteAgentFuture
-
-        where:
-        policy << AgentClosureExecutionPolicy.values()
+        agentFuture instanceof DataflowVariable
     }
 }

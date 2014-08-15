@@ -19,7 +19,7 @@ public class RemoteAgentRequestMsg extends SerialMsg {
     public void execute(RemoteConnection conn) {
         updateRemoteHost(conn);
 
-        Agent<?> agent = RemoteAgents.get(name);
+        Agent agent = conn.getLocalHost().get(Agent.class, name);
         conn.write(new RemoteAgentReplyMsg(name, agent));
     }
 }
