@@ -1,6 +1,5 @@
 package groovyx.gpars.remote.message;
 
-import groovy.lang.Closure;
 import groovyx.gpars.agent.AgentCore;
 import groovyx.gpars.agent.remote.AgentClosureExecutionClosure;
 import groovyx.gpars.agent.remote.RemoteAgent;
