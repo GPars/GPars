@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Remoting context for Actors. Manages serialization, publishing and retrieval.
+ * Remoting context for Dataflows. Manages serialization, publishing and retrieval.
  *
  * @author Rafal Slawik
  */
