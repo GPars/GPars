@@ -30,6 +30,8 @@ import java.net.InetSocketAddress;
 /**
  * Represents a server that waits for connections from clients.
  * @see NettyClient
+ *
+ * @author Rafal Slawik
  */
 public class NettyServer {
     private final EventLoopGroup bossGroup;

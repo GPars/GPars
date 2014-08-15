@@ -27,7 +27,7 @@ import io.netty.channel.*;
 import java.util.List;
 
 /**
- * @author Alex Tkachman
+ * @author Alex Tkachman, Rafal Slawik
  */
 public class NettyHandler extends ChannelInboundHandlerAdapter {
     private final RemoteConnection remoteConnection;

@@ -29,6 +29,8 @@ import java.util.List;
 /**
  * Represents client that connects to server
  * @see NettyServer
+ *
+ * @author Rafal Slawik
  */
 public class NettyClient {
     private final EventLoopGroup workerGroup;

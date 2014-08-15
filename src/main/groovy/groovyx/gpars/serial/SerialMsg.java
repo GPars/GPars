@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-10, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import java.util.UUID;
 /**
  * Base class for all messages
  *
- * @author Alex Tkachman, Vaclav Pech
+ * @author Alex Tkachman, Vaclav Pech, Rafal Slawik
  */
 public abstract class SerialMsg implements Serializable {
     private static final long serialVersionUID = 1L ;

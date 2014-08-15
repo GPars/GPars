@@ -1,7 +1,22 @@
+// GPars - Groovy Parallel Systems
+//
+// Copyright © 2014  The original author or authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package groovyx.gpars.actor.remote
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.remote.netty.NettyTransportProvider
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
@@ -101,5 +116,28 @@ class RemoteActorTest extends Specification {
         then:
         replyMessageLatch.await()
         replyMessage == "test reply"
+    }
+
+    @Timeout(5)
+    def "test sendAndWait on RemoteActor"() {
+        setup:
+        def message = "message"
+        def messageTest = "test"
+
+        def testActor = Actors.reactor {
+            message + it
+        }
+        def actorName = "testActor-4"
+
+        serverRemoteActors.publish testActor, actorName
+        def remoteActor = clientRemoteActors.get HOST, PORT, actorName get()
+
+        when:
+        def receivedMessage = remoteActor.sendAndWait(messageTest)
+
+        then:
+        receivedMessage.length() == message.length() + messageTest.length()
+        receivedMessage.startsWith message
+        receivedMessage.endsWith messageTest
     }
 }

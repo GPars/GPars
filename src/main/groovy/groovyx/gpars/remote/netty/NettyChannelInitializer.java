@@ -27,6 +27,11 @@ import io.netty.channel.socket.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Sets up Netty's communication channel.
+ *
+ * @author Rafal Slawik
+ */
 public class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
     protected final LocalHost localHost;
     protected final ConnectListener connectListener;
