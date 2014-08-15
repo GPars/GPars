@@ -38,7 +38,7 @@ import java.util.*;
  * Local host contains: remote hosts connected with this one
  * </p>
  *
- * @author Alex Tkachman
+ * @author Alex Tkachman, Rafal Slawik
  */
 public abstract class LocalHost extends SerialHandles {
     /**

@@ -22,6 +22,11 @@ import groovyx.gpars.serial.SerialMsg;
 
 import java.util.UUID;
 
+/**
+ * Message that carry Broadcast stream request.
+ *
+ * @author Rafal Slawik
+ */
 public class RemoteDataflowBroadcastRequestMsg extends SerialMsg {
     final String name;
 

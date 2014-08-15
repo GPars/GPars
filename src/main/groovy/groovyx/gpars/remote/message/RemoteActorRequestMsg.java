@@ -22,6 +22,11 @@ import groovyx.gpars.serial.SerialMsg;
 
 import java.util.UUID;
 
+/**
+ * Message used to carry remote Actor request.
+ *
+ * @author Rafal Slawik
+ */
 public class RemoteActorRequestMsg extends SerialMsg {
     private final String actorName;
 

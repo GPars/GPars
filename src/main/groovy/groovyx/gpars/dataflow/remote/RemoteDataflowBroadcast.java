@@ -22,6 +22,12 @@ import groovyx.gpars.dataflow.stream.DataflowStreamReadAdapter;
 import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
 import groovyx.gpars.remote.RemoteHost;
 
+/**
+ * Proxy object for remote instance of Broadcast.
+ * @param <T> the type of the broadcast
+ *
+ * @author Rafal Slawik
+ */
 public class RemoteDataflowBroadcast<T> extends DataflowStreamWriteAdapter<T> {
     public RemoteDataflowBroadcast(RemoteHost remoteHost) {
         super(new DataflowStream<T>());

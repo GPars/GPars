@@ -22,7 +22,11 @@ import groovyx.gpars.serial.SerialMsg;
 
 import java.util.UUID;
 
-
+/**
+ * Message that carry remote Queue request.
+ *
+ * @author Rafal Slawik
+ */
 public class RemoteDataflowQueueRequestMsg extends SerialMsg {
     final String name;
 

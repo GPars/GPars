@@ -21,6 +21,11 @@ import groovyx.gpars.dataflow.remote.RemoteDataflowVariable;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
+/**
+ * Message that carry Variable.
+ *
+ * @author Rafal Slawik
+ */
 public class RemoteDataflowVariableReplyMsg extends SerialMsg {
 
     private final String name;

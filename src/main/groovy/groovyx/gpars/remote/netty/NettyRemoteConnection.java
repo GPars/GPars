@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Connection using Netty
  *
- * @author Alex Tkachman
+ * @author Alex Tkachman, Rafal Slawik
  */
 public class NettyRemoteConnection extends RemoteConnection {
     private final Channel channel;

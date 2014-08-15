@@ -26,6 +26,11 @@ import groovyx.gpars.serial.*;
 
 import java.lang.reflect.InvocationTargetException;
 
+/**
+ * Proxy object for remote instance of Actor.
+ *
+ * @author Rafal Slawik
+ */
 public class RemoteActor extends Actor implements RemoteSerialized {
     private final RemoteHost remoteHost;
     private static final long serialVersionUID = -1375776678860848278L;

@@ -22,6 +22,12 @@ import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.remote.RemoteHost;
 import groovyx.gpars.serial.RemoteSerialized;
 
+/**
+ * Proxy object for remote Variable instance.
+ * @param <T> the type of the variable
+ *
+ * @author Rafal Slawik
+ */
 public final class RemoteDataflowVariable<T> extends DataflowVariable<T> implements RemoteSerialized {
     private static final long serialVersionUID = -420013188758006693L;
     private final RemoteHost remoteHost;

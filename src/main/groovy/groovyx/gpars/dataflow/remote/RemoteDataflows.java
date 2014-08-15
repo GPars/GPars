@@ -26,6 +26,11 @@ import groovyx.gpars.remote.message.RemoteDataflowVariableRequestMsg;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Remoting context for Actors. Manages serialization, publishing and retrieval.
+ *
+ * @author Rafal Slawik
+ */
 public final class RemoteDataflows extends LocalHost {
 
     /**

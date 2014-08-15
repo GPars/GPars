@@ -19,6 +19,11 @@ package groovyx.gpars.remote.message;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
+/**
+ * Message that triggers disconnect action.
+ *
+ * @author Rafal Slawik
+ */
 public class CloseConnectionMsg extends SerialMsg {
 
     @Override

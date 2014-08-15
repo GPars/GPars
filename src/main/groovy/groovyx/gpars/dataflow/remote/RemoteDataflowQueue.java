@@ -37,6 +37,12 @@ import static java.util.Arrays.asList;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Proxy object for remote instance of Queue.
+ * @param <T> the type of the queue
+ *
+ * @author Rafal Slawik
+ */
 public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChannel<T>, RemoteSerialized {
     private RemoteHost remoteHost;
 

@@ -22,6 +22,11 @@ import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
+/**
+ * Message used to carry Broadcast stream.
+ *
+ * @author Rafal Slawik
+ */
 public class RemoteDataflowBroadcastReplyMsg extends SerialMsg {
     private final String name;
     private final DataflowStreamWriteAdapter stream;

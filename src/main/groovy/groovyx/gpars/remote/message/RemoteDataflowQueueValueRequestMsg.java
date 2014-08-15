@@ -22,6 +22,12 @@ import groovyx.gpars.dataflow.remote.RemoteDataflowQueue;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
+/**
+ * Message that carry item request to remote queue.
+ * @param <T> the type of the queue
+ *
+ * @author Rafal Slawik
+ */
 public class RemoteDataflowQueueValueRequestMsg<T> extends SerialMsg{
     private final DataflowVariable<T> value;
     private final DataflowChannel<?> queue;

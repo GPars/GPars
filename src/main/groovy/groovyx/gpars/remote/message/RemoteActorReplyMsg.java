@@ -21,6 +21,11 @@ import groovyx.gpars.actor.remote.RemoteActor;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
+/**
+ * Message used to carry Actor.
+ *
+ * @author Rafal Slawik
+ */
 public class RemoteActorReplyMsg extends SerialMsg {
     private final String name;
     private final Actor actor;

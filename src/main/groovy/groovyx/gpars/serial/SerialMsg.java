@@ -25,7 +25,7 @@ import java.util.UUID;
 /**
  * Base class for all messages
  *
- * @author Alex Tkachman, Vaclav Pech
+ * @author Alex Tkachman, Vaclav Pech, Rafal Slawik
  */
 public abstract class SerialMsg implements Serializable {
     private static final long serialVersionUID = 1L ;

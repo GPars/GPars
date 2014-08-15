@@ -22,6 +22,11 @@ import groovyx.gpars.serial.SerialMsg;
 
 import java.util.UUID;
 
+/**
+ * Message that carry remote Variable request.
+ *
+ * @author Rafal Slawik
+ */
 public class RemoteDataflowVariableRequestMsg extends SerialMsg {
 
     private final String name;
