@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008-2012, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package groovyx.gpars.agent;
 import groovyx.gpars.actor.Actors;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
+import groovyx.gpars.serial.WithSerialId;
 import groovyx.gpars.util.AsyncMessagingCore;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import java.util.List;
  *         Date: 13.4.2010
  */
 @SuppressWarnings({"UnqualifiedStaticUsage"})
-public abstract class AgentCore {
+public abstract class AgentCore extends WithSerialId {
 
     private final AsyncMessagingCore core;
 
@@ -143,7 +144,7 @@ public abstract class AgentCore {
      *
      * @param message A value or a closure
      */
-    abstract void handleMessage(final Object message);
+    public abstract void handleMessage(final Object message);
 
     /**
      * Adds the exception to the list of thrown exceptions

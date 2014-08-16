@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-10, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,61 +16,44 @@
 
 package groovyx.gpars.remote.netty;
 
+import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelHandler;
+
+import static io.netty.channel.ChannelHandler.Sharable;
+
+import io.netty.channel.*;
+
+import java.util.List;
 
 /**
- * @author Alex Tkachman
+ * @author Alex Tkachman, Rafal Slawik
  */
-@ChannelHandler.Sharable
-public class NettyHandler extends SimpleChannelHandler {
+public class NettyHandler extends ChannelInboundHandlerAdapter {
+    private final RemoteConnection remoteConnection;
 
-    private Channel channel;
-
-    private final RemoteConnection connection;
-
-    public NettyHandler(final NettyTransportProvider provider) {
-        connection = new NettyRemoteConnection(provider, this);
+    public NettyHandler(RemoteConnection remoteConnection) {
+        this.remoteConnection = remoteConnection;
     }
 
     @Override
-    public void channelOpen(final ChannelHandlerContext ctx, final ChannelStateEvent e) throws Exception {
-        channel = e.getChannel();
-        channel.getPipeline().addFirst("encoder", new RemoteObjectEncoder(connection));
-        channel.getPipeline().addFirst("decoder", new RemoteObjectDecoder(connection));
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
+        remoteConnection.onConnect();
     }
 
     @Override
-    public void channelConnected(final ChannelHandlerContext ctx, final ChannelStateEvent e) throws Exception {
-        connection.onConnect();
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        super.channelInactive(ctx);
+        remoteConnection.onDisconnect();
     }
 
     @Override
-    public void channelDisconnected(final ChannelHandlerContext ctx, final ChannelStateEvent e) throws Exception {
-        connection.onDisconnect();
-    }
-
-    @Override
-    public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e) {
-        final SerialMsg msg = (SerialMsg) e.getMessage();
-        msg.execute(connection);
-    }
-
-    @Override
-    public void exceptionCaught(final ChannelHandlerContext ctx, final ExceptionEvent e) {
-        //noinspection ThrowableResultOfMethodCallIgnored
-        connection.onException(e.getCause());
-        e.getCause().printStackTrace();
-    }
-
-    public Channel getChannel() {
-        return channel;
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        super.channelRead(ctx, msg);
+        System.err.println("Message received: " + msg);
+        if (msg instanceof SerialMsg) {
+            ((SerialMsg) msg).execute(remoteConnection);
+        }
     }
 }

@@ -21,14 +21,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.MulticastSocket;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.UUID;
 
+/**
+ * <b>Not used</b> Local network discovery service.
+ */
 @SuppressWarnings({"MagicNumber"})
 public class BroadcastDiscovery {
     @SuppressWarnings({"StaticNonFinalField"})

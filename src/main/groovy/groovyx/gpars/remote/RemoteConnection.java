@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-11, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package groovyx.gpars.remote;
 
 import groovyx.gpars.remote.message.HostIdMsg;
 import groovyx.gpars.serial.SerialMsg;
+import io.netty.channel.Channel;
 
 /**
  * Represents connection to remote host
@@ -29,27 +30,18 @@ public abstract class RemoteConnection {
 
     private RemoteHost host;
 
-    protected RemoteConnection(final LocalHost provider) {
-        this.localHost = provider;
-    }
-
-    public void onMessage(final SerialMsg msg) {
-        if (host == null) {
-            host = (RemoteHost) localHost.getSerialHost(msg.hostId, this);
-        } else {
-            throw new IllegalStateException("Unexpected message: " + msg);
-        }
+    protected RemoteConnection(final LocalHost localHost) {
+        this.localHost = localHost;
     }
 
     @SuppressWarnings({"EmptyMethod"})
     public void onException(final Throwable cause) {
     }
 
-    public void onConnect() {
-        write(new HostIdMsg(localHost.getId()));
-    }
+    abstract public void onConnect();
 
     public void onDisconnect() {
+        System.err.println(this + ".onDisconnect()");
         localHost.onDisconnect(host);
     }
 
@@ -61,6 +53,10 @@ public abstract class RemoteConnection {
 
     public void setHost(final RemoteHost host) {
         this.host = host;
+    }
+
+    public LocalHost getLocalHost() {
+        return localHost;
     }
 
     public abstract void disconnect();

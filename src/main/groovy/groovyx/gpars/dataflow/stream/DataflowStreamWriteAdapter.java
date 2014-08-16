@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-11, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,15 @@
 
 package groovyx.gpars.dataflow.stream;
 
+import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowWriteChannel;
+import groovyx.gpars.remote.RemoteConnection;
+import groovyx.gpars.remote.RemoteHost;
+import groovyx.gpars.serial.SerialMsg;
+import groovyx.gpars.serial.WithSerialId;
+
+import java.util.List;
 
 /**
  * Adapts a DataflowStream to accommodate for the DataflowWriteChannel interface.
@@ -27,7 +34,7 @@ import groovyx.gpars.dataflow.DataflowWriteChannel;
  * @author Vaclav Pech
  */
 @SuppressWarnings({"SynchronizedMethod"})
-public class DataflowStreamWriteAdapter<T> implements DataflowWriteChannel<T> {
+public class DataflowStreamWriteAdapter<T> extends WithSerialId implements DataflowWriteChannel<T> {
 
     private StreamCore<T> head;
 
@@ -43,18 +50,28 @@ public class DataflowStreamWriteAdapter<T> implements DataflowWriteChannel<T> {
     @Override
     public final DataflowWriteChannel<T> leftShift(final T value) {
         updateHead().leftShift(value);
+        notifyRemote(value);
         return this;
     }
 
     @Override
     public final DataflowWriteChannel<T> leftShift(final DataflowReadChannel<T> ref) {
         updateHead().leftShift(ref);
+        ref.getValAsync(new MessageStream() {
+            @Override
+            public MessageStream send(Object message) {
+                if (!(message instanceof Throwable))
+                    notifyRemote((T)message);
+                return this;
+            }
+        });
         return this;
     }
 
     @Override
     public final void bind(final T value) {
         updateHead().leftShift(value);
+        notifyRemote(value);
     }
 
     /**
@@ -75,6 +92,36 @@ public class DataflowStreamWriteAdapter<T> implements DataflowWriteChannel<T> {
 
     protected final synchronized StreamCore<T> getHead() {
         return head;
+    }
+
+    private void notifyRemote(T value) {
+        if (serialHandle != null) {
+            // TODO schedule this job?
+            final Object sub = serialHandle.getSubscribers();
+            if (sub instanceof RemoteHost) {
+                RemoteHost remoteHost = (RemoteHost)sub;
+                remoteHost.write(new BindDataflowStream(this, value));
+            }
+            if (sub instanceof List) {
+                List<RemoteHost> subs = (List<RemoteHost>) sub;
+                subs.stream().forEach(host -> host.write(new BindDataflowStream(this, value)));
+            }
+        }
+    }
+
+    private class BindDataflowStream<T> extends SerialMsg {
+        private DataflowStreamWriteAdapter<T> stream;
+        private T value;
+
+        public BindDataflowStream(DataflowStreamWriteAdapter<T> stream, T value) {
+            this.stream = stream;
+            this.value = value;
+        }
+
+        @Override
+        public void execute(RemoteConnection conn) {
+            stream.leftShift(value);
+        }
     }
 }
 
