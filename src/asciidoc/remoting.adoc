@@ -38,7 +38,7 @@ At _host B_:
 
 Following mechanism was used to create proxy objects:
 
-object <-(serialization)-> handle ---(network)--- handle <-(serialization)-> proxy-object
+_object_ <-(serialization)-> _handle_ ---- [network] ---- _handle_ <-(serialization)-> _proxy-object_
 
 One of the main advantages of this mechanism is
 that sending proxy-object reference back is deserialized to original instance.
@@ -46,8 +46,8 @@ that sending proxy-object reference back is deserialized to original instance.
 As all messages are seralized before sending over a wire,
 they must implement _Serializable_ interface.
 This is a consequence of using build-in Java serialization mechanism and Netty's _ObjectDecoder/ObjectEncoder_.
-On the other hand it allows flexibility to send any custom object as a message to Actor
-or to use DataflowVariable of any type.
+On the other hand it gives a flexibility to send any custom object as a message to Actor
+or to use DataflowVariable(s) of any type.
 
 == Dataflows
 
@@ -174,20 +174,27 @@ Publishing:
 [source, groovy]
 ----
 def actor = ...
-remoteActors.publish actor, "name of actor"
+remoteActors.publish actor, "actor-name"
 ----
 
-Retrieving:
+Retrieval:
 
 [source,groovy]
 ----
-def actorPromise = remoteActors.get HOST, PORT, "name of actor"
+def actorPromise = remoteActors.get HOST, PORT, "actor-name"
 def remoteActor = actorPromise.get()
 ----
 
+It is possible to join on remote Actor, this will block until original Actor ends its work.
+Sending replies and _sendAndWait_ are supported as well.
+
+One can send any object as a message to Actor, but keep in mind it has to be _Serializable_.
+
+See example: _groovyx.gpars.samples.remote.actor_
+
 == Agents
 
-Remote Agents system is similar fashion.
+Remote Agents system is designed in similar fashion.
 To begin, a context (_RemoteAgents_ class) has to be created.
 Within the context Agents can be published or retrieved from remote hosts.
 
@@ -201,13 +208,32 @@ Publishing:
 [source,groovy]
 ----
 def agent = ...
-remoteAgents.publish agent, "name of agent"
+remoteAgents.publish agent, "agent-name"
 ----
 
 Retrieval:
 
 [source,groovy]
 ----
-def agentPromise = remoteAgents.get HOST, PORT, "name of agent"
+def agentPromise = remoteAgents.get HOST, PORT, "agent-name"
 def remoteAgent = agentPromise.get()
 ----
+
+There are two ways of executing closures used to update state of remote Agent instance:
+
+* _remote_ - closure is serialized and sent to original instance and executed in that context
+* _local_ - current state is retrieved and closure is executed where the update originated,
+then updated value is sent to original instance.
+Concurrent changes to Agent wait until this process ends.
+
+By default remote Agent uses _remote_ execution policy.
+Changing it is possible in following way:
+
+[source,groovy]
+----
+def agentPromise = remoteAgents.get HOST, PORT, "agent"
+def remoteAgent =  agentPromise.get()
+remoteAgent.executionPolicy = AgentClosureExecutionPolicy.LOCAL
+----
+
+See example: _groovyx.gpars.samples.remote.agent_
