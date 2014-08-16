@@ -187,4 +187,27 @@ def remoteActor = actorPromise.get()
 
 == Agents
 
-work in progress
+Remote Agents system is similar fashion.
+To begin, a context (_RemoteAgents_ class) has to be created.
+Within the context Agents can be published or retrieved from remote hosts.
+
+[source,groovy]
+----
+def remoteAgents = RemoteAgents.create()
+----
+
+Publishing:
+
+[source,groovy]
+----
+def agent = ...
+remoteAgents.publish agent, "name of agent"
+----
+
+Retrieval:
+
+[source,groovy]
+----
+def agentPromise = remoteAgents.get HOST, PORT, "name of agent"
+def remoteAgent = agentPromise.get()
+----
