@@ -61,8 +61,8 @@ archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
 version = '1.3-SNAPSHOT'
 
-sourceCompatibility = 8
-targetCompatibility = 8
+sourceCompatibility = 7
+targetCompatibility = 7
 
 def theVendor = 'gpars.org'
 def theTitle = 'GPars: Groovy Parallel Systems'
@@ -438,8 +438,8 @@ idea {
         excludeDirs += file('java-demo') // A separate module of a pure-java gpars usage
     }
     project {
-        jdkName '1.8'
-        languageLevel 'JDK_1_8'
+        jdkName '1.7'
+        languageLevel 'JDK_1_7'
         ipr {
             withXml { provider ->
                 def node = provider.asNode()
