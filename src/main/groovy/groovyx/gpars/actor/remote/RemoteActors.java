@@ -22,8 +22,8 @@ import groovyx.gpars.dataflow.Promise;
 import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.message.RemoteActorRequestMsg;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Remoting context for Actors. Manages serialization, publishing and retrieval.
@@ -35,12 +35,12 @@ public final class RemoteActors extends LocalHost {
     /**
      * Stores Actors published in context of this instance of RemoteActors.
      */
-    private final Map<String, Actor> publishedActors;
+    private final ConcurrentMap<String, Actor> publishedActors;
 
     /**
      * Stores promises to remote instances of Actors.
      */
-    private final Map<String, DataflowVariable<Actor>> remoteActors;
+    private final ConcurrentMap<String, DataflowVariable<Actor>> remoteActors;
 
     private RemoteActors() {
         publishedActors = new ConcurrentHashMap<>();

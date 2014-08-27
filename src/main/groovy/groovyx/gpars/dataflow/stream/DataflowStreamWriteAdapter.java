@@ -104,7 +104,9 @@ public class DataflowStreamWriteAdapter<T> extends WithSerialId implements Dataf
             }
             if (sub instanceof List) {
                 List<RemoteHost> subs = (List<RemoteHost>) sub;
-                subs.stream().forEach(host -> host.write(new BindDataflowStream(this, value)));
+                for (RemoteHost subscriber : subs) {
+                    subscriber.write(new BindDataflowStream<T>(this, value));
+                }
             }
         }
     }

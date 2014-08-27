@@ -17,6 +17,7 @@
 package groovyx.gpars.remote.netty;
 
 import groovyx.gpars.remote.LocalHost;
+import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.message.HostIdMsg;
 
 
@@ -32,8 +33,13 @@ public class NettyTransportProvider {
      * @param localHost the serialization context for connection
      * @return new instance of {@link groovyx.gpars.remote.netty.NettyServer}
      */
-    public static NettyServer createServer(String host, int port, LocalHost localHost) {
-        return new NettyServer(localHost, host, port, connection -> connection.write(new HostIdMsg(localHost.getId())));
+    public static NettyServer createServer(String host, int port, final LocalHost localHost) {
+        return new NettyServer(localHost, host, port, new ConnectListener() {
+            @Override
+            public void onConnect(RemoteConnection connection) {
+                connection.write(new HostIdMsg(localHost.getId()));
+            }
+        });
     }
 
     /**

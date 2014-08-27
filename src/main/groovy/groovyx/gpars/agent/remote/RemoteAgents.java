@@ -21,11 +21,9 @@ import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.Promise;
 import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.message.RemoteAgentRequestMsg;
-import groovyx.gpars.remote.netty.NettyTransportProvider;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Remoting context for Agents. Manages serialization, publishing and retrieval.
@@ -37,12 +35,12 @@ public final class RemoteAgents extends LocalHost {
     /**
      * Stores Agents published in context of this instance of RemoteAgents.
      */
-    private final Map<String, Agent<?>> publishedAgents;
+    private final ConcurrentMap<String, Agent<?>> publishedAgents;
 
     /**
      * Stores promises to remote instances of Agents.
      */
-    private final Map<String, DataflowVariable<RemoteAgent>> remoteAgents;
+    private final ConcurrentMap<String, DataflowVariable<RemoteAgent>> remoteAgents;
 
     private RemoteAgents() {
         publishedAgents = new ConcurrentHashMap<>();

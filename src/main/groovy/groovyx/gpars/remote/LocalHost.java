@@ -16,8 +16,8 @@
 
 package groovyx.gpars.remote;
 
-import groovyx.gpars.actor.Actor;
 import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.remote.netty.ConnectListener;
 import groovyx.gpars.remote.netty.NettyClient;
 import groovyx.gpars.remote.netty.NettyServer;
 import groovyx.gpars.remote.netty.NettyTransportProvider;
@@ -25,7 +25,11 @@ import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandles;
 import groovyx.gpars.serial.SerialMsg;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Represents communication point with other local hosts.
@@ -102,15 +106,19 @@ public abstract class LocalHost extends SerialHandles {
         server.stop();
     }
 
-    private void createRequest(String host, int port, SerialMsg msg) {
-        NettyClient client = NettyTransportProvider.createClient(host, port, this, connection -> {
-            if (connection.getHost() != null)
-                connection.write(msg);
+    private void createRequest(String host, int port, final SerialMsg msg) {
+        NettyClient client = NettyTransportProvider.createClient(host, port, this, new ConnectListener() {
+            @Override
+            public void onConnect(RemoteConnection connection) {
+                if (connection.getHost() != null) {
+                    connection.write(msg);
+                }
+            }
         });
         client.start();
     }
 
-    protected <T> DataflowVariable<T> getPromise(Map<String, DataflowVariable<T>> registry, String name, String host, int port, SerialMsg requestMsg) {
+    protected <T> DataflowVariable<T> getPromise(ConcurrentMap<String, DataflowVariable<T>> registry, String name, String host, int port, SerialMsg requestMsg) {
         DataflowVariable remoteVariable = registry.get(name);
         if (remoteVariable == null) {
             DataflowVariable newRemoteVariable = new DataflowVariable<>();

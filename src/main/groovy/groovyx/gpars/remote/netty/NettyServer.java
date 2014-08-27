@@ -66,9 +66,12 @@ public class NettyServer {
             channelFuture.addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
-                    future.channel().closeFuture().addListener(f -> {
-                        bossGroup.shutdownGracefully();
-                        workerGroup.shutdownGracefully();
+                    future.channel().closeFuture().addListener(new ChannelFutureListener() {
+                        @Override
+                        public void operationComplete(ChannelFuture future) throws Exception {
+                            bossGroup.shutdownGracefully();
+                            workerGroup.shutdownGracefully();
+                        }
                     });
                 }
             });

@@ -34,16 +34,16 @@ public enum AgentClosureExecutionPolicy {
         @Override
         public SerialMsg prepareMessage(RemoteAgent<?> agent, Object message) {
             if (message instanceof Closure) {
-                Closure closure = (Closure) message;
-                RemoteAgentMock mock = new RemoteAgentMock();
+                final Closure closure = (Closure) message;
+                final RemoteAgentMock mock = new RemoteAgentMock();
                 closure.setDelegate(mock);
                 DataflowVariable<?> oldValue = new DataflowVariable<>();
-                DataflowVariable newValue = new DataflowVariable();
+                final DataflowVariable newValue = new DataflowVariable();
                 oldValue.whenBound(new MessageStream() {
                     @Override
                     public MessageStream send(Object message) {
                         closure.call(message);
-                        newValue.bindUnique(mock.getState());
+                        newValue.bind(mock.getState());
                         return this;
                     }
                 });

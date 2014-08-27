@@ -16,15 +16,14 @@
 
 package groovyx.gpars.remote.netty;
 
-import groovyx.gpars.remote.BroadcastDiscovery;
 import groovyx.gpars.remote.LocalHost;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents client that connects to server
@@ -65,8 +64,11 @@ public class NettyClient {
             channelFuture.addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
-                    future.channel().closeFuture().addListener(f -> {
-                        workerGroup.shutdownGracefully();
+                    future.channel().closeFuture().addListener(new ChannelFutureListener() {
+                        @Override
+                        public void operationComplete(ChannelFuture future) throws Exception {
+                            workerGroup.shutdownGracefully();
+                        }
                     });
                 }
             });

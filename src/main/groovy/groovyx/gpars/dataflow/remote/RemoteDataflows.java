@@ -23,8 +23,8 @@ import groovyx.gpars.remote.message.RemoteDataflowBroadcastRequestMsg;
 import groovyx.gpars.remote.message.RemoteDataflowQueueRequestMsg;
 import groovyx.gpars.remote.message.RemoteDataflowVariableRequestMsg;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Remoting context for Dataflows. Manages serialization, publishing and retrieval.
@@ -36,32 +36,32 @@ public final class RemoteDataflows extends LocalHost {
     /**
      * Stores DataflowVariables published in context of this instance of RemoteDataflows.
      */
-    private final Map<String, DataflowVariable<?>> publishedVariables;
+    private final ConcurrentMap<String, DataflowVariable<?>> publishedVariables;
 
     /**
      * Stores promises to remote instances of DataflowVariables.
      */
-    private final Map<String, DataflowVariable<DataflowVariable>> remoteVariables;
+    private final ConcurrentMap<String, DataflowVariable<DataflowVariable>> remoteVariables;
 
     /**
      * Stores DataflowBroadcasts published in context of this instance of RemoteDataflows.
      */
-    private final Map<String, DataflowBroadcast> publishedBroadcasts;
+    private final ConcurrentMap<String, DataflowBroadcast> publishedBroadcasts;
 
     /**
      * Stores promises to remote instances of DataflowBroadcasts.
      */
-    private final Map<String, DataflowVariable<RemoteDataflowBroadcast>> remoteBroadcasts;
+    private final ConcurrentMap<String, DataflowVariable<RemoteDataflowBroadcast>> remoteBroadcasts;
 
     /**
      * Stores DataflowQueues published in context of this instance of RemoteDataflows.
      */
-    private final Map<String, DataflowQueue<?>> publishedQueues;
+    private final ConcurrentMap<String, DataflowQueue<?>> publishedQueues;
 
     /**
      * Stores promises to remote instances of DataflowQueues.
      */
-    private final Map<String, DataflowVariable<RemoteDataflowQueue<?>>> remoteQueues;
+    private final ConcurrentMap<String, DataflowVariable<RemoteDataflowQueue<?>>> remoteQueues;
 
     RemoteDataflows() {
         publishedVariables = new ConcurrentHashMap<>();
@@ -115,7 +115,7 @@ public final class RemoteDataflows extends LocalHost {
      */
     public Promise<DataflowReadChannel> getReadChannel(String host, int port, String name) {
         DataflowVariable<RemoteDataflowBroadcast> broadcastPromise = getPromise(remoteBroadcasts, name, host, port, new RemoteDataflowBroadcastRequestMsg(this.getId(), name));
-        DataflowVariable<DataflowReadChannel> promise = new DataflowVariable<>();
+        final DataflowVariable<DataflowReadChannel> promise = new DataflowVariable<>();
         broadcastPromise.whenBound(new MessageStream() {
             @Override
             public MessageStream send(Object message) {

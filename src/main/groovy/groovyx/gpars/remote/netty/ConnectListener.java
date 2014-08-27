@@ -18,7 +18,6 @@ package groovyx.gpars.remote.netty;
 
 import groovyx.gpars.remote.RemoteConnection;
 
-@FunctionalInterface
 public interface ConnectListener {
     public void onConnect(RemoteConnection connection);
 }
