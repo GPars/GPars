@@ -16,15 +16,10 @@
 
 package groovyx.gpars.remote.netty;
 
-import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
-
-import static io.netty.channel.ChannelHandler.Sharable;
-
-import io.netty.channel.*;
-
-import java.util.List;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 
 /**
  * @author Alex Tkachman, Rafal Slawik
@@ -51,7 +46,6 @@ public class NettyHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         super.channelRead(ctx, msg);
-        System.err.println("Message received: " + msg);
         if (msg instanceof SerialMsg) {
             ((SerialMsg) msg).execute(remoteConnection);
         }
