@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,15 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.integration
+package groovyx.gpars.samples.remote.actor.chat
 
-import groovyx.gpars.remote.LocalHost
-import groovyx.gpars.remote.netty.NettyTransportProvider
-
-public abstract class NettyTest extends CommunicationTestBase {
-    static int port = 5239
-
-    LocalHost getTransportProvider() {
-        new NettyTransportProvider()
-    }
+class ChatMessage implements Serializable {
+    String action
+    String sender
+    Object message
 }

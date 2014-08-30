@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,32 +16,30 @@
 
 package groovyx.gpars.remote.message;
 
-import groovyx.gpars.remote.LocalNode;
+import groovyx.gpars.actor.Actor;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
 import java.util.UUID;
 
 /**
- * Message sent when local node disconnected from remote host
+ * Message used to carry remote Actor request.
  *
- * @author Alex Tkachman
+ * @author Rafal Slawik
  */
-public class NodeDisconnectedMsg extends SerialMsg {
-    private static final long serialVersionUID = 8082827710656359290L;
+public class RemoteActorRequestMsg extends SerialMsg {
+    private final String actorName;
 
-    /**
-     * Id of node disconnected
-     */
-    public final UUID nodeId;
-
-    public NodeDisconnectedMsg(final LocalNode node) {
-        super();
-        nodeId = node.getId();
+    public RemoteActorRequestMsg(UUID hostId, String actorName) {
+        super(hostId);
+        this.actorName = actorName;
     }
 
     @Override
-    public void execute(final RemoteConnection conn) {
-        conn.getHost().getLocalHost().disconnectRemoteNode(nodeId);
+    public void execute(RemoteConnection conn) {
+        updateRemoteHost(conn);
+
+        Actor actor = conn.getLocalHost().get(Actor.class, actorName);
+        conn.getHost().write(new RemoteActorReplyMsg(actorName, actor));
     }
 }

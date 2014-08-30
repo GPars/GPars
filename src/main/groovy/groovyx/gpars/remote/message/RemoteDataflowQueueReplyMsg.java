@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,36 +16,28 @@
 
 package groovyx.gpars.remote.message;
 
-import groovyx.gpars.actor.Actor;
-import groovyx.gpars.remote.LocalNode;
+import groovyx.gpars.dataflow.DataflowChannel;
+import groovyx.gpars.dataflow.DataflowQueue;
+import groovyx.gpars.dataflow.remote.RemoteDataflowQueue;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
-import java.util.UUID;
-
 /**
- * Message sent when local node connected to remote host
+ * Message that carry DataflowQueue.
  *
- * @author Alex Tkachman
+ * @author Rafal Slawik
  */
-public class NodeConnectedMsg extends SerialMsg {
-    private static final long serialVersionUID = -2198640646677794254L;
+public class RemoteDataflowQueueReplyMsg extends SerialMsg {
+    final String name;
+    final DataflowChannel<?> queue;
 
-    /**
-     * Id of node connected
-     */
-    public final UUID nodeId;
-
-    public final Actor mainActor;
-
-    public NodeConnectedMsg(final LocalNode node) {
-        super();
-        nodeId = node.getId();
-        mainActor = node.getMainActor();
+    public RemoteDataflowQueueReplyMsg(String name, DataflowQueue<?> queue) {
+        this.name = name;
+        this.queue = queue;
     }
 
     @Override
-    public void execute(final RemoteConnection conn) {
-        conn.getHost().getLocalHost().connectRemoteNode(nodeId, conn.getHost(), mainActor);
+    public void execute(RemoteConnection conn) {
+        conn.getLocalHost().registerProxy(RemoteDataflowQueue.class, name, ((RemoteDataflowQueue) queue));
     }
 }

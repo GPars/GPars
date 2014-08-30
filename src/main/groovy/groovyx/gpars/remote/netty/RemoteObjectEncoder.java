@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-10, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 
 package groovyx.gpars.remote.netty;
 
+import java.io.Serializable;
+
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 
-@ChannelHandler.Sharable
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.serialization.ObjectEncoder;
+
 public class RemoteObjectEncoder extends ObjectEncoder {
     private final RemoteConnection connection;
 
@@ -38,14 +39,18 @@ public class RemoteObjectEncoder extends ObjectEncoder {
     }
 
     @Override
-    protected Object encode(final ChannelHandlerContext ctx, final Channel channel, final Object msg) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Serializable msg, ByteBuf out) throws Exception {
         final RemoteHost remoteHost = connection.getHost();
 
         if (remoteHost != null) {
             remoteHost.enter();
         }
         try {
-            return super.encode(ctx, channel, msg);
+            super.encode(ctx, msg, out);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw e;
         }
         finally {
             if (remoteHost != null) {

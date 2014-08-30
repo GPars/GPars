@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-10, 2014  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,16 @@
 
 package groovyx.gpars.remote.netty;
 
+import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.RemoteConnection;
+import groovyx.gpars.remote.message.CloseConnectionMsg;
+import groovyx.gpars.remote.message.HostIdMsg;
 import groovyx.gpars.serial.SerialMsg;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,56 +33,35 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Connection using Netty
  *
- * @author Alex Tkachman
+ * @author Alex Tkachman, Rafal Slawik
  */
 public class NettyRemoteConnection extends RemoteConnection {
-    private final NettyHandler handler;
-    private final MyChannelFutureListener writeListener = new MyChannelFutureListener();
+    private final Channel channel;
+    private final ConnectListener connectListener;
 
-    public NettyRemoteConnection(final NettyTransportProvider provider, final NettyHandler netHandler) {
+    public NettyRemoteConnection(final LocalHost provider, final Channel channel, ConnectListener connectListener) {
         super(provider);
-        this.handler = netHandler;
+        this.channel = channel;
+        this.connectListener = connectListener;
     }
 
     @Override
-    public void write(final SerialMsg msg) {
-        if (handler.getChannel().isConnected() && handler.getChannel().isOpen()) {
-            writeListener.incrementAndGet();
-            handler.getChannel().write(msg).addListener(writeListener);
+    public void write(SerialMsg msg) {
+        if (channel.isActive()) {
+            channel.writeAndFlush(msg);
         }
     }
 
     @Override
     public void disconnect() {
-        writeListener.incrementAndGet();
-        writeListener.handler = handler;
-        try {
-            writeListener.operationComplete(null);
-        } catch (Exception ignored) {
-        }
+        channel.close();
     }
 
-    private static class MyChannelFutureListener extends AtomicInteger implements ChannelFutureListener {
-        private static final long serialVersionUID = -3054880716233778157L;
-        public volatile NettyHandler handler;
-
-        @Override
-        public void operationComplete(final ChannelFuture future) throws Exception {
-            if (decrementAndGet() == 0 && handler != null) {
-                final CountDownLatch cdl = new CountDownLatch(1);
-                handler.getChannel().close().addListener(new ChannelFutureListener() {
-                    @Override
-                    @SuppressWarnings({"AnonymousClassVariableHidesContainingMethodVariable"})
-                    public void operationComplete(final ChannelFuture future) throws Exception {
-                        cdl.countDown();
-                    }
-                });
-                try {
-                    cdl.await();
-                } catch (InterruptedException e) {//
-                    e.printStackTrace();
-                }
-            }
+    @Override
+    public void onConnect() {
+        System.err.println(this + ".onConnect()");
+        if (connectListener != null) {
+            connectListener.onConnect(this);
         }
     }
 }
