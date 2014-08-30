@@ -29,7 +29,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:0.7.1'
+      classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.0'
     }
 }
 
@@ -119,6 +119,7 @@ configurations {
     deployerJars
     docs
     cover
+    groovyDoc // Hack due to problem with groovydoc process in Gradle.
 }
 
 // NB If hasProperty is evaluated at the top level of the script, the method associated with the Project
@@ -152,6 +153,9 @@ dependencies {
     deployerJars "org.apache.maven.wagon:wagon-http-lightweight:2.6"
     cover 'net.sourceforge.cobertura:cobertura:2.0.3'
     testRuntime 'net.sourceforge.cobertura:cobertura:2.0.3'
+    // Have to get some specific dependencies into the GroovyDoc process.
+    groovyDoc group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.3.6'
+    groovyDoc 'org.fusesource.jansi:jansi:1.11'
 }
 
 task runBenchmarks(type: JavaExec) {
@@ -289,6 +293,7 @@ if (JavaVersion.current().isJava8Compatible()) {
 }
 
 groovydoc {
+  groovyClasspath = configurations.groovyDoc // Hack, we shouldn't have to do this.
     dependsOn(classes)
     includePrivate = true
     use = true
@@ -302,7 +307,7 @@ groovydoc {
 
 asciidoctor {
     baseDir = project.file('src/asciidoc')
-    sourceDocumentName = project.file('src/asciidoc/index.adoc')
+    sourceDocumentNames = project.files('src/asciidoc/index.adoc')
     options = [
             attributes: [
                     toc                 : 'left',
