@@ -29,7 +29,7 @@ import java.util.UUID;
  * @author Alex Tkachman
  */
 public final class RemoteHost extends SerialContext {
-    private final ArrayList<RemoteConnection> connections = new ArrayList<>();
+    private final ArrayList<RemoteConnection> connections = new ArrayList<RemoteConnection>();
 
     public RemoteHost(final LocalHost localHost, final UUID hostId) {
         super(localHost, hostId);

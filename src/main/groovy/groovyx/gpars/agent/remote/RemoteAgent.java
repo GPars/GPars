@@ -47,7 +47,7 @@ public class RemoteAgent<T> extends AgentCore implements RemoteSerialized{
     }
 
     public T getVal() throws InterruptedException {
-        DataflowVariable<T> resultVariable = new DataflowVariable<>();
+        DataflowVariable<T> resultVariable = new DataflowVariable<T>();
         remoteHost.write(executionPolicy.prepareGetValMessage(this, resultVariable));
         return resultVariable.getVal();
     }

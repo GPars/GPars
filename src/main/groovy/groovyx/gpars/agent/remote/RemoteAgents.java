@@ -43,8 +43,8 @@ public final class RemoteAgents extends LocalHost {
     private final ConcurrentMap<String, DataflowVariable<RemoteAgent>> remoteAgents;
 
     private RemoteAgents() {
-        publishedAgents = new ConcurrentHashMap<>();
-        remoteAgents = new ConcurrentHashMap<>();
+        publishedAgents = new ConcurrentHashMap<String, Agent<?>>();
+        remoteAgents = new ConcurrentHashMap<String, DataflowVariable<RemoteAgent>>();
     }
 
     /**

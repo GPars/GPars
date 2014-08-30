@@ -37,7 +37,7 @@ public enum AgentClosureExecutionPolicy {
                 final Closure closure = (Closure) message;
                 final RemoteAgentMock mock = new RemoteAgentMock();
                 closure.setDelegate(mock);
-                DataflowVariable<?> oldValue = new DataflowVariable<>();
+                DataflowVariable oldValue = new DataflowVariable();
                 final DataflowVariable newValue = new DataflowVariable();
                 oldValue.whenBound(new MessageStream() {
                     @Override
@@ -62,6 +62,6 @@ public enum AgentClosureExecutionPolicy {
     public abstract SerialMsg prepareMessage(RemoteAgent<?> agent, Object message);
 
     public <T> SerialMsg prepareGetValMessage(RemoteAgent<T> agent, DataflowVariable<T> resultVariable) {
-        return new RemoteAgentGetValMsg<>(agent, resultVariable);
+        return new RemoteAgentGetValMsg<T>(agent, resultVariable);
     }
 }

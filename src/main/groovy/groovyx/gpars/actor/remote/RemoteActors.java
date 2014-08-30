@@ -43,8 +43,8 @@ public final class RemoteActors extends LocalHost {
     private final ConcurrentMap<String, DataflowVariable<Actor>> remoteActors;
 
     private RemoteActors() {
-        publishedActors = new ConcurrentHashMap<>();
-        remoteActors = new ConcurrentHashMap<>();
+        publishedActors = new ConcurrentHashMap<String, Actor>();
+        remoteActors = new ConcurrentHashMap<String, DataflowVariable<Actor>>();
     }
 
     /**

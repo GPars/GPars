@@ -119,9 +119,9 @@ public abstract class LocalHost extends SerialHandles {
     }
 
     protected <T> DataflowVariable<T> getPromise(ConcurrentMap<String, DataflowVariable<T>> registry, String name, String host, int port, SerialMsg requestMsg) {
-        DataflowVariable remoteVariable = registry.get(name);
+        DataflowVariable<T> remoteVariable = registry.get(name);
         if (remoteVariable == null) {
-            DataflowVariable newRemoteVariable = new DataflowVariable<>();
+            DataflowVariable<T> newRemoteVariable = new DataflowVariable<T>();
             remoteVariable = registry.putIfAbsent(name, newRemoteVariable);
             if (remoteVariable == null) {
                 createRequest(host, port, requestMsg);

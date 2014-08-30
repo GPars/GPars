@@ -1,8 +1,6 @@
 package groovyx.gpars.agent.remote
 
 import groovyx.gpars.agent.Agent
-import groovyx.gpars.remote.LocalHost
-import groovyx.gpars.remote.netty.NettyTransportProvider
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
@@ -42,7 +40,7 @@ class RemoteAgentsWithServerTest extends Specification {
     def "can retrieve published Agent with remote closure execution policy and retrieve state"() {
         setup:
         def agentState = "test-agent-state"
-        Agent<String> agent = new Agent<>(agentState)
+        Agent<String> agent = new Agent<String>(agentState)
         def agentName = "test-agent-1"
 
         when:
@@ -62,7 +60,7 @@ class RemoteAgentsWithServerTest extends Specification {
     def "can update state of Agent with remote closure execution"() {
         setup:
         def agentState = "test-agent-state"
-        Agent<String> agent = new Agent<>(agentState)
+        Agent<String> agent = new Agent<String>(agentState)
         def agentName = "test-agent-2"
         def updateState1 = "test-agent-state-update-1"
         def updateState2 = "test-agent-state-update-2"
@@ -98,7 +96,7 @@ class RemoteAgentsWithServerTest extends Specification {
     def "can update state of Agent with local closure execution"() {
         setup:
         def agentState = "test-agent-state"
-        Agent<String> agent = new Agent<>(agentState)
+        Agent<String> agent = new Agent<String>(agentState)
         def agentName = "test-agent-3"
         def updateState = "test-agent-state-update"
         def latch = new CountDownLatch(1)

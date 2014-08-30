@@ -32,10 +32,13 @@ import groovyx.gpars.scheduler.Pool;
 import groovyx.gpars.serial.RemoteSerialized;
 import groovyx.gpars.serial.WithSerialId;
 
-import static java.util.Arrays.asList;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static java.util.Arrays.asList;
 
 /**
  * Proxy object for remote instance of Queue.
@@ -100,22 +103,22 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public <V> Promise<V> then(Closure<V> closure) {
-        final DataflowVariable<V> result = new DataflowVariable<>();
-        whenBound(new ThenMessagingRunnable<>(result, closure));
+        final DataflowVariable<V> result = new DataflowVariable<V>();
+        whenBound(new ThenMessagingRunnable<V, V>(result, closure));
         return result;
     }
 
     @Override
     public <V> Promise<V> then(Pool pool, Closure<V> closure) {
-        final DataflowVariable<V> result = new DataflowVariable<>();
-        whenBound(pool, new ThenMessagingRunnable<>(result, closure));
+        final DataflowVariable<V> result = new DataflowVariable<V>();
+        whenBound(pool, new ThenMessagingRunnable<V, V>(result, closure));
         return result;
     }
 
     @Override
     public <V> Promise<V> then(PGroup group, Closure<V> closure) {
-        final DataflowVariable<V> result = new DataflowVariable<>();
-        whenBound(group, new ThenMessagingRunnable<>(result, closure));
+        final DataflowVariable<V> result = new DataflowVariable<V>();
+        whenBound(group, new ThenMessagingRunnable<V, V>(result, closure));
         return result;
     }
 
@@ -131,7 +134,7 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public <V> DataflowReadChannel<V> chainWith(PGroup group, Closure<V> closure) {
-        final DataflowQueue<V> result = new DataflowQueue<>();
+        final DataflowQueue<V> result = new DataflowQueue<V>();
         group.operator(this, result, new ChainWithClosure<V>(closure));
         return result;
     }
@@ -148,12 +151,12 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public <V> DataflowReadChannel<V> chainWith(PGroup group, Map<String, Object> params, Closure<V> closure) {
-        final DataflowQueue<V> result = new DataflowQueue<>();
-        final Map<String, Object> parameters = new HashMap<>(params);
+        final DataflowQueue<V> result = new DataflowQueue<V>();
+        final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
         parameters.put("outputs", asList(result));
 
-        group.operator(parameters, new ChainWithClosure<>(closure));
+        group.operator(parameters, new ChainWithClosure<V>(closure));
         return result;
     }
 
@@ -164,32 +167,32 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public DataflowReadChannel<T> filter(Closure<Boolean> closure) {
-        return chainWith(new FilterClosure<>(closure));
+        return chainWith(new FilterClosure<Boolean>(closure));
     }
 
     @Override
     public DataflowReadChannel<T> filter(Pool pool, Closure<Boolean> closure) {
-        return chainWith(pool, new FilterClosure<>(closure));
+        return chainWith(pool, new FilterClosure<Boolean>(closure));
     }
 
     @Override
     public DataflowReadChannel<T> filter(PGroup group, Closure<Boolean> closure) {
-        return chainWith(group, new FilterClosure<>(closure));
+        return chainWith(group, new FilterClosure<Boolean>(closure));
     }
 
     @Override
     public DataflowReadChannel<T> filter(Map<String, Object> params, Closure<Boolean> closure) {
-        return chainWith(params, new FilterClosure<>(closure));
+        return chainWith(params, new FilterClosure<Boolean>(closure));
     }
 
     @Override
     public DataflowReadChannel<T> filter(Pool pool, Map<String, Object> params, Closure<Boolean> closure) {
-        return chainWith(pool, params, new FilterClosure<>(closure));
+        return chainWith(pool, params, new FilterClosure<Boolean>(closure));
     }
 
     @Override
     public DataflowReadChannel<T> filter(PGroup group, Map<String, Object> params, Closure<Boolean> closure) {
-        return chainWith(group, params, new FilterClosure<>(closure));
+        return chainWith(group, params, new FilterClosure<Boolean>(closure));
     }
 
     @Override
@@ -219,10 +222,10 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public void into(PGroup group, Map<String, Object> params, DataflowWriteChannel<T> target) {
-        final Map<String, Object> parameters = new HashMap<>(params);
+        final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
         parameters.put("outputs", asList(target));
-        group.operator(parameters, new ChainWithClosure<>(new CopyChannelsClosure()));
+        group.operator(parameters, new ChainWithClosure<T>(new CopyChannelsClosure()));
     }
 
     @Override
@@ -287,10 +290,10 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public void split(PGroup group, Map<String, Object> params, List<DataflowWriteChannel<T>> targets) {
-        final Map<String, Object> parameters = new HashMap<>(params);
+        final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
         parameters.put("outputs", asList(targets));
-        group.operator(parameters, new ChainWithClosure<>(new CopyChannelsClosure()));
+        group.operator(parameters, new ChainWithClosure<T>(new CopyChannelsClosure()));
     }
 
     @Override
@@ -305,7 +308,7 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public DataflowReadChannel<T> tap(PGroup group, DataflowWriteChannel<T> target) {
-        final DataflowQueue<T> result = new DataflowQueue<>();
+        final DataflowQueue<T> result = new DataflowQueue<T>();
         group.operator(asList(this), asList(result, target), new ChainWithClosure(new CopyChannelsClosure()));
         return result;
     }
@@ -322,11 +325,11 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public DataflowReadChannel<T> tap(PGroup group, Map<String, Object> params, DataflowWriteChannel<T> target) {
-        final DataflowQueue<T> result = new DataflowQueue<>();
-        final Map<String, Object> parameters = new HashMap<>(params);
+        final DataflowQueue<T> result = new DataflowQueue<T>();
+        final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
         parameters.put("outputs", asList(result, target));
-        group.operator(parameters, new ChainWithClosure<>(new CopyChannelsClosure()));
+        group.operator(parameters, new ChainWithClosure<T>(new CopyChannelsClosure()));
         return result;
     }
 
@@ -357,8 +360,8 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public <V> DataflowReadChannel<V> merge(PGroup group, List<DataflowReadChannel<Object>> others, Closure<V> closure) {
-        final DataflowQueue<V> result = new DataflowQueue<>();
-        final List<DataflowReadChannel<?>> inputs = new ArrayList<>();
+        final DataflowQueue<V> result = new DataflowQueue<V>();
+        final List<DataflowReadChannel<?>> inputs = new ArrayList<DataflowReadChannel<?>>();
         inputs.add(this);
         inputs.addAll(others);
         group.operator(inputs, asList(result), new ChainWithClosure(closure));
@@ -392,14 +395,14 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public <V> DataflowReadChannel<V> merge(PGroup group, Map<String, Object> params, List<DataflowReadChannel<Object>> others, Closure<V> closure) {
-        final DataflowQueue<V> result = new DataflowQueue<>();
-        final List<DataflowReadChannel<?>> inputs = new ArrayList<>();
+        final DataflowQueue<V> result = new DataflowQueue<V>();
+        final List<DataflowReadChannel<?>> inputs = new ArrayList<DataflowReadChannel<?>>();
         inputs.add(this);
         inputs.addAll(others);
-        final Map<String, Object> parameters = new HashMap<>(params);
+        final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", inputs);
         parameters.put("outputs", asList(result));
-        group.operator(parameters, new ChainWithClosure<>(closure));
+        group.operator(parameters, new ChainWithClosure<T>(closure));
         return result;
     }
 
@@ -430,7 +433,7 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public void binaryChoice(PGroup group, Map<String, Object> params, DataflowWriteChannel<T> trueBranch, DataflowWriteChannel<T> falseBranch, Closure<Boolean> code) {
-        final Map<String, Object> parameters = new HashMap<>(params);
+        final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
         parameters.put("outputs", asList(trueBranch, falseBranch));
         group.operator(parameters, new BinaryChoiceClosure(code));
@@ -463,7 +466,7 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public void choice(PGroup group, Map<String, Object> params, List<DataflowWriteChannel<T>> outputs, Closure<Integer> code) {
-        final Map<String, Object> parameters = new HashMap<>(params);
+        final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
         parameters.put("outputs", asList(outputs));
         group.operator(parameters, new ChoiceClosure(code));
@@ -496,7 +499,7 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
 
     @Override
     public void separate(PGroup group, Map<String, Object> params, List<DataflowWriteChannel<?>> outputs, Closure<List<Object>> code) {
-        final Map<String, Object> parameters = new HashMap<>(params);
+        final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
         parameters.put("outputs", asList(outputs));
         group.operator(parameters, new SeparationClosure(code));
@@ -566,8 +569,8 @@ public class RemoteDataflowQueue<T> extends WithSerialId implements DataflowChan
      * @return The newly created DataflowVariable instance
      */
     private DataflowVariable<T> createRequestVariable() {
-        DataflowVariable<T> value = new DataflowVariable<>();
-        remoteHost.write(new RemoteDataflowQueueValueRequestMsg<>(this, value));
+        DataflowVariable<T> value = new DataflowVariable<T>();
+        remoteHost.write(new RemoteDataflowQueueValueRequestMsg<T>(this, value));
         return value;
     }
 

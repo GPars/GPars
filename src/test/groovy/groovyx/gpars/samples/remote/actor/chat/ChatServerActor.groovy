@@ -20,7 +20,7 @@ import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.DefaultActor
 
 class ChatServerActor extends DefaultActor {
-    Map<String, Actor> connectedClients = new HashMap<>()
+    def connectedClients = new HashMap<String, Actor>()
 
     @Override
     protected void act() {
