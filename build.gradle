@@ -318,7 +318,7 @@ asciidoctor {
     ]
 }
 
-task documentation(dependsOn: ['javadoc', 'groovydoc', 'buildGuide', 'pdfGuide'], description: 'Create the API documentation.')
+task documentation(dependsOn: ['javadoc', 'groovydoc', 'buildGuide', 'pdfGuide', 'asciidoctor'], description: 'Create the API documentation.')
 
 task zipDoc(type: Jar, dependsOn: 'documentation') {
     classifier = 'javadoc'
