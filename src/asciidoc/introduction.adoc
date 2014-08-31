@@ -42,6 +42,7 @@ product. First, it is the people in the core team who should be mentioned:
 * Russel Winder
 * Paul King
 * Jon Kerridge
+* Rafal Slawik
 
 Over time, many people have contributed their ideas, provided useful feedback or helped GPars in one way or
 another.  There are many people in this group, too many to name them all, but let's list at least the most
