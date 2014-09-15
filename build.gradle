@@ -372,7 +372,7 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.0'
+    gradleVersion = '2.1'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
