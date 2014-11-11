@@ -60,7 +60,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.concurrent.locks.LockSupport;
 
 import static java.util.Arrays.asList;
@@ -76,6 +77,19 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     private static final String ATTACHMENT = "attachment";
     private static final String RESULT = "result";
 
+    /**
+     * Updater for the state field
+     */
+    @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
+    protected static final AtomicIntegerFieldUpdater<DataflowExpression> stateUpdater
+            = AtomicIntegerFieldUpdater.newUpdater(DataflowExpression.class, "state");
+
+    /**
+     * Updater for the waiting field
+     */
+    @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
+    protected static final AtomicReferenceFieldUpdater<DataflowExpression, WaitingThread> waitingUpdater
+            = AtomicReferenceFieldUpdater.newUpdater(DataflowExpression.class, WaitingThread.class, "waiting");
     private static final long serialVersionUID = 8961916630562820109L;
     private static final String CANNOT_FIRE_BIND_ERRORS_THE_THREAD_HAS_BEEN_INTERRUPTED = "Cannot fire bind errors - the thread has been interrupted.";
     private static final String A_DATAFLOW_VARIABLE_CAN_ONLY_BE_ASSIGNED_ONCE_ONLY_RE_ASSIGNMENTS_TO_AN_EQUAL_VALUE_ARE_ALLOWED = "A DataflowVariable can only be assigned once. Only re-assignments to an equal value are allowed.";
@@ -95,12 +109,14 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     /**
      * Holds the current state of the variable
      */
-    protected final AtomicInteger state = new AtomicInteger();
+    protected volatile int state;  //modified through stateUpdater
 
     /**
      * Points to the head of the chain of requests waiting for a value to be bound
      */
-    private final AtomicReference<WaitingThread> waiting = new AtomicReference<WaitingThread>();
+    @SuppressWarnings({"UnusedDeclaration"})
+    //modified through stateUpdater
+    private volatile WaitingThread waiting;
 
     /**
      * Possible states
@@ -144,7 +160,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * Creates a new unbound Dataflow Expression
      */
     protected DataflowExpression() {
-        state.set(S_NOT_INITIALIZED);
+        state = S_NOT_INITIALIZED;
     }
 
     /**
@@ -154,7 +170,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      */
     @Override
     public final boolean isBound() {
-        return state.get() == S_INITIALIZED;
+        return state == S_INITIALIZED;
     }
 
     @Override
@@ -194,19 +210,19 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         }
 
         WaitingThread newWaiting = null;
-        while (state.get() != S_INITIALIZED) {
+        while (state != S_INITIALIZED) {
             if (newWaiting == null) {
                 newWaiting = new WaitingThread(null, null, attachment, callback);
             }
 
-            final WaitingThread previous = waiting.get();
+            final WaitingThread previous = waiting;
             // it means that writer already started processing queue, so value is already in place
             if (previous == dummyWaitingThread) {
                 break;
             }
 
             newWaiting.previous = previous;
-            if (waiting.compareAndSet(previous, newWaiting)) {
+            if (waitingUpdater.compareAndSet(this, previous, newWaiting)) {
                 // ok, we are in the queue, so writer is responsible to process us
                 return;
             }
@@ -243,21 +259,21 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     @Override
     public T getVal() throws InterruptedException {
         WaitingThread newWaiting = null;
-        while (state.get() != S_INITIALIZED) {
+        while (state != S_INITIALIZED) {
             if (newWaiting == null) {
                 newWaiting = new WaitingThread(Thread.currentThread(), null, null, null);
             }
 
-            final WaitingThread previous = waiting.get();
+            final WaitingThread previous = waiting;
             // it means that writer already started processing queue, so value is already in place
             if (previous == dummyWaitingThread) {
                 break;
             }
 
             newWaiting.previous = previous;
-            if (waiting.compareAndSet(previous, newWaiting)) {
+            if (waitingUpdater.compareAndSet(this, previous, newWaiting)) {
                 // ok, we are in the queue, so writer is responsible to process us
-                while (state.get() != S_INITIALIZED) {
+                while (state != S_INITIALIZED) {
                     LockSupport.park();
                     if (Thread.currentThread().isInterrupted()) handleInterruption(newWaiting);
                 }
@@ -279,21 +295,21 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
         final long endNano = System.nanoTime() + units.toNanos(timeout);
         WaitingThread newWaiting = null;
-        while (state.get() != S_INITIALIZED) {
+        while (state != S_INITIALIZED) {
             if (newWaiting == null) {
                 newWaiting = new WaitingThread(Thread.currentThread(), null, null, null);
             }
 
-            final WaitingThread previous = waiting.get();
+            final WaitingThread previous = waiting;
             // it means that writer already started processing queue, so value is already in place
             if (previous == dummyWaitingThread) {
                 break;
             }
 
             newWaiting.previous = previous;
-            if (waiting.compareAndSet(previous, newWaiting)) {
+            if (waitingUpdater.compareAndSet(this, previous, newWaiting)) {
                 // ok, we are in the queue, so writer is responsible to process us
-                while (state.get() != S_INITIALIZED) {
+                while (state != S_INITIALIZED) {
                     final long toWait = endNano - System.nanoTime();
                     if (toWait <= 0) {
                         newWaiting.set(true); // don't unpark please
@@ -331,7 +347,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * @param value The value to assign
      */
     public final void bindSafely(final T value) {
-        if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING)) {
+        if (!stateUpdater.compareAndSet(this, S_NOT_INITIALIZED, S_INITIALIZING)) {
             fireBindError(value, false);
             return;
         }
@@ -339,7 +355,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     public final void bindError(final Throwable e) {
-        if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING)) {
+        if (!stateUpdater.compareAndSet(this, S_NOT_INITIALIZED, S_INITIALIZING)) {
             fireBindError(e);
             throw new IllegalStateException(A_DATAFLOW_VARIABLE_CAN_ONLY_BE_ASSIGNED_ONCE_ONLY_RE_ASSIGNMENTS_TO_AN_EQUAL_VALUE_ARE_ALLOWED);
         }
@@ -354,9 +370,9 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * @param value The value to assign
      */
     public final void bind(final T value) {
-        if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING)) {
+        if (!stateUpdater.compareAndSet(this, S_NOT_INITIALIZED, S_INITIALIZING)) {
             try {
-                final T boundValue = getVal();
+                final Object boundValue = getVal();
                 if (value == null && boundValue == null) return;
                 if (value != null) {
                     if (value.equals(boundValue)) return;
@@ -378,7 +394,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * @param value The value to assign
      */
     public final void bindUnique(final T value) {
-        if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING)) {
+        if (!stateUpdater.compareAndSet(this, S_NOT_INITIALIZED, S_INITIALIZING)) {
             fireBindError(value, true);
             throw new IllegalStateException("A DataflowVariable can only be assigned once. Use bind() to allow for equal values to be passed into already-bound variables.");
         }
@@ -399,10 +415,10 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     protected void doBindImpl(final T value) {
         this.value = value;
         if (value instanceof Throwable) error = (Throwable) value;
-        state.set(S_INITIALIZED);
+        state = S_INITIALIZED;
         fireOnMessage(value);
 
-        final WaitingThread waitingQueue = waiting.getAndSet(dummyWaitingThread);
+        final WaitingThread waitingQueue = waitingUpdater.getAndSet(this, dummyWaitingThread);
 
         // no more new waiting threads since that point
         for (WaitingThread currentWaiting = waitingQueue; currentWaiting != null; currentWaiting = currentWaiting.previous) {
@@ -1258,7 +1274,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
             }
 
             final DataflowExpression<?> dataflowExpression = (DataflowExpression<?>) element;
-            if (dataflowExpression.state.get() == S_INITIALIZED) {
+            if (dataflowExpression.state == S_INITIALIZED) {
                 return dataflowExpression.value;
             }
 
