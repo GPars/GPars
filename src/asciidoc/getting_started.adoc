@@ -70,11 +70,11 @@ snapshots repositories.  The released versions are in the Maven and Codehaus mai
 the current development version (SNAPSHOT) is in the Codehaus snapshots repository.  To use from Gradle
 or Grapes use the specification:
 ----
-"org.codehaus.gpars:gpars:1.2.0"
+"org.codehaus.gpars:gpars:1.3.0"
 ----
 for the release version, and:
 ----
-"org.codehaus.gpars:gpars:1.2-SNAPSHOT"
+"org.codehaus.gpars:gpars:1.4-SNAPSHOT"
 ----
 for the development version.  You will likely need to add the Codehaus snapshots repository manually to the
 search list in this latter case.  Using Maven the dependency is:
@@ -82,39 +82,17 @@ search list in this latter case.  Using Maven the dependency is:
 <dependency>
     <groupId>org.codehaus.gpars</groupId>
     <artifactId>gpars</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
 </dependency>
 ----
-or version 1.2-SNAPSHOT if using the latest snapshot.
+or version 1.4-SNAPSHOT if using the latest snapshot.
 
 === Transitive Dependencies
 
-GPars as a library depends on Groovy version equal to or greater than 2.0. Also, the Fork/Join concurrency
-library must be available. This comes as standard with Java 7, but not with Java 6. Groovy currently caters
-for Java 6 and so GPars is dependent on the http://gee.cs.oswego.edu/dl/jsr166/dist/jsr166y.jar[jsr166y]
-artefact (an artefact from the http://g.oswego.edu/dl/concurrency-interest/[JSR-166 Project]). This artefact
-must be on the classpath of programs which use current released versions of GPars to compile and execute.
-Released versions of the jsr166y artefact are in the main Maven and Codehaus repositories.  Development versions of
-the artefact are available in the Codehaus snapshots repository.  Using Gradle or Grapes you would use the
-following dependency specification:
-----
-"org.codehaus.jsr166-mirror:jsr166y:1.7.0"
-----
-For Maven, the specification would be:
-----
-<dependency>
-    <groupId>org.codehaus.jsr166-mirror</groupId>
-    <artifactId>jsr166y</artifactId>
-    <version>1.7.0</version>
-</dependency>
-----
-The development versions have version number 1.7.0.1-SNAPSHOT.
+GPars as a library depends on Groovy version equal to or greater than 2.3. Also, the Fork/Join concurrency
+library must be available. This comes as standard with Java 7.
 
-GPars defines this dependency in its own descriptor, so ideally all dependency management should be taken care of
-automatically, if you use Gradle, Grails, Griffon, Maven, Ivy or other type of automatic dependency resolution tool.
-
-Future versions of GPars 1.x will depend on Java 7 and avoid this dependency on additional artefacts. GPars
-2.x will depend on Java 8 and will only be usable with Groovy 2.3.0 and later.
+GPars 2.x will depend on Java 8 and will only be usable with Groovy 3.0 and later.
 
 Please visit the page http://gpars.codehaus.org/Integration[Integration] on the GPars website for more
 details.
@@ -310,7 +288,7 @@ details on them in the User Guide.
 The new GPars 1.3.0 release introduces several enhancements and improvements on top of the previous release,
 mainly in the dataflow area.
 
-Check out the http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=19439[JIRA release notes]
+Check out the http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=20355[JIRA release notes]
 
 === Project changes
 
@@ -327,9 +305,15 @@ See "the Breaking Changes listing":http://gpars.codehaus.org/Breaking+Changes fo
 
 === Actors
 
+* Remote actors
+
 === Dataflow
 
+* Remote dataflow variables and channels
+
 === Agent
+
+* Remote agents
 
 === Stm
 
