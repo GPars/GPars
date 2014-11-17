@@ -30,6 +30,7 @@ contributor(parallelCollection) {
     method name: "eachParallel", type: "void", params: [closure: 'groovy.lang.Closure']
     method name: "eachWithIndexParallel", type: "void", params: [closure: 'groovy.lang.Closure']
     method name: "collectParallel", type: "Object", params: [closure: 'groovy.lang.Closure']
+    method name: "collectManyParallel", type: "Object", params: [closure: 'groovy.lang.Closure']
     method name: "findParallel", type: "Object", params: [closure: 'groovy.lang.Closure']
     method name: "findAnyParallel", type: "Object", params: [closure: 'groovy.lang.Closure']
     method name: "findAllParallel", type: "Object", params: [closure: 'groovy.lang.Closure']

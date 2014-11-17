@@ -1,7 +1,7 @@
 The new GPars 1.3.0 release introduces several enhancements and improvements on top of the previous release,
 mainly in the dataflow area.
 
-Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=19439
+Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=20355
 
 h3. Project changes
 
@@ -17,9 +17,15 @@ h3. Fork / Join
 
 h3. Actors
 
+* Remote actors
+
 h3. Dataflow
 
+* Remote dataflow variables and channels
+
 h3. Agent
+
+* Remote agents
 
 h3. Stm
 
