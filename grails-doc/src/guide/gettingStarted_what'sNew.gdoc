@@ -22,6 +22,8 @@ h3. Actors
 h3. Dataflow
 
 * Remote dataflow variables and channels
+* Dataflow operators accepting variable number arguments
+* Select made @CompileStatic compatible
 
 h3. Agent
 

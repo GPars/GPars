@@ -308,7 +308,20 @@ public class DataflowOperatorTest extends GroovyTestCase {
 
     public void testMissingChannels() {
         final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
         final DataflowQueue d = new DataflowQueue()
+
+        group.operator(inputs: [a, b], outputs: [d]) { Object... v -> }
+        group.operator(inputs: [a, b], outputs: [d]) { Object[] v -> }
+        group.operator(inputs: [a, b], outputs: [d]) { Object x, Object... v -> }
+
+        shouldFail(IllegalArgumentException) {
+            group.operator(inputs: [a, b], outputs: [d]) { Object x, Object y, Object... v -> }
+        }
+
+        shouldFail(IllegalArgumentException) {
+            group.operator(inputs: [a, b], outputs: [d]) { List v -> }
+        }
 
         shouldFail(IllegalArgumentException) {
             group.operator(inputs1: [a], outputs: [d]) {v -> }
@@ -319,6 +332,51 @@ public class DataflowOperatorTest extends GroovyTestCase {
         shouldFail(IllegalArgumentException) {
             group.operator([:]) {v -> }
         }
+    }
+
+    public void testListParams1() {
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+        final DataflowVariable result = new DataflowVariable()
+        group.operator(inputs: [a, b], outputs: [d]) { Object... v ->
+            result << v
+        }
+
+        a << 1
+        b << 2
+        assert result.val.class.isArray()
+        assert result.val == [1, 2]
+    }
+
+    public void testListParams2() {
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+        final DataflowVariable result = new DataflowVariable()
+        group.operator(inputs: [a, b], outputs: [d]) { Object[] v ->
+            result << v
+        }
+
+        a << 1
+        b << 2
+        assert result.val.class.isArray()
+        assert result.val == [1, 2]
+    }
+
+    public void testListParams3() {
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+        final DataflowVariable result = new DataflowVariable()
+        group.operator(inputs: [a, b], outputs: [d]) { x, Object... v ->
+            result << v
+        }
+
+        a << 1
+        b << 2
+        assert result.val.class.isArray()
+        assert result.val == [2]
     }
 
     public void testException() {
