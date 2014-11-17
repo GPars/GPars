@@ -310,6 +310,8 @@ See "the Breaking Changes listing":http://gpars.codehaus.org/Breaking+Changes fo
 === Dataflow
 
 * Remote dataflow variables and channels
+* Dataflow operators accepting variable number arguments
+* Select made @CompileStatic compatible
 
 === Agent
 
