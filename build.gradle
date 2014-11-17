@@ -108,11 +108,8 @@ repositories {
     if (project.hasProperty('gpars_useMavenLocal') && gpars_useMavenLocal) {
         mavenLocal()
     }
+    jcenter()
     mavenCentral()
-    //maven {
-    //url 'http://download.java.net/maven/2'
-    //url 'http://oss.sonatype.org/content/repositories/snapshots' // For Spock SNAPSHOT artefacts.
-    //}
 }
 
 configurations {
@@ -366,7 +363,7 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.1'
+    gradleVersion = '2.2'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
