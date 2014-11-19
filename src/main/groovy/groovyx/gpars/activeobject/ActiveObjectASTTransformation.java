@@ -16,7 +16,11 @@
 
 package groovyx.gpars.activeobject;
 
-import groovyx.gpars.util.ASTUtils;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.codehaus.groovy.GroovyBugError;
 import org.codehaus.groovy.ast.ASTNode;
 import org.codehaus.groovy.ast.AnnotatedNode;
@@ -40,10 +44,7 @@ import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.transform.ASTTransformation;
 import org.codehaus.groovy.transform.GroovyASTTransformation;
 
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import groovyx.gpars.util.ASTUtils;
 
 /**
  * Transforms active objects so that their active methods can be invoked asynchronously through an internal actor.
@@ -97,7 +98,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
     private static String lookupActorFieldName(final AnnotationNode logAnnotation) {
         final Expression member = logAnnotation.getMember("actorName");
-        if (member != null && member.getText() != null) {
+        if (member != null) {
             return member.getText();
         } else {
             return ActiveObject.INTERNAL_ACTIVE_OBJECT_ACTOR;
@@ -106,7 +107,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
     private static String lookupActorGroupName(final AnnotationNode logAnnotation) {
         final Expression member = logAnnotation.getMember("value");
-        if (member != null && member.getText() != null) {
+        if (member != null) {
             return member.getText();
         } else {
             return "";
@@ -139,55 +140,37 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
         @Override
         public void visitClass(final ClassNode node) {
-
             final FieldNode actorField = node.getField(actorFieldName);
+
             if (actorField != null) {
                 if (actorField.getType().getName().contains("groovyx.gpars.activeobject.InternalActor")) {
                     actorNode = actorField;
-                } else
+                }
+                else
                     this.addError("Active Object cannot have a field named " + actorFieldName + " declared", actorField);
-            } else {
-                actorNode = addActorFieldToClass(node, actorFieldName, actorGroupName);
             }
+            else
+                actorNode = addActorFieldToClass(node, actorFieldName, actorGroupName);
 
             final Iterable<MethodNode> copyOfMethods = new ArrayList<MethodNode>(node.getMethods());
+
             for (final MethodNode method : copyOfMethods) {
                 final List<AnnotationNode> annotations = method.getAnnotations(new ClassNode(ActiveMethod.class));
-                if (annotations.isEmpty()) continue;
-                if (method.isStatic()) this.addError("Static methods cannot be active", method);
+
+                if (annotations.isEmpty())
+                    continue;
+
+                if (method.isStatic())
+                    this.addError("Static methods cannot be active", method);
 
                 addActiveMethod(actorNode, node, method, checkBlockingMethod(method, annotations));
             }
             super.visitClass(node);
         }
 
-        private boolean checkBlockingMethod(final MethodNode method, final Iterable<AnnotationNode> annotations) {
-            boolean blocking = false;
-
-            for (final AnnotationNode annotation : annotations) {
-                final Expression member = annotation.getMember("blocking");
-                if (member != null && member.getText() != null) {
-                    if ("true".equals(member.getText())) blocking = true;
-                }
-            }
-
-            final ClassNode returnType = method.getReturnType();
-            final String text = returnType.getName();
-            if (!blocking && blockingMandated(text)) {
-                this.addError("Non-blocking methods must not return a specific type. Use def or void instead.", method);
-                return true;
-            }
-            return blocking;
-        }
-
-        @SuppressWarnings({"OverlyComplexBooleanExpression"})
-        private static boolean blockingMandated(final String text) {
-            assert text != null;
-            return !("java.lang.Object".equals(text) || "void".equals(text) || text.contains("groovyx.gpars.dataflow.DataflowVariable") || text.contains("groovyx.gpars.dataflow.Promise"));
-        }
-
         private static void addActiveMethod(final FieldNode actorNode, final ClassNode owner, final MethodNode original, final boolean blocking) {
-            if (original.isSynthetic()) return;
+            if (original.isSynthetic())
+                return;
 
             final ArgumentListExpression args = new ArgumentListExpression();
             final Parameter[] params = original.getParameters();
@@ -212,10 +195,45 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
             newMethod.setGenericsTypes(original.getGenericsTypes());
 
             final String submitMethodName = blocking ? "submitAndWait" : "submit";
-            original.setCode(new ExpressionStatement(
-                    new MethodCallExpression(
-                            new VariableExpression(actorNode), submitMethodName, args)
-            ));
+
+            VariableExpression actor = new VariableExpression(actorNode);
+
+            MethodCallExpression submitCall = new MethodCallExpression(actor, submitMethodName, args);
+            Expression newCode = submitCall;
+
+            if (!blocking) {
+                newCode = new MethodCallExpression(actor,
+                        InternalActor.PREPROCESS_METHOD_NAME,
+                        new ArgumentListExpression(submitCall, new VariableExpression("this"), new ConstantExpression(original.getName())));
+            }
+
+            original.setCode(new ExpressionStatement(newCode));
+        }
+
+        private boolean checkBlockingMethod(final MethodNode method, final Iterable<AnnotationNode> annotations) {
+            boolean blocking = false;
+
+            for (final AnnotationNode annotation : annotations) {
+                final Expression member = annotation.getMember("blocking");
+
+                if (member != null) {
+                    if ("true".equals(member.getText())) blocking = true; // getText() is @NotNull
+                }
+            }
+
+            final ClassNode returnType = method.getReturnType();
+            final String text = returnType.getName();
+            if (!blocking && blockingMandated(text)) {
+                this.addError("Non-blocking methods must not return a specific type. Use def or void instead.", method);
+                return true;
+            }
+            return blocking;
+        }
+
+        @SuppressWarnings({"OverlyComplexBooleanExpression"})
+        private static boolean blockingMandated(final String text) {
+            assert text != null;
+            return !("java.lang.Object".equals(text) || "void".equals(text) || text.contains("groovyx.gpars.dataflow.DataflowVariable") || text.contains("groovyx.gpars.dataflow.Promise"));
         }
 
         private static String findSuitablePrivateMethodName(final ClassNode owner, final MethodNode original) {
