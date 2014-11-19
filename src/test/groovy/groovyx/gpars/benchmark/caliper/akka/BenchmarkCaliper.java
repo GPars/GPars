@@ -16,15 +16,16 @@
 
 package groovyx.gpars.benchmark.caliper.akka;
 
-import com.google.caliper.api.Benchmark;
-import groovyx.gpars.actor.Actor;
-import groovyx.gpars.group.DefaultPGroup;
-import groovyx.gpars.scheduler.FJPool;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
+
+import com.google.caliper.api.Benchmark;
+
+import groovyx.gpars.actor.Actor;
+import groovyx.gpars.group.DefaultPGroup;
+import groovyx.gpars.scheduler.FJPool;
 
 public abstract class BenchmarkCaliper extends Benchmark {
     public static final int STATIC_RUN = 1;
@@ -54,6 +55,7 @@ public abstract class BenchmarkCaliper extends Benchmark {
         POISON = null;
     }
 
+    @SuppressWarnings("unchecked")
     BenchmarkCaliper(int totalPerRep, Object run, Class clientType, Class destinationType) {
         this.totalPerRep = totalPerRep;
         this.repeat = totalPerRep * repeatFactor;
@@ -63,6 +65,7 @@ public abstract class BenchmarkCaliper extends Benchmark {
         this.destinationType = destinationType;
     }
 
+    @SuppressWarnings("unchecked")
     BenchmarkCaliper(final int totalPerRep, final Object run, final Object poison, final Class clientType, final Class destinationType, final Class waypointType) {
         this.totalPerRep = totalPerRep;
         this.repeat = totalPerRep * repeatFactor;
