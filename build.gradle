@@ -303,22 +303,17 @@ groovydoc {
 }
 
 asciidoctor {
-    baseDir = project.file('src/asciidoc')
-    sourceDocumentNames = project.files('src/asciidoc/index.adoc')
-    options = [
-            attributes: [
-                    toc                 : 'left',
-                    doctype             : 'book',
-                    icons               : 'font',
-                    sectlink            : true,
-                    sectanchors         : true,
-                    numbered            : true,
-                    linkattrs           : true,
-                    imagesdir           : 'images',
-                    'source-highlighter': 'coderay',
-                    stylesheet          : 'src/asciidoc-resources/css/style.css'
-            ]
-    ]
+  sources { include 'index.adoc' }
+  attributes  toc: 'left',
+               doctype: 'book',
+               icons: 'font',
+               sectlink: true,
+               sectanchors: true,
+               numbered: true,
+               linkattrs: true,
+               imagesdir: 'images',
+               'source-highlighter': 'coderay',
+               stylesheet: 'css/style.css'
 }
 
 task documentation(dependsOn: ['javadoc', 'groovydoc', 'buildGuide', 'pdfGuide', 'asciidoctor'], description: 'Create the API documentation.')
