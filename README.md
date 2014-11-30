@@ -1,5 +1,5 @@
-master branch: ![TravisCI status master](https://travis-ci.org/GPars/GPars.svghttps://travis-ci.org/GPars/GPars.svg?branch=master)
-|  jdk8 branch: ![TravisCI status jdk8](https://travis-ci.org/GPars/GPars.svghttps://travis-ci.org/GPars/GPars.svg?branch=jdk8)
+master branch: ![TravisCI status master](https://travis-ci.org/GPars/GPars.svg?branch=master)
+|  jdk8 branch: ![TravisCI status jdk8](https://travis-ci.org/GPars/GPars.svg?branch=jdk8)
 
 # Introduction
 
