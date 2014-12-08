@@ -1,6 +1,9 @@
+image::gpars-rgb.svg[Logo, 250, float="right"]
+
 = The GPars Guide
 
 :leveloffset: 1
+
 include::introduction.adoc[]
 include::getting_started.adoc[]
 include::data_parallelism.adoc[]
