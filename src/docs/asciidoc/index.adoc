@@ -1,15 +1,27 @@
-= The GPars Guide
+= The GPars Guide image:gpars-rgb.svg[Logo,200,float=right]
 
 :leveloffset: 1
+
 include::introduction.adoc[]
+
 include::getting_started.adoc[]
+
 include::data_parallelism.adoc[]
+
 include::groovy_csp.adoc[]
+
 include::actors.adoc[]
+
 include::agents.adoc[]
+
 include::dataflow.adoc[]
+
 include::stm.adoc[]
+
 include::google_app_engine_integration.adoc[]
+
 include::tips.adoc[]
+
 include::remoting.adoc[]
+
 include::conclusion.adoc[]

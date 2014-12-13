@@ -1,7 +1,7 @@
-@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,600);
-@import url(http://fonts.googleapis.com/css?family=Source+Code+Pro:500,700);
+@import url(http://fonts.googleapis.com/css?family=Asul:400,700);
+@import url(http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700);
 
-/* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
+/* Based on Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
 article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
     display: block;
 }
@@ -26,7 +26,7 @@ script {
 html {
     background: #fff;
     color: #000;
-    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Asul, sans-serif;
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
 }
@@ -76,7 +76,7 @@ mark {
 }
 
 code, kbd, pre, samp {
-    font-family: 'Source Code Pro', monospace, serif;
+    font-family: "Anonymous Pro", monospace;
     font-size: 1em;
 }
 
@@ -199,7 +199,7 @@ body {
     color: #222222;
     padding: 0;
     margin: 0;
-    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Asul, sans-serif;
     font-weight: normal;
     font-style: normal;
     line-height: 1;
@@ -327,7 +327,7 @@ p aside {
 }
 
 h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6 {
-    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Asul, sans-serif;
     font-weight: normal;
     font-style: normal;
     color: #222;
@@ -395,7 +395,7 @@ small {
 }
 
 code {
-    font-family: 'Source Code Pro', Consolas, "Liberation Mono", Courier, monospace;
+    font-family: "Anonymous Pro", monospace;
     font-weight: normal;
     color: #6d180b;
     font-size: 85%;
@@ -680,7 +680,7 @@ table thead tr th, table tfoot tr th, table tbody tr td, table tr td, table tfoo
 pre, pre > code {
     line-height: 1.4;
     color: inherit;
-    font-family: 'Source Code Pro', Consolas, "Liberation Mono", Courier, monospace;
+    font-family: "Anonymous Pro", monospace;
     font-weight: normal;
 }
 
@@ -886,7 +886,7 @@ p a > code:hover {
 
 #content #toctitle {
     font-weight: bold;
-    font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+    font-family: Asul, sans-serif;
     font-size: 1em;
     padding-left: 0.125em;
 }
@@ -1751,7 +1751,7 @@ span.icon > [class^="icon-"], span.icon > [class*=" icon-"] {
     font-size: 12px;
     font-weight: bold;
     line-height: 20px;
-    font-family: Arial, sans-serif;
+    font-family: Asul, sans-serif;
     font-style: normal;
     position: relative;
     top: -2px;

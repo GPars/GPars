@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import org.apache.tools.ant.taskdefs.Javadoc
 
 //  Author: Václav Pech
 //  Author: Russel Winder
@@ -22,6 +21,7 @@ import org.apache.tools.ant.taskdefs.Javadoc
 //  Author: Hans Dockter
 //  Author: Rene Groeschke
 //  Author: Hamlet D'Arcy - Updated OSGi configuration
+//  Author: Schalk W. Cronjé
 
 buildscript {
     repositories {
@@ -29,47 +29,103 @@ buildscript {
     }
 
     dependencies {
-      classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.1'
+        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.6'
     }
 }
 
-final userPropertiesAreSet = {
-    project.hasProperty('codehausUsername') && project.hasProperty('codehausPassword')
-}
-
-final signingPropertiesAreSet = {
-    project.hasProperty('signing.keyId') && project.hasProperty('signing.password') && project.hasProperty('signing.secretKeyRingFile')
+plugins {
+    id "org.asciidoctor.convert" version "1.5.2"
+    id "com.jfrog.bintray" version "1.0"
+    id "com.jfrog.artifactory" version "3.0.1"
 }
 
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'osgi'
-apply plugin: 'org.asciidoctor.gradle.asciidoctor'
-
-if (signingPropertiesAreSet()) {
-    apply plugin: 'signing'
-}
-
-//apply plugin: 'codenarc'
-
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-defaultTasks 'test'
+import org.apache.tools.ant.taskdefs.Javadoc
 
 archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
 version = '2.0.0-SNAPSHOT'
 
+// Set default properties
+[
+    'useMavenLocal'      : false,
+    'groovyVersion'      : '2.3.8',
+    'nettyVersion'       : '4.0.24.Final',
+    'spockVersion'       : '0.7-groovy-2.0'
+].each { k,v ->
+    String name = "gpars_${k}"
+    if (!project.hasProperty(name)) {
+        project.ext."${name}" = v
+    }
+}
+
+defaultTasks 'test'
+
 sourceCompatibility = 8
 targetCompatibility = 8
 
-def theVendor = 'gpars.org'
-def theTitle = 'GPars: Groovy Parallel Systems'
+ext {
+    theVendor = 'gpars.org'
+    theTitle = 'GPars: Groovy Parallel Systems'
+
+    titleForDocumentation = archivesBaseName + ' ' + version
+    copyrightString = 'Copyright &#169; 2008&#8211;2014  V&#225;clav Pech.  All Rights Reserved.'
+    packageTitle = group
+    description = 'The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more'
+}
 
 apply {
     from 'gradle/docs.gradle'
     from 'gradle/docsDependencies.gradle'
+}
+
+repositories {
+    if (gpars_useMavenLocal) {
+        mavenLocal()
+    }
+    jcenter()
+    mavenCentral()
+}
+
+configurations {
+    deployerJars
+    docs
+    cover
+    groovyDoc // Hack due to problem with groovydoc process in Gradle.
+}
+
+dependencies {
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: gpars_groovyVersion
+    compile 'org.multiverse:multiverse-core:0.7.0', { transitive = false }
+    compile group: 'io.netty', name: 'netty-all', version: gpars_nettyVersion
+    compile 'org.codehaus.jcsp:jcsp:1.1-rc5'
+
+    testCompile group: 'org.spockframework', name: 'spock-core', version:  gpars_spockVersion
+    testCompile 'com.google.code.gson:gson:2.3'
+    testCompile 'com.google.guava:guava:18.0'
+    testCompile fileTree(dir: 'lib', include: '*.jar')
+
+    //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
+    //  Grails, including all the SpringRoo stuff.
+    docs group: 'org.codehaus.groovy', name: 'groovy-all', version:  gpars_groovyVersion
+    docs 'org.yaml:snakeyaml:1.14'
+    docs 'commons-lang:commons-lang:2.6'
+    docs project.ext.grailsDocs
+    docs project.ext.radeox
+    docs project.ext.lowagieItext
+    docs project.ext.xhtmlRenderer
+    docs 'commons-logging:commons-logging:1.2'
+    deployerJars "org.apache.maven.wagon:wagon-http-lightweight:2.8"
+    cover 'net.sourceforge.cobertura:cobertura:2.0.3'
+    testRuntime 'net.sourceforge.cobertura:cobertura:2.0.3'
+    // Have to get some specific dependencies into the GroovyDoc process.
+    groovyDoc group: 'org.codehaus.groovy', name: 'groovy-all', version:  gpars_groovyVersion
+    groovyDoc 'org.fusesource.jansi:jansi:1.11'
 }
 
 task copyDSLDefinitions(type: Copy) {
@@ -100,66 +156,24 @@ jar {
         instruction 'Import-Package', '*;resolution:=optional'
         instruction '-removeheaders', 'Bnd-LastModified'
     }
+
+    dependsOn copyDSLDefinitions
 }
 
-jar.dependsOn copyDSLDefinitions
-
-repositories {
-    if (project.hasProperty('gpars_useMavenLocal') && gpars_useMavenLocal) {
-        mavenLocal()
-    }
-    jcenter()
-    mavenCentral()
-}
-
-configurations {
-    deployerJars
-    docs
-    cover
-    groovyDoc // Hack due to problem with groovydoc process in Gradle.
-}
-
-// NB If hasProperty is evaluated at the top level of the script, the method associated with the Project
-// instance is called, and everything works as expected.  When executed without qualification in the context
-// of the dependencies Closure then the hasProperties associated with the DependencyHandler instance is
-// called -- and so the test appears to fail unexpectedly as the properties are not defined in that context.
-// We must therefore be explicit about evaluating the hasProperty of the Project instance.  Thanks to
-// Ladislav Thon for pointing this out on the Gradle Developer email list.  The only question is why the
-// symbol look up works correctly without qualification.
-
-dependencies {
-    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.3.8'
-    compile('org.multiverse:multiverse-core:0.7.0') { transitive = false }
-    compile group: 'io.netty', name: 'netty-all', version: project.hasProperty('gpars_nettyVersion') ? gpars_nettyVersion : '4.0.24.Final'
-    compile 'org.codehaus.jcsp:jcsp:1.1-rc5'
-    testCompile group: 'junit', name: 'junit', version: project.hasProperty('gpars_junitVersion') ? gpars_junitVersion : '4.11'
-    testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.7-groovy-2.0'
-    testCompile 'com.google.code.gson:gson:2.3'
-    testCompile 'com.google.guava:guava:18.0'
-    testCompile fileTree(dir: 'lib', include: '*.jar')
-    //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
-    //  Grails, including all the SpringRoo stuff.
-    docs group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.3.8'
-    docs 'org.yaml:snakeyaml:1.14'
-    docs 'commons-lang:commons-lang:2.6'
-    docs project.ext.grailsDocs
-    docs project.ext.radeox
-    docs project.ext.lowagieItext
-    docs project.ext.xhtmlRenderer
-    docs 'commons-logging:commons-logging:1.2'
-    deployerJars "org.apache.maven.wagon:wagon-http-lightweight:2.8"
-    cover 'net.sourceforge.cobertura:cobertura:2.0.3'
-    testRuntime 'net.sourceforge.cobertura:cobertura:2.0.3'
-    // Have to get some specific dependencies into the GroovyDoc process.
-    groovyDoc group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.3.8'
-    groovyDoc 'org.fusesource.jansi:jansi:1.11'
-}
 
 task runBenchmarks(type: JavaExec) {
     description = 'Runs benchmarks measuring the throughput and latency of actors in GPars'
     main = 'groovyx.gpars.benchmark.caliper.BenchmarkRunner'
     classpath = sourceSets.test.runtimeClasspath
-    args = ['-Jxms=-Xms512M', '-Jxmx=-Xmx1024M', '-Jserver=-server']
+
+    def gcArg = "-XX:+UseParallelGC"
+
+    // On Windows, calling the JVM with extended params requires multiple levels of quoting
+    if (System.getProperty('os.name').matches(".*Windows.*")) {
+        gcArg = '"""-XX:+UseParallelGC"""'
+    }
+    args = ["-Jgc=${gcArg}", '-Jxms=-Xms512M', '-Jxmx=-Xmx1024M', '-Jserver=-server']
+
 }
 
 //  To get the details of the "unchecked" issues.
@@ -167,18 +181,6 @@ compileGroovy.options.compilerArgs = ['-Xlint']
 
 [compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '512M')
 
-gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.hasTask(":release") && version.contains("SNAPSHOT")) {
-        throw (new StopExecutionException("You should not release a snapshot version! We're Stopping the build!"))
-    }
-    if (taskGraph.hasTask(':test') && taskGraph.hasTask(':withCoverage')) {
-        new Coverage(this).setup()
-    }
-}
-
-task release(dependsOn: ['build', 'zipSamples', 'zipJavaDemo', 'zipDist', 'zipGuide']) << {
-    println 'We release now'
-}
 
 task withCoverage { // only here such that it can be put on the command line for enabling coverage
     description = 'Prepare the test task to use code coverage if needed.'
@@ -200,60 +202,32 @@ tasks.withType(CodeNarc).all { codeNarcTask ->
     codeNarcTask.ignoreFailures = true
 }
 
-if (signingPropertiesAreSet()) {
-    signing {
-        sign configurations.archives
-    }
-}
-
-//build.dependsOn integrationTest
-
-gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.hasTask(uploadArchives)) {
-        if (!(userPropertiesAreSet() && signingPropertiesAreSet())) {
-            throw new RuntimeException('Must define both codehausUsername, codehausPassword, signing.keyId, signing.password, and signing.secretKeyRingFile to upload signed archives.')
-        }
-        project.ext.deployer = uploadArchives.repositories.mavenDeployer {
-            uniqueVersion = false
-            configuration = configurations.deployerJars
-            repository(url: 'https://nexus.codehaus.org/service/local/staging/deploy/maven2') {
-                authentication(userName: codehausUsername, password: codehausPassword)
-            }
-            snapshotRepository(url: 'https://nexus.codehaus.org/content/repositories/snapshots') {
-                authentication(userName: codehausUsername, password: codehausPassword)
-            }
-            pom.project {
-                name 'GPars'
-                description 'The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more'
-                url 'http://gpars.codehaus.org'
-                inceptionYear '2009'
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-            }
-            // In the future Gradle will allow to use dynamic props for dependencies to deal with optionals
-            pom.whenConfigured { pom ->
-                // dependency is a native Maven dependency object (With properties artifactId, groupId, ...)
-                pom.dependencies.each { dependency ->
-                    if (dependency.artifactId in ['netty', 'jcsp', 'multiverse', 'groovy-all']) {
-                        dependency.optional = true
-                    }
-                }
-                // Remove test dependencies from all poms
-                pom.dependencies.removeAll(pom.dependencies.findAll { it.scope == 'test' })
+project.tasks.install.repositories.mavenInstaller.pom.with {
+    project {
+        name 'GPars'
+        description 'The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more'
+        url 'http://gpars.codehaus.org'
+        inceptionYear '2009'
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
             }
         }
     }
+
+    whenConfigured { pom ->
+        // dependency is a native Maven dependency object (With properties artifactId, groupId, ...)
+        pom.dependencies.each { dependency ->
+            if (dependency.artifactId in ['netty-all', 'jcsp', 'multiverse', 'groovy-all']) {
+                dependency.optional = true
+            }
+        }
+        // Remove test dependencies from all poms
+        pom.dependencies.removeAll(pom.dependencies.findAll { it.scope == 'test' })
+    }
 }
-
-
-def titleForDocumentation = archivesBaseName + ' ' + version
-def copyrightString = 'Copyright &#169; 2008&#8211;2014  V&#225;clav Pech.  All Rights Reserved.'
-def packageTitle = group
 
 javadoc {
     options.overview('overview.html')
@@ -273,13 +247,10 @@ javadoc {
 }
 
 if (JavaVersion.current().isJava8Compatible()) {
-    allprojects {
+    tasks.withType(Javadoc) {
+        // disable the crazy super-strict doclint tool in Java 8
         //noinspection SpellCheckingInspection
-        tasks.withType(Javadoc) {
-            // disable the crazy super-strict doclint tool in Java 8
-            //noinspection SpellCheckingInspection
-            options.addStringOption('Xdoclint:none', '-quiet')
-        }
+        options.addStringOption('Xdoclint:none', '-quiet')
     }
 }
 
@@ -297,8 +268,17 @@ groovydoc {
 }
 
 asciidoctor {
-  sources { include 'index.adoc' }
-  attributes  toc: 'left',
+    sources {
+      include 'index.adoc'
+    }
+
+    backends 'html5','pdf'
+
+    resources {
+        include 'images/**'
+        include 'css/**'
+    }
+    attributes  toc: 'left',
                doctype: 'book',
                icons: 'font',
                sectlink: true,
@@ -356,6 +336,74 @@ task zipDist(type: Zip) {
     }
     appendix = 'all'
 }
+
+// TODO: What is the bintray organisation (will it be part of groovy)
+// TODO: Activate signing to bintray
+// TODO: Activate sync to Maven Central
+bintray {
+    user = project.properties.bintrayUser
+    key = project.properties.bintrayKey
+    publish = false
+    dryRun = false
+    configurations = ['archives']
+
+    pkg {
+        userOrg = '__PLEASE_SET_THE_GPARS_BINTRAY_ORG'
+        repo = 'GPars'
+        name = 'gpars'
+        desc = project.description
+        labels = ['groovy','gpars']
+        publicDownloadNumbers = true
+
+        websiteUrl = 'http://gpars.org'
+        issueTrackerUrl = 'https://github.com/GPars/GPars/issues'
+        vcsUrl = 'https://github.com/GPars/GPars.git'
+        licenses = ['Apache-2.0']
+
+        version {
+            name = project.version
+            vcsTag = "v${project.version}"
+
+            gpg {
+                sign = false
+                passphrase = project.properties.bintrayGpgPassphrase
+            }
+
+//            mavenCentralSync {
+//                sync = true //Optional (true by default). Determines whether to sync the version to Maven Central.
+//                user = 'userToken' //OSS user token
+//                password = 'paasword' //OSS user password
+//                close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+//            }
+        }
+    }
+}
+
+bintrayUpload {
+    dependsOn build, documentation, zipDoc, zipSrc
+    onlyIf { project.properties.bintrayUser && project.properties.bintrayKey && !version.contains('SNAPSHOT')}
+}
+
+artifactory {
+    publish {
+        contextUrl = 'http://oss.jfrog.org'
+        repository {
+            repoKey = 'oss-snapshot-local'
+            username = project.properties.bintrayUser
+            password = project.properties.bintrayKey
+        }
+    }
+}
+
+artifactoryPublish {
+    onlyIf {project.properties.bintrayUser && project.properties.bintrayKey && version.contains('SNAPSHOT') }
+}
+
+// TODO: Don't think we really need this task
+task release(dependsOn: ['build', 'zipSamples', 'zipJavaDemo', 'zipDist', 'zipGuide','bintrayUpload']) << {
+    println 'We release now'
+}
+
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.2.1'
@@ -457,5 +505,12 @@ idea {
                 gradleSettings.appendNode('option', [name: 'SDK_HOME', value: gradle.gradleHomeDir.absolutePath])
             }
         }
+    }
+}
+
+// TODO: WTF is happening with coverage?
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(':test') && taskGraph.hasTask(':withCoverage')) {
+        new Coverage(this).setup()
     }
 }
