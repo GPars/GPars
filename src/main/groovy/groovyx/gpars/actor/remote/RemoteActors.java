@@ -32,6 +32,8 @@ import java.util.concurrent.ConcurrentMap;
  */
 public final class RemoteActors extends LocalHost {
 
+    private final String contextName;
+
     /**
      * Stores Actors published in context of this instance of RemoteActors.
      */
@@ -42,9 +44,10 @@ public final class RemoteActors extends LocalHost {
      */
     private final ConcurrentMap<String, DataflowVariable<Actor>> remoteActors;
 
-    private RemoteActors() {
+    private RemoteActors(String contextName) {
         publishedActors = new ConcurrentHashMap<>();
         remoteActors = new ConcurrentHashMap<>();
+        this.contextName = contextName != null ? contextName : getId().toString();
     }
 
     /**
@@ -68,8 +71,26 @@ public final class RemoteActors extends LocalHost {
         return getPromise(remoteActors, name, host, port, new RemoteActorRequestMsg(this.getId(), name));
     }
 
+    /**
+     * Retrieves {@link groovyx.gpars.actor.Actor} published under specified url
+     * @param actorUrl the actor url
+     * @return promise of {@link groovyx.gpars.actor.remote.RemoteActor}
+     */
+    public Promise<Actor> get(String actorUrl) {
+        return null;
+    }
+
     public static RemoteActors create() {
-        return new RemoteActors();
+        return new RemoteActors(null);
+    }
+
+    /**
+     * Creates remoting context for Actors with specified name
+     * @param contextName the name of the context
+     * @return Context with specified name
+     */
+    public static RemoteActors create(String contextName) {
+        return new RemoteActors(contextName);
     }
 
     @Override
