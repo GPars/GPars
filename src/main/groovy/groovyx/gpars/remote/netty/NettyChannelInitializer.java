@@ -18,14 +18,11 @@ package groovyx.gpars.remote.netty;
 
 import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.RemoteConnection;
+import groovyx.gpars.remote.netty.NettyHandler;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Sets up Netty's communication channel.

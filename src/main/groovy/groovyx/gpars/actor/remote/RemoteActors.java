@@ -19,6 +19,7 @@ package groovyx.gpars.actor.remote;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.Promise;
+import groovyx.gpars.remote.RemotingContextWithUrls;
 import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.message.RemoteActorRequestMsg;
 
@@ -30,7 +31,7 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author Rafal Slawik
  */
-public final class RemoteActors extends LocalHost {
+public final class RemoteActors extends LocalHost implements RemotingContextWithUrls {
 
     private final String contextName;
 
@@ -80,6 +81,15 @@ public final class RemoteActors extends LocalHost {
         return null;
     }
 
+    /**
+     * Checks if {@link groovyx.gpars.actor.Actor} under specified url was published within this context
+     * @param actorUrl the actor url
+     * @return true if url matches some actor within this context
+     */
+    public boolean has(String actorUrl) {
+        return publishedActors.containsKey(actorUrl);
+    }
+
     public static RemoteActors create() {
         return new RemoteActors(null);
     }
@@ -108,5 +118,12 @@ public final class RemoteActors extends LocalHost {
             return klass.cast(publishedActors.get(name));
         }
         throw new IllegalArgumentException("Unsupported type");
+    }
+
+    @Override
+    public void startServer(String host, int port) {
+        super.startServer(host, port);
+
+        // TODO
     }
 }
