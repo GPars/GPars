@@ -17,12 +17,17 @@
 package groovyx.gpars.actor.remote;
 
 import groovyx.gpars.actor.Actor;
+import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.Promise;
+import groovyx.gpars.remote.BroadcastDiscovery;
 import groovyx.gpars.remote.RemotingContextWithUrls;
 import groovyx.gpars.remote.LocalHost;
 import groovyx.gpars.remote.message.RemoteActorRequestMsg;
+import groovyx.gpars.remote.netty.discovery.DiscoveryClient;
+import groovyx.gpars.remote.netty.discovery.DiscoveryServer;
 
+import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -45,6 +50,11 @@ public final class RemoteActors extends LocalHost implements RemotingContextWith
      */
     private final ConcurrentMap<String, DataflowVariable<Actor>> remoteActors;
 
+    /**
+     * Server of broadcast discovery service
+     */
+    private DiscoveryServer discoveryServer;
+
     private RemoteActors(String contextName) {
         publishedActors = new ConcurrentHashMap<>();
         remoteActors = new ConcurrentHashMap<>();
@@ -58,6 +68,9 @@ public final class RemoteActors extends LocalHost implements RemotingContextWith
      * @param name the name under which Actor is published
      */
     public void publish(Actor actor, String name) {
+        if (!RemoteActorsUrlUtils.isValidActorName(name)) {
+            throw new IllegalArgumentException("Cannot publish actor under given name: " + name);
+        }
         publishedActors.put(name, actor);
     }
 
@@ -78,7 +91,30 @@ public final class RemoteActors extends LocalHost implements RemotingContextWith
      * @return promise of {@link groovyx.gpars.actor.remote.RemoteActor}
      */
     public Promise<Actor> get(String actorUrl) {
-        return null;
+        return get(actorUrl, DiscoveryServer.DEFAULT_BROADCAST_PORT);
+    }
+
+    public Promise<Actor> get(final String actorUrl, int broadcastPort) {
+        DiscoveryClient client = new DiscoveryClient(broadcastPort);
+
+        final DataflowVariable<Actor> result = new DataflowVariable<Actor>();
+        Promise<InetSocketAddress> serverSocketAddressPromise = client.ask(actorUrl);
+        serverSocketAddressPromise.whenBound(new MessageStream() {
+            @Override
+            public MessageStream send(Object message) {
+                InetSocketAddress serverSocketAddress = (InetSocketAddress) message;
+                Promise<Actor> actorPromise = get(serverSocketAddress.getHostName(), serverSocketAddress.getPort(), RemoteActorsUrlUtils.getActorName(actorUrl));
+                actorPromise.whenBound(new MessageStream() {
+                    @Override
+                    public MessageStream send(Object message) {
+                        result.bind(((Actor) message));
+                        return this;
+                    }
+                });
+                return this;
+            }
+        });
+        return result;
     }
 
     /**
@@ -87,7 +123,9 @@ public final class RemoteActors extends LocalHost implements RemotingContextWith
      * @return true if url matches some actor within this context
      */
     public boolean has(String actorUrl) {
-        return publishedActors.containsKey(actorUrl);
+        String groupName = RemoteActorsUrlUtils.getGroupName(actorUrl);
+        String actorName = RemoteActorsUrlUtils.getActorName(actorUrl);
+        return publishedActors.containsKey(actorName) && (groupName.isEmpty() || contextName.equals(groupName));
     }
 
     public static RemoteActors create() {
@@ -122,8 +160,20 @@ public final class RemoteActors extends LocalHost implements RemotingContextWith
 
     @Override
     public void startServer(String host, int port) {
+        startServer(host, port, DiscoveryServer.DEFAULT_BROADCAST_PORT);
+    }
+
+    public void startServer(String host, int port, int broadcastPort) {
         super.startServer(host, port);
 
-        // TODO
+        final InetSocketAddress serverSocketAddress = new InetSocketAddress(host, port);
+        discoveryServer = new DiscoveryServer(broadcastPort, serverSocketAddress, this);
+        discoveryServer.start();
+    }
+
+    @Override
+    public void stopServer() {
+        super.stopServer();
+        discoveryServer.stop();
     }
 }

@@ -99,6 +99,17 @@ class RemoteActorsTest extends Specification {
         testActor2.stop()
     }
 
+    def "Cannot register actor under name with slashes"() {
+        setup:
+        def testActor = new TestActor()
+
+        when:
+        serverRemoteActors.publish testActor, "some-forbidden/name"
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
     class TestActor extends DefaultActor {
         def lastMessage
         def lastMessageLatch

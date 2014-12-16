@@ -19,39 +19,69 @@ package groovyx.gpars.actor.remote
 import groovyx.gpars.actor.Actors
 import org.apache.tools.ant.taskdefs.optional.extension.Specification
 import spock.lang.Specification
+import spock.lang.Timeout
+
+import java.util.concurrent.CountDownLatch
 
 class RemoteActorsWithNamesTest extends Specification {
+    // @Timeout(5)
     def "register and get Actor using its name"() {
         setup:
         def serverRemoteActors = RemoteActors.create "test-group"
         def clientRemoteActors = RemoteActors.create "test-group"
-        serverRemoteActors.startServer "localhost", 9123
-        def actor = Actors.reactor { it ->
-            println "dupa"
-        }
+        serverRemoteActors.startServer "192.168.0.2", 9123
+        def actor = Actors.reactor { it -> null }
         serverRemoteActors.publish actor, "test-actor"
 
         when:
-        def remoteActor = clientRemoteActors.get "test-actor"
+        def remoteActor = clientRemoteActors.get "test-actor" get()
 
         then:
         remoteActor != null
+
+        cleanup:
+        serverRemoteActors.stopServer()
     }
 
+    @Timeout(5)
     def "register and get Actor using its name and group"() {
         setup:
         def serverRemoteActors = RemoteActors.create "test-group-1"
         def clientRemoteActors = RemoteActors.create "test-group-2"
-        serverRemoteActors.startServer "localhost", 9123
-        def actor = Actors.reactor { it ->
-            println "dupa"
-        }
+        serverRemoteActors.startServer "192.168.0.2", 9124
+        def actor = Actors.reactor { it -> null }
         serverRemoteActors.publish actor, "test-actor"
 
         when:
-        def remoteActor = clientRemoteActors.get "test-group-1/test-actor"
+        def remoteActor = clientRemoteActors.get "test-group-1/test-actor" get()
 
         then:
         remoteActor != null
+
+        cleanup:
+        serverRemoteActors.stopServer()
+    }
+
+    @Timeout(5)
+    def "register and get Actor using its name and group and send message to it"() {
+        setup:
+        def serverRemoteActors = RemoteActors.create "test-group-1"
+        def clientRemoteActors = RemoteActors.create "test-group-2"
+        serverRemoteActors.startServer "192.168.0.2", 9125
+
+        def latch = new CountDownLatch(1)
+        def actor = Actors.actor { latch.countDown() }
+        serverRemoteActors.publish actor, "test-actor"
+
+        when:
+        def remoteActor = clientRemoteActors.get "test-group-1/test-actor" get()
+        remoteActor << "test"
+        latch.await()
+
+        then:
+        "ok"
+
+        cleanup:
+        serverRemoteActors.stopServer()
     }
 }

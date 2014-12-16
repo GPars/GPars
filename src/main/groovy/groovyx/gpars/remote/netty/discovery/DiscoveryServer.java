@@ -29,6 +29,8 @@ import java.net.InetSocketAddress;
  * Represents a server that waits for {@link groovyx.gpars.remote.netty.discovery.DiscoveryRequest}s.
  */
 public class DiscoveryServer {
+    public static final int DEFAULT_BROADCAST_PORT = 11553;
+
     private final EventLoopGroup group;
 
     private final Bootstrap bootstrap;
