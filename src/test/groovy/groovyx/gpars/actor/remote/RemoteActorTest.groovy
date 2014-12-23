@@ -24,7 +24,6 @@ import spock.lang.Timeout
 import java.util.concurrent.CountDownLatch
 
 class RemoteActorTest extends Specification {
-    def static HOST = "localhost"
     def static PORT = 9012
 
     @Shared
@@ -35,7 +34,7 @@ class RemoteActorTest extends Specification {
 
     def setupSpec() {
         serverRemoteActors = RemoteActors.create()
-        serverRemoteActors.startServer HOST, PORT
+        serverRemoteActors.startServer getHostAddress(), PORT
 
         clientRemoteActors = RemoteActors.create()
     }
@@ -58,7 +57,7 @@ class RemoteActorTest extends Specification {
         def actorName = "testActor-1"
 
         serverRemoteActors.publish testActor, actorName
-        def remoteActor = clientRemoteActors.get HOST, PORT, actorName get()
+        def remoteActor = clientRemoteActors.get getHostAddress(), PORT, actorName get()
 
         when:
         remoteActor.join()
@@ -79,7 +78,7 @@ class RemoteActorTest extends Specification {
         def actorName = "testActor-2"
 
         serverRemoteActors.publish testActor, actorName
-        def remoteActor = clientRemoteActors.get HOST, PORT, actorName get()
+        def remoteActor = clientRemoteActors.get getHostAddress(), PORT, actorName get()
 
         when:
         remoteActor << "test message"
@@ -102,7 +101,7 @@ class RemoteActorTest extends Specification {
         def actorName = "testActor-3"
 
         serverRemoteActors.publish testActor, actorName
-        def remoteActor = clientRemoteActors.get HOST, PORT, actorName get()
+        def remoteActor = clientRemoteActors.get getHostAddress(), PORT, actorName get()
 
         when:
         Actors.actor {
@@ -130,7 +129,7 @@ class RemoteActorTest extends Specification {
         def actorName = "testActor-4"
 
         serverRemoteActors.publish testActor, actorName
-        def remoteActor = clientRemoteActors.get HOST, PORT, actorName get()
+        def remoteActor = clientRemoteActors.get getHostAddress(), PORT, actorName get()
 
         when:
         def receivedMessage = remoteActor.sendAndWait(messageTest)
@@ -139,5 +138,9 @@ class RemoteActorTest extends Specification {
         receivedMessage.length() == message.length() + messageTest.length()
         receivedMessage.startsWith message
         receivedMessage.endsWith messageTest
+    }
+
+    static String getHostAddress() {
+        InetAddress.getLocalHost().getHostAddress()
     }
 }
