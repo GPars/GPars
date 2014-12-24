@@ -25,7 +25,6 @@ import java.util.concurrent.CountDownLatch
 
 
 class RemoteActorsTest extends Specification {
-    def static HOST = "localhost"
     def static PORT = 9011
 
     @Shared
@@ -36,7 +35,7 @@ class RemoteActorsTest extends Specification {
 
     def setupSpec() {
         serverRemoteActors = RemoteActors.create()
-        serverRemoteActors.startServer HOST, PORT
+        serverRemoteActors.startServer getHostAddress(), PORT
 
         clientRemoteActors = RemoteActors.create()
     }
@@ -54,7 +53,7 @@ class RemoteActorsTest extends Specification {
         when:
         testActor.start()
         serverRemoteActors.publish testActor, "testActor"
-        def remoteActor = clientRemoteActors.get HOST, PORT, "testActor" get()
+        def remoteActor = clientRemoteActors.get getHostAddress(), PORT, "testActor" get()
         remoteActor << testMessage
 
         then:
@@ -78,8 +77,8 @@ class RemoteActorsTest extends Specification {
         serverRemoteActors.publish testActor1, "testActor1"
         serverRemoteActors.publish testActor2, "testActor2"
 
-        def remoteActor1Promise = clientRemoteActors.get HOST, PORT, "testActor1"
-        def remoteActor2Promise = clientRemoteActors.get HOST, PORT, "testActor2"
+        def remoteActor1Promise = clientRemoteActors.get getHostAddress(), PORT, "testActor1"
+        def remoteActor2Promise = clientRemoteActors.get getHostAddress(), PORT, "testActor2"
 
         def remoteActor1 = remoteActor1Promise.get()
         def remoteActor2 = remoteActor2Promise.get()
@@ -128,5 +127,9 @@ class RemoteActorsTest extends Specification {
                 }
             }
         }
+    }
+
+    String getHostAddress() {
+        InetAddress.getLocalHost().getHostAddress()
     }
 }

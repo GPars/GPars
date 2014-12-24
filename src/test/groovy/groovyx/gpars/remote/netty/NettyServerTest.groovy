@@ -20,13 +20,12 @@ import spock.lang.Specification
 import spock.lang.Timeout
 
 class NettyServerTest extends Specification {
-    def static HOST = "localhost"
     def static PORT = 9001
 
     @Timeout(5)
     def "test if NettyServer starts"() {
         setup:
-        NettyServer server = new NettyServer(null, HOST, PORT, null)
+        NettyServer server = new NettyServer(null, getHostAddress(), PORT, null)
 
         when:
         server.start()
@@ -40,7 +39,7 @@ class NettyServerTest extends Specification {
 
     def "test if stopping server fails when server is not running"() {
         setup:
-        NettyServer server = new NettyServer(null, HOST, PORT, null)
+        NettyServer server = new NettyServer(null, getHostAddress(), PORT, null)
 
         when:
         server.stop()
@@ -53,7 +52,7 @@ class NettyServerTest extends Specification {
     @Timeout(5)
     def "test if only one server instance starts at given host:port"() {
         setup:
-        def servers = [new NettyServer(null, HOST, PORT, null), new NettyServer(null, HOST, PORT, null)]
+        def servers = [new NettyServer(null, getHostAddress(), PORT, null), new NettyServer(null, getHostAddress(), PORT, null)]
 
         when:
         servers*.start()
@@ -63,5 +62,9 @@ class NettyServerTest extends Specification {
         thrown(BindException)
 
         servers*.stop()
+    }
+
+    String getHostAddress() {
+        InetAddress.getLocalHost().getHostAddress()
     }
 }

@@ -23,7 +23,6 @@ import spock.lang.Specification
 import spock.lang.Timeout
 
 class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
-    def static HOST = "localhost"
     def static PORT = 9031
 
     @Shared
@@ -34,7 +33,7 @@ class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
 
     def setupSpec() {
         serverRemoteDataflows = RemoteDataflows.create()
-        serverRemoteDataflows.startServer HOST, PORT
+        serverRemoteDataflows.startServer getHostAddress(), PORT
 
         clientRemoteDataflows = RemoteDataflows.create()
     }
@@ -45,7 +44,7 @@ class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
 
     RemoteDataflowQueue publishNewQueueAndGetRemotely(DataflowQueue queue, String queueName) {
         serverRemoteDataflows.publish queue, queueName
-        clientRemoteDataflows.getDataflowQueue HOST, PORT, queueName get()
+        clientRemoteDataflows.getDataflowQueue getHostAddress(), PORT, queueName get()
     }
 
     @Timeout(5)
@@ -116,5 +115,9 @@ class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
 
         then:
         resultVariable.val == queueName
+    }
+
+    String getHostAddress() {
+        InetAddress.getLocalHost().getHostAddress()
     }
 }
