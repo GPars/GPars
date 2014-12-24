@@ -241,7 +241,7 @@ groovydoc {
 
 asciidoctor {
     sources {
-      include 'index.adoc'
+      include 'index.adoc', 'quick_reference.adoc'
     }
     backends 'html5','pdf'
     resources {
