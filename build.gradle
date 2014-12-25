@@ -244,10 +244,6 @@ asciidoctor {
       include 'index.adoc', 'quick_reference.adoc'
     }
     backends 'html5','pdf'
-    resources {
-        include 'images/**'
-        include 'css/**'
-    }
     attributes  toc: 'left',
              doctype: 'book',
              icons: 'font',
