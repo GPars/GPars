@@ -14,34 +14,44 @@ background to be performed asynchronously and collect the results later.
 
 Closures enhancements
 
-    GParsExecutorsPool.withPool() {
-        Closure longLastingCalculation = {calculate()}
-        Closure fastCalculation = longLastingCalculation.async()  //create a new closure, which starts the original closure on a thread pool
-        Future result=fastCalculation()                           //returns almost immediately
-        //do stuff while calculation performs ...
-        println result.get()
-    }
+----
+GParsExecutorsPool.withPool() {
+    Closure longLastingCalculation = {calculate()}
+    // Create a new closure, which starts the original closure on a thread pool.
+    Closure fastCalculation = longLastingCalculation.async()
+    // Returns almost immediately.
+    Future result=fastCalculation()
+    // Do stuff while calculation performs...
+    println result.get()
+}
+----
 
-
-    GParsExecutorsPool.withPool() {
-        /**
-         * The callAsync() method is an asynchronous variant of the default call() method to invoke a closure.
-         * It will return a Future for the result value.
-         */
-        assert 6 == {it * 2}.call(3).get()
-        assert 6 == {it * 2}.callAsync(3).get()
-    }
+----
+GParsExecutorsPool.withPool() {
+    /**
+     * The callAsync() method is an asynchronous variant of the default call() method
+     * to invoke a closure. It will return a Future for the result value.
+     */
+    assert 6 == {it * 2}.call(3).get()
+    assert 6 == {it * 2}.callAsync(3).get()
+}
+----
 
 === Executor service enhancements
 
-    GParsExecutorsPool.withPool {ExecutorService executorService ->
-        executorService << {println 'Inside parallel task'}
-    }
-
+----
+GParsExecutorsPool.withPool {ExecutorService executorService ->
+    executorService << {println 'Inside parallel task'}
+}
+----
 
 === Asynchronous function processing
 
-    GParsExecutorsPool.withPool {
-        assert [10, 20] == AsyncInvokerUtil.doInParallel({calculateA()}, {calculateB()})         //waits for results
-        assert [10, 20] == AsyncInvokerUtil.executeAsync({calculateA()}, {calculateB()})*.get()  //returns Futures instead and doesn't wait for results to be calculated
-    }
+----
+GParsExecutorsPool.withPool {
+    // Waits for results.
+    assert [10, 20] == AsyncInvokerUtil.doInParallel({calculateA()}, {calculateB()})
+    // Returns a Future and doesn't wait for results to be calculated.
+    assert [10, 20] == AsyncInvokerUtil.executeAsync({calculateA()}, {calculateB()})*.get()
+}
+----

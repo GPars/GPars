@@ -19,29 +19,38 @@ attributes.
 
 === Running a piece of code atomically
 
-    import groovyx.gpars.stm.GParsStm
-    import org.multiverse.api.references.TxnInteger
-    import static org.multiverse.api.StmUtils.newTxnInteger
-    public class Account {
-        private final TxnInteger amount = newTxnInteger(0);
-        public void transfer(final int a) {
-            GParsStm.atomic {
-                amount.increment(a);
-            }
-        }
-        public int getCurrentAmount() {
-            GParsStm.atomicWithInt {
-                amount.get();
-            }
+----
+import groovyx.gpars.stm.GParsStm
+import org.multiverse.api.references.TxnInteger
+
+import static org.multiverse.api.StmUtils.newTxnInteger
+
+public class Account {
+    private final TxnInteger amount = newTxnInteger(0);
+
+    public void transfer(final int a) {
+        GParsStm.atomic {
+            amount.increment(a);
         }
     }
+
+    public int getCurrentAmount() {
+        GParsStm.atomicWithInt {
+            amount.get();
+        }
+    }
+}
+----
 
 === Customizing the transactional properties
 
-    import groovyx.gpars.stm.GParsStm
-    import org.multiverse.api.AtomicBlock
-    import org.multiverse.api.PropagationLevel
-    final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
-    assert GParsStm.atomicWithBoolean(block) {
-        true
-    }
+----
+import groovyx.gpars.stm.GParsStm
+import org.multiverse.api.AtomicBlock
+import org.multiverse.api.PropagationLevel
+
+final TxnExecutor block = GParsStm.createTxnExecutor(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+assert GParsStm.atomicWithBoolean(block) {
+    true
+}
+----

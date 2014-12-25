@@ -46,38 +46,46 @@ The following methods are currently supported on all objects in Groovy:
 * maxParallel()
 * sumParallel()
 
-    //summarize numbers concurrently
-    ForkJoinPool.withPool {
-        final AtomicInteger result = new AtomicInteger(0)
-        [1, 2, 3, 4, 5].eachParallel {result.addAndGet(it)}
-        assert 15 == result
-    }
-    //multiply numbers asynchronously
-    ForkJoinPool.withPool {
-        final List result = [1, 2, 3, 4, 5].collectParallel {it * 2}
-        assert ([2, 4, 6, 8, 10].equals(result))
-    }
+----
+// Summarize numbers concurrently.
+ForkJoinPool.withPool{
+    final AtomicInteger result = new AtomicInteger(0)
+    [1, 2, 3, 4, 5].eachParallel{result.addAndGet(it)}
+    assert 15 == result
+}
+
+// Multiply numbers asynchronously.
+ForkJoinPool.withPool{
+    final List result = [1, 2, 3, 4, 5].collectParallel{it * 2}
+    assert ([2, 4, 6, 8, 10].equals(result))
+}
+----
 
 === Meta-class enhancer
 
-    import groovyx.gpars.ParallelEnhancer
-    def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    ParallelEnhancer.enhanceInstance(list)
-    println list.collectParallel {it * 2 }
+----
+import groovyx.gpars.ParallelEnhancer
+
+def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+ParallelEnhancer.enhanceInstance(list)
+println list.collectParallel{it * 2 }
+----
 
 === Transparently parallel collections
 
-    ForkJoinPool.withPool {
-        //The selectImportantNames() will process the name collections concurrently
-        assert ['ALICE', 'JASON'] == selectImportantNames(['Joe', 'Alice', 'Dave', 'Jason'].makeConcurrent())
-    }
-    /**
-     * A function implemented using standard sequential collect() and findAll() methods.
-     */
-    def selectImportantNames(names) {
-        names.collect {it.toUpperCase()}.findAll{it.size() > 4}
-    }
+----
+ForkJoinPool.withPool{
+    // The selectImportantNames() will process the name collections concurrently.
+    assert ['ALICE', 'JASON'] == selectImportantNames(['Joe', 'Alice', 'Dave', 'Jason'].makeConcurrent())
+}
 
+/**
+ * A function implemented using standard sequential collect() and findAll() methods.
+ */
+def selectImportantNames(names) {
+    names.collect{it.toUpperCase()}.findAll{it.size() > 4}
+}
+----
 
 === Map/Reduce
 
@@ -93,9 +101,11 @@ Available methods:
 
 The _collection_ property will return all elements wrapped in a Groovy collection instance.
 
-    println 'Number of occurrences of the word GROOVY today: ' + urls.parallel
-            .map {it.toURL().text.toUpperCase()}
-            .filter {it.contains('GROOVY')}
-            .map{it.split()}
-            .map{it.findAll{word -> word.contains 'GROOVY'}.size()}
-            .sum()
+----
+println 'Number of occurrences of the word GROOVY today: ' + urls.parallel
+        .map{it.toURL().text.toUpperCase()}
+        .filter{it.contains('GROOVY')}
+        .map{it.split()}
+        .map{it.findAll{word -> word.contains 'GROOVY'}.size()}
+        .sum()
+----

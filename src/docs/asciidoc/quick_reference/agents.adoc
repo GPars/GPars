@@ -17,18 +17,21 @@ values.
 
 === Agent implements a Clojure-like agent concept
 
-    import groovyx.gpars.agent.Agent
-    def jugMembers = new Agent<List>(['Me'])  //add Me
-    jugMembers.send {it.add 'James'}  //add James
-    final Thread t1 = Thread.start {
-        jugMembers {it.add 'Joe'}  //add Joe (using the implicit call() method to send the function)
-    }
-    final Thread t2 = Thread.start {
-        jugMembers << {it.add 'Dave'}  //add Dave
-        jugMembers << {it.add 'Alice'}  //add Alice
-    }
-    [t1, t2]*.join()
-    println jugMembers.val
-    jugMembers.valAsync {println "Current members: $it"}
-    System.in.read()
-    jugMembers.stop()
+----
+import groovyx.gpars.agent.Agent
+
+def jugMembers = new Agent<List>(['Me'])  // Add Me.
+jugMembers.send {it.add 'James'}  // Add James.
+final Thread t1 = Thread.start{
+    jugMembers {it.add 'Jo'}  // Add Jo --- using the implicit call() method to send the function.
+}
+final Thread t2 = Thread.start{
+    jugMembers << {it.add 'Dave'}  // Add Dave.
+    jugMembers << {it.add 'Alice'}  // Add Alice.
+}
+[t1, t2]*.join()
+println jugMembers.val
+jugMembers.valAsync {println "Current members: $it"}
+System.in.read()
+jugMembers.stop()
+----
