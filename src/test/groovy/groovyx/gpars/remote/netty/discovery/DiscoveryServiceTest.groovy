@@ -21,11 +21,14 @@ import groovyx.gpars.remote.RemotingContextWithUrls
 import spock.lang.Specification
 import spock.lang.Timeout
 
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
+
 class DiscoveryServiceTest extends Specification {
     @Timeout(5)
     def "can use discovery mechanism"() {
         setup:
-        def serverSocketAddress = new InetSocketAddress(InetAddresses.forString("192.168.1.123"), 1234)
+        def serverSocketAddress = new InetSocketAddress(InetAddresses.forString("1.2.3.4"), 1234)
         def remotingContext = { true } as RemotingContextWithUrls
         def discoveryServer = new DiscoveryServer(11345, serverSocketAddress, remotingContext)
         discoveryServer.start()
@@ -34,13 +37,25 @@ class DiscoveryServiceTest extends Specification {
 
 
         when:
-        def promise = discoveryClient.ask "test-actor"
+        def receivedServerSocketAddress = tryGetServerSocketAddress discoveryClient, "test-actor"
 
         then:
-        def receivedServerSocketAddress = promise.get()
         receivedServerSocketAddress.getPort() == 1234
 
         cleanup:
         [discoveryServer, discoveryClient]*.stop()
+    }
+
+    SocketAddress tryGetServerSocketAddress(DiscoveryClient client, String actorUrl) {
+        SocketAddress address = null
+        def received = false
+        while (!received) {
+            try {
+                println "ask"
+                address = client.ask actorUrl get 10, TimeUnit.MILLISECONDS
+                received = true
+            } catch (TimeoutException e) {}
+        }
+        address
     }
 }
