@@ -30,6 +30,7 @@ class RemoteAgentsWithServerTest extends Specification {
 
     RemoteAgent publishAndRetrieveRemoteAgent(Agent agent, String name, AgentClosureExecutionPolicy policy) {
         serverRemoteAgents.publish agent, name
+        sleep 250
         def remoteAgent = clientRemoteAgents.get getHostAddress(), PORT, name get()
         remoteAgent.executionPolicy = policy
         return remoteAgent
