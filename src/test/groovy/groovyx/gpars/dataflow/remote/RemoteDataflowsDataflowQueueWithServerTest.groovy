@@ -22,6 +22,9 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
 
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
+
 class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
     def static PORT = 9031
 
@@ -44,7 +47,15 @@ class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
 
     RemoteDataflowQueue publishNewQueueAndGetRemotely(DataflowQueue queue, String queueName) {
         serverRemoteDataflows.publish queue, queueName
-        clientRemoteDataflows.getDataflowQueue getHostAddress(), PORT, queueName get()
+        RemoteDataflowQueue remoteQueue = null
+        def received = false
+        while (!received) {
+            try {
+                remoteQueue = clientRemoteDataflows.getDataflowQueue getHostAddress(), PORT, queueName get(10, TimeUnit.MILLISECONDS)
+                received = true
+            } catch (TimeoutException e) { }
+        }
+        remoteQueue
     }
 
     @Timeout(5)
