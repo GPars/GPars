@@ -44,6 +44,7 @@ class RemoteDataflowsDataflowBroadcastWithServerTest extends Specification {
 
     DataflowReadChannel publishNewBroadcastAndGetRemotely(DataflowBroadcast broadcast, String broadcastName) {
         serverRemoteDataflows.publish broadcast, broadcastName
+        sleep 250
         clientRemoteDataflows.getReadChannel getHostAddress(), PORT, broadcastName get()
     }
 
