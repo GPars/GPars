@@ -1,9 +1,6 @@
 
 = Actors
 
-The actor support in GPars was originally inspired by the Actors library in Scala, but has since gone well
-beyond what Scala offers as standard.
-
 Actors allow for a message passing-based concurrency model: programs are collections of independent active
 objects that exchange messages and have no mutable shared state.  Actors can help developers avoid issues
 such as deadlock, live-lock and starvation, which are common problems for shared memory based approaches.
@@ -11,8 +8,11 @@ Actors are a way of leveraging the multi-core nature of today's hardware without
 traditionally associated with shared-memory multi-threading, which is why programming languages such as
 Erlang and Scala have taken up this model.
 
+NOTE: The actor support in GPars was originally inspired by the Actors library in Scala, but has since gone
+well beyond what Scala offers as standard.
+
 A nice article summarizing the key http://ruben.savanne.be/articles/concurrency-in-erlang-scala[concepts
-behind actors] was written recently by Ruben Vermeersch.  Actors always guarantee that *at most one thread
+behind actors] has been written by Ruben Vermeersch.  Actors always guarantee that *at most one thread
 processes the actor's body* at any one time and also, under the covers, that the memory gets synchronized
 each time a thread gets assigned to an actor so the actor's state *can be safely modified* by code in the
 body *without any other extra (synchronization or locking) effort* .  Ideally actor's code should *never be
@@ -23,10 +23,10 @@ actor's code and state are *no longer valid* .
 
 == Types of actors
 
-In general, you can find two types of actors in the wild - ones that hold *implicit state* and those, who
+In general, you can find two types of actors in the wild -- ones that hold *implicit state* and ones that
 don't. GPars gives you both options.  *Stateless* actors, represented in *GPars* by the
 _DynamicDispatchActor_ and the _ReactiveActor_ classes, keep no track of what messages have arrived
-previously.  You may thing of these as flat message handlers, which process messages as they come. Any
+previously.  You may think of these as flat message handlers, which process messages as they come. Any
 state-based behavior has to be implemented by the user.
 
 The *stateful* actors, represented in GPars by the _DefaultActor_ class (and previously also by the
@@ -41,9 +41,9 @@ performance cost, mainly due to the lack of continuations support on JVM.
 
 Since actors are detached from the system threads, a great number of actors can share a relatively small
 thread pool.  This can go as far as having many concurrent actors that share a single pooled thread. This
-architecture allows to avoid some of the threading limitations of the JVM. In general, while the JVM can
-only give you a limited number of threads (typically around a couple of thousands), the number of actors is
-only limited by the available memory. If an actor has no work to do, it doesn't consume threads.
+architecture avoids some of the threading limitations of the JVM. In general, while the JVM can only give
+you a limited number of threads (typically around a couple of thousands), the number of actors is only
+limited by the available memory. If an actor has no work to do, it doesn't consume threads.
 
 Actor code is processed in chunks separated by quiet periods of waiting for new events (messages).  This can
 be naturally modeled through _continuations_ . As JVM doesn't support continuations directly, they have to
@@ -64,10 +64,12 @@ class GameMaster extends DefaultActor {
     void act() {
         loop {
             react { int num ->
-                if (num > secretNum)
-                reply 'too large'
-                else if (num < secretNum)
-                reply 'too small'
+                if (num > secretNum) {
+                    reply 'too large'
+                }
+                else if (num < secretNum) {
+                    reply 'too small'
+                }
                 else {
                     reply 'you win'
                     terminate()
@@ -88,9 +90,9 @@ class Player extends DefaultActor {
             server.send myNum
             react {
                 switch (it) {
-                    case 'too large': println "$name: $myNum was too large"; break
-                    case 'too small': println "$name: $myNum was too small"; break
-                    case 'you win': println "$name: I won $myNum"; terminate(); break
+                  case 'too large': println "$name: $myNum was too large"; break
+                  case 'too small': println "$name: $myNum was too small"; break
+                  case 'you win': println "$name: I won $myNum"; terminate(); break
                 }
             }
         }
@@ -100,23 +102,23 @@ class Player extends DefaultActor {
 def master = new GameMaster().start()
 def player = new Player(name: 'Player', server: master).start()
 
-//this forces main thread to live until both actors stop
+// This forces the main thread to wait until both actors have terminated.
 [master, player]*.join()
 ----
 
 example by _Jordi Campos i Miralles, Departament de Matemàtica Aplicada i Anàlisi, MAiA Facultat de
 Matemàtiques, Universitat de Barcelona_
 
-== Usage of Actors
+== Usage of actors
 
-Gpars provides consistent Actor APIs and DSLs. Actors in principal perform three specific operations - send
-messages, receive messages and create new actors. Although not specifically enforced by *GPars* messages
+GPars provides consistent Actor APIs and DSLs. Actors in principal perform three specific operations -- send
+messages, receive messages and create new actors. Although not specifically enforced by GPars messages
 should be immutable or at least follow the *hands-off* policy when the sender never touches the messages
 after the message has been sent off.
 
 === Sending messages
 
-Messages can be sent to actors using the _send()_ method.
+Messages can be sent to actors using the _send_ method.
 
 ----
 def passiveActor = Actors.actor{
@@ -129,9 +131,9 @@ passiveActor << 'Message 2'    //using the << operator
 passiveActor 'Message 3'       //using the implicit call() method
 ----
 
-Alternatively, the _<<_ operator or the implicit _call()_ method can be used. A family of _sendAndWait()_
+Alternatively, the _<<_ operator or the implicit _call_ method can be used. A family of _sendAndWait_
 methods is available to block the caller until a reply from the actor is available.  The _reply_ is returned
-from the _sendAndWait()_ method as a return value.  The _sendAndWait()_ methods may also return after a
+from the _sendAndWait_ method as a return value.  The _sendAndWait_ methods may also return after a
 timeout expires or in case of termination of the called actor.
 
 ----
@@ -143,14 +145,17 @@ def replyingActor = Actors.actor{
         }
     }
 }
+
 def reply1 = replyingActor.sendAndWait('Message 4')
+
 def reply2 = replyingActor.sendAndWait('Message 5', 10, TimeUnit.SECONDS)
+
 use (TimeCategory) {
     def reply3 = replyingActor.sendAndWait('Message 6', 10.seconds)
 }
 ----
 
-The _sendAndContinue()_ method allows the caller to continue its processing while the supplied closure is
+The _sendAndContinue_ method allows the caller to continue its processing while the supplied closure is
 waiting for a reply from the actor.
 
 ----
@@ -158,30 +163,30 @@ friend.sendAndContinue 'I need money!', {money -> pocket money}
 println 'I can continue while my friend is collecting money for me'
 ----
 
-The _sendAndPromise()_ method returns a _Promise_ (aka Future) to the final reply and so allows the caller
+The _sendAndPromise_ method returns a *Promise* (aka Future) to the final reply and so allows the caller
 to continue its processing while the actor is handling the submitted message.
 
 ----
 Promise loan = friend.sendAndPromise 'I need money!'
 println 'I can continue while my friend is collecting money for me'
-loan.whenBound {money -> pocket money}  //asynchronous waiting for a reply
-println "Received ${loan.get()}"  //synchronous waiting for a reply
+loan.whenBound {money -> pocket money}  // Asynchronous waiting for a reply.
+println "Received ${loan.get()}"  // Synchronous waiting for a reply.
 ----
 
-All _send()_ , _sendAndWait()_ or _sendAndContinue()_ methods will throw an exception if invoked on a non-active actor.
+All _send_ , _sendAndWait_ or _sendAndContinue_ methods will throw an exception if invoked on a non-active actor.
 
 === Receiving messages
 
 ==== Non-blocking message retrieval
 
-Calling the _react()_ method, optionally with a timeout parameter, from within the actor's code will consume
+Calling the _react_ method, optionally with a timeout parameter, from within the actor's code will consume
 the next message from the actor's inbox, potentially waiting, if there is no message to be processed
 immediately.
 
 ----
 println 'Waiting for a gift'
 react {gift ->
-    if (myWife.likes gift) reply 'Thank you!'
+    if (mySpouse.likes gift) reply 'Thank you!'
 }
 ----
 
@@ -189,14 +194,14 @@ Under the covers the supplied closure is not invoked directly, but scheduled for
 the thread pool once a message is available. After scheduling the current thread will then be detached from
 the actor and freed to process any other actor, which has received a message already.
 
-To allow detaching actors from the threads the _react()_ method demands the code to be written in a special
-*Continuation-style*.
+To allow detaching actors from the threads the _react_ method demands the code to be written in a special
+*continuation style*.
 ----
 Actors.actor {
     loop {
         println 'Waiting for a gift'
         react {gift ->
-            if (myWife.likes gift) reply 'Thank you!'
+            if (mySpouse.likes gift) reply 'Thank you!'
             else {
                 reply 'Try again, please'
                 react {anotherGift ->
@@ -211,21 +216,21 @@ Actors.actor {
 }
 ----
 
-The _react()_ method has a special semantics to allow actors to be detached from threads when no messages
-are available in their mailbox.  Essentially, _react()_ schedules the supplied code (closure) to be executed
-upon next message arrival and returns.  The closure supplied to the _react()_ methods is the code where the
+The _react_ method has a special semantics to allow actors to be detached from threads when no messages
+are available in their mailbox.  Essentially, _react_ schedules the supplied code (closure) to be executed
+upon next message arrival and returns.  The closure supplied to the _react_ methods is the code where the
 computation should *continue* . Thus *continuation style* .
 
-Since actor has to preserve the guarantee of at most one thread active within the actor's body, the next
-message cannot be handled before the current message processing finishes. Typically, there shouldn't be a
-need to put code after calls to _react()_.  Some actor implementations even enforce this, however, GPars
-does not for performance reasons.  The _loop()_ method allows iteration within the actor body. Unlike
-typical looping constructs, like _for_ or _while_ loops, _loop()_ cooperates with nested _react()_ blocks
-and will ensure looping across subsequent message retrievals.
+Since actors have to preserve the guarantee that at most one thread is active within the actor's body, the
+next message cannot be handled before the current message processing finishes. Typically, there shouldn't be
+a need to put code after calls to _react_.  Some actor implementations even enforce this. However, GPars
+does not for performance reasons.  The _loop_ method allows iteration within the actor body. Unlike typical
+looping constructs, like _for_ or _while_ loops, _loop_ cooperates with nested _react_ blocks and will
+ensure looping across subsequent message retrievals.
 
 === Sending replies
 
-The _reply/replyIfExists_ methods are not only defined on the actors themselves, but for
+The _reply_ and _replyIfExists_ methods are not only defined on the actors themselves, but for
 _AbstractPooledActor_ (not available in _DefaultActor_ , _DynamicDispatchActor_ nor _ReactiveActor_ classes)
 also on the processed messages themselves upon their reception, which is particularly handy when handling
 multiple messages in a single call. In such cases _reply()_ invoked on the actor sends a reply to authors of
@@ -242,7 +247,7 @@ available inside the Actor's closure:
 ----
 react {tweet ->
     if (isSpam(tweet)) ignoreTweetsFrom sender
-    sender.send 'Never write me again!'
+    sender.send 'Never write to me again!'
 }
 ----
 
