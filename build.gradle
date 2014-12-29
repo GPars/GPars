@@ -63,13 +63,8 @@ ext {
     description = 'The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more'
 }
 
-apply {
-    from 'gradle/docs.gradle'
-    from 'gradle/docsDependencies.gradle'
-}
-
 repositories {
-    if (gpars_useMavenLocal) { mavenLocal()}
+    if (gpars_useMavenLocal) { mavenLocal() }
     jcenter()
     mavenCentral()
 }
@@ -90,16 +85,6 @@ dependencies {
     testCompile "com.google.code.gson:gson:${gpars_gsonVersion}"
     testCompile "com.google.guava:guava:${gpars_guavaVersion}"
     testCompile fileTree(dir: 'lib', include: '*.jar')
-    //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
-    //  Grails, including all the SpringRoo stuff.
-    docs "org.codehaus.groovy:groovy-all:${gpars_groovyVersion}"
-    docs "org.yaml:snakeyaml:${gpars_snakeyamlVersion}"
-    docs "commons-lang:commons-lang:${gpars_commonslangVersion}"
-    docs project.ext.grailsDocs
-    docs project.ext.radeox
-    docs project.ext.lowagieItext
-    docs project.ext.xhtmlRenderer
-    docs "commons-logging:commons-logging:${gpars_commonsloggingVersion}"
     deployerJars "org.apache.maven.wagon:wagon-http-lightweight:${gpars_wagonhttplightweightVersion}"
     cover "net.sourceforge.cobertura:cobertura:${gpars_coberturaVersion}"
     testRuntime "net.sourceforge.cobertura:cobertura:${gpars_coberturaVersion}"
@@ -256,21 +241,24 @@ asciidoctor {
              stylesheet: 'css/style.css'
 }
 
-task documentation(dependsOn: ['javadoc', 'groovydoc', 'buildGuide', 'pdfGuide', 'asciidoctor'], description: 'Create the API documentation.')
-
-task zipDoc(type: Jar, dependsOn: 'documentation') {
+task jarDoc(type: Jar, dependsOn: [javadoc, groovydoc]) {
     classifier = 'javadoc'
     from docsDir
 }
 
-task zipSrc(type: Jar, dependsOn: classes) {
+task jarSrc(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
 artifacts {
-    archives(zipSrc)
-    archives(zipDoc)
+    archives(jarSrc)
+    archives(jarDoc)
+}
+
+task zipGuide(type: Zip, dependsOn: asciidoctor) {
+    appendix = 'guide'
+    from(buildDir.name + '/asciidoc')
 }
 
 task zipSamples(type: Zip) {
@@ -282,7 +270,7 @@ task zipSamples(type: Zip) {
 
 task zipJavaDemo(type: Zip) {
     appendix = 'mvn-java-demo'
-    from('java-demo') {
+    from('java-demo'){
         include 'src/**'
         include 'pom.xml'
     }
@@ -290,14 +278,14 @@ task zipJavaDemo(type: Zip) {
 
 task zipDist(type: Zip) {
     from jar.outputs.files
-    from(runtimeClasspath) {
+    from(runtimeClasspath){
         include('netty*', 'multiverse*')
     }
-    from('licenses') {
+    from('licenses'){
         include '*'
         into 'licenses'
     }
-    from('src/main/resources/META-INF/') {
+    from('src/main/resources/META-INF/'){
         include('LICENSE.txt', 'NOTICE.txt')
     }
     appendix = 'all'
@@ -341,7 +329,7 @@ bintray {
 }
 
 bintrayUpload {
-    dependsOn build, documentation, zipDoc, zipSrc
+    dependsOn build, jarDoc, jarSrc
     onlyIf{project.properties.bintrayUser && project.properties.bintrayKey && !version.contains('SNAPSHOT')}
 }
 
@@ -360,11 +348,9 @@ artifactoryPublish {
     onlyIf{project.properties.bintrayUser && project.properties.bintrayKey && version.contains('SNAPSHOT')}
 }
 
-// TODO: Don't think we really need this task
-task release(dependsOn: ['build', 'zipSamples', 'zipJavaDemo', 'zipDist', 'zipGuide','bintrayUpload']) << {
+task release(dependsOn: ['build', 'jarSrc', 'jarDoc', 'zipSamples', 'zipJavaDemo', 'zipDist', 'zipGuide']) << {
     println 'We release now'
 }
-
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.2.1'
