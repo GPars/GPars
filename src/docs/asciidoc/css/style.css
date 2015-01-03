@@ -1,4 +1,4 @@
-@import url(http://fonts.googleapis.com/css?family=Asul:400,700);
+@import url(http://fonts.googleapis.com/css?family=Merriweather+Sans:400,400italic,700,700italic);
 @import url(http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700);
 
 /* Based on Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
@@ -26,7 +26,7 @@ script {
 html {
     background: #fff;
     color: #000;
-    font-family: Asul, sans-serif;
+    font-family: 'Merriweather Sans', sans-serif;
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
 }
@@ -199,7 +199,7 @@ body {
     color: #222222;
     padding: 0;
     margin: 0;
-    font-family: Asul, sans-serif;
+    font-family: 'Merriweather Sans', sans-serif;
     font-weight: normal;
     font-style: normal;
     line-height: 1;
@@ -327,7 +327,7 @@ p aside {
 }
 
 h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6 {
-    font-family: Asul, sans-serif;
+    font-family: 'Merriweather Sans', sans-serif;
     font-weight: normal;
     font-style: normal;
     color: #222;
@@ -887,7 +887,7 @@ p a > code:hover {
 
 #content #toctitle {
     font-weight: bold;
-    font-family: Asul, sans-serif;
+    font-family: 'Merriweather Sans', sans-serif;
     font-size: 1em;
     padding-left: 0.125em;
 }
@@ -1753,7 +1753,7 @@ span.icon > [class^="icon-"], span.icon > [class*=" icon-"] {
     font-size: 12px;
     font-weight: bold;
     line-height: 20px;
-    font-family: Asul, sans-serif;
+    font-family: 'Merriweather Sans', sans-serif;
     font-style: normal;
     position: relative;
     top: -2px;

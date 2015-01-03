@@ -238,7 +238,10 @@ asciidoctor {
              linkattrs: true,
              imagesdir: 'images',
              'source-highlighter': 'coderay',
-             stylesheet: 'css/style.css'
+             stylesheet: 'css/style.css',
+             'pdf-stylesdir': 'theme',
+             'pdf-fontsdir': 'fonts',
+             'pdf-style': 'gpars'
 }
 
 task jarDoc(type: Jar, dependsOn: [javadoc, groovydoc]) {
