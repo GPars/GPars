@@ -22,7 +22,6 @@ import spock.lang.Specification
 import spock.lang.Timeout
 
 class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
-    def static HOST = "localhost"
     def static PORT = 9021
 
     @Shared
@@ -33,7 +32,7 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
 
     def setupSpec() {
         serverRemoteDataflows = RemoteDataflows.create()
-        serverRemoteDataflows.startServer HOST, PORT
+        serverRemoteDataflows.startServer getHostAddress(), PORT
 
         clientRemoteDataflows = RemoteDataflows.create()
     }
@@ -51,7 +50,7 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
 
         when:
         serverRemoteDataflows.publish variable, variableName
-        def remoteVariable = clientRemoteDataflows.getVariable HOST, PORT, variableName get()
+        def remoteVariable = clientRemoteDataflows.getVariable getHostAddress(), PORT, variableName get()
 
         variable << testValue
 
@@ -68,7 +67,7 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
         variable << testValue
 
         serverRemoteDataflows.publish variable, variableName
-        def remoteVariable = clientRemoteDataflows.getVariable HOST, PORT, variableName get()
+        def remoteVariable = clientRemoteDataflows.getVariable getHostAddress(), PORT, variableName get()
 
         then:
         remoteVariable.val == testValue
@@ -85,7 +84,7 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
 
         when:
         serverRemoteDataflows.publish variable, variableName
-        def remoteVariable = clientRemoteDataflows.getVariable HOST, PORT, variableName get()
+        def remoteVariable = clientRemoteDataflows.getVariable getHostAddress(), PORT, variableName get()
 
         remoteVariable << testValue
 
@@ -95,5 +94,9 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
         where:
         variableName << ["test-variable-3a", "test-variable-3b"]
         testValue << ["test DataflowVariable", null]
+    }
+
+    static String getHostAddress() {
+        InetAddress.getLocalHost().getHostAddress()
     }
 }

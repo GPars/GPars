@@ -27,16 +27,15 @@ buildscript {
     repositories {
         jcenter()
     }
-
     dependencies {
         classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.6'
     }
 }
 
 plugins {
-    id "org.asciidoctor.convert" version "1.5.2"
-    id "com.jfrog.bintray" version "1.0"
-    id "com.jfrog.artifactory" version "3.0.1"
+    id 'org.asciidoctor.convert' version '1.5.2'
+    id 'com.jfrog.bintray' version '1.0'
+    id 'com.jfrog.artifactory' version '3.0.1'
 }
 
 apply plugin: 'groovy'
@@ -47,22 +46,8 @@ apply plugin: 'idea'
 
 import org.apache.tools.ant.taskdefs.Javadoc
 
-archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
-version = '2.0.0-SNAPSHOT'
-
-// Set default properties
-[
-    'useMavenLocal'      : false,
-    'groovyVersion'      : '2.3.8',
-    'nettyVersion'       : '4.0.24.Final',
-    'spockVersion'       : '0.7-groovy-2.0'
-].each { k,v ->
-    String name = "gpars_${k}"
-    if (!project.hasProperty(name)) {
-        project.ext."${name}" = v
-    }
-}
+archivesBaseName = 'gpars'
 
 defaultTasks 'test'
 
@@ -72,22 +57,14 @@ targetCompatibility = 8
 ext {
     theVendor = 'gpars.org'
     theTitle = 'GPars: Groovy Parallel Systems'
-
     titleForDocumentation = archivesBaseName + ' ' + version
     copyrightString = 'Copyright &#169; 2008&#8211;2014  V&#225;clav Pech.  All Rights Reserved.'
     packageTitle = group
     description = 'The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more'
 }
 
-apply {
-    from 'gradle/docs.gradle'
-    from 'gradle/docsDependencies.gradle'
-}
-
 repositories {
-    if (gpars_useMavenLocal) {
-        mavenLocal()
-    }
+    if (gpars_useMavenLocal) { mavenLocal() }
     jcenter()
     mavenCentral()
 }
@@ -100,39 +77,25 @@ configurations {
 }
 
 dependencies {
-    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: gpars_groovyVersion
-    compile 'org.multiverse:multiverse-core:0.7.0', { transitive = false }
-    compile group: 'io.netty', name: 'netty-all', version: gpars_nettyVersion
-    compile 'org.codehaus.jcsp:jcsp:1.1-rc5'
-
-    testCompile group: 'org.spockframework', name: 'spock-core', version:  gpars_spockVersion
-    testCompile 'com.google.code.gson:gson:2.3'
-    testCompile 'com.google.guava:guava:18.0'
+    compile "org.codehaus.groovy:groovy-all:${gpars_groovyVersion}"
+    compile "org.multiverse:multiverse-core:${gpars_multiverseVersion}", { transitive = false }
+    compile "io.netty:netty-all:${gpars_nettyVersion}"
+    compile "org.codehaus.jcsp:jcsp:${gpars_jcspVersion}"
+    testCompile "org.spockframework:spock-core:${gpars_spockVersion}"
+    testCompile "com.google.code.gson:gson:${gpars_gsonVersion}"
+    testCompile "com.google.guava:guava:${gpars_guavaVersion}"
     testCompile fileTree(dir: 'lib', include: '*.jar')
-
-    //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
-    //  Grails, including all the SpringRoo stuff.
-    docs group: 'org.codehaus.groovy', name: 'groovy-all', version:  gpars_groovyVersion
-    docs 'org.yaml:snakeyaml:1.14'
-    docs 'commons-lang:commons-lang:2.6'
-    docs project.ext.grailsDocs
-    docs project.ext.radeox
-    docs project.ext.lowagieItext
-    docs project.ext.xhtmlRenderer
-    docs 'commons-logging:commons-logging:1.2'
-    deployerJars "org.apache.maven.wagon:wagon-http-lightweight:2.8"
-    cover 'net.sourceforge.cobertura:cobertura:2.0.3'
-    testRuntime 'net.sourceforge.cobertura:cobertura:2.0.3'
+    deployerJars "org.apache.maven.wagon:wagon-http-lightweight:${gpars_wagonhttplightweightVersion}"
+    cover "net.sourceforge.cobertura:cobertura:${gpars_coberturaVersion}"
+    testRuntime "net.sourceforge.cobertura:cobertura:${gpars_coberturaVersion}"
     // Have to get some specific dependencies into the GroovyDoc process.
-    groovyDoc group: 'org.codehaus.groovy', name: 'groovy-all', version:  gpars_groovyVersion
-    groovyDoc 'org.fusesource.jansi:jansi:1.11'
+    groovyDoc "org.codehaus.groovy:groovy-all:${gpars_groovyVersion}"
+    groovyDoc "org.fusesource.jansi:jansi:${gpars_jansiVersion}"
 }
 
 task copyDSLDefinitions(type: Copy) {
     into "$buildDir/classes/main"
-    from(sourceSets.main.allSource) {
-        include('**/*.gdsl')
-    }
+    from(sourceSets.main.allSource) { include('**/*.gdsl') }
 }
 
 jar {
@@ -156,7 +119,6 @@ jar {
         instruction 'Import-Package', '*;resolution:=optional'
         instruction '-removeheaders', 'Bnd-LastModified'
     }
-
     dependsOn copyDSLDefinitions
 }
 
@@ -165,9 +127,7 @@ task runBenchmarks(type: JavaExec) {
     description = 'Runs benchmarks measuring the throughput and latency of actors in GPars'
     main = 'groovyx.gpars.benchmark.caliper.BenchmarkRunner'
     classpath = sourceSets.test.runtimeClasspath
-
     def gcArg = "-XX:+UseParallelGC"
-
     // On Windows, calling the JVM with extended params requires multiple levels of quoting
     if (System.getProperty('os.name').matches(".*Windows.*")) {
         gcArg = '"""-XX:+UseParallelGC"""'
@@ -205,7 +165,7 @@ tasks.withType(CodeNarc).all { codeNarcTask ->
 project.tasks.install.repositories.mavenInstaller.pom.with {
     project {
         name 'GPars'
-        description 'The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more'
+        description ext.description
         url 'http://gpars.codehaus.org'
         inceptionYear '2009'
         licenses {
@@ -216,7 +176,6 @@ project.tasks.install.repositories.mavenInstaller.pom.with {
             }
         }
     }
-
     whenConfigured { pom ->
         // dependency is a native Maven dependency object (With properties artifactId, groupId, ...)
         pom.dependencies.each { dependency ->
@@ -239,7 +198,6 @@ javadoc {
     options.windowTitle(titleForDocumentation)
     options.docTitle(titleForDocumentation)
     options.footer(copyrightString)
-
     doFirst {
         javadoc.title = titleForDocumentation
         javadoc.options.docTitle = javadoc.title
@@ -255,7 +213,7 @@ if (JavaVersion.current().isJava8Compatible()) {
 }
 
 groovydoc {
-  groovyClasspath = configurations.groovyDoc // Hack, we shouldn't have to do this.
+    groovyClasspath = configurations.groovyDoc // Hack, we shouldn't have to do this.
     dependsOn(classes)
     includePrivate = true
     use = true
@@ -269,42 +227,42 @@ groovydoc {
 
 asciidoctor {
     sources {
-      include 'index.adoc'
+      include 'index.adoc', 'quick_reference.adoc'
     }
-
     backends 'html5','pdf'
-
-    resources {
-        include 'images/**'
-        include 'css/**'
-    }
     attributes  toc: 'left',
-               doctype: 'book',
-               icons: 'font',
-               sectlink: true,
-               sectanchors: true,
-               numbered: true,
-               linkattrs: true,
-               imagesdir: 'images',
-               'source-highlighter': 'coderay',
-               stylesheet: 'css/style.css'
+             doctype: 'book',
+             icons: 'font',
+             sectlink: true,
+             sectanchors: true,
+             numbered: true,
+             linkattrs: true,
+             imagesdir: 'images',
+             'source-highlighter': 'coderay',
+             stylesheet: 'css/style.css',
+             'pdf-stylesdir': 'theme',
+             'pdf-fontsdir': 'fonts',
+             'pdf-style': 'gpars'
 }
 
-task documentation(dependsOn: ['javadoc', 'groovydoc', 'buildGuide', 'pdfGuide', 'asciidoctor'], description: 'Create the API documentation.')
-
-task zipDoc(type: Jar, dependsOn: 'documentation') {
+task jarDoc(type: Jar, dependsOn: [javadoc, groovydoc]) {
     classifier = 'javadoc'
     from docsDir
 }
 
-task zipSrc(type: Jar, dependsOn: classes) {
+task jarSrc(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
 artifacts {
-    archives(zipSrc)
-    archives(zipDoc)
+    archives(jarSrc)
+    archives(jarDoc)
+}
+
+task zipGuide(type: Zip, dependsOn: asciidoctor) {
+    appendix = 'guide'
+    from(buildDir.name + '/asciidoc')
 }
 
 task zipSamples(type: Zip) {
@@ -316,7 +274,7 @@ task zipSamples(type: Zip) {
 
 task zipJavaDemo(type: Zip) {
     appendix = 'mvn-java-demo'
-    from('java-demo') {
+    from('java-demo'){
         include 'src/**'
         include 'pom.xml'
     }
@@ -324,14 +282,14 @@ task zipJavaDemo(type: Zip) {
 
 task zipDist(type: Zip) {
     from jar.outputs.files
-    from(runtimeClasspath) {
+    from(runtimeClasspath){
         include('netty*', 'multiverse*')
     }
-    from('licenses') {
+    from('licenses'){
         include '*'
         into 'licenses'
     }
-    from('src/main/resources/META-INF/') {
+    from('src/main/resources/META-INF/'){
         include('LICENSE.txt', 'NOTICE.txt')
     }
     appendix = 'all'
@@ -346,7 +304,6 @@ bintray {
     publish = false
     dryRun = false
     configurations = ['archives']
-
     pkg {
         userOrg = '__PLEASE_SET_THE_GPARS_BINTRAY_ORG'
         repo = 'GPars'
@@ -354,21 +311,17 @@ bintray {
         desc = project.description
         labels = ['groovy','gpars']
         publicDownloadNumbers = true
-
         websiteUrl = 'http://gpars.org'
         issueTrackerUrl = 'https://github.com/GPars/GPars/issues'
         vcsUrl = 'https://github.com/GPars/GPars.git'
         licenses = ['Apache-2.0']
-
         version {
             name = project.version
             vcsTag = "v${project.version}"
-
             gpg {
                 sign = false
                 passphrase = project.properties.bintrayGpgPassphrase
             }
-
 //            mavenCentralSync {
 //                sync = true //Optional (true by default). Determines whether to sync the version to Maven Central.
 //                user = 'userToken' //OSS user token
@@ -380,8 +333,8 @@ bintray {
 }
 
 bintrayUpload {
-    dependsOn build, documentation, zipDoc, zipSrc
-    onlyIf { project.properties.bintrayUser && project.properties.bintrayKey && !version.contains('SNAPSHOT')}
+    dependsOn build, jarDoc, jarSrc
+    onlyIf{project.properties.bintrayUser && project.properties.bintrayKey && !version.contains('SNAPSHOT')}
 }
 
 artifactory {
@@ -396,14 +349,12 @@ artifactory {
 }
 
 artifactoryPublish {
-    onlyIf {project.properties.bintrayUser && project.properties.bintrayKey && version.contains('SNAPSHOT') }
+    onlyIf{project.properties.bintrayUser && project.properties.bintrayKey && version.contains('SNAPSHOT')}
 }
 
-// TODO: Don't think we really need this task
-task release(dependsOn: ['build', 'zipSamples', 'zipJavaDemo', 'zipDist', 'zipGuide','bintrayUpload']) << {
+task release(dependsOn: ['build', 'jarSrc', 'jarDoc', 'zipSamples', 'zipJavaDemo', 'zipDist', 'zipGuide']) << {
     println 'We release now'
 }
-
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.2.1'
@@ -457,9 +408,7 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'DemoReplyCompileStatic',                     //Weird compile static issue
             'DemoFibonacciWithSingleOperatorCompileStatic',                     //Weird compile static issue
     ]
-
     classpath = sourceSets.main.runtimeClasspath
-
     demoFiles = sourceSets.test.allGroovy.matching {
         include '**/*Demo*.groovy'
         exclude excludedDemos.collect { name -> "**/${name}.groovy".toString() }
@@ -484,7 +433,6 @@ idea {
                 def node = provider.asNode()
                 def vcsConfig = node.component.find { it.'@name' == 'VcsDirectoryMappings' }
                 vcsConfig.mapping[0].'@vcs' = 'Git'
-
                 //Copy the inspection profiles as well as the spell-checker's dictionaries from the default project file
                 def inspectionConfig = provider.asNode().component.find {
                     it.'@name' == 'InspectionProjectProfileManager'
@@ -492,7 +440,6 @@ idea {
                 if (inspectionConfig) node.remove(inspectionConfig)
                 def dictionaryConfig = provider.asNode().component.find { it.'@name' == 'ProjectDictionaryState' }
                 if (dictionaryConfig) node.remove(dictionaryConfig)
-
                 new File('GPars_CI_only.ipr').withReader { reader ->
                     def project = new XmlParser().parse(reader)
                     def inspections = project.component.find { it.'@name' == 'InspectionProjectProfileManager' }
@@ -500,7 +447,6 @@ idea {
                     def dictionaries = project.component.find { it.'@name' == 'ProjectDictionaryState' }
                     node.append(dictionaries)
                 }
-
                 def gradleSettings = node.appendNode('component', [name: 'GradleSettings'])
                 gradleSettings.appendNode('option', [name: 'SDK_HOME', value: gradle.gradleHomeDir.absolutePath])
             }

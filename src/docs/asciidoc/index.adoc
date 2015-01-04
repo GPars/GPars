@@ -2,26 +2,30 @@
 
 :leveloffset: 1
 
-include::introduction.adoc[]
+include::guide/introduction.adoc[]
 
-include::getting_started.adoc[]
+include::guide/getting_started.adoc[]
 
-include::data_parallelism.adoc[]
+include::guide/data_parallelism.adoc[]
 
-include::groovy_csp.adoc[]
+include::guide/groovy_csp.adoc[]
 
-include::actors.adoc[]
+include::guide/actors.adoc[]
 
-include::agents.adoc[]
+include::guide/agents.adoc[]
 
-include::dataflow.adoc[]
+include::guide/dataflow.adoc[]
 
-include::stm.adoc[]
+include::guide/stm.adoc[]
 
-include::google_app_engine_integration.adoc[]
+include::guide/google_app_engine_integration.adoc[]
 
-include::tips.adoc[]
+include::guide/tips.adoc[]
 
-include::remoting.adoc[]
+include::guide/remoting.adoc[]
 
-include::conclusion.adoc[]
+include::guide/conclusion.adoc[]
+
+:numbered!:
+
+= link:quick_reference.html[Quick Reference]

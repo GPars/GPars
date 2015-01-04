@@ -23,7 +23,6 @@ import spock.lang.Timeout
 import java.util.concurrent.CountDownLatch
 
 class NettyClientServerTest extends Specification {
-    def static HOST = "localhost"
     def static PORT = 9003
 
     @Timeout(5)
@@ -34,8 +33,8 @@ class NettyClientServerTest extends Specification {
         def connectedLatch = new CountDownLatch(2)
 
         LocalHost localHost = null
-        NettyServer server = new NettyServer(localHost, HOST, PORT, { serverConnected = true; connectedLatch.countDown() } as ConnectListener)
-        NettyClient client = new NettyClient(localHost, HOST, PORT, { clientConnected = true; connectedLatch.countDown() } as ConnectListener)
+        NettyServer server = new NettyServer(localHost, getHostAddress(), PORT, { serverConnected = true; connectedLatch.countDown() } as ConnectListener)
+        NettyClient client = new NettyClient(localHost, getHostAddress(), PORT, { clientConnected = true; connectedLatch.countDown() } as ConnectListener)
 
         when:
         server.start()
@@ -51,5 +50,9 @@ class NettyClientServerTest extends Specification {
 
         client.stop()
         server.stop()
+    }
+
+    String getHostAddress() {
+        InetAddress.getLocalHost().getHostAddress()
     }
 }

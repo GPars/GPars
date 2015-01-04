@@ -18,6 +18,8 @@ package groovyx.gpars.remote.netty;
 
 import groovyx.gpars.remote.BroadcastDiscovery;
 import groovyx.gpars.remote.LocalHost;
+import groovyx.gpars.remote.netty.ConnectListener;
+import groovyx.gpars.remote.netty.NettyChannelInitializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -28,7 +30,7 @@ import java.util.List;
 
 /**
  * Represents client that connects to server
- * @see NettyServer
+ * @see groovyx.gpars.remote.netty.NettyServer
  *
  * @author Rafal Slawik
  */

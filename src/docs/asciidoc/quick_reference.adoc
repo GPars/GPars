@@ -1,0 +1,21 @@
+= The GPars Quick Reference image:gpars-rgb.svg[Logo,200,float=right]
+
+:leveloffset: 1
+
+:numbered!:
+
+include::quick_reference/actors.adoc[]
+
+include::quick_reference/agents.adoc[]
+
+include::quick_reference/csp.adoc[]
+
+include::quick_reference/dataflow.adoc[]
+
+include::quick_reference/forkjoin.adoc[]
+
+include::quick_reference/forkjoinpool.adoc[]
+
+include::quick_reference/stm.adoc[]
+
+include::quick_reference/threadpool.adoc[]
