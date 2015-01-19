@@ -16,11 +16,14 @@
 
 package groovyx.gpars.actor.remote
 
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import spock.lang.Specification
 import spock.lang.Timeout
 
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class RemoteActorsWithNamesTest extends Specification {
     @Timeout(5)
@@ -33,7 +36,7 @@ class RemoteActorsWithNamesTest extends Specification {
         serverRemoteActors.publish actor, "test-actor"
 
         when:
-        def remoteActor = clientRemoteActors.get "test-actor" get()
+        def remoteActor = tryGetActorByUrl clientRemoteActors, "test-actor"
 
         then:
         remoteActor != null
@@ -52,7 +55,7 @@ class RemoteActorsWithNamesTest extends Specification {
         serverRemoteActors.publish actor, "test-actor"
 
         when:
-        def remoteActor = clientRemoteActors.get "test-group-1/test-actor" get()
+        def remoteActor = tryGetActorByUrl clientRemoteActors, "test-group-1/test-actor"
 
         then:
         remoteActor != null
@@ -73,7 +76,7 @@ class RemoteActorsWithNamesTest extends Specification {
         serverRemoteActors.publish actor, "test-actor"
 
         when:
-        def remoteActor = clientRemoteActors.get "test-group-1/test-actor" get()
+        def remoteActor = tryGetActorByUrl clientRemoteActors, "test-group-1/test-actor"
         remoteActor << "test"
         latch.await()
 
@@ -86,5 +89,13 @@ class RemoteActorsWithNamesTest extends Specification {
 
     String getHostAddress() {
         InetAddress.getLocalHost().getHostAddress()
+    }
+
+    Actor tryGetActorByUrl(RemoteActors remoteActors, String actorUrl) {
+        while (true) {
+            try {
+                return remoteActors.get(actorUrl).get(10, TimeUnit.MILLISECONDS)
+            } catch (TimeoutException e) {}
+        }
     }
 }
