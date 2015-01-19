@@ -192,6 +192,36 @@ One can send any object as a message to Actor, but keep in mind it has to be _Se
 
 See example: _groovyx.gpars.samples.remote.actor_
 
+=== Remote Actor Names
+
+A context (_RemoteActors_ class) may be represented by a name.
+To create one with a name use:
+
+[source,groovy]
+----
+def remoteActors = RemoteActors.create "test-group-1"
+----
+
+Actors published withing this context may be accessed by providing a special actor URL.
+For example: publishing an actor under name "actor" within this context makes it accessible under URL
+"test-group-1/actor".
+
+[source,groovy]
+----
+def actor = remoteActors.get "test-group-1/actor"
+----
+
+Host and port of an instance holding this actor is determined automatically.
+Invoking _get_ method sends a broadcast (to _255.255.255.255_) with a query
+for an actor with specified name within a context with specified name.
+Matching instance responds to that query with necessary information (host and port).
+
+.Allowed actor and context names
+[NOTE]
+As the URL contains "/" (backslash) as separator between context and actor name,
+it is not allowed to use backslashes in actor name.
+Context name can contain any UTF characters though.
+
 == Agents
 
 Remote Agents system is designed in similar fashion.
