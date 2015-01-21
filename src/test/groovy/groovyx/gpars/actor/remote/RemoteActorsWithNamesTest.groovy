@@ -31,7 +31,7 @@ class RemoteActorsWithNamesTest extends Specification {
         setup:
         def serverRemoteActors = RemoteActors.create "test-group"
         def clientRemoteActors = RemoteActors.create "test-group"
-        serverRemoteActors.startServer getHostAddress(), 9123
+        serverRemoteActors.startServer getHostAddress(), 22123
         def actor = Actors.reactor { it -> null }
         serverRemoteActors.publish actor, "test-actor"
 
@@ -50,7 +50,7 @@ class RemoteActorsWithNamesTest extends Specification {
         setup:
         def serverRemoteActors = RemoteActors.create "test-group-1"
         def clientRemoteActors = RemoteActors.create "test-group-2"
-        serverRemoteActors.startServer getHostAddress(), 9124
+        serverRemoteActors.startServer getHostAddress(), 22124
         def actor = Actors.reactor { it -> null }
         serverRemoteActors.publish actor, "test-actor"
 
@@ -69,7 +69,7 @@ class RemoteActorsWithNamesTest extends Specification {
         setup:
         def serverRemoteActors = RemoteActors.create "test-group-1"
         def clientRemoteActors = RemoteActors.create "test-group-2"
-        serverRemoteActors.startServer getHostAddress(), 9125
+        serverRemoteActors.startServer getHostAddress(), 22125
 
         def latch = new CountDownLatch(1)
         def actor = Actors.actor { latch.countDown() }
@@ -95,7 +95,9 @@ class RemoteActorsWithNamesTest extends Specification {
         while (true) {
             try {
                 return remoteActors.get(actorUrl).get(10, TimeUnit.MILLISECONDS)
-            } catch (TimeoutException e) {}
+            } catch (TimeoutException e) {
+                System.err << "Retry\n"
+            }
         }
     }
 }
