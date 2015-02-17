@@ -36,7 +36,7 @@ class RemoteDataflowsDataflowVariableTest extends Specification {
 
     def "can publish DataflowVariable"() {
         setup:
-        DataflowVariable<String> var = new DataflowVariable<String>()
+        DataflowVariable<String> var = new DataflowVariable<>()
         def varName = "test-variable"
 
         when:

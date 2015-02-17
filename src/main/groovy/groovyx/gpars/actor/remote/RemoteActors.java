@@ -56,8 +56,8 @@ public final class RemoteActors extends LocalHost implements RemotingContextWith
     private DiscoveryServer discoveryServer;
 
     private RemoteActors(String contextName) {
-        publishedActors = new ConcurrentHashMap<String, Actor>();
-        remoteActors = new ConcurrentHashMap<String, DataflowVariable<Actor>>();
+        publishedActors = new ConcurrentHashMap<>();
+        remoteActors = new ConcurrentHashMap<>();
         this.contextName = contextName != null ? contextName : getId().toString();
     }
 

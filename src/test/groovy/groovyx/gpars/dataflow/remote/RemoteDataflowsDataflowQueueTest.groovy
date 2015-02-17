@@ -37,7 +37,7 @@ class RemoteDataflowsDataflowQueueTest extends Specification {
 
     def "can publish DataflowQueue"() {
         setup:
-        DataflowQueue<String> queue = new DataflowQueue<String>()
+        DataflowQueue<String> queue = new DataflowQueue<>()
         def queueName = "test-queue"
 
         when:

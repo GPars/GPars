@@ -44,7 +44,7 @@ class RemoteAgentsWithServerTest extends RemoteSpecification {
     def "can retrieve published Agent with remote closure execution policy and retrieve state"() {
         setup:
         def agentState = "test-agent-state"
-        Agent<String> agent = new Agent<String>(agentState)
+        Agent<String> agent = new Agent<>(agentState)
         def agentName = "test-agent-1"
 
         when:
@@ -64,7 +64,7 @@ class RemoteAgentsWithServerTest extends RemoteSpecification {
     def "can update state of Agent with remote closure execution"() {
         setup:
         def agentState = "test-agent-state"
-        Agent<String> agent = new Agent<String>(agentState)
+        Agent<String> agent = new Agent<>(agentState)
         def agentName = "test-agent-2"
         def updateState1 = "test-agent-state-update-1"
         def updateState2 = "test-agent-state-update-2"
@@ -100,7 +100,7 @@ class RemoteAgentsWithServerTest extends RemoteSpecification {
     def "can update state of Agent with local closure execution"() {
         setup:
         def agentState = "test-agent-state"
-        Agent<String> agent = new Agent<String>(agentState)
+        Agent<String> agent = new Agent<>(agentState)
         def agentName = "test-agent-3"
         def updateState = "test-agent-state-update"
         def latch = new CountDownLatch(1)

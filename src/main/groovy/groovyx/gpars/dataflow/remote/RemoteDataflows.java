@@ -64,14 +64,14 @@ public final class RemoteDataflows extends LocalHost {
     private final ConcurrentMap<String, DataflowVariable<RemoteDataflowQueue<?>>> remoteQueues;
 
     RemoteDataflows() {
-        publishedVariables = new ConcurrentHashMap<String, DataflowVariable<?>>();
-        remoteVariables = new ConcurrentHashMap<String, DataflowVariable<DataflowVariable>>();
+        publishedVariables = new ConcurrentHashMap<>();
+        remoteVariables = new ConcurrentHashMap<>();
 
-        publishedBroadcasts = new ConcurrentHashMap<String, DataflowBroadcast>();
-        remoteBroadcasts = new ConcurrentHashMap<String, DataflowVariable<RemoteDataflowBroadcast>>();
+        publishedBroadcasts = new ConcurrentHashMap<>();
+        remoteBroadcasts = new ConcurrentHashMap<>();
 
-        publishedQueues = new ConcurrentHashMap<String, DataflowQueue<?>>();
-        remoteQueues = new ConcurrentHashMap<String, DataflowVariable<RemoteDataflowQueue<?>>>();
+        publishedQueues = new ConcurrentHashMap<>();
+        remoteQueues = new ConcurrentHashMap<>();
     }
 
     /**
@@ -115,7 +115,7 @@ public final class RemoteDataflows extends LocalHost {
      */
     public Promise<DataflowReadChannel> getReadChannel(String host, int port, String name) {
         DataflowVariable<RemoteDataflowBroadcast> broadcastPromise = getPromise(remoteBroadcasts, name, host, port, new RemoteDataflowBroadcastRequestMsg(this.getId(), name));
-        final DataflowVariable<DataflowReadChannel> promise = new DataflowVariable<DataflowReadChannel>();
+        final DataflowVariable<DataflowReadChannel> promise = new DataflowVariable<>();
         broadcastPromise.whenBound(new MessageStream() {
             @Override
             public MessageStream send(Object message) {
