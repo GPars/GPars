@@ -624,7 +624,7 @@ public abstract class PGroup {
      *
      * @param channels Dataflow variables or streams to wait for values on
      */
-    public final Select select(final List<SelectableChannel> channels) {
+    public final Select select(final List<? extends SelectableChannel> channels) {
         return new Select(this, channels);
     }
 

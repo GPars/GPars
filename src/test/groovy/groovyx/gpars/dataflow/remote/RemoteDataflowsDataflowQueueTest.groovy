@@ -50,12 +50,11 @@ class RemoteDataflowsDataflowQueueTest extends Specification {
 
     def "retrieving DataflowQueue from remote host returns Future"() {
         setup:
-        def HOST = "localhost"
         def PORT = 9030
         def queueName = "test-queue"
 
         when:
-        def queuePromise = remoteDataflows.getDataflowQueue HOST, PORT, queueName
+        def queuePromise = remoteDataflows.getDataflowQueue getHostAddress(), PORT, queueName
 
         then:
         queuePromise != null
@@ -64,15 +63,18 @@ class RemoteDataflowsDataflowQueueTest extends Specification {
 
     def "retrieving DataflowQueue from remote host returns the same Promise"() {
         setup:
-        def HOST = "localhost"
         def PORT = 9030
         def queueName = "test-queue"
 
         when:
-        def queuePromise1 = remoteDataflows.getDataflowQueue HOST, PORT, queueName
-        def queuePromise2 = remoteDataflows.getDataflowQueue HOST, PORT, queueName
+        def queuePromise1 = remoteDataflows.getDataflowQueue getHostAddress(), PORT, queueName
+        def queuePromise2 = remoteDataflows.getDataflowQueue getHostAddress(), PORT, queueName
 
         then:
         queuePromise1.is(queuePromise2)
+    }
+
+    String getHostAddress() {
+        InetAddress.getLocalHost().getHostAddress()
     }
 }

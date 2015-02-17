@@ -20,13 +20,12 @@ import spock.lang.Specification
 import spock.lang.Timeout
 
 class NettyClientTest extends Specification {
-    def static HOST = "localhost"
     def static PORT = 9002
 
     @Timeout(5)
     def "test if client throws an exception when it is unable to connect"() {
         setup:
-        NettyClient client = new NettyClient(null, HOST, PORT, null)
+        NettyClient client = new NettyClient(null, getHostAddress(), PORT, null)
 
         when:
         client.start()
@@ -40,7 +39,7 @@ class NettyClientTest extends Specification {
 
     def "test if client cannot be stopped if not running"() {
         setup:
-        NettyClient client = new NettyClient(null, HOST, PORT, null)
+        NettyClient client = new NettyClient(null, getHostAddress(), PORT, null)
 
         when:
         client.stop()
@@ -48,6 +47,10 @@ class NettyClientTest extends Specification {
         then:
         IllegalStateException e = thrown()
         e.message == "Client has not been started"
+    }
+
+    String getHostAddress() {
+        InetAddress.getLocalHost().getHostAddress()
     }
 }
 

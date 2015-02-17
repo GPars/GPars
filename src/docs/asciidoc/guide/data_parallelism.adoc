@@ -1,0 +1,1626 @@
+
+= Data Parallelism
+
+Focusing on data instead of processes helps create robust concurrent programs. You as a programmer define
+your data together with functions that should be applied to it and then let the underlying machinery process
+the data.  Typically a set of concurrent tasks will be created and submitted to a thread pool for
+processing.
+
+In GPars the *GParsPool* and *GParsExecutorsPool* classes give you access to low-level data parallelism
+techniques.  The *GParsPool* class relies on the Fork/Join implementation introduced in JDK 7 and offers
+excellent functionality and performance. The *GParsExecutorsPool* is provided for those who still need to
+use the older Java executors.
+
+There are three fundamental domains covered by the GPars low-level data parallelism:
+
+* Processing collections concurrently.
+* Running functions (closures) asynchronously.
+* Performing Fork/Join (Divide/Conquer) algorithms.
+
+NOTE: The API described here is based on using GPars with JDK7. It can be used with later JDKs, but JDK8
+introduced the Streams framework which can be used directly from Groovy and in essence replaces the GPars
+features covered here. There is work underway to provide the API described here based on the JDK8 Streams
+framework for use with JDK8 and later to provide a simple upgrade path.
+
+== Parallel Collections
+
+Dealing with data frequently involves manipulating collections. Lists, arrays, sets, maps, iterators,
+strings and lot of other data types can be viewed as collections of items.  The common pattern to process
+such collections is to take elements sequentially, one-by-one, and make an action for each of the items
+in row.
+
+Take, for example, the _min_ function, which is supposed to return the smallest element of a
+collection. When you call the _min_ method on a collection of numbers, a variable (_minVal_ say) is create
+to store the smallest value seen so far, initialized to some reasonable value of the given type, for example
+for integers and floating point this may well be zero. The elements of the collection are then iterated
+through with each being compared to the stored value. Should a value be less than the one currently held in
+_minVal_ then _minVal_ is changed to store the newly seen smaller value. Once all elements have been
+processed, the minimum value in the collection is stored in the _minVal_ .
+
+This algorithm, however simple, is *totally wrong* on multi-core and multi-processor hardware. Running the
+_min_ function on a dual-core chip can leverage *at most 50%* of the computing power of the chip.  On a
+quad-core it would be only 25%. In this latter case, this algorithm effectively wastes 75% of the computing
+power of the chip.
+
+Tree-like structures proved to be more appropriate for parallel processing. The _min_ function in our
+example doesn't need to iterate through all the elements in row and compare their values with the
+_minVal_ variable.  What it can do instead is relying on the multi-core/multi-processor nature of your
+hardware. A _parallel_min_ function can, for example, compare pairs (or tuples of certain size) of
+neighboring values in the collection and promote the smallest value from the tuple into a next round of
+comparison. Searching for minimum in different tuples can safely happen in parallel and so tuples in the
+same round can be processed by different cores at the same time without races or contention among threads.
+
+=== Meet Parallel Arrays
+
+Although not part of JDK7, the extra166y library brings a very convenient abstraction called
+ http://groovy.dzone.com/articles/parallelize-your-arrays-with-j[Parallel Arrays], and GPars has harnessed
+ this to provide a very Groovy API.
+
+NOTE: extra166y was never made part of the JDK -- unlike the jsr166y library. In fact extra166y has been
+made redundant from JDK8 onwards by the Streams framework.  So as to continue to support JDK7, GPars has a
+copy of extra166y in it so there is no external dependency. As noted earlier, there is work underway to rewrite the
+GPars API in terms of Streams for users of JDK8 onwards. Of course people using JDK8 onwards can simply use
+Streams directly from Groovy.
+
+GPars leverages the
+Parallel Arrays implementation in several ways. The *GParsPool* and *GParsExecutorsPool* classes provide
+parallel variants of the common Groovy iteration methods like _each_ , _collect_ , _findAll_ and
+such.
+
+----
+ def selfPortraits = images.findAllParallel{it.contains me}.collectParallel{it.resize()}
+----
+
+It also allows for a more functional style map/reduce collection processing.
+
+----
+ def smallestSelfPortrait = images.parallel.filter{it.contains me}.map{it.resize()}.min{it.sizeInMB}
+----
+
+
+=== GParsPool
+
+Use of *GParsPool* -- the JSR-166y based concurrent collection processor
+
+==== Usage of GParsPool
+
+The *GParsPool* class enables a *ParallelArray*-based (from JSR-166y) concurrency DSL for collections and
+objects.
+
+Examples of use:
+
+----
+// Summarize numbers concurrently.
+GParsPool.withPool {
+    final AtomicInteger result = new AtomicInteger(0)
+    [1, 2, 3, 4, 5].eachParallel{result.addAndGet(it)}
+    assert 15 == result
+}
+
+// Multiply numbers asynchronously.
+GParsPool.withPool {
+    final List result = [1, 2, 3, 4, 5].collectParallel{it * 2}
+    assert ([2, 4, 6, 8, 10].equals(result))
+}
+----
+
+The passed-in closure takes an instance of a ForkJoinPool as a parameter, which can be then used freely inside the closure.
+
+----
+// Check whether all elements within a collection meet certain criteria.
+GParsPool.withPool(5){ForkJoinPool pool ->
+    assert [1, 2, 3, 4, 5].everyParallel{it > 0}
+    assert ![1, 2, 3, 4, 5].everyParallel{it > 1}
+}
+----
+
+The _GParsPool.withPool_ method takes optional parameters for number of threads in the created pool and an
+unhandled exception handler.
+
+----
+withPool(10){...}
+withPool(20, exceptionHandler){...}
+----
+
+The _GParsPool.withExistingPool_ takes an already existing ForkJoinPool instance to reuse.  The DSL is valid
+only within the associated block of code and only for the thread that has called the _withPool_ or
+_withExistingPool_ methods. The _withPool_ method returns only after all the worker threads have finished
+their tasks and the pool has been destroyed, returning back the return value of the associated block of
+code. The _withExistingPool_ method doesn't wait for the pool threads to finish.
+
+Alternatively, the *GParsPool* class can be statically imported _import static groovyx.gpars.GParsPool_,
+which will allow omitting the *GParsPool* class name.
+
+----
+withPool {
+    assert [1, 2, 3, 4, 5].everyParallel{it > 0}
+    assert ![1, 2, 3, 4, 5].everyParallel{it > 1}
+}
+----
+
+The following methods are currently supported on all objects in Groovy:
+
+* _eachParallel_
+* _eachWithIndexParallel_
+* _collectParallel_
+* _collectManyParallel_
+* _findAllParallel_
+* _findAnyParallel_
+* _findParallel_
+* _everyParallel_
+* _anyParallel_
+* _grepParallel_
+* _groupByParallel_
+* _foldParallel_
+* _minParallel_
+* _maxParallel_
+* _sumParallel_
+* _splitParallel_
+* _countParallel_
+* _foldParallel_
+
+==== Meta-class enhancer
+
+As an alternative you can use the *ParallelEnhancer* class to enhance meta-classes of any classes or
+individual instances with the parallel methods.
+
+----
+import groovyx.gpars.ParallelEnhancer
+
+def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+ParallelEnhancer.enhanceInstance(list)
+println list.collectParallel {it * 2 }
+
+def animals = ['dog', 'ant', 'cat', 'whale']
+ParallelEnhancer.enhanceInstance animals
+println (animals.anyParallel {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
+println (animals.everyParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
+----
+
+When using the *ParallelEnhancer* class, you're not restricted to a _withPool_ block with the use of the
+GParsPool DSLs. The enhanced classed or instances remain enhanced till they get garbage collected.
+
+==== Exception handling
+
+If an exception is thrown while processing any of the passed-in closures, the first exception gets re-thrown
+from the xxxParallel methods and the algorithm stops as soon as possible.
+
+****
+The exception handling mechanism of GParsPool builds on the one built into the Fork/Join framework. Since
+Fork/Join algorithms are by nature hierarchical, once any part of the algorithm fails, there's usually
+little benefit from continuing the computation, since some branches of the algorithm will never return a
+result.
+
+Bear in mind that the GParsPool implementation doesn't give any guarantees about its behavior after a first
+unhandled exception occurs, beyond stopping the algorithm and re-throwing the first detected exception to
+the caller.  This behavior, after all, is consistent with what the traditional sequential iteration
+methods do.
+****
+
+==== Transparently parallel collections
+
+On top of adding new _xxxParallel_ methods, GPars can also let you change the semantics of the original
+iteration methods. For example, you may be passing a collection into a library method, which will process
+your collection in a sequential way, let say using the _collect_ method. By changing the semantics of the
+_collect_ method on your collection you can effectively parallelize the library sequential code.
+
+----
+GParsPool.withPool {
+
+    //The selectImportantNames() will process the name collections concurrently
+    assert ['ALICE', 'JASON'] == selectImportantNames(['Joe', 'Alice', 'Dave', 'Jason'].makeConcurrent())
+}
+
+/**
+ * A function implemented using standard sequential collect() and findAll() methods.
+ */
+def selectImportantNames(names) {
+    names.collect {it.toUpperCase()}.findAll{it.size() > 4}
+}
+----
+
+The _makeSequential_ method will reset the collection back to the original sequential semantics.
+
+----
+import static groovyx.gpars.GParsPool.withPool
+
+def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+println 'Sequential: ' list.each { print it + ',' } println()
+
+withPool {
+
+    println 'Sequential: '
+    list.each { print it + ',' }
+    println()
+
+    list.makeConcurrent()
+
+    println 'Concurrent: '
+    list.each { print it + ',' }
+    println()
+
+    list.makeSequential()
+
+    println 'Sequential: '
+    list.each { print it + ',' }
+    println()
+}
+
+println 'Sequential: '
+list.each { print it + ',' }
+println()
+----
+
+The _asConcurrent()_ convenience method will allow you to specify code blocks, in which the collection
+maintains concurrent semantics.
+
+----
+import static groovyx.gpars.GParsPool.withPool
+
+def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+println 'Sequential: '
+list.each { print it + ',' }
+println()
+
+withPool {
+
+    println 'Sequential: '
+    list.each { print it + ',' }
+    println()
+
+    list.asConcurrent {
+        println 'Concurrent: '
+        list.each { print it + ',' }
+        println()
+    }
+
+    println 'Sequential: '
+    list.each { print it + ',' }
+    println()
+}
+
+println 'Sequential: '
+list.each { print it + ',' }
+println()
+----
+
+Transparent parallelizm, including the _makeConcurrent()_ , _makeSequential()_ and _asConcurrent()_ methods,
+is also available in combination with _ParallelEnhancer_ .
+----
+/**
+ * A function implemented using standard sequential collect() and findAll() methods.
+ */
+def selectImportantNames(names) {
+    names.collect {it.toUpperCase()}.findAll{it.size() > 4}
+}
+
+def names = ['Joe', 'Alice', 'Dave', 'Jason']
+ParallelEnhancer.enhanceInstance(names)
+//The selectImportantNames() will process the name collections concurrently
+assert ['ALICE', 'JASON'] == selectImportantNames(names.makeConcurrent())
+
+----
+
+----
+import groovyx.gpars.ParallelEnhancer
+
+def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+println 'Sequential: '
+list.each { print it + ',' }
+println()
+
+ParallelEnhancer.enhanceInstance(list)
+
+println 'Sequential: '
+list.each { print it + ',' }
+println()
+
+list.asConcurrent {
+    println 'Concurrent: '
+    list.each { print it + ',' }
+    println()
+
+}
+list.makeSequential()
+
+println 'Sequential: '
+list.each { print it + ',' }
+println()
+----
+=== Avoid side-effects in functions
+
+We have to warn you. Since the closures that are provided to the parallel methods like _eachParallel_ or
+_collectParallel()_ may be run in parallel, you have to make sure that each of the closures is written in a
+thread-safe manner. The closures must hold no internal state, share data nor have side-effects beyond the
+boundaries the single element that they've been invoked on.  Violations of these rules will open the door
+for race conditions and deadlocks, the most severe enemies of a modern multi-core programmer.
+
+*Don't do this:*
+----
+def thumbnails = []
+images.eachParallel {thumbnails << it.thumbnail}  //Concurrently accessing a not-thread-safe collection of thumbnails, don't do this!
+----
+At least, you've been warned.
+
+****
+Because *GParsPool* uses a *Fork/Join* pool (with work stealing), threads may
+not be applied to a waiting processing task even though they may appear
+idle. With a work-stealing algorithm, worker threads that run out of things
+to do can steal tasks from other threads that are still busy.
+
+if you use *GParsExecutorsPool* , which doesn't use *Fork/Join*, you get the
+thread allocation behavior that you would naively expect.
+****
+
+
+=== GParsExecutorsPool
+
+Use of GParsExecutorsPool - the Java Executors' based concurrent collection processor
+
+=== Usage of GParsExecutorsPool
+
+The *GParsPool* class enables a Java Executors-based concurrency DSL for collections and objects.
+
+The *GParsExecutorsPool* class can be used as a pure-JDK-based collection parallel processor. Unlike the
+*GParsPool* class, *GParsExecutorsPool* doesn't require fork/join thread pools, but leverages the standard
+JDK executor services to parallelize closures processing a collections or an object iteratively.  It needs
+to be states, however, that *GParsPool* performs typically much better than *GParsExecutorsPool* does.
+
+Examples of use:
+
+----
+//multiply numbers asynchronously
+ GParsExecutorsPool.withPool {
+     Collection<Future> result = [1, 2, 3, 4, 5].collectParallel{it * 10}
+     assert new HashSet([10, 20, 30, 40, 50]) == new HashSet((Collection)result*.get())
+ }
+
+ //multiply numbers asynchronously using an asynchronous closure
+ GParsExecutorsPool.withPool {
+     def closure={it * 10}
+     def asyncClosure=closure.async()
+     Collection<Future> result = [1, 2, 3, 4, 5].collect(asyncClosure)
+     assert new HashSet([10, 20, 30, 40, 50]) == new HashSet((Collection)result*.get())
+ }
+----
+
+The passed-in closure takes an instance of a ExecutorService as a parameter, which can be then used freely
+inside the closure.
+
+----
+//find an element meeting specified criteria
+ GParsExecutorsPool.withPool(5) {ExecutorService service ->
+     service.submit({performLongCalculation()} as Runnable)
+ }
+----
+The _GParsExecutorsPool.withPool()_ method takes optional parameters for number of threads in the created pool and a thread factory.
+----
+withPool(10) {...}
+withPool(20, threadFactory) {...}
+----
+
+The _GParsExecutorsPool.withExistingPool()_ takes an already existing executor service instance to
+reuse. The DSL is valid only within the associated block of code and only for the thread that has called the
+_withPool()_ or _withExistingPool()_ method. The _withPool()_ method returns only after all the worker
+threads have finished their tasks and the executor service has been destroyed, returning back the return
+value of the associated block of code. The _withExistingPool()_ method doesn't wait for the executor service
+threads to finish.
+
+Alternatively, the *GParsExecutorsPool* class can be statically imported _import static groovyx.gpars.GParsExecutorsPool.`*`_, which will allow omitting the *GParsExecutorsPool* class name.
+----
+withPool {
+     def result = [1, 2, 3, 4, 5].findParallel{Number number -> number > 2}
+     assert result in [3, 4, 5]
+ }
+----
+The following methods on all objects, which support iterations in Groovy, are currently supported:
+* eachParallel()
+* eachWithIndexParallel()
+* collectParallel()
+* findAllParallel()
+* findParallel()
+* allParallel()
+* anyParallel()
+* grepParallel()
+* groupByParallel()
+
+==== Meta-class enhancer
+
+As an alternative you can use the _GParsExecutorsPoolEnhancer_ class to enhance meta-classes for any classes
+or individual instances with asynchronous methods.
+----
+import groovyx.gpars.GParsExecutorsPoolEnhancer
+
+def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+GParsExecutorsPoolEnhancer.enhanceInstance(list)
+println list.collectParallel {it * 2 }
+
+def animals = ['dog', 'ant', 'cat', 'whale']
+GParsExecutorsPoolEnhancer.enhanceInstance animals
+println (animals.anyParallel {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
+println (animals.allParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
+----
+
+When using the _GParsExecutorsPoolEnhancer_ class, you're not restricted to a _withPool()_ block with the
+use of the GParsExecutorsPool DSLs. The enhanced classed or instances remain enhanced till they get garbage
+collected.
+
+==== Exception handling
+
+If exceptions are thrown while processing any of the passed-in closures, an instance of _AsyncException_
+wrapping all the original exceptions gets re-thrown from the xxxParallel methods.
+
+=== Avoid side-effects in functions
+
+Once again we need to warn you about using closures with side-effects effecting objects beyond the scope of
+the single currently processed element or closures which keep state. Don't do that! It is dangerous to pass
+them to any of the _xxxParallel()_ methods.
+
+
+=== Memoize
+
+The _memoize_ function enables caching of function's return values. Repeated calls to the memoized function
+with the same argument values will, instead of invoking the calculation encoded in the original function,
+retrieve the result value from an internal transparent cache.  Provided the calculation is considerably
+slower than retrieving a cached value from the cache, this allows users to trade-off memory for performance.
+Checkout out the example, where we attempt to scan multiple websites for particular content:
+
+The memoize functionality of GPars has been contributed to Groovy in version 1.8 and if you run on Groovy
+1.8 or later, it is recommended to use the Groovy functionality.  Memoize in GPars is almost identical,
+except that it searches the memoize caches concurrently using the surrounding thread pool and so may give
+performance benefits in some scenarios.
+
+****
+The GPars memoize functionality has been renamed to avoid future conflicts with the memoize functionality in Groovy.
+GPars now calls the methods with a preceding letter _g_ , such as gmemoize().
+****
+
+=== Examples of use
+----
+GParsPool.withPool {
+    def urls = ['http://www.dzone.com', 'http://www.theserverside.com', 'http://www.infoq.com']
+    Closure download = {url ->
+        println "Downloading $url"
+        url.toURL().text.toUpperCase()
+    }
+    Closure cachingDownload = download.gmemoize()
+
+    println 'Groovy sites today: ' + urls.findAllParallel {url -> cachingDownload(url).contains('GROOVY')}
+    println 'Grails sites today: ' + urls.findAllParallel {url -> cachingDownload(url).contains('GRAILS')}
+    println 'Griffon sites today: ' + urls.findAllParallel {url -> cachingDownload(url).contains('GRIFFON')}
+    println 'Gradle sites today: ' + urls.findAllParallel {url -> cachingDownload(url).contains('GRADLE')}
+    println 'Concurrency sites today: ' + urls.findAllParallel {url -> cachingDownload(url).contains('CONCURRENCY')}
+    println 'GPars sites today: ' + urls.findAllParallel {url -> cachingDownload(url).contains('GPARS')}
+}
+----
+
+Notice closures are enhanced inside the _GParsPool.withPool()_ blocks with a _memoize()_ function, which
+returns a new closure wrapping the original closure with a cache.  In the example we're calling the
+_cachingDownload_ function in several places in the code, however, each unique url gets downloaded only
+once - the first time it is needed. The values are then cached and available for subsequent calls. And also
+to all threads, no matter which thread originally came first with a download request for the particular url
+and had to handle the actual calculation/download.
+
+So, to wrap up, memoize shields a function by a cache of past return values. However, _memoize_ can do even
+more. In some algorithms adding a little memory may have dramatic impact on the computational complexity of
+the calculation. Let's look at a classical example of Fibonacci numbers.
+
+=== Fibonacci example
+
+A purely functional, recursive implementation, following closely the definition of Fibonacci numbers is
+exponentially complex:
+
+----
+Closure fib = {n -> n > 1 ? call(n - 1) + call(n - 2) : n}
+----
+
+Try calling the _fib_ function with numbers around 30 and you'll see how slow it is.
+
+Now with a little twist and added memoize cache the algorithm magically turns into a linearly complex one:
+
+----
+Closure fib
+fib = {n -> n > 1 ? fib(n - 1) + fib(n - 2) : n}.gmemoize()
+----
+
+The extra memory we added cut off all but one recursive branches of the calculation. And all subsequent
+calls to the same _fib_ function will also benefit from the cached values.
+
+Also, see below, how the _memoizeAtMost_ variant can reduce memory consumption in our example, yet preserve
+the linear complexity of the algorithm.
+
+=== Available variants
+
+==== memoize
+
+The basic variant, which keeps values in the internal cache for the whole lifetime of the memoized
+function. Provides the best performance characteristics of all the variants.
+
+==== memoizeAtMost
+
+Allows the user to set a hard limit on number of items cached. Once the limit has been reached, all
+subsequently added values will eliminate the oldest value from the cache using the LRU (Last Recently Used)
+strategy.
+
+So for our Fibonacci number example, we could safely reduce the cache size to two items:
+
+----
+Closure fib
+fib = {n -> n > 1 ? fib(n - 1) + fib(n - 2) : n}.memoizeAtMost(2)
+----
+
+Setting an upper limit on the cache size may have two purposes:
+* Keep the memory footprint of the cache within defined boundaries
+* Preserve desired performance characteristics of the function. Too large caches may take longer to retrieve
+  the cached value than it would have taken to calculate the result directly.
+
+==== memoizeAtLeast
+
+Allows unlimited growth of the internal cache until the JVM's garbage collector decides to step in and evict
+SoftReferences, used by our implementation, from the memory. The single parameter value to the
+_memoizeAtLeast()_ method specifies the minimum number of cached items that should be protected from gc
+eviction. The cache will never shrink below the specified number of entries.  The cache ensures it only
+protects the most recently used items from eviction using the LRU (Last Recently Used) strategy.
+
+==== memoizeBetween
+
+Combines memoizeAtLeast and memoizeAtMost and so allowing the cache to grow and shrink in the range between
+the two parameter values depending on available memory and the gc activity, yet the cache size will never
+exceed the upper size limit to preserve desired performance characteristics of the cache.
+
+
+
+
+== Map-Reduce
+
+The Parallel Collection Map/Reduce DSL gives GPars a more functional flavor. In general, the Map/Reduce DSL
+may be used for the same purpose as the _xxxParallel()_ family methods and has very similar semantics.  On
+the other hand, Map/Reduce can perform considerably faster, if you need to chain multiple methods to process
+a single collection in multiple steps:
+----
+    println 'Number of occurrences of the word GROOVY today: ' + urls.parallel
+            .map {it.toURL().text.toUpperCase()}
+            .filter {it.contains('GROOVY')}
+            .map{it.split()}
+            .map{it.findAll{word -> word.contains 'GROOVY'}.size()}
+            .sum()
+----
+
+The _xxxParallel()_ methods have to follow the contract of their non-parallel peers. So a
+_collectParallel()_ method must return a legal collection of items, which you can again treat as a Groovy
+collection.  Internally the parallel collect method builds an efficient parallel structure, called parallel
+array, performs the required operation concurrently and before returning destroys the Parallel Array
+building the collection of results to return to you.  A potential call to let say _findAllParallel()_ on the
+resulting collection would repeat the whole process of construction and destruction of a Parallel Array
+instance under the covers.
+
+With Map/Reduce you turn your collection into a Parallel Array and back only once. The Map/Reduce family of
+methods do not return Groovy collections, but are free to pass along the internal Parallel Arrays directly.
+Invoking the _parallel_ property on a collection will build a Parallel Array for the collection and return a
+thin wrapper around the Parallel Array instance.  Then you can chain all required methods like:
+* map()
+* reduce()
+* filter()
+* size()
+* sum()
+* min()
+* max()
+* sort()
+* groupBy()
+* combine()
+
+Returning back to a plain Groovy collection instance is always just a matter of retrieving the _collection_
+property.
+
+----
+def myNumbers = (1..1000).parallel.filter{it % 2 == 0}.map{Math.sqrt it}.collection
+----
+
+=== Avoid side-effects in functions
+
+Once again we need to warn you. To avoid nasty surprises, please, keep your closures, which you pass to the
+Map/Reduce functions, stateless and clean from side-effects.
+
+==== Availability
+
+This feature is only available when using in the Fork/Join-based *GParsPool* , not in *GParsExecutorsPool* .
+
+==== Classical Example
+
+A classical example, inspired by http://github.com/thevery, counting occurrences of words in a string:
+
+----
+import static groovyx.gpars.GParsPool.withPool
+
+def words = "This is just a plain text to count words in"
+print count(words)
+
+def count(arg) {
+  withPool {
+    return arg.parallel
+      .map{[it, 1]}
+      .groupBy{it[0]}.getParallel()
+      .map {it.value=it.value.size();it}
+      .sort{-it.value}.collection
+  }
+}
+----
+
+The same example, now implemented the more general _combine_ operation:
+
+----
+def words = "This is just a plain text to count words in"
+print count(words)
+
+def count(arg) {
+  withPool {
+    return arg.parallel
+      .map{[it, 1]}
+      .combine(0) {sum, value -> sum + value}.getParallel()
+      .sort{-it.value}.collection
+  }
+}
+----
+
+=== Combine
+
+The _combine_ operation expects on its input a list of tuples (two-element lists) considered to be key-value
+pairs (such as [ [key1, value1], [key2, value2], [key1, value3], [key3, value4] ... ] ) with potentially
+repeating keys. When invoked, _combine_ merges the values for identical keys using the provided accumulator
+function and produces a map mapping the original (unique) keys to their accumulated values.  E.g. [[a, b],
+[c, d], [a, e], [c, f]] will be combined into [a : b+e, c : d+f], while the '+' operation on the values
+needs to be provided by the user as the accumulation closure.
+
+The _accumulation function_ argument needs to specify a function to use for combining (accumulating) the
+values belonging to the same key.  An _initial accumulator value_ needs to be provided as well. Since the
+_combine_ method processes items in parallel, the _initial accumulator value_ will be reused multiple times.
+Thus the provided value must allow for reuse. It should be either a *cloneable* or *immutable* value or a
+*closure* returning a fresh initial accumulator each time requested.  Good combinations of accumulator
+functions and reusable initial values include:
+----
+accumulator = {List acc, value -> acc << value} initialValue = []
+accumulator = {List acc, value -> acc << value} initialValue = {-> []}
+accumulator = {int sum, int value -> acc + value} initialValue = 0
+accumulator = {int sum, int value -> sum + value} initialValue = {-> 0}
+accumulator = {ShoppingCart cart, Item value -> cart.addItem(value)} initialValue = {-> new ShoppingCart()}
+----
+
+The return type is a map.
+E.g. [['he', 1], ['she', 2], ['he', 2], ['me', 1], ['she', 5], ['he', 1]] with the initial value provided a 0
+will be combined into ['he' : 4, 'she' : 7, 'me' : 1]
+
+****
+The keys will be mutually compared using their equals and hashCode methods. Consider using _\@Canonical_ or _\@EqualsAndHashCode_
+to annotate classes that you use as keys. Just like with all hash maps in Groovy, be sure you're using a String not a GString as a key!
+****
+
+For more involved scenarios when you _combine()_ complex objects, a good strategy here is to have a class
+that can be used as a key for the common use cases and apply different keys for uncommon cases.
+
+
+----
+import groovy.transform.ToString
+import groovy.transform.TupleConstructor
+
+import static groovyx.gpars.GParsPool.withPool
+
+@TupleConstructor @ToString
+class PricedCar implements Cloneable {
+    String model
+    String color
+    Double price
+
+    boolean equals(final o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        final PricedCar pricedCar = (PricedCar) o
+
+        if (color != pricedCar.color) return false
+        if (model != pricedCar.model) return false
+
+        return true
+    }
+
+    int hashCode() {
+        int result
+        result = (model != null ? model.hashCode() : 0)
+        result = 31 * result + (color != null ? color.hashCode() : 0)
+        return result
+    }
+
+    @Override
+    protected Object clone() {
+        return super.clone()
+    }
+}
+
+def cars = [new PricedCar('F550', 'blue', 2342.223),
+        new PricedCar('F550', 'red', 234.234),
+        new PricedCar('Da', 'white', 2222.2),
+        new PricedCar('Da', 'white', 1111.1)]
+
+withPool {
+    //Combine by model
+    def result =
+        cars.parallel.map {
+            [it.model, it]
+        }.combine(new PricedCar('', 'N/A', 0.0)) {sum, value ->
+            sum.model = value.model
+            sum.price += value.price
+            sum
+        }.values()
+
+    println result
+
+
+    //Combine by model and color (the PricedCar's equals and hashCode))
+    result =
+        cars.parallel.map {
+            [it, it]
+        }.combine(new PricedCar('', 'N/A', 0.0)) {sum, value ->
+            sum.model = value.model
+            sum.color = value.color
+            sum.price += value.price
+            sum
+        }.values()
+
+    println result
+}
+----
+
+== Parallel Arrays
+
+As an alternative, the efficient tree-based data structures defines in JSR-166y can be used directly. The
+_parallelArray_ property on any collection or object will return a _ParallelArray_ instance holding the
+elements of the original collection, which then can be manipulated through the jsr166y API. Please refer to
+the jsr166y documentation for the API details.
+
+----
+import groovyx.gpars.extra166y.Ops
+
+groovyx.gpars.GParsPool.withPool {
+    assert 15 == [1, 2, 3, 4, 5].parallelArray.reduce({a, b -> a + b} as Ops.Reducer, 0)                                        //summarize
+    assert 55 == [1, 2, 3, 4, 5].parallelArray.withMapping({it ** 2} as Ops.Op).reduce({a, b -> a + b} as Ops.Reducer, 0)       //summarize squares
+    assert 20 == [1, 2, 3, 4, 5].parallelArray.withFilter({it % 2 == 0} as Ops.Predicate)                                       //summarize squares of even numbers
+            .withMapping({it ** 2} as Ops.Op)
+            .reduce({a, b -> a + b} as Ops.Reducer, 0)
+
+    assert 'aa:bb:cc:dd:ee' == 'abcde'.parallelArray                                                                            //concatenate duplicated characters with separator
+            .withMapping({it * 2} as Ops.Op)
+            .reduce({a, b -> "$a:$b"} as Ops.Reducer, "")
+----
+
+
+== Asynchronous Invocation
+
+Running long-lasting tasks in the background belongs to the activities, the need for which arises quite
+frequently. Your main thread of execution wants to initialize a few calculations, downloads, searches or
+such, however, the results may not be needed immediately. GPars gives the developers the tools to schedule
+the asynchronous activities for processing in the background and collect the results once they're needed.
+
+=== Usage of GParsPool and GParsExecutorsPool asynchronous processing facilities
+
+Both *GParsPool* and *GParsExecutorsPool* provide almost identical services in this domain, although they
+leverage different underlying machinery, based on which of the two classes the user chooses.
+
+==== Closures enhancements
+
+The following methods are added to closures inside the _GPars(Executors)Pool.withPool()_ blocks:
+* async() - Creates an asynchronous variant of the supplied closure, which when invoked returns a future for
+  the potential return value
+* callAsync() - Calls a closure in a separate thread supplying the given arguments, returning a future for
+  the potential return value,
+
+Examples:
+----
+GParsPool.withPool() {
+    Closure longLastingCalculation = {calculate()}
+    Closure fastCalculation = longLastingCalculation.async()  //create a new closure, which starts the original closure on a thread pool
+    Future result=fastCalculation()                           //returns almost immediately
+    //do stuff while calculation performs ...
+    println result.get()
+}
+----
+
+----
+GParsPool.withPool() {
+    /**
+     * The callAsync() method is an asynchronous variant of the default call() method to invoke a closure.
+     * It will return a Future for the result value.
+     */
+    assert 6 == {it * 2}.call(3)
+    assert 6 == {it * 2}.callAsync(3).get()
+}
+----
+
+==== Timeouts
+
+The _callTimeoutAsync()_ methods, taking either a long value or a Duration instance, allow the user to have
+the calculation cancelled after a given time interval.
+
+----
+{->
+    while(true) {
+        Thread.sleep 1000  //Simulate a bit of interesting calculation
+        if (Thread.currentThread().isInterrupted()) break;  //We've been cancelled
+    }
+}.callTimeoutAsync(2000)
+----
+
+In order to allow cancellation, the asynchronously running code must keep checking the _interrupted_ flag of
+its own thread and cease the calculation once the flag is set to true.
+
+==== Executor Service enhancements
+
+The ExecutorService and ForkJoinPool class is enhanced with the << (leftShift) operator to submit tasks to
+the pool and return a _Future_ for the result.
+
+Example:
+----
+GParsExecutorsPool.withPool {ExecutorService executorService ->
+    executorService << {println 'Inside parallel task'}
+}
+----
+
+==== Running functions (closures) in parallel
+
+The *GParsPool* and *GParsExecutorsPool* classes also provide handy methods _executeAsync()_ and
+_executeAsyncAndWait()_ to easily run multiple closures asynchronously.
+
+Example:
+----
+GParsPool.withPool {
+    assert [10, 20] == GParsPool.executeAsyncAndWait({calculateA()}, {calculateB()}         //waits for results
+    assert [10, 20] == GParsPool.executeAsync({calculateA()}, {calculateB()})*.get()  //returns Futures instead and doesn't wait for results to be calculated
+}
+----
+
+
+== Composable Asynchronous Functions
+
+Functions are to be composed. In fact, composing side-effect-free functions is very easy. Much easier and
+reliable than composing objects, for example.  Given the same input, functions always return the same
+result, they never change their behavior unexpectedly nor they break when multiple threads call them at the
+same time.  h3. Functions in Groovy We can treat Groovy closures as functions. They take arguments, do their
+calculation and return a value. Provided you don't let your closures touch anything outside their scope,
+your closures are well-behaved pure functions. Functions that you can combine for a better good.
+----
+def sum = (0..100000).inject(0, {a, b -> a + b})
+----
+For example, by combining a function adding two numbers with the _inject_ function, which iterates through
+the whole collection, you can quickly summarize all items. Then, replacing the _adding_ function with a
+_comparison_ function will immediately give you a combined function calculating maximum.
+----
+def max = myNumbers.inject(0, {a, b -> a>b?a:b})
+----
+
+You see, functional programming is popular for a reason.
+
+=== Are we concurrent yet?
+
+This all works just fine until you realize you're not utilizing the full power of your expensive
+hardware. The functions are plain sequential.  No parallelism in here. All but one processor core do
+nothing, they're idle, totally wasted.
+****
+Those paying attention would suggest to use the _Parallel Collection_ techniques described earlier and they
+would certainly be correct.  For our scenario described here, where we process a collection, using those
+_parallel_ methods would be the best choice.  However, we're now looking for a *generic way to create and
+combine asynchronous functions* , which would help us not only for collection processing but mostly in other
+more generic cases, like the one right below.
+****
+To make things more obvious, here's an example of combining four functions, which are supposed to check
+whether a particular web page matches the contents of a local file.  We need to download the page, load the
+file, calculate hashes of both and finally compare the resulting numbers.
+----
+Closure download = {String url ->
+    url.toURL().text
+}
+
+Closure loadFile = {String fileName ->
+    ...  //load the file here
+}
+
+Closure hash = {s -> s.hashCode()}
+
+Closure compare = {int first, int second ->
+    first == second
+}
+
+def result = compare(hash(download('http://www.gpars.org')), hash(loadFile('/coolStuff/gpars/website/index.html')))
+println "The result of comparison: " + result
+----
+We need to download the page, load up the file, calculate hashes of both and finally compare the resulting
+numbers.  Each of the functions is responsible for one particular job. One downloads the content, second
+loads the file, third calculates the hashes and finally the fourth one will do the comparison. Combining the
+functions is as simple as nesting their calls.
+
+==== Making it all asynchronous
+
+The downside of our code is that we don't leverage the independence of the _download()_ and the _loadFile()_
+functions.  Neither we allow the two hashes to be run concurrently. They could well run in parallel, but our
+way to combine functions restricts any parallelism.
+
+Obviously not all of the functions can run concurrently. Some functions depend on results of others. They
+cannot start before the other function finishes.  We need to block them till their parameters are
+available. The _hash()_ functions needs a string to work on. The _compare()_ function needs two numbers to
+compare.
+
+So we can only parallelize some functions, while blocking parallelism of others. Seems like a challenging
+task.
+
+==== Things are bright in the functional world
+
+Luckily, the dependencies between functions are already expressed implicitly in the code. There's no need
+for us to duplicate the dependency information.  If one functions takes parameters and the parameters need
+first to be calculated by another function, we implicitly have a dependency here. The _hash()_ function
+depends on the _loadFile()_ as well as on the _download()_ functions in our example.  The _inject_ function
+in our earlier example depends on the results of the _addition_ functions invoked gradually on all the
+elements of the collection.
+
+****
+However difficult it may seem at first, our task is in fact very simple. We only need to teach our functions
+to return _promises_ of their future results. And we need to teach the other functions to accept those
+_promises_ as parameters so that they wait for the real values before they start their work.  And if we
+convince the functions to release the threads they hold while waiting for the values, we get directly to
+where the magic can happen.
+****
+
+In the good tradition of _GPars_ we've made it very straightforward for you to convince any function to
+believe in other functions' promises. Call the _asyncFun()_ function on a closure and you're asynchronous.
+----
+withPool {
+    def maxPromise = numbers.inject(0, {a, b -> a>b?a:b}.asyncFun())
+    println "Look Ma, I can talk to the user while the math is being done for me!"
+    println maxPromise.get()
+}
+----
+
+The _inject_ function doesn't really care what objects are being returned from the _addition_ function,
+maybe it is just a little surprised that each call to the _addition_ function returns so fast, but doesn't
+moan much, keeps iterating and finally returns the overall result to you.
+
+Now, this is the time you should stand behind what you say and do what you want others to do. Don't frown at
+the result and just accepts that you got back just a promise.  A *promise* to get the result delivered as
+soon as the calculation is done. The extra heat coming out of your laptop is an indication the calculation
+exploits natural parallelism in your functions and makes its best effort to deliver the result to you
+quickly.
+
+****
+The _promise_ is a good old _DataflowVariable_ , so you may query its status, register notification hooks or
+make it an input to a Dataflow algorithm.
+****
+
+----
+withPool {
+    def sumPromise = (0..100000).inject(0, {a, b -> a + b}.asyncFun())
+    println "Are we done yet? " + sumPromise.bound
+    sumPromise.whenBound {sum -> println sum}
+}
+----
+
+****
+The _get()_ method has also a variant with a timeout parameter, if you want to avoid the risk of waiting
+indefinitely.
+****
+
+==== Can things go wrong?
+
+Sure. But you'll get an exception thrown from the result promise _get()_ method.
+
+----
+try {
+    sumPromise.get()
+} catch (MyCalculationException e) {
+    println "Guess, things are not ideal today."
+}
+----
+
+==== This is all fine, but what functions can be really combined?
+
+There are no limits. Take any sequential functions you need to combine and you should be able to combine
+their asynchronous variants as well.
+
+Back to our initial example comparing content of a file with a web page, we simply make all the functions
+asynchronous by calling the _asyncFun()_ method on them and we are ready to set off.
+
+----
+    Closure download = {String url ->
+        url.toURL().text
+    }.asyncFun()
+
+    Closure loadFile = {String fileName ->
+        ...  //load the file here
+    }.asyncFun()
+
+    Closure hash = {s -> s.hashCode()}.asyncFun()
+
+    Closure compare = {int first, int second ->
+        first == second
+    }.asyncFun()
+
+    def result = compare(hash(download('http://www.gpars.org')), hash(loadFile('/coolStuff/gpars/website/index.html')))
+    println 'Allowed to do something else now'
+    println "The result of comparison: " + result.get()
+----
+
+==== Calling asynchronous functions from within asynchronous functions
+
+Another very valuable characteristics of asynchronous functions is that their result promises can also be
+composed.
+
+----
+import static groovyx.gpars.GParsPool.withPool
+
+  withPool {
+      Closure plus = {Integer a, Integer b ->
+          sleep 3000
+          println 'Adding numbers'
+          a + b
+      }.asyncFun()
+
+      Closure multiply = {Integer a, Integer b ->
+          sleep 2000
+          a * b
+      }.asyncFun()
+
+      Closure measureTime = {->
+          sleep 3000
+          4
+      }.asyncFun()
+
+      Closure distance = {Integer initialDistance, Integer velocity, Integer time ->
+          plus(initialDistance, multiply(velocity, time))
+      }.asyncFun()
+
+      Closure chattyDistance = {Integer initialDistance, Integer velocity, Integer time ->
+          println 'All parameters are now ready - starting'
+          println 'About to call another asynchronous function'
+          def innerResultPromise = plus(initialDistance, multiply(velocity, time))
+          println 'Returning the promise for the inner calculation as my own result'
+          return innerResultPromise
+      }.asyncFun()
+
+      println "Distance = " + distance(100, 20, measureTime()).get() + ' m'
+      println "ChattyDistance = " + chattyDistance(100, 20, measureTime()).get() + ' m'
+  }
+----
+
+If an asynchronous function (e.f. the _distance_ function in the example) in its body calls another
+asynchronous function (e.g. _plus_ ) and returns the the promise of the invoked function, the inner
+function's ( _plus_ ) result promise will compose with the outer function's ( _distance_ ) result
+promise. The inner function ( _plus_ ) will now bind its result to the outer function's ( _distance_ )
+promise, once the inner function (plus) finishes its calculation.  This ability of promises to compose
+allows functions to cease their calculation without blocking a thread not only when waiting for parameters,
+but also whenever they call another asynchronous function anywhere in their body.
+
+==== Methods as asynchronous functions
+
+Methods can be referred to as closures using the _.&_ operator. These closures can then be transformed using
+_asyncFun_ into composable asynchronous functions just like ordinary closures.
+
+----
+class DownloadHelper {
+    String download(String url) {
+        url.toURL().text
+    }
+
+    int scanFor(String word, String text) {
+        text.findAll(word).size()
+    }
+
+    String lower(s) {
+        s.toLowerCase()
+    }
+}
+//now we'll make the methods asynchronous
+withPool {
+    final DownloadHelper d = new DownloadHelper()
+    Closure download = d.&download.asyncFun()
+    Closure scanFor = d.&scanFor.asyncFun()
+    Closure lower = d.&lower.asyncFun()
+
+    //asynchronous processing
+    def result = scanFor('groovy', lower(download('http://www.infoq.com')))
+    println 'Allowed to do something else now'
+    println result.get()
+}
+----
+
+==== Using annotation to create asynchronous functions
+
+Instead of calling the _asyncFun()_ function, the _@AsyncFun_ annotation can be used to annotate
+Closure-typed fields.  The fields have to be initialized in-place and the containing class needs to be
+instantiated withing a _withPool_ block.
+
+----
+import static groovyx.gpars.GParsPool.withPool
+import groovyx.gpars.AsyncFun
+
+class DownloadingSearch {
+    @AsyncFun Closure download = {String url ->
+        url.toURL().text
+    }
+
+    @AsyncFun Closure scanFor = {String word, String text ->
+        text.findAll(word).size()
+    }
+
+    @AsyncFun Closure lower = {s -> s.toLowerCase()}
+
+    void scan() {
+        def result = scanFor('groovy', lower(download('http://www.infoq.com')))  //synchronous processing
+        println 'Allowed to do something else now'
+        println result.get()
+    }
+}
+
+withPool {
+    new DownloadingSearch().scan()
+}
+----
+
+===== Alternative pools
+
+The _AsyncFun_ annotation by default uses an instance of *GParsPool* from the wrapping withPool block. You
+may, however, specify the type of pool explicitly:
+----
+@AsyncFun(GParsExecutorsPoolUtil) def sum6 = {a, b -> a + b }
+----
+
+===== Blocking functions through annotations
+
+The _AsyncFun_ also allows the user to specify, whether the resulting function should have blocking (true)
+or non-blocking (false - default) semantics.
+
+----
+@AsyncFun(blocking = true)
+def sum = {a, b -> a + b }
+----
+
+===== Explicit and delayed pool assignment
+
+When using the _GPars(Executors)PoolUtil.asyncFun()_ function directly to create an asynchronous function
+you have two additional options to assign a thread pool to the function.
+
+* The thread pool to use by the function can be specified explicitly as an additional argument at creation time
+* The implicit thread pool can be obtained from the surrounding scope at invocation rather at creation time
+
+When specifying the thread pool explicitly, the call doesn't need to be wrapped in an _withPool()_ block:
+----
+Closure sPlus = {Integer a, Integer b ->
+    a + b
+}
+
+Closure sMultiply = {Integer a, Integer b ->
+    sleep 2000
+    a * b
+}
+
+println "Synchronous result: " + sMultiply(sPlus(10, 30), 100)
+
+final pool = new FJPool()
+
+Closure aPlus = GParsPoolUtil.asyncFun(sPlus, pool)
+Closure aMultiply = GParsPoolUtil.asyncFun(sMultiply, pool)
+
+def result = aMultiply(aPlus(10, 30), 100)
+
+println "Time to do something else while the calculation is running"
+println "Asynchronous result: " + result.get()
+----
+
+With delayed pool assignment only the function invocation must be surrounded with a _withPool()_ block:
+
+----
+Closure aPlus = GParsPoolUtil.asyncFun(sPlus)
+Closure aMultiply = GParsPoolUtil.asyncFun(sMultiply)
+
+withPool {
+    def result = aMultiply(aPlus(10, 30), 100)
+
+    println "Time to do something else while the calculation is running"
+    println "Asynchronous result: " + result.get()
+}
+----
+
+On our side this is a very interesting domain to explore, so any comments, questions or suggestions on
+combining asynchronous functions or hints about its limits are welcome.
+
+
+== Fork-Join
+
+Fork/Join or Divide and Conquer is a very powerful abstraction to solve hierarchical problems.
+
+=== The abstraction
+
+When talking about hierarchical problems, think about quick sort, merge sort, file system or general tree
+navigation and such.
+
+ * Fork / Join algorithms essentially split a problem at hands into several smaller sub-problems and
+   recursively apply the same algorithm to each of the sub-problems.
+ * Once the sub-problem is small enough, it is solved directly.
+ * The solutions of all sub-problems are combined to solve their parent problem, which in turn helps solve
+   its own parent problem.
+
+****
+Check out the fancy http://blog.krecan.net/2011/03/27/visualizing-forkjoin/[interactive Fork/Join
+visualization demo], which will show you how threads cooperate to solve a common divide-and-conquer
+algorithm.
+****
+
+The mighty *JSR-166y* library solves Fork / Join orchestration pretty nicely for us, but leaves a couple of
+rough edges, which can hurt you, if you don't pay attention enough. You still deal with threads, pools or
+synchronization barriers.
+
+==== The GPars abstraction convenience layer
+
+GPars can hide the complexities of dealing with threads, pools and recursive tasks from you, yet let you
+leverage the powerful Fork/Join implementation in jsr166y.
+
+----
+import static groovyx.gpars.GParsPool.runForkJoin
+import static groovyx.gpars.GParsPool.withPool
+
+withPool() {
+    println """Number of files: ${
+        runForkJoin(new File("./src")) {file ->
+            long count = 0
+            file.eachFile {
+                if (it.isDirectory()) {
+                    println "Forking a child task for $it"
+                    forkOffChild(it)           //fork a child task
+                } else {
+                    count++
+                }
+            }
+            return count + (childrenResults.sum(0))
+            //use results of children tasks to calculate and store own result
+        }
+    }"""
+}
+----
+
+The _runForkJoin()_ factory method will use the supplied recursive code together with the provided values
+and build a hierarchical Fork/Join calculation. The number of values passed to the _runForkJoin()_ method
+must match the number of expected parameters of the closure as well as the number of arguments passed into
+the _forkOffChild()_ or _runChildDirectly()_ methods.
+
+----
+def quicksort(numbers) {
+    withPool {
+        runForkJoin(0, numbers) {index, list ->
+            def groups = list.groupBy {it <=> list[list.size().intdiv(2)]}
+            if ((list.size() < 2) || (groups.size() == 1)) {
+                return [index: index, list: list.clone()]
+            }
+            (-1..1).each {forkOffChild(it, groups[it] ?: [])}
+            return [index: index, list: childrenResults.sort {it.index}.sum {it.list}]
+        }.list
+    }
+}
+----
+
+****
+The important piece of the puzzle that needs to be mentioned here is that _forkOffChild()_ doesn't
+wait for the child to run.  It merely schedules it for execution some time in the future. If a child fails
+by throwing an exception, you should not expect the exception to be fired from the forkOffChild() method
+itself. The exception ise likely to happen long after the parent has returned from the call to the
+_forkOffChild()_ method.
+
+It is the _getChildrenResults()_ method that will re-throw exceptions that happened in the child sub-tasks
+back to the parent task.
+****
+
+===== Alternative approach
+
+Alternatively, the underlying mechanism of nested Fork/Join worker tasks can be used
+directly. Custom-tailored workers can eliminate the performance overhead associated with parameter spreading
+imposed when using the generic workers. Also, custom workers can be implemented in Java and so further
+increase the performance of the algorithm.
+
+----
+public final class FileCounter extends AbstractForkJoinWorker<Long> {
+    private final File file;
+
+    def FileCounter(final File file) {
+        this.file = file
+    }
+
+    @Override
+    protected Long computeTask() {
+        long count = 0;
+        file.eachFile {
+            if (it.isDirectory()) {
+                println "Forking a thread for $it"
+                forkOffChild(new FileCounter(it))           //fork a child task
+            } else {
+                count++
+            }
+        }
+        return count + ((childrenResults)?.sum() ?: 0)  //use results of children tasks to calculate and store own result
+    }
+}
+
+withPool(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
+    println "Number of files: ${runForkJoin(new FileCounter(new File("..")))}"
+}
+----
+
+The AbstractForkJoinWorker subclasses may be written both in Java or Groovy, giving you the option to easily
+optimize for execution speed, if row performance of the worker becomes a bottleneck.
+
+==== Fork / Join saves your resources
+
+Fork/Join operations can be safely run with small number of threads thanks to internally using the
+TaskBarrier class to synchronize the threads. While a thread is blocked inside an algorithm waiting for its
+sub-problems to be calculated, the thread is silently returned to the pool to take on any of the available
+sub-problems from the task queue and process them.  Although the algorithm creates as many tasks as there
+are sub-directories and tasks wait for the sub-directory tasks to complete, as few as one thread is enough
+to keep the computation going and eventually calculate a valid result.
+
+==== Mergesort example
+
+----
+import static groovyx.gpars.GParsPool.runForkJoin
+import static groovyx.gpars.GParsPool.withPool
+
+/**
+ * Splits a list of numbers in half
+ */
+def split(List<Integer> list) {
+    int listSize = list.size()
+    int middleIndex = listSize / 2
+    def list1 = list[0..<middleIndex]
+    def list2 = list[middleIndex..listSize - 1]
+    return [list1, list2]
+}
+
+/**
+ * Merges two sorted lists into one
+ */
+List<Integer> merge(List<Integer> a, List<Integer> b) {
+    int i = 0, j = 0
+    final int newSize = a.size() + b.size()
+    List<Integer> result = new ArrayList<Integer>(newSize)
+
+    while ((i < a.size()) && (j < b.size())) {
+        if (a[i] <= b[j]) result << a[i++]
+        else result << b[j++]
+    }
+
+    if (i < a.size()) result.addAll(a[i..-1])
+    else result.addAll(b[j..-1])
+    return result
+}
+
+final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1, 4, 1, 7, 5, 8, 2, 3, 9, 5, 7, 4, 3]
+
+withPool(3) {  //feel free to experiment with the number of fork/join threads in the pool
+    println """Sorted numbers: ${
+        runForkJoin(numbers) {nums ->
+            println "Thread ${Thread.currentThread().name[-1]}: Sorting $nums"
+            switch (nums.size()) {
+                case 0..1:
+                    return nums                                   //store own result
+                case 2:
+                    if (nums[0] <= nums[1]) return nums     //store own result
+                    else return nums[-1..0]                       //store own result
+                default:
+                    def splitList = split(nums)
+                    [splitList[0], splitList[1]].each {forkOffChild it}  //fork a child task
+                    return merge(* childrenResults)      //use results of children tasks to calculate and store own result
+            }
+        }
+    }"""
+}
+----
+
+==== Mergesort example using a custom-tailored worker class
+
+----
+public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
+    private final List numbers
+
+    def SortWorker(final List<Integer> numbers) {
+        this.numbers = numbers.asImmutable()
+    }
+
+    /**
+     * Splits a list of numbers in half
+     */
+    def split(List<Integer> list) {
+        int listSize = list.size()
+        int middleIndex = listSize / 2
+        def list1 = list[0..<middleIndex]
+        def list2 = list[middleIndex..listSize - 1]
+        return [list1, list2]
+    }
+
+    /**
+     * Merges two sorted lists into one
+     */
+    List<Integer> merge(List<Integer> a, List<Integer> b) {
+        int i = 0, j = 0
+        final int newSize = a.size() + b.size()
+        List<Integer> result = new ArrayList<Integer>(newSize)
+
+        while ((i < a.size()) && (j < b.size())) {
+            if (a[i] <= b[j]) result << a[i++]
+            else result << b[j++]
+        }
+
+        if (i < a.size()) result.addAll(a[i..-1])
+        else result.addAll(b[j..-1])
+        return result
+    }
+
+    /**
+     * Sorts a small list or delegates to two children, if the list contains more than two elements.
+     */
+    @Override
+    protected List<Integer> computeTask() {
+        println "Thread ${Thread.currentThread().name[-1]}: Sorting $numbers"
+        switch (numbers.size()) {
+            case 0..1:
+                return numbers                                   //store own result
+            case 2:
+                if (numbers[0] <= numbers[1]) return numbers     //store own result
+                else return numbers[-1..0]                       //store own result
+            default:
+                def splitList = split(numbers)
+                [new SortWorker(splitList[0]), new SortWorker(splitList[1])].each{forkOffChild it}  //fork a child task
+                return merge(* childrenResults)      //use results of children tasks to calculate and store own result
+        }
+    }
+}
+
+final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1, 4, 1, 7, 5, 8, 2, 3, 9, 5, 7, 4, 3]
+
+withPool(1) {  //feel free to experiment with the number of fork/join threads in the pool
+    println "Sorted numbers: ${runForkJoin(new SortWorker(numbers))}"
+}
+----
+
+==== Running child tasks directly
+
+The _forkOffChild_ method has a sibling -- the _runChildDirectly_ method, which will run the child task
+directly and immediately within the current thread instead of scheduling the child task for asynchronous
+processing on the thread pool. Typically you'll call _forkOffChild_ on all sub-tasks but the last, which
+you invoke directly without the scheduling overhead.
+
+----
+Closure fib = {number ->
+    if (number <= 2) {
+        return 1
+    }
+    forkOffChild(number - 1)                            //  This task will run asynchronously, probably in a different thread
+    final def result = runChildDirectly(number - 2)     //  This task is run directly within the current thread
+    return (Integer) getChildrenResults().sum() + result
+}
+
+withPool {
+    assert 55 == runForkJoin(10, fib)
+}
+----
+
+==== Availability
+
+This feature is only available when using in the Fork/Join-based *GParsPool* , not in *GParsExecutorsPool* .
+
+
+== Parallel Speculations
+
+With processor cores having become plentiful, some algorithms might benefit from brutal-force parallel
+duplication.  Instead of deciding up-front about how to solve a problem, what algorithm to use or which
+location to connect to, you run all potential solutions in parallel.
+
+=== Parallel speculations
+
+Imagine you need to perform a task like e.g. calculate an expensive function or read data from a file,
+database or internet. Luckily, you know of several good ways (e.g. functions or urls) to achieve your
+goal. However, they are not all equal. Although they return back the same (as far as your needs are
+concerned) result, they may all take different amount of time to complete and some of them may even fail
+(e.g. network issues). What's worse, no-one is going to tell you which path gives you the solution first nor
+which paths lead to no solution at all. Shall I run _quick sort_ or _merge sort_ on my list? Which url will
+work best? Is this service available at its primary location or should I use the backup one?
+
+GPars speculations give you the option to try all the available alternatives in parallel and so get the
+result from the fastest functional path, silently ignoring the slow or broken ones.
+
+This is what the _speculate_ methods on *GParsPool* and *GParsExecutorsPool* can do.
+
+----
+def numbers = ...
+def quickSort = ...
+def mergeSort = ...
+def sortedNumbers = speculate(quickSort, mergeSort)
+----
+
+Here we're performing both _quick sort_ and _merge sort_ *concurrently*, while getting the result of the
+faster one. Given the parallel resources available these days on mainstream hardware, running the two
+functions in parallel will not have dramatic impact on speed of calculation of either one, and so we get the
+result in about the same time as if we ran solely the faster of the two calculations. And we get the result
+sooner than when running the slower one. Yet we didn't have to know up-front, which of the two sorting
+algorithms would perform better on our data. Thus we speculated.
+
+Similarly, downloading a document from multiple sources of different speed and reliability would look like
+this:
+
+----
+import static groovyx.gpars.GParsPool.speculate
+import static groovyx.gpars.GParsPool.withPool
+
+def alternative1 = {
+    'http://www.dzone.com/links/index.html'.toURL().text
+}
+
+def alternative2 = {
+    'http://www.dzone.com/'.toURL().text
+}
+
+def alternative3 = {
+    'http://www.dzzzzzone.com/'.toURL().text  //wrong url
+}
+
+def alternative4 = {
+    'http://dzone.com/'.toURL().text
+}
+
+withPool(4){
+    println speculate([alternative1, alternative2, alternative3, alternative4]).contains('groovy')
+}
+----
+
+****
+Make sure the surrounding thread pool has enough threads to process all alternatives in parallel. The size of the pool should match
+the number of closures supplied.
+****
+
+=== Alternatives using dataflow variables and streams
+
+In cases, when stopping unsuccessful alternatives is not needed, dataflow variables or streams may be used to obtain the result value
+from the winning speculation.
+
+****
+Please refer to the Dataflow Concurrency section of the User Guide for details on Dataflow variables and streams.
+****
+
+----
+import groovyx.gpars.dataflow.DataflowQueue
+import static groovyx.gpars.dataflow.Dataflow.task
+
+def alternative1 = {
+    'http://www.dzone.com/links/index.html'.toURL().text
+}
+
+def alternative2 = {
+    'http://www.dzone.com/'.toURL().text
+}
+
+def alternative3 = {
+    'http://www.dzzzzzone.com/'.toURL().text  //will fail due to wrong url
+}
+
+def alternative4 = {
+    'http://dzone.com/'.toURL().text
+}
+
+//Pick either one of the following, both will work:
+final def result = new DataflowQueue()
+//  final def result = new DataflowVariable()
+
+[alternative1, alternative2, alternative3, alternative4].each{code ->
+    task{
+        try {
+            result << code()
+        }
+        catch (ignore) { }  // We deliberately ignore unsuccessful urls.
+    }
+}
+
+println result.val.contains('groovy')
+----

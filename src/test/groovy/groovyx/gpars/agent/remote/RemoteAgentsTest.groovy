@@ -30,15 +30,18 @@ class RemoteAgentsTest extends Specification {
 
     def "retrieving an Agent from remote host returns Future"() {
         setup:
-        def HOST = "localhost"
         def PORT = 9555
         def name = "test-agent"
 
         when:
-        def agentFuture = remoteAgents.get HOST, PORT, name
+        def agentFuture = remoteAgents.get getHostAddress(), PORT, name
 
         then:
         agentFuture != null
         agentFuture instanceof DataflowVariable
+    }
+
+    String getHostAddress() {
+        InetAddress.getLocalHost().getHostAddress()
     }
 }

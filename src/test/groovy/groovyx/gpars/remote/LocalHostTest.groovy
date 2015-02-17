@@ -25,8 +25,8 @@ class LocalHostTest extends Specification {
         def localHostMock = new LocalHostMock()
 
         when:
-        localHostMock.startServer("localhost", 11223)
-        localHostMock.startServer("localhost", 11224)
+        localHostMock.startServer(getHostAddress(), 11223)
+        localHostMock.startServer(getHostAddress(), 11224)
 
         then:
         thrown(IllegalStateException)
@@ -41,5 +41,9 @@ class LocalHostTest extends Specification {
 
         then:
         thrown(IllegalStateException)
+    }
+
+    String getHostAddress() {
+        InetAddress.getLocalHost().getHostAddress()
     }
 }

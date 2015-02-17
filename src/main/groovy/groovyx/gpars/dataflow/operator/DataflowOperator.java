@@ -53,7 +53,7 @@ public final class DataflowOperator extends DataflowProcessor {
     public DataflowOperator(final PGroup group, final Map channels, final Closure code) {
         super(channels, code);
         final int parameters = code.getMaximumNumberOfParameters();
-        if (verifyChannelParameters(channels, parameters))
+        if (verifyChannelParameters(channels, parameters, code.getParameterTypes()))
             throw new IllegalArgumentException("The operator's body accepts " + parameters + " parameters while it is given " + countInputChannels(channels) + " input streams. The numbers must match.");
         if (shouldBeMultiThreaded(channels)) {
             checkMaxForks(channels);
@@ -66,10 +66,12 @@ public final class DataflowOperator extends DataflowProcessor {
         }
     }
 
-    private static boolean verifyChannelParameters(final Map channels, final int parameters) {
+    private static boolean verifyChannelParameters(final Map channels, final int parameters, final Class[] parameterTypes) {
         if (channels == null) return true;
         final Collection inputs = (Collection) channels.get(INPUTS);
-        return inputs == null || inputs.isEmpty() || parameters != inputs.size();
+        return inputs == null || inputs.isEmpty() || parameters == 0 || parameters > inputs.size() ||
+                (parameters < inputs.size() &&
+                        !parameterTypes[parameterTypes.length - 1].isArray());
     }
 
     private static String countInputChannels(final Map channels) {
