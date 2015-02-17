@@ -14,10 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow.remote
+package groovyx.gpars.integration.remote.dataflow
 
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.DataflowVariable
+import groovyx.gpars.dataflow.remote.RemoteDataflowQueue
+import groovyx.gpars.dataflow.remote.RemoteDataflows
+import groovyx.gpars.integration.remote.RemoteSpecification
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
@@ -25,7 +28,7 @@ import spock.lang.Timeout
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
+class RemoteDataflowsDataflowQueueWithServerTest extends RemoteSpecification {
     def static PORT = 9031
 
     @Shared
@@ -126,9 +129,5 @@ class RemoteDataflowsDataflowQueueWithServerTest extends Specification {
 
         then:
         resultVariable.val == queueName
-    }
-
-    String getHostAddress() {
-        InetAddress.getLocalHost().getHostAddress()
     }
 }

@@ -14,16 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.actor.remote
+package groovyx.gpars.integration.remote.actor
 
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.remote.RemoteActors
+import groovyx.gpars.integration.remote.RemoteSpecification
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
 
 import java.util.concurrent.CountDownLatch
 
-class RemoteActorTest extends Specification {
+class RemoteActorTest extends RemoteSpecification {
     def static PORT = 9012
 
     @Shared
@@ -138,9 +140,5 @@ class RemoteActorTest extends Specification {
         receivedMessage.length() == message.length() + messageTest.length()
         receivedMessage.startsWith message
         receivedMessage.endsWith messageTest
-    }
-
-    static String getHostAddress() {
-        InetAddress.getLocalHost().getHostAddress()
     }
 }
