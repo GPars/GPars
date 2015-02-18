@@ -14,10 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.actor.remote
+package groovyx.gpars.integration.remote.actor
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.remote.RemoteActors
+import groovyx.gpars.integration.remote.RemoteSpecification
 import spock.lang.Specification
 import spock.lang.Timeout
 
@@ -25,7 +27,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-class RemoteActorsWithNamesTest extends Specification {
+class RemoteActorsWithNamesTest extends RemoteSpecification {
     @Timeout(5)
     def "register and get Actor using its name"() {
         setup:
@@ -85,10 +87,6 @@ class RemoteActorsWithNamesTest extends Specification {
 
         cleanup:
         serverRemoteActors.stopServer()
-    }
-
-    String getHostAddress() {
-        InetAddress.getLocalHost().getHostAddress()
     }
 
     Actor tryGetActorByUrl(RemoteActors remoteActors, String actorUrl) {

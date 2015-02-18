@@ -34,14 +34,9 @@ class RemoteAgentsTest extends Specification {
         def name = "test-agent"
 
         when:
-        def agentFuture = remoteAgents.get getHostAddress(), PORT, name
+        def agentFuture = remoteAgents.get "some-host", PORT, name
 
         then:
         agentFuture != null
-        agentFuture instanceof DataflowVariable
-    }
-
-    String getHostAddress() {
-        InetAddress.getLocalHost().getHostAddress()
     }
 }
