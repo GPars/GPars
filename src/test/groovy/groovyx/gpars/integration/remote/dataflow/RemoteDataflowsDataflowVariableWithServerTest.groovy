@@ -14,14 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow.remote
+package groovyx.gpars.integration.remote.dataflow
 
 import groovyx.gpars.dataflow.DataflowVariable
+import groovyx.gpars.dataflow.remote.RemoteDataflows
+import groovyx.gpars.integration.remote.RemoteSpecification
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
 
-class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
+class RemoteDataflowsDataflowVariableWithServerTest extends RemoteSpecification {
     def static PORT = 9021
 
     @Shared
@@ -94,9 +96,5 @@ class RemoteDataflowsDataflowVariableWithServerTest extends Specification {
         where:
         variableName << ["test-variable-3a", "test-variable-3b"]
         testValue << ["test DataflowVariable", null]
-    }
-
-    static String getHostAddress() {
-        InetAddress.getLocalHost().getHostAddress()
     }
 }

@@ -1,6 +1,10 @@
-package groovyx.gpars.agent.remote
+package groovyx.gpars.integration.remote.agent
 
 import groovyx.gpars.agent.Agent
+import groovyx.gpars.agent.remote.AgentClosureExecutionPolicy
+import groovyx.gpars.agent.remote.RemoteAgent
+import groovyx.gpars.agent.remote.RemoteAgents
+import groovyx.gpars.integration.remote.RemoteSpecification
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
@@ -8,7 +12,7 @@ import spock.lang.Timeout
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 
-class RemoteAgentsWithServerTest extends Specification {
+class RemoteAgentsWithServerTest extends RemoteSpecification {
     def static PORT = 9677
 
     @Shared
@@ -116,9 +120,5 @@ class RemoteAgentsWithServerTest extends Specification {
         then:
         latch.await()
         agent.val == updateState
-    }
-
-    String getHostAddress() {
-        InetAddress.getLocalHost().getHostAddress()
     }
 }

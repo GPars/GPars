@@ -14,15 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow.remote
+package groovyx.gpars.integration.remote.dataflow
 
 import groovyx.gpars.dataflow.DataflowBroadcast
 import groovyx.gpars.dataflow.DataflowReadChannel
+import groovyx.gpars.dataflow.remote.RemoteDataflows
+import groovyx.gpars.integration.remote.RemoteSpecification
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Timeout
 
-class RemoteDataflowsDataflowBroadcastWithServerTest extends Specification {
+class RemoteDataflowsDataflowBroadcastWithServerTest extends RemoteSpecification {
     def static PORT = 9177
 
     @Shared
@@ -95,9 +97,5 @@ class RemoteDataflowsDataflowBroadcastWithServerTest extends Specification {
         then:
         remoteChannel1 != remoteChannel2
         [remoteChannel1, remoteChannel2, localChannel].collect { it.val } every { it == testValue }
-    }
-
-    static String getHostAddress() {
-        InetAddress.getLocalHost().getHostAddress()
     }
 }
