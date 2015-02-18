@@ -16,9 +16,10 @@
 
 package groovyx.gpars.dataflow.operator;
 
-import groovy.lang.Closure;
-
+import java.util.Collections;
 import java.util.List;
+
+import groovy.lang.Closure;
 
 /**
  * Used by the chainWith() method to wrap the supplied closure inside the operator's body.
@@ -73,7 +74,7 @@ public final class SeparationClosure extends Closure<Void> {
 
     @Override
     public Void call() {
-        final List<Object> results = code.call(null);
+        final List<Object> results = code.call(Collections.emptyList());
         ((DataflowProcessor) getDelegate()).bindAllOutputValuesAtomically(results.toArray());
         return null;
     }

@@ -46,6 +46,54 @@ public class ActiveObjectExceptionASTTransformationTest extends GroovyTestCase {
         }
         assert a.result.val != Thread.currentThread()
     }
+
+    public void testExceptionRecovery() {
+        final def a = new MyExceptionWrapperWithErrorHandler()
+
+        def result = a.exceptionBaz(10).get()
+
+        assert a.result.val != Thread.currentThread()
+        assert result == MyExceptionWrapperWithErrorHandler.NEW_VALUE
+        assert a.lastRecoveredMethod == 'exceptionBaz'
+    }
+
+    public void testMemozedMethod() {
+        final def a = new MyExceptionWrapperWithErrorHandler()
+
+        def result = a.exceptionBaz(10).get()
+
+        for (int i in 1..5)
+            testExceptionRecovery()
+    }
+
+    public void testNoRecoveryForBlocking() {
+        shouldFail(RuntimeException) {
+            new MyExceptionWrapperWithErrorHandler().exceptionFoo(10)
+        }
+    }
+
+    public void testNoProblemWithRecoveryError() {
+        new MyExceptionWrapperWithErrorHandlerException().doThrow()
+    }
+
+    public void testNoProblemWithRecoveryError2() {
+        shouldFail(Exception) {
+            new MyExceptionWrapperWithErrorHandlerException().doReturnThrow().get()
+        }
+    }
+
+    public void testFailSilently() {
+        new MyExceptionWrapperWithoutHandler().doThrow()
+    }
+
+    public void testFailAndNotModifyException() {
+        try {
+            new MyExceptionWrapperWithoutHandler().doReturnThrow().get()
+        }
+        catch (def e) {
+            assert e.message == 'proper message'
+        }
+    }
 }
 
 @ActiveObject
@@ -79,6 +127,64 @@ class MyExceptionWrapper {
         result << Thread.currentThread()
         throw new RuntimeException('test')
     }
+}
 
+@ActiveObject
+class MyExceptionWrapperWithErrorHandler implements ActorWithExceptionHandler {
+    public static final String NEW_VALUE = "new value"
 
+    def result = new DataflowVariable()
+    def lastCurrentThread;
+    def lastRecoveredMethod;
+
+    @ActiveMethod(blocking = true)
+    def exceptionFoo(value) {
+        result << Thread.currentThread()
+        throw new RuntimeException('test')
+    }
+
+    @ActiveMethod
+    def exceptionBaz(value) {
+        lastCurrentThread = Thread.currentThread()
+
+        result << lastCurrentThread
+        throw new RuntimeException('test')
+    }
+
+    @Override
+    Object recoverFromException(String methodName, Exception e) {
+        lastRecoveredMethod = methodName
+
+        return NEW_VALUE
+    }
+}
+
+@ActiveObject
+class MyExceptionWrapperWithErrorHandlerException implements ActorWithExceptionHandler {
+    @ActiveMethod
+    void doThrow() {
+        throw new Exception()
+    }
+
+    @ActiveMethod
+    DataflowVariable doReturnThrow() {
+        throw new Exception()
+    }
+
+    @Override
+    Object recoverFromException(String methodName, Exception e) {
+        throw new Exception(e)
+    }
+}
+@ActiveObject
+class MyExceptionWrapperWithoutHandler {
+    @ActiveMethod
+    void doThrow() {
+        throw new Exception()
+    }
+
+    @ActiveMethod
+    DataflowVariable doReturnThrow() {
+        throw new Exception('proper message')
+    }
 }
