@@ -14,10 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.remote.netty.discovery
+package groovyx.gpars.integration.remote
 
 import com.google.common.net.InetAddresses
 import groovyx.gpars.remote.RemotingContextWithUrls
+import groovyx.gpars.remote.netty.discovery.DiscoveryClient
+import groovyx.gpars.remote.netty.discovery.DiscoveryServer
 import spock.lang.Specification
 import spock.lang.Timeout
 
