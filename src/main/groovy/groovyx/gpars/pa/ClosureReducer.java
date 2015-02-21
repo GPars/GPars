@@ -32,6 +32,7 @@
 //         this.code = code;
 //     }
 
+//    @SuppressWarnings("unchecked")
 //     @Override
 //     public T op(final Object o, final Object o1) {
 //         final Object[] args = {o, o1};
