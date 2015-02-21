@@ -16,10 +16,10 @@
 
 package groovyx.gpars.dataflow.operator;
 
+import groovy.lang.Closure;
+
 import java.util.Collections;
 import java.util.List;
-
-import groovy.lang.Closure;
 
 /**
  * Used by the chainWith() method to wrap the supplied closure inside the operator's body.

@@ -16,9 +16,6 @@
 
 package groovyx.gpars.dataflow;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
@@ -26,6 +23,9 @@ import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.dataflow.remote.RemoteDataflowVariable;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Represents a thread-safe single-assignment, multi-read variable.

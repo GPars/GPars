@@ -60,7 +60,7 @@ public class ActiveObjectExceptionASTTransformationTest extends GroovyTestCase {
     public void testMemozedMethod() {
         final def a = new MyExceptionWrapperWithErrorHandler()
 
-        def result = a.exceptionBaz(10).get()
+        def ignore = a.exceptionBaz(10).get()
 
         for (int i in 1..5)
             testExceptionRecovery()
@@ -100,7 +100,7 @@ public class ActiveObjectExceptionASTTransformationTest extends GroovyTestCase {
 class MyExceptionWrapper {
     def result = new DataflowVariable()
 
-    private def bar() {
+    private static def bar() {
         throw new RuntimeException('test')
     }
 

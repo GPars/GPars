@@ -17,19 +17,21 @@
 package groovyx.gpars.activeobject;
 
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.codehaus.groovy.runtime.InvokerHelper;
-
 import groovy.transform.Memoized;
 import groovyx.gpars.MessagingRunnable;
 import groovyx.gpars.actor.AbstractLoopingActor;
 import groovyx.gpars.actor.Actors;
 import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.DataflowWriteChannel;
+import groovyx.gpars.dataflow.Promise;
 import groovyx.gpars.group.PGroup;
+import org.codehaus.groovy.runtime.InvokerHelper;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Backs active objects and invokes all object's active methods.
@@ -78,6 +80,26 @@ public final class InternalActor extends AbstractLoopingActor {
         return internalActor;
     }
 
+    @SuppressWarnings({"unchecked"})
+    private static Object handleCurrentMessage(final Object msg) {
+        try {
+            final Object[] params;
+            if (msg instanceof Collection) {
+                params = ((Collection<Object>) msg).toArray(new Object[((Collection<Object>) msg).size()]);
+            } else {
+                params = (Object[]) msg;
+            }
+
+            final Object target = params[0];
+            final String methodName = (String) params[1];
+            final Object[] args = params.length > 2 ? Arrays.copyOfRange(params, 2, params.length) : NO_ARGS;
+
+            return InvokerHelper.invokeMethod(target, METHOD_NAME_PREFIX + methodName, args);
+        } catch (final Throwable all) {
+            return all;
+        }
+    }
+
     /**
      * Handles incoming messages
      *
@@ -85,8 +107,7 @@ public final class InternalActor extends AbstractLoopingActor {
      */
     @SuppressWarnings({"unchecked", "MethodMayBeStatic"})
     public void onMessage(final Object[] msg) {
-        final DataflowVariable<Object> promise = (DataflowVariable<Object>) msg[1];
-
+        final DataflowWriteChannel<Object> promise = (DataflowWriteChannel<Object>) msg[1];
         promise.leftShift(handleCurrentMessage(msg[0]));
     }
 
@@ -121,37 +142,15 @@ public final class InternalActor extends AbstractLoopingActor {
         if (this.currentThread == Thread.currentThread())
             return handleCurrentMessage(args);
         else {
-            final DataflowVariable<Object> result = new DataflowVariable<Object>();
+            final Promise<Object> result = new DataflowVariable<Object>();
             send(new Object[]{args, result});
-
             return result.get();
         }
     }
 
-    @SuppressWarnings({"unchecked"})
-    private static Object handleCurrentMessage(final Object msg) {
-        try {
-            final Object[] params;
-
-            if (msg instanceof Collection)
-                params = ((Collection<Object>) msg).toArray(new Object[((Collection<Object>) msg).size()]);
-            else
-                params = (Object[]) msg;
-
-            final Object target = params[0];
-            final String methodName = (String) params[1];
-            final Object[] args = params.length > 2 ? Arrays.copyOfRange(params, 2, params.length) : NO_ARGS;
-
-            return InvokerHelper.invokeMethod(target, METHOD_NAME_PREFIX + methodName, args);
-        } catch (Throwable all) {
-            return all;
-        }
-    }
-
     /**
-     * @see groovyx.gpars.activeobject.ActiveObjectASTTransformation.MyClassCodeExpressionTransformer#addActiveMethod(org.codehaus.groovy.ast.FieldNode, org.codehaus.groovy.ast.ClassNode, org.codehaus.groovy.ast.MethodNode, boolean)
      */
-    private DataflowVariable<Object> preProcessReturnValue(final DataflowVariable<Object> actualResult, final Object actorHolder, final String executedMethodName) {
+    private DataflowVariable<Object> preProcessReturnValue(final DataflowReadChannel<Object> actualResult, final Object actorHolder, final String executedMethodName) {
         final DataflowVariable<Object> resultProxy = new DataflowVariable<>();
 
         actualResult.getValAsync(new MessageStream() {
@@ -166,13 +165,11 @@ public final class InternalActor extends AbstractLoopingActor {
                     final Method recoveryMethod = getMethod(holderClass);
 
                     if (recoveryMethod != null) {
-                        Object newVal = null;
                         try {
-                            newVal = recoveryMethod.invoke(actorHolder, executedMethodName, message);
-
+                            final Object newVal = recoveryMethod.invoke(actorHolder, executedMethodName, message);
                             if (!recoveryMethod.getReturnType().equals(Void.class)) // If we can have such new value returned
                                 message = newVal;
-                        } catch (Exception ignored) {
+                        } catch (final Exception ignored) {
                         }
                     }
                 }
@@ -183,18 +180,17 @@ public final class InternalActor extends AbstractLoopingActor {
             }
 
             @Memoized
-            private Method getMethod(Class<?> holderClass) {
+            private Method getMethod(final Class<?> holderClass) {
                 Method recoveryMethod = null;
+                Class<?> currentClass = holderClass;
 
                 try {
-                    recoveryMethod = getMethodHelper(holderClass);
-                }
-                catch (NoSuchMethodException e) {
-                    while ((holderClass = holderClass.getSuperclass()) != null) {
+                    recoveryMethod = getMethodHelper(currentClass);
+                } catch (final NoSuchMethodException e) {
+                    while ((currentClass = currentClass.getSuperclass()) != null) {
                         try {
-                            recoveryMethod = getMethodHelper(holderClass);
-                        }
-                        catch (NoSuchMethodException ignored) {
+                            recoveryMethod = getMethodHelper(currentClass);
+                        } catch (final NoSuchMethodException ignored) {
                         }
                     }
                 }
@@ -205,7 +201,7 @@ public final class InternalActor extends AbstractLoopingActor {
                 return recoveryMethod;
             }
 
-            private Method getMethodHelper(Class<?> holderClass) throws NoSuchMethodException {
+            private Method getMethodHelper(final Class<?> holderClass) throws NoSuchMethodException {
                 return holderClass.getDeclaredMethod(RECOVERY_METHOD_NAME, String.class, Exception.class);
             }
         });
