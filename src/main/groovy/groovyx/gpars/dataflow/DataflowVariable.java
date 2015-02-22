@@ -22,9 +22,7 @@ import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.dataflow.remote.RemoteDataflowVariable;
 import groovyx.gpars.group.PGroup;
-import groovyx.gpars.remote.RemoteHost;
 import groovyx.gpars.scheduler.Pool;
-import groovyx.gpars.serial.RemoteSerialized;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -56,6 +54,7 @@ public class DataflowVariable<T> extends DataflowExpression<T> implements Datafl
      *
      * @param value The value to assign
      */
+    @SuppressWarnings("unchecked")
     @Override
     public DataflowWriteChannel<T> leftShift(final T value) {
         if (value instanceof DataflowReadChannel) bindDFV((DataflowReadChannel<T>) value);

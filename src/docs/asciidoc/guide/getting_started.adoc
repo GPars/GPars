@@ -306,6 +306,7 @@ See "the Breaking Changes listing":http://gpars.codehaus.org/Breaking+Changes fo
 === Actors
 
 * Remote actors
+* Exception propagation from active objects
 
 === Dataflow
 
