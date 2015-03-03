@@ -4,6 +4,9 @@
 Snap-CI [master branch](https://snap-ci.com/GPars/GPars/branch/master): ![Snap-CI status master](https://snap-ci.com/GPars/GPars/branch/master/build_image)
 |  [jdk8 branch](https://snap-ci.com/GPars/GPars/branch/jdk8): ![Snap-CI status jdk8](https://snap-ci.com/GPars/GPars/branch/jdk8/build_image)
 
+Codeship [master branch](https://codeship.com/projects/66218): ![Codeship Status for GPars/GPars](https://codeship.com/projects/e4493e40-a3f5-0132-995a-12052818d981/status?branch=master)
+| jdk8 branch: ![Codeship Status for GPars/GPars](https://codeship.com/projects/e4493e40-a3f5-0132-995a-12052818d981/status?branch=jdk8)
+
 # Introduction
 
 The GPars framework (http://gpars.codehaus.org) offers Java developers intuitive and safe ways to handle
