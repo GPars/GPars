@@ -282,7 +282,7 @@ task zipJavaDemo(type: Zip) {
 
 task zipDist(type: Zip) {
     from jar.outputs.files
-    from(runtimeClasspath){
+    from(sourceSets.main.runtimeClasspath){
         include('netty*', 'multiverse*')
     }
     from('licenses'){
