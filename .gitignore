@@ -6,6 +6,7 @@
 /cobertura.ser
 /buildSrc/.gradle/
 /buildSrc/build/
+/buildSrc/buildSrc.iml
 /*.iws
 /GPars.ipr
 /GPars.iml
