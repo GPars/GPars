@@ -167,8 +167,8 @@ project.tasks.install.repositories.mavenInstaller.pom.with {
     project {
         name 'GPars'
         description ext.description
-        url 'http://gpars.codehaus.org'
-        inceptionYear '2009'
+        url 'http://gpars.github.io'
+        inceptionYear '2008'
         licenses {
             license {
                 name 'The Apache Software License, Version 2.0'
@@ -300,8 +300,8 @@ task zipDist(type: Zip) {
 // TODO: Activate signing to bintray
 // TODO: Activate sync to Maven Central
 bintray {
-    user = project.properties.bintrayUser
-    key = project.properties.bintrayKey
+    user = project.properties.gpars_bintrayUser
+    key = project.properties.gpars_bintrayKey
     publish = false
     dryRun = false
     configurations = ['archives']
@@ -335,7 +335,7 @@ bintray {
 
 bintrayUpload {
     dependsOn build, jarDoc, jarSrc
-    onlyIf{project.properties.bintrayUser && project.properties.bintrayKey && !version.contains('SNAPSHOT')}
+    onlyIf{project.properties.gpars_bintrayUser && project.properties.gpars_bintrayKey && !version.contains('SNAPSHOT')}
 }
 
 artifactory {
@@ -343,14 +343,14 @@ artifactory {
         contextUrl = 'http://oss.jfrog.org'
         repository {
             repoKey = 'oss-snapshot-local'
-            username = project.properties.bintrayUser
-            password = project.properties.bintrayKey
+            username = project.properties.gpars_bintrayUser
+            password = project.properties.gpars_bintrayKey
         }
     }
 }
 
 artifactoryPublish {
-    onlyIf{project.properties.bintrayUser && project.properties.bintrayKey && version.contains('SNAPSHOT')}
+    onlyIf{project.properties.gpars_bintrayUser && project.properties.gpars_bintrayKey && version.contains('SNAPSHOT')}
 }
 
 task release(dependsOn: ['build', 'jarSrc', 'jarDoc', 'zipSamples', 'zipJavaDemo', 'zipDist', 'zipGuide']) << {
