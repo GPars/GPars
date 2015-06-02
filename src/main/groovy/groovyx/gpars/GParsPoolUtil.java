@@ -38,16 +38,12 @@ import groovyx.gpars.util.GeneralTimer;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
-import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.*;
 
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 // TODO: delete
 //import static groovyx.gpars.util.PAGroovyUtils.createCollection;
@@ -360,7 +356,7 @@ public class GParsPoolUtil {
      * </p>
      */
     public static <T> Collection<T> eachParallel(final Collection<T> collection, final Closure cl) {
-      collection.parallelStream().forEach(new ClosureConsumer<T>(cl));
+        collection.parallelStream().forEach(new ClosureConsumer<T>(cl));
         //GParsPoolUtilHelper.eachParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
         return collection;
     }
@@ -410,9 +406,12 @@ public class GParsPoolUtil {
      * Note that the {@code result} variable is synchronized to prevent race conditions between multiple threads.
      * </p>
      */
-    public static <K, V> Map<K, V> eachParallel(final Map<K, V> collection, final Closure cl) {
-        GParsPoolUtilHelper.eachParallelPA(createPA(collection, retrievePool()), buildClosureForMaps(cl));
-        return collection;
+    public static <K, V> Map<K, V> eachParallel(final Map<K, V> collection, final Closure<V> cl) throws ExecutionException, InterruptedException {
+        return retrievePool().submit(() ->
+                collection.entrySet().parallelStream().collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> valueFromClosure(e, cl))))
+                .get();
     }
 
 
@@ -1403,12 +1402,12 @@ public class GParsPoolUtil {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      *
      * @param collection The collection to reduce over.
-     * @param seed A seed value to initialize the operation.
-     * @param cl A binary operation (assumed to be an accumulation) to apply during the reduction.
+     * @param seed       A seed value to initialize the operation.
+     * @param cl         A binary operation (assumed to be an accumulation) to apply during the reduction.
      * @return The value calculated by the reduction.
      */
     public static <T> T injectParallel(final Collection<T> collection, final T seed, final Closure cl) {
-      return collection.parallelStream().reduce(seed, new ClosureReducer<T>(cl));
+        return collection.parallelStream().reduce(seed, new ClosureReducer<T>(cl));
     }
 
 //    /**
@@ -1458,4 +1457,11 @@ public class GParsPoolUtil {
 //    public static ParallelArray getParallelArray(final Object collection) {
 //        return GParsPoolUtilHelper.createPA(collection, retrievePool());
 //    }
+
+    private static <K, V> V valueFromClosure(final Map.Entry<K, V> e, final Closure<V> cl) {
+        if (cl.getMaximumNumberOfParameters() == 2) {
+            return cl.call(e.getKey(), e.getValue());
+        }
+        return cl.call(e);
+    }
 }
