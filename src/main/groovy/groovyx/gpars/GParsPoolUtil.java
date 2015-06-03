@@ -47,7 +47,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.RecursiveTask;
 
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 // TODO: delete
 //import static groovyx.gpars.util.PAGroovyUtils.createCollection;
@@ -65,7 +65,8 @@ import static java.util.Arrays.asList;
  *
  * @author Vaclav Pech
  * @author Robert Fischer
- *         Date: Mar 10, 2010
+ * @author Russel Winder
+ *
  * @see groovyx.gpars.GParsPool
  */
 public class GParsPoolUtil {
@@ -359,8 +360,8 @@ public class GParsPoolUtil {
      * Note that the {@code result} variable is synchronized to prevent race conditions between multiple threads.
      * </p>
      */
-    public static <T> Collection<T> eachParallel(final Collection<T> collection, final Closure cl) {
-      collection.parallelStream().forEach(new ClosureConsumer<T>(cl));
+    public static <T> Collection<T> eachParallel(final Collection<T> collection, final Closure<?> cl) {
+        collection.parallelStream().forEach(new ClosureConsumer<T>(cl));
         //GParsPoolUtilHelper.eachParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
         return collection;
     }
@@ -410,9 +411,12 @@ public class GParsPoolUtil {
      * Note that the {@code result} variable is synchronized to prevent race conditions between multiple threads.
      * </p>
      */
-    public static <K, V> Map<K, V> eachParallel(final Map<K, V> collection, final Closure cl) {
-        GParsPoolUtilHelper.eachParallelPA(createPA(collection, retrievePool()), buildClosureForMaps(cl));
-        return collection;
+    public static <K, V> Map<K, V> eachParallel(final Map<K, V> collection, final Closure<V> cl) {
+        return retrievePool().submit(() ->
+                collection.entrySet().parallelStream().collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> valueFromClosure(e, cl))))
+                .get();
     }
 
 
@@ -437,6 +441,7 @@ public class GParsPoolUtil {
      * </p>
      */
     public static <T> Collection<T> eachWithIndexParallel(final Collection<T> collection, final Closure cl) {
+        /*
         final List<List<Object>> indexedCollection = new ArrayList<List<Object>>();
         int index = 0;
         for (final T element : collection) {
@@ -445,6 +450,7 @@ public class GParsPoolUtil {
         }
         final ParallelArray<List<Object>> paFromCollection = GParsPoolUtilHelper.createPAFromCollection(indexedCollection, retrievePool());
         GParsPoolUtilHelper.eachWithIndex(paFromCollection, cl).all();
+        */
         return collection;
     }
 
@@ -469,7 +475,7 @@ public class GParsPoolUtil {
      * </p>
      */
     public static <T> T eachWithIndexParallel(final T collection, final Closure cl) {
-        eachWithIndexParallel(createCollection(collection), cl);
+        //eachWithIndexParallel(createCollection(collection), cl);
         return collection;
     }
 
@@ -477,7 +483,7 @@ public class GParsPoolUtil {
      * Does parallel eachWithIndex on maps
      */
     public static <K, V> Map<K, V> eachWithIndexParallel(final Map<K, V> collection, final Closure cl) {
-        eachWithIndexParallel(createCollection(collection), buildClosureForMapsWithIndex(cl));
+        //eachWithIndexParallel(createCollection(collection), buildClosureForMapsWithIndex(cl));
         return collection;
     }
 
@@ -497,8 +503,9 @@ public class GParsPoolUtil {
      * }
      * </pre>
      */
-    public static <T> Collection<T> collectParallel(final Collection collection, final Closure<? extends T> cl) {
-        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withMapping(new ClosureMapper(new CallClosure(cl))).all().asList();
+    public static <T> Collection<T> collectParallel(final Collection<? extends T> collection, final Closure<? extends T> cl) {
+        //return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withMapping(new ClosureMapper(new CallClosure(cl))).all().asList();
+        return null;
     }
 
     /**
@@ -518,7 +525,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static <T> Collection<T> collectParallel(final Object collection, final Closure<? extends T> cl) {
-        return GParsPoolUtilHelper.createPA(collection, retrievePool()).withMapping(new ClosureMapper(new CallClosure(cl))).all().asList();
+        //return GParsPoolUtilHelper.createPA(collection, retrievePool()).withMapping(new ClosureMapper(new CallClosure(cl))).all().asList();
+        return null;
     }
 
     /**
@@ -538,7 +546,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static <T> Collection<T> collectParallel(final Map collection, final Closure<? extends T> cl) {
-        return createPA(collection, retrievePool()).withMapping(new ClosureMapper(buildClosureForMaps(cl))).all().asList();
+        //return createPA(collection, retrievePool()).withMapping(new ClosureMapper(buildClosureForMaps(cl))).all().asList();
+        return null;
     }
 
     /**
@@ -560,7 +569,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static <T> List<T> collectManyParallel(final Collection collection, final Closure<Collection<? extends T>> projection) {
-        return (List<T>) GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withMapping(new ClosureMapper(new CallClosure(projection))).reduce(new ClosureReducer(SumClosure.getInstance()), null);
+        //return (List<T>) GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withMapping(new ClosureMapper(new CallClosure(projection))).reduce(new ClosureReducer(SumClosure.getInstance()), null);
+        return null;
     }
 
     /**
@@ -582,7 +592,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static <T> List<T> collectManyParallel(final Object collection, final Closure<Collection<? extends T>> projection) {
-        return (List<T>) GParsPoolUtilHelper.createPA(collection, retrievePool()).withMapping(new ClosureMapper(new CallClosure(projection))).reduce(new ClosureReducer(SumClosure.getInstance()), null);
+        //return (List<T>) GParsPoolUtilHelper.createPA(collection, retrievePool()).withMapping(new ClosureMapper(new CallClosure(projection))).reduce(new ClosureReducer(SumClosure.getInstance()), null);
+        return null;
     }
 
     /**
@@ -604,7 +615,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static <T> List<T> collectManyParallel(final Map collection, final Closure<Collection<? extends T>> projection) {
-        return (List<T>) createPA(collection, retrievePool()).withMapping(new ClosureMapper(buildClosureForMaps(projection))).reduce(new ClosureReducer(SumClosure.getInstance()), null);
+        //return (List<T>) createPA(collection, retrievePool()).withMapping(new ClosureMapper(buildClosureForMaps(projection))).reduce(new ClosureReducer(SumClosure.getInstance()), null);
+        return null;
     }
 
     /**
@@ -624,7 +636,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static <T> Collection<T> findAllParallel(final Collection<T> collection, final Closure cl) {
-        return GParsPoolUtilHelper.findAllParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
+        //return GParsPoolUtilHelper.findAllParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
+        return null;
     }
 
     /**
@@ -644,7 +657,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static Collection<Object> findAllParallel(final Object collection, final Closure cl) {
-        return (Collection<Object>) GParsPoolUtilHelper.findAllParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), cl);
+        //return (Collection<Object>) GParsPoolUtilHelper.findAllParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), cl);
+        return null;
     }
 
     /**
@@ -664,7 +678,8 @@ public class GParsPoolUtil {
      * </code>
      */
     public static <K, V> Map<K, V> findAllParallel(final Map<K, V> collection, final Closure cl) {
-        return buildResultMap(GParsPoolUtilHelper.findAllParallelPA(createPA(collection, retrievePool()), buildClosureForMaps(cl)));
+        //return buildResultMap(GParsPoolUtilHelper.findAllParallelPA(createPA(collection, retrievePool()), buildClosureForMaps(cl)));
+        return null;
     }
 
     /**
@@ -685,7 +700,8 @@ public class GParsPoolUtil {
      */
     @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T findParallel(final Collection<T> collection, final Closure cl) {
-        return GParsPoolUtilHelper.findParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
+        //return GParsPoolUtilHelper.findParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
+        return null;
     }
 
     /**
@@ -705,7 +721,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static Object findParallel(final Object collection, final Closure cl) {
-        return GParsPoolUtilHelper.findParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), cl);
+        //return GParsPoolUtilHelper.findParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), cl);
+        return null;
     }
 
     /**
@@ -725,7 +742,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static <K, V> Map.Entry<K, V> findParallel(final Map<K, V> collection, final Closure cl) {
-        return GParsPoolUtilHelper.findParallelPA(createPA(collection, retrievePool()), buildClosureForMaps(cl));
+        //return GParsPoolUtilHelper.findParallelPA(createPA(collection, retrievePool()), buildClosureForMaps(cl));
+        return null;
     }
 
     /**
@@ -748,7 +766,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static <T> T findAnyParallel(final Collection<T> collection, final Closure cl) {
-        return GParsPoolUtilHelper.findAnyParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
+        //return GParsPoolUtilHelper.findAnyParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
+        return null;
     }
 
     /**
@@ -771,7 +790,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static Object findAnyParallel(final Object collection, final Closure cl) {
-        return GParsPoolUtilHelper.findAnyParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), cl);
+        //return GParsPoolUtilHelper.findAnyParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), cl);
+        return null;
     }
 
     /**
@@ -794,7 +814,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static <K, V> Map.Entry<K, V> findAnyParallel(final Map<K, V> collection, final Closure cl) {
-        return GParsPoolUtilHelper.findAnyParallelPA(createPA(collection, retrievePool()), buildClosureForMaps(cl));
+        //return GParsPoolUtilHelper.findAnyParallelPA(createPA(collection, retrievePool()), buildClosureForMaps(cl));
+        return null;
     }
 
     /**
@@ -814,7 +835,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static <T> Collection<T> grepParallel(final Collection<T> collection, final Object filter) {
-        return GParsPoolUtilHelper.grepParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), filter);
+        //return GParsPoolUtilHelper.grepParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), filter);
+        return null;
     }
 
     /**
@@ -834,7 +856,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static Object grepParallel(final Object collection, final Object filter) {
-        return (Collection<Object>) GParsPoolUtilHelper.grepParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), filter);
+        //return (Collection<Object>) GParsPoolUtilHelper.grepParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), filter);
+        return null;
     }
 
     /**
@@ -854,7 +877,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static <K, V> Map<K, V> grepParallel(final Map<K, V> collection, final Object filter) {
-        return buildResultMap(GParsPoolUtilHelper.grepParallelPA(createPA(collection, retrievePool()), filter instanceof Closure ? buildClosureForMaps((Closure<Object>) filter) : filter));
+        //return buildResultMap(GParsPoolUtilHelper.grepParallelPA(createPA(collection, retrievePool()), filter instanceof Closure ? buildClosureForMaps((Closure<Object>) filter) : filter));
+        return null;
     }
 
     /**
@@ -890,8 +914,11 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static Object splitParallel(final Object collection, final Object filter) {
+        /*
         final Map groups = groupByParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), (Closure) filter);
         return asList(groups.containsKey(Boolean.TRUE) ? groups.get(Boolean.TRUE) : new ArrayList<Object>(), groups.containsKey(Boolean.FALSE) ? groups.get(Boolean.FALSE) : new ArrayList<Object>());
+        */
+        return null;
     }
 
     /**
@@ -911,12 +938,15 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static int countParallel(final Collection collection, final Object filter) {
+        /*
         return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withFilter(new Ops.Predicate<Object>() {
             @Override
             public boolean op(final Object o) {
                 return filter.equals(o);
             }
         }).size();
+        */
+        return 0;
     }
 
     /**
@@ -936,12 +966,15 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static int countParallel(final Object collection, final Object filter) {
+        /*
         return GParsPoolUtilHelper.createPA(collection, retrievePool()).withFilter(new Ops.Predicate<Object>() {
             @Override
             public boolean op(final Object o) {
                 return filter.equals(o);
             }
         }).size();
+        */
+        return 0;
     }
 
     /**
@@ -962,7 +995,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static int countParallel(final Collection collection, final Closure filter) {
-        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withFilter(new ClosurePredicate(filter)).size();
+        //return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withFilter(new ClosurePredicate(filter)).size();
+        return 0;
     }
 
     /**
@@ -983,7 +1017,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static int countParallel(final Object collection, final Closure filter) {
-        return GParsPoolUtilHelper.createPA(collection, retrievePool()).withFilter(new ClosurePredicate(filter)).size();
+        //return GParsPoolUtilHelper.createPA(collection, retrievePool()).withFilter(new ClosurePredicate(filter)).size();
+        return 0;
     }
 
     /**
@@ -1006,7 +1041,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static boolean anyParallel(final Collection collection, final Closure cl) {
-        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withFilter(new ClosurePredicate(cl)).any() != null;
+        //return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withFilter(new ClosurePredicate(cl)).any() != null;
+        return false;
     }
 
     /**
@@ -1029,7 +1065,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static boolean anyParallel(final Object collection, final Closure cl) {
-        return GParsPoolUtilHelper.createPA(collection, retrievePool()).withFilter(new ClosurePredicate(cl)).any() != null;
+        //return GParsPoolUtilHelper.createPA(collection, retrievePool()).withFilter(new ClosurePredicate(cl)).any() != null;
+        return false;
     }
 
     /**
@@ -1052,8 +1089,11 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static boolean anyParallel(final Map collection, final Closure cl) {
+        /*
         final Closure mapClosure = buildClosureForMaps(cl);
         return createPA(collection, retrievePool()).withFilter(new ClosurePredicate(mapClosure)).any() != null;
+        */
+        return false;
     }
 
     /**
@@ -1074,7 +1114,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static boolean everyParallel(final Collection collection, final Closure cl) {
-        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withFilter(new ClosureNegationPredicate(cl)).any() == null;
+        //return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withFilter(new ClosureNegationPredicate(cl)).any() == null;
+        return false;
     }
 
     /**
@@ -1095,7 +1136,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static boolean everyParallel(final Object collection, final Closure cl) {
-        return GParsPoolUtilHelper.createPA(collection, retrievePool()).withFilter(new ClosureNegationPredicate(cl)).any() == null;
+        //return GParsPoolUtilHelper.createPA(collection, retrievePool()).withFilter(new ClosureNegationPredicate(cl)).any() == null;
+        return false;
     }
 
     /**
@@ -1116,8 +1158,11 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static boolean everyParallel(final Map collection, final Closure cl) {
+        /*
         final Closure mapClosure = buildClosureForMaps(cl);
         return createPA(collection, retrievePool()).withFilter(new ClosureNegationPredicate(mapClosure)).any() == null;
+        */
+        return false;
     }
 
     /**
@@ -1137,7 +1182,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static <K, T> Map<K, List<T>> groupByParallel(final Collection<T> collection, final Closure<K> cl) {
-        return groupByParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
+        //return groupByParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
+        return null;
     }
 
     /**
@@ -1157,7 +1203,8 @@ public class GParsPoolUtil {
      * </pre>
      */
     public static <K> Map<K, List<Object>> groupByParallel(final Object collection, final Closure<K> cl) {
-        return groupByParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), cl);
+        //return groupByParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), cl);
+        return null;
     }
 
 //    private static <K, T> Map<K, List<T>> groupByParallelPA(final ParallelArray<T> pa, final Closure<K> cl) {
@@ -1182,7 +1229,8 @@ public class GParsPoolUtil {
      */
     @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T minParallel(final Collection<T> collection, final Closure cl) {
-        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).min((Comparator<T>) createComparator(cl));
+        //return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).min((Comparator<T>) createComparator(cl));
+        return null;
     }
 
     /**
@@ -1199,7 +1247,8 @@ public class GParsPoolUtil {
      * @param cl A one or two-argument closure
      */
     public static Object minParallel(final Object collection, final Closure cl) {
-        return GParsPoolUtilHelper.createPA(collection, retrievePool()).min(createComparator(cl));
+        //return GParsPoolUtilHelper.createPA(collection, retrievePool()).min(createComparator(cl));
+        return null;
     }
 
     /**
@@ -1211,7 +1260,8 @@ public class GParsPoolUtil {
      */
     @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T minParallel(final Collection<T> collection) {
-        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).min();
+        //return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).min();
+        return null;
     }
 
     /**
@@ -1222,7 +1272,8 @@ public class GParsPoolUtil {
      * have a new {@code min(Closure cl)} method, which delegates to the {@code GParsPoolUtil} class.
      */
     public static Object minParallel(final Object collection) {
-        return GParsPoolUtilHelper.createPA(collection, retrievePool()).min();
+        //return GParsPoolUtilHelper.createPA(collection, retrievePool()).min();
+        return null;
     }
 
     /**
@@ -1240,7 +1291,8 @@ public class GParsPoolUtil {
      */
     @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T maxParallel(final Collection<T> collection, final Closure cl) {
-        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).max((Comparator<T>) createComparator(cl));
+        //return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).max((Comparator<T>) createComparator(cl));
+        return null;
     }
 
     /**
@@ -1257,7 +1309,8 @@ public class GParsPoolUtil {
      * @param cl A one or two-argument closure
      */
     public static Object maxParallel(final Object collection, final Closure cl) {
-        return GParsPoolUtilHelper.createPA(collection, retrievePool()).max(createComparator(cl));
+        //return GParsPoolUtilHelper.createPA(collection, retrievePool()).max(createComparator(cl));
+        return null;
     }
 
     /**
@@ -1269,7 +1322,8 @@ public class GParsPoolUtil {
      */
     @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T maxParallel(final Collection<T> collection) {
-        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).max();
+        //return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).max();
+        return null;
     }
 
     /**
@@ -1280,7 +1334,8 @@ public class GParsPoolUtil {
      * have a new {@code max(Closure cl)} method, which delegates to the {@code GParsPoolUtil} class.
      */
     public static Object maxParallel(final Object collection) {
-        return GParsPoolUtilHelper.createPA(collection, retrievePool()).max();
+        //return GParsPoolUtilHelper.createPA(collection, retrievePool()).max();
+        return null;
     }
 
     /**
@@ -1292,7 +1347,8 @@ public class GParsPoolUtil {
      * have a new {@code sun(Closure cl)} method, which delegates to the {@code GParsPoolUtil} class.
      */
     public static <T> T sumParallel(final Collection<T> collection) {
-        return foldParallel(collection, SumClosure.getInstance());
+        //return foldParallel(collection, SumClosure.getInstance());
+        return null;
     }
 
     /**
@@ -1304,7 +1360,8 @@ public class GParsPoolUtil {
      * have a new {@code sum(Closure cl)} method, which delegates to the {@code GParsPoolUtil} class.
      */
     public static Object sumParallel(final Object collection) {
-        return foldParallel(collection, SumClosure.getInstance());
+        //return foldParallel(collection, SumClosure.getInstance());
+        return null;
     }
 
 //    /**
@@ -1379,7 +1436,8 @@ public class GParsPoolUtil {
      */
     @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T injectParallel(final Collection<T> collection, final Closure cl) {
-        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).reduce(new ClosureReducer<T>(cl), null);
+        //return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).reduce(new ClosureReducer<T>(cl), null);
+        return null;
     }
 
 //    /**
@@ -1408,7 +1466,7 @@ public class GParsPoolUtil {
      * @return The value calculated by the reduction.
      */
     public static <T> T injectParallel(final Collection<T> collection, final T seed, final Closure cl) {
-      return collection.parallelStream().reduce(seed, new ClosureReducer<T>(cl));
+        return collection.parallelStream().reduce(seed, new ClosureReducer<T>(cl));
     }
 
 //    /**
@@ -1458,4 +1516,13 @@ public class GParsPoolUtil {
 //    public static ParallelArray getParallelArray(final Object collection) {
 //        return GParsPoolUtilHelper.createPA(collection, retrievePool());
 //    }
+
+
+    private static <K, V> V valueFromClosure(final Map.Entry<K, V> e, final Closure<V> cl) {
+        if (cl.getMaximumNumberOfParameters() == 2) {
+            return cl.call(e.getKey(), e.getValue());
+        }
+        return cl.call(e);
+    }
+
 }
