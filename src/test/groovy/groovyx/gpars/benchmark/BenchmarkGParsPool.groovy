@@ -58,7 +58,7 @@ withExistingPool(pool) {
     println GParsPoolUtil.sumParallel(nums)
     println GParsPoolUtil.getParallel(nums).sum()
     println GParsPoolUtil.getParallel(nums).sum()
-    println ParallelArray.createFromCopy(nums.toArray(new Long[nums.size()]), pool).reduce({ a, b -> a + b } as Reducer, null)
+//    println ParallelArray.createFromCopy(nums.toArray(new Long[nums.size()]), pool).reduce({ a, b -> a + b } as Reducer, null)
 //    println ParallelArray.createFromCopy(nums, pool).reduce({a, b -> a + b} as Reducer, null)
 }
 
@@ -122,7 +122,7 @@ println "parallel summing numbers inside a withPool using PA directly"
 start = System.currentTimeMillis()
 def pnums = ParallelArray.createFromCopy(nums.toArray(new Long[nums.size()]), pool)
 //def pnums = ParallelArray.createFromCopy(nums, pool)
-println pnums.reduce({ a, b -> a + b } as Reducer, null)
+//println pnums.reduce({ a, b -> a + b } as Reducer, null)
 println "time: ${System.currentTimeMillis() - start}ms"
 
 sleep 2000

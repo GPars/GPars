@@ -38,6 +38,25 @@ public class GParsPoolUtilTest extends GroovyTestCase {
         }
     }
 
+    public void testEachResult() {
+        groovyx.gpars.GParsPool.withPool(5) {
+            def result = GParsPoolUtil.eachParallel([1, 2, 3, 4, 5], { it * 2 })
+            assert result == [2, 4, 6, 8, 10]
+        }
+    }
+
+    public void testEachWithMap() {
+        groovyx.gpars.GParsPool.withPool(5) {
+            final AtomicInteger result = new AtomicInteger(0)
+            final Map map = [one: 1, two: 2, three: 3, four: 4, five: 5]
+            GParsPoolUtil.eachParallel(map, { result.addAndGet(it.value) })
+            assert 15 == result
+            result.set(0)
+            GParsPoolUtil.eachParallel(map, { key, value -> result.addAndGet(value) })
+            assert 15 == result
+        }
+    }
+
     public void testEachWithIndex() {
         groovyx.gpars.GParsPool.withPool(5) {
             final AtomicInteger result = new AtomicInteger(0)
