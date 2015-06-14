@@ -42,10 +42,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
-import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.*;
 
 import java.util.stream.Collectors;
 
@@ -360,10 +357,13 @@ public class GParsPoolUtil {
      * Note that the {@code result} variable is synchronized to prevent race conditions between multiple threads.
      * </p>
      */
-    public static <T> Collection<T> eachParallel(final Collection<T> collection, final Closure<?> cl) {
-        collection.parallelStream().forEach(new ClosureConsumer<T>(cl));
+    public static <T> Collection eachParallel(final Collection<T> collection, final Closure<?> cl) throws ExecutionException, InterruptedException {
+        return retrievePool().submit(() ->
+                collection.parallelStream().map(cl::call).collect(Collectors.toList())
+        ).get();
+        //collection.parallelStream().forEach(new ClosureConsumer<T>(cl));
         //GParsPoolUtilHelper.eachParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
-        return collection;
+        //return collection;
     }
 
 //    /**
@@ -411,12 +411,13 @@ public class GParsPoolUtil {
      * Note that the {@code result} variable is synchronized to prevent race conditions between multiple threads.
      * </p>
      */
-    public static <K, V> Map<K, V> eachParallel(final Map<K, V> collection, final Closure<V> cl) {
+    public static <K, V> Map<K, V> eachParallel(final Map<K, V> collection, final Closure<V> cl)
+            throws ExecutionException, InterruptedException {
         return retrievePool().submit(() ->
                 collection.entrySet().parallelStream().collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        e -> valueFromClosure(e, cl))))
-                .get();
+                        e -> valueFromClosure(e, cl)))
+        ).get();
     }
 
 
