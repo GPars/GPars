@@ -358,8 +358,8 @@ public class GParsPoolUtil {
      * </p>
      */
     public static <T> Collection eachParallel(final Collection<T> collection, final Closure<?> cl) throws ExecutionException, InterruptedException {
-        return retrievePool().submit(() ->
-                collection.parallelStream().map(cl::call).collect(Collectors.toList())
+        return (Collection)retrievePool().submit(() ->
+                collection.parallelStream().map((item) -> (Object)cl.call(item)).collect(Collectors.toList())
         ).get();
         //collection.parallelStream().forEach(new ClosureConsumer<T>(cl));
         //GParsPoolUtilHelper.eachParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
