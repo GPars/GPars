@@ -4,8 +4,7 @@
 Software Transactional Memory (STM) gives developers transactional semantics for accessing in-memory
 data. When multiple threads share data in memory, by marking blocks of code as transactional (atomic) the
 developer delegates the responsibility for data consistency to the STM engine.  GPars leverages the
-Multiverse STM engine. Check out more details on the transactional engine at the
-http://multiverse.codehaus.org/overview.html[Multiverse site]
+https://github.com/pveentjer/Multiverse[Multiverse STM engine].
 
 == Running a piece of code atomically
 
@@ -123,6 +122,8 @@ You typically create these through the factory methods of the _org.multiverse.ap
 
 == More information
 
-We decided not to duplicate the information that is already available on the Multiverse website. Please
-visit the http://multiverse.codehaus.org/overview.html[Multiverse site] and use it as a reference for your
-further STM adventures with GPars.
+We decided not to duplicate the information that was already available on the Multiverse website.
+Unfortunately with the closure of Codehaus, that website is longer available. You may try to
+decipher more information from the https://github.com/pveentjer/Multiverse[Multiverse source code].
+As we are unclear about the future of the Multiverse project, we are considering using a different
+STM implementation in a future GParse 2.0.
