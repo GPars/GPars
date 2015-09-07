@@ -41,6 +41,7 @@ plugins {
 
 apply plugin: 'groovy'
 apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'osgi'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
@@ -296,6 +297,34 @@ task zipDist(type: Zip) {
     appendix = 'all'
 }
 
+publishing {
+    publications {
+        gParsPublish(MavenPublication) {
+            artifactId 'gpars'
+            from components.java
+
+            artifact jarDoc {
+                classifier = 'javadoc'
+            }
+            artifact jarSrc {
+                classifier = 'sources'
+            }
+            artifact zipGuide {
+                classifier = 'guide'
+            }
+            artifact zipSamples {
+                classifier = 'samples'
+            }
+            artifact zipJavaDemo {
+                classifier = 'mvn-java-demo'
+            }
+            artifact zipDist {
+                classifier = 'all'
+            }
+        }
+    }
+}
+
 // TODO: What is the bintray organisation (will it be part of groovy)
 // TODO: Activate signing to bintray
 // TODO: Activate sync to Maven Central
@@ -350,6 +379,8 @@ artifactory {
 }
 
 artifactoryPublish {
+    dependsOn 'generatePomFileForGParsPublishPublication'
+    publications(publishing.publications.gParsPublish)
     onlyIf{project.properties.gpars_bintrayUser && project.properties.gpars_bintrayKey && version.contains('SNAPSHOT')}
 }
 
@@ -358,7 +389,7 @@ task release(dependsOn: ['build', 'jarSrc', 'jarDoc', 'zipSamples', 'zipJavaDemo
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.4'
+    gradleVersion = '2.6'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
