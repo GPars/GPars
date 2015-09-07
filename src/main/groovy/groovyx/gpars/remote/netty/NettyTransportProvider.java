@@ -48,7 +48,7 @@ public class NettyTransportProvider {
      * @param port the destination port
      * @param localHost the serialization context for connection
      * @param listener the action performed on connect
-     * @return new instance of {@link groovyx.gpars.remote.netty.NettyClient}
+     * @return new instance of {@link NettyClient}
      */
     public static NettyClient createClient(String host, int port, LocalHost localHost, ConnectListener listener) {
         return new NettyClient(localHost, host, port, listener);

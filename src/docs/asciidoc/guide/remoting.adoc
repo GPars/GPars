@@ -1,0 +1,269 @@
+
+= Remoting
+
+Concepts like Actors, Dataflows and Agents are not restricted just to single VM,
+where they provide an abstraction layer for concurrent programming
+that allows to separate logic from low level synchronization code.
+These concepts can be easly extended to multiple nodes in a network.
+Following chapter describes remoting in GPars.
+
+*Remark*: Remoting for GPars was a _Google Summer of Code 2014_ project.
+
+== Introduction
+
+To use Actors, Dataflows or Agent remotely a new remote proxy object was introduced (with _Remote_ prefix).
+The proxy object usually has the same interface as its local counterpart,
+which allows to use it in place of local counterpart.
+Under the hood proxy object just sends messages over a wire to original instance.
+To transport messages across the network http://netty.io[Netty] library was used.
+To create a proxy-object instance serialization mechanism is used (more in <<remote-serialization>>).
+
+General scheme of using remote is as follows (details can be found in section below):
+
+At _host A_:
+
+. Create remoting context and start a server to handle incomming requests.
+. Publish an instance under specified _name_
+
+At _host B_:
+
+. Create remoting context
+. Ask for an instance with specified _name_ from _hostA:port_. A promise is returned.
+. Get a proxy object from the promise.
+
+*Note*: At this moment a new connection is created for each request.
+
+[#remote-serialization]
+=== Serialization
+
+Following mechanism was used to create proxy objects:
+
+_object_ <-(serialization)-> _handle_ ---- [network] ---- _handle_ <-(serialization)-> _proxy-object_
+
+One of the main advantages of this mechanism is
+that sending proxy-object reference back is deserialized to original instance.
+
+As all messages are seralized before sending over a wire,
+they must implement _Serializable_ interface.
+This is a consequence of using build-in Java serialization mechanism and Netty's _ObjectDecoder/ObjectEncoder_.
+On the other hand it gives a flexibility to send any custom object as a message to Actor
+or to use DataflowVariable(s) of any type.
+
+== Dataflows
+
+In order to use remoting for Dataflows, a context (_RemoteDataflows_ class) has to be created.
+Within this context dataflows can be published and retrieved from remote hosts.
+
+[source,groovy]
+----
+def remoteDataflows = RemoteDataflows.create()
+----
+
+*Note*: In all subsections we assume that context is already created as shown above.
+
+After creating context, if you want to allow other hosts to retrieve published dataflows,
+you need to start a server. You need to provied address and port to listen on (eq. _localhost_:11222,
+10.0.0.123:11333).
+
+[source,groovy]
+----
+remoteDataflows.startServer HOST PORT
+----
+
+To stop the server, there is _stopServer()_ method. Note that both method are asynchronous,
+they don't block - server is started/stopped in background.
+Multiple execution of these methods or executing them in wrong order results in exception.
+
+*Remark*: To only retrieve instances from remote hosts starting a server is not necessary.
+
+=== DataflowVariable
+
+DataflowVariable is a core part of Dataflows subsystem that received remoting abilities.
+Other structures(?) and subsystems depend on it.
+
+Publishing a variable within context is done simply by:
+
+[source,groovy]
+----
+def variable = new DataflowVariable()
+remoteDataflows.publish variable "my-first-variable"
+----
+
+It registers the variable under given name, so when a request for variable with name _my-first-variable_ comes,
+variable can be sent to remote host.
+It's important to remember, that publishing another variable under the same name,
+will override the provious one and subsequent requests will send newly published one.
+
+Retrieving of a variable is done by:
+
+[source,groovy]
+----
+def remoteVariablePromise = remoteDataflows.getVariable HOST, PORT, "my-first-variable"
+def remoteVariable = remoteVariablePromise.get()
+----
+
+The _getVariable_ method is non-blocking and returns promise, that will eventually hold a proxy object to variable.
+This proxy has the same interface as DataflowVariable and can be used seemlessly as regular variable.
+
+To explore a full example see: _groovyx.gpars.samples.remote.dataflow.variable_
+
+=== DataflowBroadcast
+
+It's possible to subscribe to DataflowBroadcast on remote host.
+To do this, one had to publish it first (assuming that context is already created):
+
+[source,groovy]
+----
+def stream = new DataflowBroadcast()
+remoteDataflows.publish stream "my-first-broadcast"
+----
+
+Then on other host it can be retrieved:
+
+[source,groovy]
+----
+def readChannelPromise = remoteDataflows.getReadChannel HOST, PORT, "my-first-broadcast"
+def readChannel = readChannelPromise.get()
+----
+
+Obtainted proxy object has the same interface as ReadChannel
+and can be used in same fashion as ReadChannel of regular DataflowBroadcast.
+
+To explore a full example see: _groovyx.gpars.samples.remote.dataflow.broadcast_
+
+=== DataflowQueue
+
+DataflowQueue received similar functionality. It can be published:
+
+[source,groovy]
+----
+def queue = new DataflowQueue()
+remoteDataflows.publish queue, "my-first-queue"
+----
+
+and in similar way retrieved on remote host:
+
+[source,groovy]
+----
+def queuePromise = remoteDataflows.getQueue HOST, PORT, "my-first-queue"
+def queue = queuePromise.get()
+----
+
+New items can be pushed into remote proxy of queue.
+Such elements are sent over a wire to original instance and pushed into it.
+Retrieval sends a request for an element to original instance.
+Conceptually remote proxy is an interface -
+it just sends request to original instance.
+
+To explore a full example see:
+_groovyx.gpars.samples.remote.dataflow.queue_ or _groovyx.gpars.samples.remote.dataflow.queuebalancer_
+
+== Actors
+
+Remote Actors subsystem is designed in similar way.
+To start, a context (_RemoteActors_ class) has to be created.
+Within the context Actors instances can be published or retrieved from remote hosts.
+
+[source,groovy]
+----
+def remoteActors = RemoteActors.create()
+----
+
+Publishing:
+
+[source, groovy]
+----
+def actor = ...
+remoteActors.publish actor, "actor-name"
+----
+
+Retrieval:
+
+[source,groovy]
+----
+def actorPromise = remoteActors.get HOST, PORT, "actor-name"
+def remoteActor = actorPromise.get()
+----
+
+It is possible to join on remote Actor, this will block until original Actor ends its work.
+Sending replies and _sendAndWait_ are supported as well.
+
+One can send any object as a message to Actor, but keep in mind it has to be _Serializable_.
+
+See example: _groovyx.gpars.samples.remote.actor_
+
+=== Remote Actor Names
+
+A context (_RemoteActors_ class) may be represented by a name.
+To create one with a name use:
+
+[source,groovy]
+----
+def remoteActors = RemoteActors.create "test-group-1"
+----
+
+Actors published withing this context may be accessed by providing a special actor URL.
+For example: publishing an actor under name "actor" within this context makes it accessible under URL
+"test-group-1/actor".
+
+[source,groovy]
+----
+def actor = remoteActors.get "test-group-1/actor"
+----
+
+Host and port of an instance holding this actor is determined automatically.
+Invoking _get_ method sends a broadcast (to _255.255.255.255_) with a query
+for an actor with specified name within a context with specified name.
+Matching instance responds to that query with necessary information (host and port).
+
+.Allowed actor and context names
+[NOTE]
+As the URL contains "/" (backslash) as separator between context and actor name,
+it is not allowed to use backslashes in actor name.
+Context name can contain any UTF characters though.
+
+== Agents
+
+Remote Agents system is designed in similar fashion.
+To begin, a context (_RemoteAgents_ class) has to be created.
+Within the context Agents can be published or retrieved from remote hosts.
+
+[source,groovy]
+----
+def remoteAgents = RemoteAgents.create()
+----
+
+Publishing:
+
+[source,groovy]
+----
+def agent = ...
+remoteAgents.publish agent, "agent-name"
+----
+
+Retrieval:
+
+[source,groovy]
+----
+def agentPromise = remoteAgents.get HOST, PORT, "agent-name"
+def remoteAgent = agentPromise.get()
+----
+
+There are two ways of executing closures used to update state of remote Agent instance:
+
+* _remote_ - closure is serialized and sent to original instance and executed in that context
+* _local_ - current state is retrieved and closure is executed where the update originated,
+then updated value is sent to original instance.
+Concurrent changes to Agent wait until this process ends.
+
+By default remote Agent uses _remote_ execution policy.
+Changing it is possible in following way:
+
+[source,groovy]
+----
+def agentPromise = remoteAgents.get HOST, PORT, "agent"
+def remoteAgent =  agentPromise.get()
+remoteAgent.executionPolicy = AgentClosureExecutionPolicy.LOCAL
+----
+
+See example: _groovyx.gpars.samples.remote.agent_

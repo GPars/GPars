@@ -49,12 +49,11 @@ class RemoteDataflowsDataflowVariableTest extends Specification {
 
     def "retrieving DataflowVariable from remote host returns Promise"() {
         setup:
-        def HOST = "localhost"
         def PORT = 9020
         def varName = "test-variable"
 
         when:
-        def varFuture = remoteDataflows.getVariable HOST, PORT, varName
+        def varFuture = remoteDataflows.getVariable getHostAddress(), PORT, varName
 
         then:
         varFuture != null
@@ -63,16 +62,19 @@ class RemoteDataflowsDataflowVariableTest extends Specification {
 
     def "retrieving DataflowVariable from remote host returns the same Promise"() {
         setup:
-        def HOST = "localhost"
         def PORT = 9020
         def varName = "test-variable"
 
         when:
-        def varFuture1 = remoteDataflows.getVariable HOST, PORT, varName
-        def varFuture2 = remoteDataflows.getVariable HOST, PORT, varName
+        def varFuture1 = remoteDataflows.getVariable getHostAddress(), PORT, varName
+        def varFuture2 = remoteDataflows.getVariable getHostAddress(), PORT, varName
 
         then:
         varFuture1.is(varFuture2)
+    }
+
+    String getHostAddress() {
+        InetAddress.getLocalHost().getHostAddress()
     }
 
 }

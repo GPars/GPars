@@ -1,0 +1,574 @@
+
+= Getting Started
+
+Let's set out a few assumptions before we get started:
+
+* You know and use Groovy and Java: otherwise you'd not be investing your valuable time studying a
+  concurrency and parallelism library for Groovy and Java.
+* You definitely want to write your codes employing concurrency and parallelism using Groovy and Java.
+* If you are not using Groovy for your code, you are prepared to pay the inevitable verbosity tax of using
+  Java.
+* You target multi-core hardware with your code.
+* You appreciate that in concurrent and parallel code things can happen at any time, in any order, and more
+  likely with than one thing happening at once.
+
+With those assumptions in place, we get started.
+
+It's becoming more and more obvious that dealing with concurrency and parallelism at the
+thread/synchronized/lock level, as provided by the JVM, is far too low a level to be safe and comfortable.
+Many high-level concepts, such as actors and dataflow have been around for quite some time: parallel
+computers have been in use, at least in data centres if not on the desktop, long before multi-core chips hit
+the hardware mainstream. Now then is the time to adopt these higher-level abstractions in the mainstream
+software industry.  This is what *GPars* enables for the Groovy and Java languages, allowing Groovy and Java
+programmers to use higher-level abstractions and therefore make developing concurrent and parallel software
+easier and less error prone.
+
+The concepts available in *GPars* can be categorized into three groups:
+
+* _Code-level helpers_ Constructs that can be applied to small parts of the code-base such as individual
+  algorithms or data structures without any major changes in the overall project architecture
+** Parallel Collections
+** Asynchronous Processing
+** Fork/Join (Divide/Conquer)
+
+* _Architecture-level concepts_ Constructs that need to be taken into account when designing the project
+  structure
+** Actors
+** Communicating Sequential Processes (CSP)
+** Dataflow
+** Data Parallelism
+
+* _Shared Mutable State Protection_ Although about 95% of current use of shared mutable state can be avoided
+  using proper abstractions, good abstractions are still necessary for the remaining 5% use cases, when
+  shared mutable state cannot be avoided
+** Agents
+** Software Transactional Memory (not fully implemented in GPars as yet)
+
+== Downloading and Installing
+
+GPars is now distributed as standard with Groovy.  So if you have a Groovy installation, you should have
+GPars already.  The exact version of GPars you have will, of course, depend of which version of Groovy.  If
+you don't already have GPars, and you do have Groovy, then perhaps you should upgrade your Groovy!
+
+If you do not have a Groovy installation, but get Groovy by using dependencies or just having the groovy-all
+artifact, then you will need to get GPars.  Also if you want to use a version of GPars different from the
+one with Groovy, or have an old GPars-less Groovy you cannot upgrade, you will need to get GPars.  The ways
+of getting GPars are:
+
+* Download the artifact from a repository and add it and all the transitive dependencies manually.
+* Specify a dependency in Gradle, Maven, or Ivy (or Gant, or Ant) build files.
+* Use Grapes (especially useful for Groovy scripts).
+
+If you're building a Grails or a Griffon application, you can use the appropriate plugins to fetch the jar
+files for you.
+
+=== The GPars Artifact
+
+As noted above GPars is now distributed as standard with Groovy.  If however, you have to manage this
+dependency manually, the GPars artifact is in the main Maven repository and in the Codehaus main and
+snapshots repositories.  The released versions are in the Maven and Codehaus main repositories,
+the current development version (SNAPSHOT) is in the Codehaus snapshots repository.  To use from Gradle
+or Grapes use the specification:
+----
+"org.codehaus.gpars:gpars:1.3.0"
+----
+for the release version, and:
+----
+"org.codehaus.gpars:gpars:1.4-SNAPSHOT"
+----
+for the development version.  You will likely need to add the Codehaus snapshots repository manually to the
+search list in this latter case.  Using Maven the dependency is:
+----
+<dependency>
+    <groupId>org.codehaus.gpars</groupId>
+    <artifactId>gpars</artifactId>
+    <version>1.3.0</version>
+</dependency>
+----
+or version 1.4-SNAPSHOT if using the latest snapshot.
+
+=== Transitive Dependencies
+
+GPars as a library depends on Groovy version equal to or greater than 2.3. Also, the Fork/Join concurrency
+library must be available. This comes as standard with Java 7.
+
+GPars 2.x will depend on Java 8 and will only be usable with Groovy 3.0 and later.
+
+Please visit the page http://gpars.codehaus.org/Integration[Integration] on the GPars website for more
+details.
+
+== A Hello World Example
+
+Once you are setup, try the following Groovy script to test that your setup is functioning as it should.
+----
+import static groovyx.gpars.actor.Actors.actor
+
+/**
+ * A demo showing two cooperating actors. The decryptor decrypts received messages
+ * and replies them back.  The console actor sends a message to decrypt, prints out
+ * the reply and terminates both actors.  The main thread waits on both actors to
+ * finish using the join() method to prevent premature exit, since both actors use
+ * the default actor group, which uses a daemon thread pool.
+ * @author Dierk Koenig, Vaclav Pech
+ */
+
+def decryptor = actor {
+    loop {
+        react { message ->
+            if (message instanceof String) reply message.reverse()
+            else stop()
+        }
+    }
+}
+
+def console = actor {
+    decryptor.send 'lellarap si yvoorG'
+    react {
+        println 'Decrypted message: ' + it
+        decryptor.send false
+    }
+}
+
+[decryptor, console]*.join()
+----
+You should get a message "Decrypted message: Groovy is parallel" printed out on the console when you run the code.
+
+.Java API
+****
+GPars has been designed primarily for use with the Groovy programming language.  Of course all Java and
+Groovy programs are just bytecodes running on the JVM, so GPars can be used with Java source.  Despite being
+aimed at Groovy code use, the solid technical foundation, plus the good performance characteristics, of
+GPars make it an excellent library for Java programs. In fact most of GPars is written in Java, so there is
+no performance penalty for Java applications using GPars.
+
+For details please refer to the Java API section.
+****
+
+To quick-test using GPars via the Java API, you can compile and run the following Java code:
+----
+import groovyx.gpars.MessagingRunnable;
+import groovyx.gpars.actor.DynamicDispatchActor;
+
+public class StatelessActorDemo {
+    public static void main(String[] args) throws InterruptedException {
+        final MyStatelessActor actor = new MyStatelessActor();
+        actor.start();
+        actor.send("Hello");
+        actor.sendAndWait(10);
+        actor.sendAndContinue(10.0, new MessagingRunnable<String>() {
+            @Override protected void doRun(final String s) {
+                System.out.println("Received a reply " + s);
+            }
+        });
+    }
+}
+
+class MyStatelessActor extends DynamicDispatchActor {
+    public void onMessage(final String msg) {
+        System.out.println("Received " + msg);
+        replyIfExists("Thank you");
+    }
+
+    public void onMessage(final Integer msg) {
+        System.out.println("Received a number " + msg);
+        replyIfExists("Thank you");
+    }
+
+    public void onMessage(final Object msg) {
+        System.out.println("Received an object " + msg);
+        replyIfExists("Thank you");
+    }
+}
+----
+Remember though that you will almost certainly have to add the Groovy artifact to the build as well as the
+GPars artifact.  GPars may well work at Java speeds with Java applications, but it still has some
+compilation dependencies on Groovy.
+
+== Code Conventions
+
+We follow certain conventions in the code samples. Understanding these may help you read and comprehend
+GPars code samples better.
+
+ * The _leftShift_ operator _<<_ has been overloaded on actors, agents and dataflow expressions (both
+   variables and streams) to mean _send_ a message or _assign_ a value.
+----
+myActor << 'message'
+
+myAgent << {account -> account.add('5 USD')}
+
+myDataflowVariable << 120332
+----
+
+ * On actors and agents the default _call()_ method has been also overloaded to mean _send_ . So sending a
+   message to an actor or agent may look like a regular method call.
+----
+myActor "message"
+
+myAgent {house -> house.repair()}
+----
+
+ * The _rightShift_ operator _>>_ in GPars has the _when bound_ meaning. So
+----
+ myDataflowVariable >> {value -> doSomethingWith(value)}
+----
+will schedule the closure to run only after _myDataflowVariable_ is bound to a value, with the value as a parameter.
+
+In samples we tend to statically import frequently used factory methods:
+
+* GParsPool.withPool()
+* GParsPool.withExistingPool()
+* GParsExecutorsPool.withPool()
+* GParsExecutorsPool.withExistingPool()
+* Actors.actor()
+* Actors.reactor()
+* Actors.fairReactor()
+* Actors.messageHandler()
+* Actors.fairMessageHandler()
+* Agent.agent()
+* Agent.fairAgent()
+* Dataflow.task()
+* Dataflow.operator()
+
+It is more a matter of style preferences and personal taste, but we think static imports make the code more compact and readable.
+
+== Getting Set Up In An IDE
+
+Adding the GPars jar files to your project or defining the appropriate dependencies in pom.xml should be
+enough to get you started with GPars in your IDE.
+
+=== GPars DSL recognition
+
+*IntelliJ IDEA* in both the free _Community Edition_ and the commercial _Ultimate Edition_ will recognize
+the GPars domain specific languages, complete methods like _eachParallel()_ , _reduce()_ or _callAsync()_
+and validate them. GPars uses the
+http://www.jetbrains.net/confluence/display/GRVY/Scripting+IDE+for+DSL+awareness[Groovy DSL] mechanism,
+which teaches IntelliJ IDEA the DSLs as soon as the GPars jar file is added to the project.
+
+== Applicability of Concepts
+
+GPars provides a lot of concepts to pick from. We're continuously building and updating a page that tries to
+help user choose the right abstraction for their tasks at hands.  Please, refer to the
+http://gpars.codehaus.org/Concepts+compared[Concepts Compared] page for details.
+
+To briefly summarize the suggestions, below you can find the basic guide-lines:
+
+* You're looking at a collection, which needs to be *iterated* or processed using one of the many beautiful
+  Groovy collections method, like _each()_ , _collect()_ , _find()_ and such. Proposing that processing each
+  element of the collection is independent of the other items, using GPars *parallel collections* can be
+  recommended.
+* If you have a *long-lasting calculation* , which may safely run in the background, use the *asynchronous
+  invocation support* in GPars. Since the GPars asynchronous functions can be composed, you can quickly
+  parallelize complex functional calculations without having to mark independent calculations explicitly.
+* You need to *parallelize* an algorithm at hand. You can identify a set of *tasks* with their mutual
+  dependencies. The tasks typically do not need to share data, but instead some tasks may need to wait for
+  other tasks to finish before starting. You're ready to express these dependencies explicitly in code. With
+  GPars *dataflow tasks* you create internally sequential tasks, each of which can run concurrently with the
+  others. Dataflow variables and channels provide the tasks with the capability to express their
+  dependencies and to exchange data safely.
+* You can't avoid using *shared mutable state* in your algorithm. Multiple threads will be accessing shared
+  data and (some of them) modifying it. Traditional locking and synchronized approach feels too risky or
+  unfamiliar. Go for *agents*, which will wrap your data and serialize all access to it.
+* You're building a system with high concurrency demands. Tweaking a data structure here or task there won't
+  cut it. You need to build the architecture from the ground up with concurrency in mind. *Message-passing*
+  might be the way to go.
+** *Groovy CSP* will give you highly deterministic and composable model for concurrent processes. The model
+    is organized around the concept of *calculations* or *processes*, which run concurrently and communicate
+    through synchronous channels.
+** If you're trying to solve a complex data-processing problem, consider GPars *dataflow operators* to build
+   a data flow network. The concept is organized around event-driven transformations wired into pipelines
+   using asynchronous channels.
+** *Actors* and *Active Objects* will shine if you need to build a general-purpose, highly concurrent and
+    scalable architecture following the object-oriented paradigm.
+
+Now you may have a better idea of what concepts to use on your current project. Go and check out more
+details on them in the User Guide.
+
+== What's New
+
+The new GPars 1.3.0 release introduces several enhancements and improvements on top of the previous release,
+mainly in the dataflow area.
+
+Check out the http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=20355[JIRA release notes]
+
+=== Project changes
+
+.Breaking Changes
+****
+See "the Breaking Changes listing":http://gpars.codehaus.org/Breaking+Changes for the list of breaking changes.
+****
+
+=== Asynchronous functions
+
+=== Parallel collections
+
+=== Fork / Join
+
+=== Actors
+
+* Remote actors
+* Exception propagation from active objects
+
+=== Dataflow
+
+* Remote dataflow variables and channels
+* Dataflow operators accepting variable number arguments
+* Select made @CompileStatic compatible
+
+=== Agent
+
+* Remote agents
+
+=== Stm
+
+=== Other
+
+* Raised the JDK dependency to version 1.7
+* Raised the Groovy dependency to version 2.2
+* Replaced the jsr-177y fork-join pool implementation with the one from JDK 1.7
+* Removed the dependency on jsr-166y
+
+=== Renaming hints
+
+== Java API – Using GPars from Java
+
+Using GPars is very addictive, I guarantee. Once you get hooked you won't be able to code without it.  May
+the world force you to write code in Java, you will still be able to benefit from most of GPars features.
+
+=== Java API specifics
+
+Some parts of GPars are irrelevant in Java and it is better to use the underlying Java libraries directly:
+* Parallel Collection – use jsr-166y library's Parallel Array directly
+* Fork/Join – use jsr-166y library's Fork/Join support directly
+* Asynchronous functions – use Java executor services directly
+
+The other parts of GPars can be used from Java just like from Groovy, although most will miss the Groovy DSL capabilities.
+
+=== GPars Closures in Java API
+
+To overcome the lack of closures as a language element in Java and to avoid forcing users to use Groovy closures directly
+through the Java API, a few handy wrapper classes have been provided to help you define callbacks, actor body or dataflow tasks.
+* groovyx.gpars.MessagingRunnable - used for single-argument callbacks or actor body
+* groovyx.gpars.ReactorMessagingRunnable - used for ReactiveActor body
+* groovyx.gpars.DataflowMessagingRunnable - used for dataflow operators' body
+
+These classes can be used in all places GPars API expects a Groovy closure.
+
+=== Actors
+
+The _DynamicDispatchActor_ as well as the _ReactiveActor_ classes can be used just like in Groovy:
+----
+ import groovyx.gpars.MessagingRunnable;
+ import groovyx.gpars.actor.DynamicDispatchActor;
+
+ public class StatelessActorDemo {
+     public static void main(String[] args) throws InterruptedException {
+         final MyStatelessActor actor = new MyStatelessActor();
+         actor.start();
+         actor.send("Hello");
+         actor.sendAndWait(10);
+         actor.sendAndContinue(10.0, new MessagingRunnable<String>() {
+             @Override protected void doRun(final String s) {
+                 System.out.println("Received a reply " + s);
+             }
+         });
+     }
+ }
+
+ class MyStatelessActor extends DynamicDispatchActor {
+     public void onMessage(final String msg) {
+         System.out.println("Received " + msg);
+         replyIfExists("Thank you");
+     }
+
+     public void onMessage(final Integer msg) {
+         System.out.println("Received a number " + msg);
+         replyIfExists("Thank you");
+     }
+
+     public void onMessage(final Object msg) {
+         System.out.println("Received an object " + msg);
+         replyIfExists("Thank you");
+     }
+ }
+----
+
+Although there are not many differences between Groovy and Java GPars use, notice, the callbacks
+instantiating the MessagingRunnable class in place for a groovy closure.
+----
+import groovy.lang.Closure;
+import groovyx.gpars.ReactorMessagingRunnable;
+import groovyx.gpars.actor.Actor;
+import groovyx.gpars.actor.ReactiveActor;
+
+public class ReactorDemo {
+    public static void main(final String[] args) throws InterruptedException {
+        final Closure handler = new ReactorMessagingRunnable<Integer, Integer>() {
+            @Override protected Integer doRun(final Integer integer) {
+                return integer * 2;
+            }
+        };
+        final Actor actor = new ReactiveActor(handler);
+        actor.start();
+
+        System.out.println("Result: " +  actor.sendAndWait(1));
+        System.out.println("Result: " +  actor.sendAndWait(2));
+        System.out.println("Result: " +  actor.sendAndWait(3));
+    }
+}
+----
+
+=== Convenience factory methods
+
+Obviously, all the essential factory methods to build actors quickly are available where you'd expect them.
+----
+import groovy.lang.Closure;
+import groovyx.gpars.ReactorMessagingRunnable;
+import groovyx.gpars.actor.Actor;
+import groovyx.gpars.actor.Actors;
+
+public class ReactorDemo {
+    public static void main(final String[] args) throws InterruptedException {
+        final Closure handler = new ReactorMessagingRunnable<Integer, Integer>() {
+            @Override protected Integer doRun(final Integer integer) {
+                return integer * 2;
+            }
+        };
+        final Actor actor = Actors.reactor(handler);
+
+        System.out.println("Result: " +  actor.sendAndWait(1));
+        System.out.println("Result: " +  actor.sendAndWait(2));
+        System.out.println("Result: " +  actor.sendAndWait(3));
+    }
+}
+----
+
+=== Agents
+
+----
+ import groovyx.gpars.MessagingRunnable;
+ import groovyx.gpars.agent.Agent;
+
+ public class AgentDemo {
+     public static void main(final String[] args) throws InterruptedException {
+         final Agent counter = new Agent<Integer>(0);
+         counter.send(10);
+         System.out.println("Current value: " + counter.getVal());
+         counter.send(new MessagingRunnable<Integer>() {
+             @Override protected void doRun(final Integer integer) {
+                 counter.updateValue(integer + 1);
+             }
+         });
+         System.out.println("Current value: " + counter.getVal());
+     }
+ }
+----
+
+=== Dataflow Concurrency
+
+Both _DataflowVariables_ and _DataflowQueues_ can be used from Java without any hiccups. Just avoid the
+handy overloaded operators and go straight to the methods, like _bind_ , _whenBound_, _getVal_ and other.
+You may also continue using dataflow _tasks_ passing to them instances of _Runnable_ or _Callable_ just like
+groovy _Closure_ .
+----
+import groovyx.gpars.MessagingRunnable;
+import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.group.DefaultPGroup;
+
+import java.util.concurrent.Callable;
+
+public class DataflowTaskDemo {
+    public static void main(final String[] args) throws InterruptedException {
+        final DefaultPGroup group = new DefaultPGroup(10);
+
+        final DataflowVariable a = new DataflowVariable();
+
+        group.task(new Runnable() {
+            public void run() {
+                a.bind(10);
+            }
+        });
+
+        final Promise result = group.task(new Callable() {
+            public Object call() throws Exception {
+                return (Integer)a.getVal() + 10;
+            }
+        });
+
+        result.whenBound(new MessagingRunnable<Integer>() {
+            @Override protected void doRun(final Integer integer) {
+                System.out.println("arguments = " + integer);
+            }
+        });
+
+        System.out.println("result = " + result.getVal());
+    }
+}
+----
+
+=== Dataflow operators
+
+The sample below should illustrate the main differences between Groovy and Java API for dataflow operators.
+* Use the convenience factory methods accepting list of channels to create operators or selectors
+* Use _DataflowMessagingRunnable_ to specify the operator body
+* Call _getOwningProcessor()_ to get hold of the operator from within the body in order to e.g. bind output values
+----
+import groovyx.gpars.DataflowMessagingRunnable;
+import groovyx.gpars.dataflow.Dataflow;
+import groovyx.gpars.dataflow.DataflowQueue;
+import groovyx.gpars.dataflow.operator.DataflowProcessor;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class DataflowOperatorDemo {
+    public static void main(final String[] args) throws InterruptedException {
+        final DataflowQueue stream1 = new DataflowQueue();
+        final DataflowQueue stream2 = new DataflowQueue();
+        final DataflowQueue stream3 = new DataflowQueue();
+        final DataflowQueue stream4 = new DataflowQueue();
+
+        final DataflowProcessor op1 = Dataflow.selector(Arrays.asList(stream1), Arrays.asList(stream2), new DataflowMessagingRunnable(1) {
+            @Override protected void doRun(final Object... objects) {
+                getOwningProcessor().bindOutput(2*(Integer)objects[0]);
+            }
+        });
+
+        final List secondOperatorInput = Arrays.asList(stream2, stream3);
+
+        final DataflowProcessor op2 = Dataflow.operator(secondOperatorInput, Arrays.asList(stream4), new DataflowMessagingRunnable(2) {
+            @Override protected void doRun(final Object... objects) {
+                getOwningProcessor().bindOutput((Integer) objects[0] + (Integer) objects[1]);
+            }
+        });
+
+        stream1.bind(1);
+        stream1.bind(2);
+        stream1.bind(3);
+        stream3.bind(100);
+        stream3.bind(100);
+        stream3.bind(100);
+        System.out.println("Result: " + stream4.getVal());
+        System.out.println("Result: " + stream4.getVal());
+        System.out.println("Result: " + stream4.getVal());
+        op1.stop();
+        op2.stop();
+    }
+}
+----
+
+=== Performance
+
+In general, GPars overhead is identical irrespective of whether you use it from Groovy or Java and tends to
+be very low.  GPars actors, for example, can compete head-to-head with other JVM actor options, like Scala
+actors.
+
+Since Groovy code in general runs slower than Java code, mainly due to dynamic method invocation, you might
+consider writing your code in Java to improve performance. Typically numeric operations or frequent
+fine-grained method calls within a task or actor body may benefit from a rewrite into Java.
+
+=== Prerequisites
+
+All the GPars integration rules apply to Java projects just like they do to Groovy projects. You only need
+to include the groovy distribution jar file in your project and all is clear to march ahead.  You may also
+want to check out the sample Java Maven project to get tips on how to integrate GPars into a maven-based
+pure Java application – http://gpars.codehaus.org/Demos[Sample Java Maven Project]

@@ -1,4 +1,4 @@
-@import url(http://fonts.googleapis.com/css?family=Asul:400,700);
+@import url(http://fonts.googleapis.com/css?family=Merriweather+Sans:400,400italic,700,700italic);
 @import url(http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700);
 
 /* Based on Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
@@ -26,7 +26,7 @@ script {
 html {
     background: #fff;
     color: #000;
-    font-family: Asul, sans-serif;
+    font-family: 'Merriweather Sans', sans-serif;
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
 }
@@ -77,7 +77,7 @@ mark {
 
 code, kbd, pre, samp {
     font-family: "Anonymous Pro", monospace;
-    font-size: 1em;
+    font-size: 0.6em;
 }
 
 pre {
@@ -199,7 +199,7 @@ body {
     color: #222222;
     padding: 0;
     margin: 0;
-    font-family: Asul, sans-serif;
+    font-family: 'Merriweather Sans', sans-serif;
     font-weight: normal;
     font-style: normal;
     line-height: 1;
@@ -327,7 +327,7 @@ p aside {
 }
 
 h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6 {
-    font-family: Asul, sans-serif;
+    font-family: 'Merriweather Sans', sans-serif;
     font-weight: normal;
     font-style: normal;
     color: #222;
@@ -398,7 +398,7 @@ code {
     font-family: "Anonymous Pro", monospace;
     font-weight: normal;
     color: #6d180b;
-    font-size: 85%;
+    font-size: 60%;
 }
 
 ul, ol, dl {
@@ -667,7 +667,7 @@ table thead tr th, table tfoot tr th, table tbody tr td, table tr td, table tfoo
 }
 
 *:not(pre) > code {
-    font-size: 0.9375em;
+    font-size: 0.6em;
     padding: 1px 3px 0;
     white-space: nowrap;
     background-color: #f2f2f2;
@@ -682,6 +682,7 @@ pre, pre > code {
     color: inherit;
     font-family: "Anonymous Pro", monospace;
     font-weight: normal;
+    font-size: 0.6em;
 }
 
 kbd.keyseq {
@@ -886,7 +887,7 @@ p a > code:hover {
 
 #content #toctitle {
     font-weight: bold;
-    font-family: Asul, sans-serif;
+    font-family: 'Merriweather Sans', sans-serif;
     font-size: 1em;
     padding-left: 0.125em;
 }
@@ -1092,6 +1093,7 @@ table.tableblock #preamble > .sectionbody > .paragraph:first-of-type p {
 
 .literalblock > .content pre > code, .listingblock > .content pre > code {
     display: block;
+    font-size: 0.8em;
 }
 
 @media only screen {
@@ -1102,13 +1104,13 @@ table.tableblock #preamble > .sectionbody > .paragraph:first-of-type p {
 
 @media only screen and (min-width: 768px) {
     .literalblock > .content pre, .listingblock > .content pre {
-        font-size: 0.9em;
+        font-size: 0.8em;
     }
 }
 
 @media only screen and (min-width: 1280px) {
     .literalblock > .content pre, .listingblock > .content pre {
-        font-size: 1em;
+        font-size: 0.8em;
     }
 }
 
@@ -1751,7 +1753,7 @@ span.icon > [class^="icon-"], span.icon > [class*=" icon-"] {
     font-size: 12px;
     font-weight: bold;
     line-height: 20px;
-    font-family: Asul, sans-serif;
+    font-family: 'Merriweather Sans', sans-serif;
     font-style: normal;
     position: relative;
     top: -2px;
