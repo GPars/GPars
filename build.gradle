@@ -34,9 +34,9 @@ buildscript {
 
 plugins {
     // TODO: Cannot use anything other than literals here. Why?
-    id 'org.asciidoctor.convert' version '1.5.2'
-    id 'com.jfrog.bintray' version '1.0'
-    id 'com.jfrog.artifactory' version '3.0.1'
+    id 'org.asciidoctor.convert' version '1.5.3'
+    id 'com.jfrog.bintray' version '1.5'
+    id 'com.jfrog.artifactory' version '4.0.0'
 }
 
 apply plugin: 'groovy'
@@ -389,7 +389,7 @@ task release(dependsOn: ['build', 'jarSrc', 'jarDoc', 'zipSamples', 'zipJavaDemo
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.9'
+    gradleVersion = '2.10'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
