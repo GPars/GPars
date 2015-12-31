@@ -4,7 +4,7 @@
 Concepts like Actors, Dataflows and Agents are not restricted just to single VM,
 where they provide an abstraction layer for concurrent programming
 that allows to separate logic from low level synchronization code.
-These concepts can be easly extended to multiple nodes in a network.
+These concepts can be easily extended to multiple nodes in a network.
 Following chapter describes remoting in GPars.
 
 *Remark*: Remoting for GPars was a _Google Summer of Code 2014_ project.
@@ -43,7 +43,7 @@ _object_ <-(serialization)-> _handle_ ---- [network] ---- _handle_ <-(serializat
 One of the main advantages of this mechanism is
 that sending proxy-object reference back is deserialized to original instance.
 
-As all messages are seralized before sending over a wire,
+As all messages are serialized before sending over a wire,
 they must implement _Serializable_ interface.
 This is a consequence of using build-in Java serialization mechanism and Netty's _ObjectDecoder/ObjectEncoder_.
 On the other hand it gives a flexibility to send any custom object as a message to Actor
@@ -62,7 +62,7 @@ def remoteDataflows = RemoteDataflows.create()
 *Note*: In all subsections we assume that context is already created as shown above.
 
 After creating context, if you want to allow other hosts to retrieve published dataflows,
-you need to start a server. You need to provied address and port to listen on (eq. _localhost_:11222,
+you need to start a server. You need to provided address and port to listen on (eq. _localhost_:11222,
 10.0.0.123:11333).
 
 [source,groovy]
@@ -92,7 +92,7 @@ remoteDataflows.publish variable "my-first-variable"
 It registers the variable under given name, so when a request for variable with name _my-first-variable_ comes,
 variable can be sent to remote host.
 It's important to remember, that publishing another variable under the same name,
-will override the provious one and subsequent requests will send newly published one.
+will override the previous one and subsequent requests will send newly published one.
 
 Retrieving of a variable is done by:
 
@@ -103,7 +103,7 @@ def remoteVariable = remoteVariablePromise.get()
 ----
 
 The _getVariable_ method is non-blocking and returns promise, that will eventually hold a proxy object to variable.
-This proxy has the same interface as DataflowVariable and can be used seemlessly as regular variable.
+This proxy has the same interface as DataflowVariable and can be used seamlessly as regular variable.
 
 To explore a full example see: _groovyx.gpars.samples.remote.dataflow.variable_
 
@@ -126,7 +126,7 @@ def readChannelPromise = remoteDataflows.getReadChannel HOST, PORT, "my-first-br
 def readChannel = readChannelPromise.get()
 ----
 
-Obtainted proxy object has the same interface as ReadChannel
+Obtained proxy object has the same interface as ReadChannel
 and can be used in same fashion as ReadChannel of regular DataflowBroadcast.
 
 To explore a full example see: _groovyx.gpars.samples.remote.dataflow.broadcast_
