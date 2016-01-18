@@ -46,3 +46,5 @@ messages passed to them and communicate with other actors by sending them messag
 solution by combining these actors into a communication network.
 
 For more details, visit the GPars project home page at http://gpars.github.io
+
+For more dodumentation, visit the GPars project documentation home page at http://gpars.website
