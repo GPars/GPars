@@ -33,7 +33,7 @@ _groovyx.gpars.scheduler.Pool_ interface to pass to the _DefaultPGroup_ or _NonD
 
 Most of GPars functionality can be used from Java just as well as from Groovy. Checkout the _2.6 Java API -
 Using GPars from Java_ section of the User Guide and experiment with the Maven-based stand-alone Java
-http://gpars.codehaus.org/Demos[demo applications].  Take GPars with you wherever you go!
+http://gparsdocs.de.a9sapp.eu/Demos.html[demo applications].  Take GPars with you wherever you go!
 
 == Performance
 

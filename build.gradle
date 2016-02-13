@@ -107,7 +107,7 @@ jar {
         symbolicName = 'gpars.org'
         instruction 'Bundle-Vendor', theVendor
         instruction 'Bundle-Description', group
-        instruction 'Bundle-DocURL', 'http://gpars.codehaus.org'
+        instruction 'Bundle-DocURL', 'http://gpars.website'
         instruction 'Built-By', System.properties.'user.name'
         instruction 'Extension-Name', archivesBaseName
         instruction 'Specification-Title', theTitle

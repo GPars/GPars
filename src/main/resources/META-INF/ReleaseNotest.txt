@@ -167,7 +167,7 @@ Check out the JIRA release notes at http://jira.codehaus.org/secure/ReleaseNote.
 
 h3. Project changes
 
-See http://gpars.codehaus.org/Breaking+Changes for the list of breaking changes.
+See http://gparsdocs.de.a9sapp.eu/Breaking_Changes.html for the list of breaking changes.
 
 h3. Parallel collections
 
@@ -227,7 +227,7 @@ Check out the JIRA release notes at http://jira.codehaus.org/secure/ReleaseNote.
 
 Project changes
 
-See http://gpars.codehaus.org/Breaking+Changes for the list of breaking changes.
+See http://gparsdocs.de.a9sapp.eu/Breaking_Changes.html for the list of breaking changes.
 
 Parallel collections
 
