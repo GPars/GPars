@@ -9,7 +9,7 @@ Codeship [master branch](https://codeship.com/projects/66218): ![Codeship Status
 
 # Introduction
 
-The GPars framework (http://gpars.github.io) offers Java developers intuitive and safe ways to handle
+The GPars framework (http://www.gpars.org) offers Java developers intuitive and safe ways to handle
 Java or Groovy tasks concurrently. Leveraging the enormous flexibility of the Groovy programing language and
 building on proven Java technologies, we aim to make concurrent programming for multi-core hardware
 intuitive, robust and enjoyable.
@@ -45,4 +45,4 @@ Groovy developers. With actors support you can quickly create several independen
 messages passed to them and communicate with other actors by sending them messages. You then build your
 solution by combining these actors into a communication network.
 
-For more details, visit the GPars project home page at http://gpars.github.io
+For more details, visit the GPars project home page at http://www.gpars.org
