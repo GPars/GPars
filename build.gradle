@@ -334,8 +334,8 @@ bintray {
     dryRun = false
     configurations = ['archives']
     pkg {
-        userOrg = '__PLEASE_SET_THE_GPARS_BINTRAY_ORG'
-        repo = 'GPars'
+        userOrg = 'gpars'
+        repo = 'maven'
         name = 'gpars'
         desc = project.description
         labels = ['groovy','gpars']
