@@ -46,7 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.RecursiveTask;
-
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 // TODO: delete
@@ -411,7 +411,7 @@ public class GParsPoolUtil {
      * Note that the {@code result} variable is synchronized to prevent race conditions between multiple threads.
      * </p>
      */
-    public static <K, V> Map<K, V> eachParallel(final Map<K, V> collection, final Closure<V> cl) {
+    public static <K, V> Map<K, V> eachParallel(final Map<K, V> collection, final Closure<V> cl) throws InterruptedException, ExecutionException {
         return retrievePool().submit(() ->
                 collection.entrySet().parallelStream().collect(Collectors.toMap(
                         Map.Entry::getKey,
