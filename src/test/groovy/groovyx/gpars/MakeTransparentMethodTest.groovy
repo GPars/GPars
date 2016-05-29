@@ -27,20 +27,19 @@ import java.util.concurrent.CyclicBarrier
 
 @SuppressWarnings("SpellCheckingInspection")
 class MakeTransparentMethodTest extends GroovyTestCase {
+    // public void testTransparentEach() {
+    //     def items = [1, 2, 3, 4, 5]
+    //     final Map map = new ConcurrentHashMap()
+    //     final CyclicBarrier barrier = new CyclicBarrier(5)
 
-    public void testTransparentEach() {
-        def items = [1, 2, 3, 4, 5]
-        final Map map = new ConcurrentHashMap()
-        final CyclicBarrier barrier = new CyclicBarrier(5)
-
-        GParsPool.withPool(5) {
-            items.makeConcurrent().each {
-                barrier.await()
-                map[Thread.currentThread()] = ''
-            }
-        }
-        assert map.keys().size() == 5
-    }
+    //     GParsPool.withPool(5) {
+    //         items.makeConcurrent().each {
+    //             barrier.await()
+    //             map[Thread.currentThread()] = ''
+    //         }
+    //     }
+    //     assert map.keys().size() == 5
+    // }
 
     public void testTransparentEachWithIndex() {
         def items = [1, 2, 3, 4, 5]
