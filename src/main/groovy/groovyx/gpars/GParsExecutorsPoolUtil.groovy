@@ -21,7 +21,6 @@ import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.scheduler.DefaultPool
 import groovyx.gpars.scheduler.Pool
 import groovyx.gpars.util.GeneralTimer
-import groovyx.gpars.util.PAUtils
 
 import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
@@ -33,10 +32,11 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
-import static groovyx.gpars.util.PAGroovyUtils.createCollection
-import static groovyx.gpars.util.PAUtils.buildClosureForMaps
-import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex
-import static groovyx.gpars.util.PAUtils.buildResultMap
+import java.util.Collection
+import static groovyx.gpars.util.ParallelUtils.createCollection
+import static groovyx.gpars.util.ParallelUtils.buildClosureForMaps
+import static groovyx.gpars.util.ParallelUtils.buildClosureForMapsWithIndex
+import static groovyx.gpars.util.ParallelUtils.buildResultMap
 
 /**
  * This class forms the core of the DSL initialized by <i>GParsExecutorsPool</i>. The static methods of <i>GParsExecutorsPoolUtil</i>
@@ -54,6 +54,11 @@ public class GParsExecutorsPoolUtil {
      */
     private static final GeneralTimer timer = GParsConfig.retrieveDefaultTimer('GParsExecutorsTimeoutTimer', true)
 
+   private static java.util.Collection createCollection(Object object) {
+       def collection = []
+       for (element in object) collection << element
+       return collection
+   }
     /**
      * schedules the supplied closure for processing in the underlying thread pool.
      */
