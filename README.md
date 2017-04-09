@@ -1,11 +1,11 @@
 [Travis-CI](https://travis-ci.org/GPars/GPars) master branch: ![Travis-CI status master](https://travis-ci.org/GPars/GPars.svg?branch=master)
-|  jdk8 branch: ![Travis-CI status jdk8](https://travis-ci.org/GPars/GPars.svg?branch=jdk8)
+|  1\_3\_X branch: ![Travis-CI status 1_3_X](https://travis-ci.org/GPars/GPars.svg?branch=1_3_X)
 
 Snap-CI [master branch](https://snap-ci.com/GPars/GPars/branch/master): ![Snap-CI status master](https://snap-ci.com/GPars/GPars/branch/master/build_image)
-|  [jdk8 branch](https://snap-ci.com/GPars/GPars/branch/jdk8): ![Snap-CI status jdk8](https://snap-ci.com/GPars/GPars/branch/jdk8/build_image)
+|  [1_3_X branch](https://snap-ci.com/GPars/GPars/branch/1_3_X): ![Snap-CI status 1_3_X](https://snap-ci.com/GPars/GPars/branch/1_3_X/build_image)
 
 Codeship [master branch](https://codeship.com/projects/66218): ![Codeship Status for GPars/GPars](https://codeship.com/projects/e4493e40-a3f5-0132-995a-12052818d981/status?branch=master)
-| jdk8 branch: ![Codeship Status for GPars/GPars](https://codeship.com/projects/e4493e40-a3f5-0132-995a-12052818d981/status?branch=jdk8)
+| 1\_3\_X branch: ![Codeship Status for GPars/GPars](https://codeship.com/projects/e4493e40-a3f5-0132-995a-12052818d981/status?branch=1_3_X)
 
 # Introduction
 
