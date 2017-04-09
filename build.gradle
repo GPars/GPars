@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008–2016  The original author or authors
+// Copyright © 2008–2017  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ plugins {
     // TODO: Cannot use anything other than literals here. Why?
     id 'org.asciidoctor.convert' version '1.5.3'
     id 'com.jfrog.bintray' version '1.7.3'
-    id 'com.jfrog.artifactory' version '4.4.12'
+    id 'com.jfrog.artifactory' version '4.4.14'
 }
 
 apply plugin: 'groovy'
@@ -389,7 +389,7 @@ task release(dependsOn: ['build', 'jarSrc', 'jarDoc', 'zipSamples', 'zipJavaDemo
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.3'
+    gradleVersion = '3.4.1'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
