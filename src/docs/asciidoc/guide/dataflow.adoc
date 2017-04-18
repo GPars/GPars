@@ -158,7 +158,7 @@ The _DataflowChannel_ interface combines two interfaces, each serving its purpos
 You may prefer using these dedicated interfaces instead of the general _DataflowChannel_ interface, to better express the intended usage.
 ****
 
-Please refer to the http://gpars.codehaus.org/API+doc[API doc] for more details on the channel interfaces.
+Please refer to the http://gparsdocs.de.a9sapp.eu/API_Doc.html[API doc] for more details on the channel interfaces.
 
 ==== Point-to-point communication
 
@@ -619,7 +619,7 @@ will not get accidentally swallowed.
 
 ----
 task {
-    'gpars.codehaus.org'.toURL().text  //should throw MalformedURLException
+    'gpars.website'.toURL().text  //should throw MalformedURLException
 }
 .then {page -> page.toUpperCase()}
 .then {page -> page.contains('GROOVY')}
@@ -722,7 +722,7 @@ Closure<String> download = {url ->
     url.toURL().text
 }
 
-def pageContent = new LazyDataflowVariable(download.curry("http://gpars.codehaus.org"))
+def pageContent = new LazyDataflowVariable(download.curry("http://gpars.website"))
 ----
 
 Instances of _LazyDataflowVariable_ have an initializer specified at construction time, which only gets
@@ -802,7 +802,7 @@ import groovyx.gpars.dataflow.Dataflow
 
 def pageContent = Dataflow.lazyTask {
         println "Downloading"
-        "http://gpars.codehaus.org".toURL().text
+        "http://gpars.website".toURL().text
     }
 
 println "No-one has asked for the value just yet. Bound = ${pageContent.bound}"
@@ -1034,7 +1034,7 @@ elements inside a code block using the _Dataflow.usingGroup()_ method:
 ----
 Dataflow.usingGroup(group) {
     task {
-        'http://gpars.codehaus.org'.toURL().text  //should throw MalformedURLException
+        'http://gpars.website'.toURL().text
     }
     .then {page -> page.toUpperCase()}
     .then {page -> page.contains('GROOVY')}
@@ -1047,7 +1047,7 @@ You can always override the default group by being specific:
 ----
 Dataflow.usingGroup(group) {
     anotherGroup.task {
-        'http://gpars.codehaus.org'.toURL().text  //should throw MalformedURLException
+        'http://gpars.website'.toURL().text
     }
     .then(anotherGroup) {page -> page.toUpperCase()}
     .then(anotherGroup) {page -> page.contains('GROOVY')}.then(anotherGroup) {println Dataflow.retrieveCurrentDFPGroup();it}

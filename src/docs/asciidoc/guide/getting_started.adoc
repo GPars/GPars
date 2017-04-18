@@ -94,7 +94,7 @@ library must be available. This comes as standard with Java 7.
 
 GPars 2.x will depend on Java 8 and will only be usable with Groovy 3.0 and later.
 
-Please visit the page http://gpars.codehaus.org/Integration[Integration] on the GPars website for more
+Please visit the page http://gparsdocs.de.a9sapp.eu/Integration.html[Integration] on the GPars website for more
 details.
 
 == A Hello World Example
@@ -248,7 +248,7 @@ which teaches IntelliJ IDEA the DSLs as soon as the GPars jar file is added to t
 
 GPars provides a lot of concepts to pick from. We're continuously building and updating a page that tries to
 help user choose the right abstraction for their tasks at hands.  Please, refer to the
-http://gpars.codehaus.org/Concepts+compared[Concepts Compared] page for details.
+http://gparsdocs.de.a9sapp.eu/Concepts_Compared.html[Concepts Compared] page for details.
 
 To briefly summarize the suggestions, below you can find the basic guide-lines:
 
@@ -294,7 +294,7 @@ Check out the http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&v
 
 .Breaking Changes
 ****
-See "the Breaking Changes listing":http://gpars.codehaus.org/Breaking+Changes for the list of breaking changes.
+See "the Breaking Changes listing":http://gparsdocs.de.a9sapp.eu/Breaking_Changes.html for the list of breaking changes.
 ****
 
 === Asynchronous functions
@@ -571,4 +571,4 @@ fine-grained method calls within a task or actor body may benefit from a rewrite
 All the GPars integration rules apply to Java projects just like they do to Groovy projects. You only need
 to include the groovy distribution jar file in your project and all is clear to march ahead.  You may also
 want to check out the sample Java Maven project to get tips on how to integrate GPars into a maven-based
-pure Java application – http://gpars.codehaus.org/Demos[Sample Java Maven Project]
+pure Java application – http://gparsdocs.de.a9sapp.eu/Demos.html[Sample Java Maven Project]

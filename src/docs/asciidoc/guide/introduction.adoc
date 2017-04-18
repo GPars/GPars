@@ -16,7 +16,7 @@ abstractions for different types of problem domains while leveraging the multi-c
 
 == Enter GPars
 
-Meet http://gpars.codehaus.org[GPars], an open-source concurrency and parallelism library for Java and
+Meet http://gpars.website[GPars], an open-source concurrency and parallelism library for Java and
 Groovy that gives you a number of high-level abstractions for writing concurrent and parallel code in Groovy
 (map/reduce, fork/join, asynchronous closures, actors, agents, dataflow concurrency and other concepts),
 which can make your Java and Groovy code concurrent and/or parallel with little effort.  With GPars your
@@ -25,10 +25,10 @@ multiple calculations at the same time, request network resources in parallel, s
 divide-and-conquer problems, perform functional style map/reduce or data parallel collection processing or
 build your applications around the actor or dataflow model.
 
-The project is open sourced under the http://gpars.codehaus.org/License[Apache 2 License]. If you're working
-on a commercial, open-source, educational or any other type of software project in Groovy, download the
-binaries or integrate them from the Maven repository and get going. The way to writing highly concurrent
-and/or parallel Java and Groovy code is wide open. Enjoy!
+The project is open sourced under the http://gparsdocs.de.a9sapp.eu/home#_licencing[Apache 2 License]. If
+you're working on a commercial, open-source, educational or any other type of software project in Groovy,
+download the binaries or integrate them from the Maven repository and get going. The way to writing highly
+concurrent and/or parallel Java and Groovy code is wide open. Enjoy!
 
 == Credits
 

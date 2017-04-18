@@ -2,4 +2,4 @@ Run "./gradlew idea" to have a fresh IntelliJ IDEA project file generated. Do no
 since you are likely to run into problems with unresolved dependencies on third-party libraries,
 as the default project file is primarily targeted to be used for code analysis on the Continuous Integration server (TeamCity).
 
-Find complete developer guidelines at http://gpars.codehaus.org/Developer+Zone
+Find complete developer guidelines at http://gparsdocs.de.a9sapp.eu/Developer_Zone.html
