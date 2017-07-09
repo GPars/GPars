@@ -17,18 +17,19 @@
 package groovyx.gpars;
 
 import groovy.lang.Closure;
+import groovy.lang.GroovyObjectSupport;
 import groovy.time.Duration;
 import groovyx.gpars.forkjoin.CallAsyncTask;
 import groovyx.gpars.forkjoin.GParsPoolUtilHelper;
 import groovyx.gpars.scheduler.FJPool;
 import groovyx.gpars.util.GeneralTimer;
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 // TODO: delete
@@ -366,30 +368,29 @@ public class GParsPoolUtil {
         return collection;
     }
 
-//    /**
-//     * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
-//     * closure as the transformation operation.
-//     * The closure will be effectively invoked concurrently on the elements of the collection.
-//     * After all the elements have been processed, the method returns.
-//     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-//     * Alternatively a DSL can be used to simplify the code. All collections/objects within the {@code withPool} block
-//     * have a new {@code eachParallel(Closure cl)} method, which delegates to the {@code GParsPoolUtil} class.
-//     * Example:
-//     * <pre>
-//     * GParsPool.withPool {
-//     *     def result = new ConcurrentSkipListSet()
-//     *     [1, 2, 3, 4, 5].eachParallel {Number number -&gt; result.add(number * 10)}
-//     *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-//     * }
-//     * </pre>
-//     * <p>
-//     * Note that the {@code result} variable is synchronized to prevent race conditions between multiple threads.
-//     * </p>
-//     */
-//    public static <T> T eachParallel(final T collection, final Closure cl) {
-//        GParsPoolUtilHelper.eachParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), cl);
-//        return collection;
-//    }
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
+     * closure as the transformation operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the {@code withPool} block
+     * have a new {@code eachParallel(Closure cl)} method, which delegates to the {@code GParsPoolUtil} class.
+     * Example:
+     * <pre>
+     * GParsPool.withPool {
+     *     def result = new ConcurrentSkipListSet()
+     *     [1, 2, 3, 4, 5].eachParallel {Number number -&gt; result.add(number * 10)}
+     *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * }
+     * </pre>
+     * <p>
+     * Note that the {@code result} variable is synchronized to prevent race conditions between multiple threads.
+     * </p>
+     */
+    public static <T> Collection<T> eachParallel(final T collection, final Closure cl) throws ExecutionException, InterruptedException {
+        return eachParallel(toCollection(collection), cl);
+    }
 
     /**
      * Creates a Parallel Array out of the supplied map and invokes the withMapping() method using the supplied
@@ -442,7 +443,7 @@ public class GParsPoolUtil {
         final List<ForkJoinTask> tasks = new LinkedList<>();
         final ForkJoinPool pool = retrievePool();
 
-        collection.stream()
+        collection.parallelStream()
                 .forEachOrdered(it -> {
                     int index = counter.getAndIncrement();
                     tasks.add(pool.submit(() -> cl.call(it, index)));
@@ -883,37 +884,15 @@ public class GParsPoolUtil {
      * }
      * </pre>
      */
-    public static <T> Collection<T> grepParallel(final Collection<T> collection, final Closure filter) throws ExecutionException, InterruptedException {
-        //return GParsPoolUtilHelper.grepParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), filter);
-        return retrievePool().submit(() ->
-                collection.parallelStream()
-                        .filter(it -> DefaultGroovyMethods.asBoolean(filter.call(it)))
-                        .collect(Collectors.toList())
-        ).get();
-    }
-
-    /**
-     * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
-     * rule as the filter predicate.
-     * The filter will be effectively used concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the {@code withPool} block
-     * have a new {@code grepParallel(Closure cl)} method, which delegates to the {@code GParsPoolUtil} class.
-     * Example:
-     * <pre>
-     * GParsPool.withPool {
-     *     def result = [1, 2, 3, 4, 5].grepParallel(4..6)
-     *     assertEquals(new HashSet([4, 5]), result)
-     * }
-     * </pre>
-     */
     public static <T> Collection<T> grepParallel(final Collection<T> collection, final Object filter) throws ExecutionException, InterruptedException {
         //return GParsPoolUtilHelper.grepParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), filter);
-        final Collection<Object> grepUsing = toCollection(filter);
+        final Closure<Object> predicate = isClosure(filter) ?
+                (Closure<Object>) filter :
+                collectionContainsClosure(toCollection(filter));
+
         return retrievePool().submit(() ->
                 collection.parallelStream()
-                        .filter(grepUsing::contains)
+                        .filter(it -> GParsPoolUtilHelper.convertToBoolean(predicate.call(it)))
                         .collect(Collectors.toList())
         ).get();
     }
@@ -1682,10 +1661,54 @@ public class GParsPoolUtil {
             return Collections.unmodifiableList(target);
         }
 
+        if (Iterator.class.isAssignableFrom(object.getClass())) {
+            final List target = new LinkedList<>();
+            ((Iterator) object).forEachRemaining(target::add);
+            return Collections.unmodifiableList(target);
+        }
+
         if (Map.class.isAssignableFrom(object.getClass())) {
             return Collections.unmodifiableSet(((Map) object).entrySet());
         }
 
+        return inspectGroovyMetaClassIfNeeded((GroovyObjectSupport) object);
+    }
+
+    private static <T> Collection<T> inspectGroovyMetaClassIfNeeded(final GroovyObjectSupport object) {
+        Class<?> metaClass = (Class<?>) object.invokeMethod("getClass", null);
+        
+        if (List.class.isAssignableFrom(metaClass)) {
+            Object[] objects = (Object[]) object.invokeMethod("toArray", null);
+            return (List<T>) Arrays.asList((objects));
+        }
+
+        if (CharSequence.class.isAssignableFrom(metaClass)) {
+            char[] chars = ((String) object.invokeMethod("toString", null)).toCharArray();
+            final List<String> result = new LinkedList<>();
+            for (int i = 0; i < chars.length; i++) {
+                result.add(String.valueOf(chars[i]));
+            }
+            return (List<T>) Collections.unmodifiableList(result);
+        }
+
+        if (Iterator.class.isAssignableFrom(metaClass)) {
+            final List<T> target = new LinkedList<>();
+            object.invokeMethod("forEachRemaining", (Consumer<T>) t -> target.add(t));
+            return Collections.unmodifiableList(target);
+        }
+
         return Collections.emptyList();
+    }
+
+    private static boolean isClosure(final Object object) {
+        return Closure.class.isAssignableFrom(object.getClass());
+    }
+
+    private static Closure<Object> collectionContainsClosure(final Collection collection) {
+        return new Closure<Object>(null) {
+            public Object doCall(Object el) {
+                return collection.contains(el);
+            }
+        };
     }
 }

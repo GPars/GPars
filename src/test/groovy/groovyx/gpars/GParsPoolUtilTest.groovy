@@ -59,13 +59,13 @@ public class GParsPoolUtilTest extends GroovyTestCase {
             GParsPoolUtil.eachWithIndexParallel([1, 2, 3, 4, 5], { element, int index -> result.addAndGet(element * index) })
             assert 40 == result
 
-            final StringBuilder builder = new StringBuilder();
-            GParsPoolUtil.eachWithIndexParallel('abcde', { el, int index -> builder.append(el + index) })
-            assert builder.toString().contains("a0");
-            assert builder.toString().contains("b1");
-            assert builder.toString().contains("c2");
-            assert builder.toString().contains("d3");
-            assert builder.toString().contains("e4");
+            final Map<String, Integer> lettersMap = new ConcurrentHashMap<>();
+            GParsPoolUtil.eachWithIndexParallel('abcde', { el, int index -> lettersMap.put(el, index) })
+            assert 0 == lettersMap.get("a")
+            assert 1 == lettersMap.get("b")
+            assert 2 == lettersMap.get("c")
+            assert 3 == lettersMap.get("d")
+            assert 4 == lettersMap.get("e")
 
             final ConcurrentMap<Integer, Integer> map = new ConcurrentHashMap<>()
             GParsPoolUtil.eachWithIndexParallel([1: 1, 2: 2, 3: 3, 4: 4], { el, int index -> map.put(el.key, el.value * index) })
@@ -78,6 +78,8 @@ public class GParsPoolUtilTest extends GroovyTestCase {
             final List result = GParsPoolUtil.collectParallel([1, 2, 3, 4, 5], { it * 2 })
             assert ([2, 4, 6, 8, 10] == result)
             assert ([2, 41, 6, 8, 10] != result)
+
+            assert ['aa', 'bb', 'cc', 'dd', 'ee'] == GParsPoolUtil.collectParallel('abcde', { it * 2 })
         }
     }
 
