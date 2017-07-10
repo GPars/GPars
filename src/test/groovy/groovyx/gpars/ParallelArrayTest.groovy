@@ -29,7 +29,7 @@ public class ParallelArrayTest extends GroovyTestCase {
 
     public void testReduce() {
         GParsPool.withPool(5) {
-            assert 15 == [1, 2, 3, 4, 5].parallelStream.map({it}).reduce({a, b -> a + b}).get()
+            assert 15 == [1, 2, 3, 4, 5].parallelStream().map({it}).reduce({a, b -> a + b}).get()
             //assert 'abc' == 'abc'.parallelArray.withMapping({it} as Ops.Op).reduce({a, b -> a + b} as Ops.Reducer, null)
         }
     }
@@ -64,8 +64,8 @@ public class ParallelArrayTest extends GroovyTestCase {
 
     public void testMinMax() {
         GParsPool.withPool(5) {
-            assert 1 == [1, 2, 3, 4, 5].parallelStream().min({a, b -> a - b} as Comparator)
-            assert 5 == [1, 2, 3, 4, 5].parallelStream().max({a, b -> a - b} as Comparator)
+            assert 1 == [1, 2, 3, 4, 5].parallelStream().min({a, b -> a - b} as Comparator).get()
+            assert 5 == [1, 2, 3, 4, 5].parallelStream().max({a, b -> a - b} as Comparator).get()
             //assert 'a' == 'abc'.parallelArray.withMapping({it} as Ops.Op).min()
             //assert 'c' == 'abc'.parallelArray.withMapping({it} as Ops.Op).max()
         }
