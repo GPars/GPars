@@ -80,6 +80,8 @@ public class GParsPoolUtilTest extends GroovyTestCase {
             assert ([2, 41, 6, 8, 10] != result)
 
             assert ['aa', 'bb', 'cc', 'dd', 'ee'] == GParsPoolUtil.collectParallel('abcde', { it * 2 })
+
+            assert [1,3,5] == GParsPoolUtil.collectParallel([1: 2, 3: 4, 5: 6], { k,v -> k})
         }
     }
 

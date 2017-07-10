@@ -363,7 +363,7 @@ public class GParsPoolUtil {
         final ForkJoinPool pool = retrievePool();
         final List<ForkJoinTask> tasks = new LinkedList<>();
         collection.stream()
-                .forEach(it -> tasks.add(pool.submit(() -> cl.call(it))));
+                .forEach(it -> tasks.add(pool.submit(() -> callClosure(cl, it))));
         tasks.forEach(ForkJoinTask::join);
         return collection;
     }
@@ -446,7 +446,7 @@ public class GParsPoolUtil {
         collection.parallelStream()
                 .forEachOrdered(it -> {
                     int index = counter.getAndIncrement();
-                    tasks.add(pool.submit(() -> cl.call(it, index)));
+                    tasks.add(pool.submit(() -> callIndexedClosure(cl, it, index)));
                 });
         tasks.forEach(ForkJoinTask::join);
         return collection;
@@ -506,7 +506,7 @@ public class GParsPoolUtil {
         //return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withMapping(new ClosureMapper(new CallClosure(cl))).all().asList();
         return (Collection<T>) retrievePool().submit(() ->
                 collection.parallelStream()
-                        .map(it -> cl.call(it))
+                        .map(it -> callClosure(cl, it))
                         .collect(Collectors.toList())
         ).get();
     }
@@ -550,12 +550,7 @@ public class GParsPoolUtil {
      */
     public static <T> Collection<T> collectParallel(final Map collection, final Closure<? extends T> cl) throws ExecutionException, InterruptedException {
         //return createPA(collection, retrievePool()).withMapping(new ClosureMapper(buildClosureForMaps(cl))).all().asList();
-        return (Collection<T>) retrievePool().submit(() ->
-                collection.entrySet()
-                        .parallelStream()
-                        .map(it -> cl.call(it))
-                        .collect(Collectors.toList())
-        ).get();
+        return collectParallel(collection.entrySet(), cl);
     }
 
     /**
@@ -629,13 +624,7 @@ public class GParsPoolUtil {
      */
     public static <T> List<T> collectManyParallel(final Map collection, final Closure<Collection<? extends T>> projection) throws ExecutionException, InterruptedException {
         //return (List<T>) createPA(collection, retrievePool()).withMapping(new ClosureMapper(buildClosureForMaps(projection))).reduce(new ClosureReducer(SumClosure.getInstance()), null);
-        return (List<T>) retrievePool().submit(() ->
-                collection.entrySet()
-                        .parallelStream()
-                        .map(it -> projection.call(it))
-                        .flatMap(it -> ((Collection) it).stream())
-                        .collect(Collectors.toList())
-        ).get();
+        return collectManyParallel(collection.entrySet(), projection);
     }
 
     /**
@@ -705,7 +694,7 @@ public class GParsPoolUtil {
         return retrievePool().submit(() ->
                 collection.entrySet()
                         .parallelStream()
-                        .filter(it -> (Boolean) cl.call(it))
+                        .filter(it -> GParsPoolUtilHelper.convertToBoolean(callClosure(cl, it)))
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
         ).get();
     }
@@ -731,7 +720,7 @@ public class GParsPoolUtil {
         //return GParsPoolUtilHelper.findParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
         return retrievePool().submit(() ->
                 collection.parallelStream()
-                        .filter(it -> GParsPoolUtilHelper.convertToBoolean(cl.call(it)))
+                        .filter(it -> GParsPoolUtilHelper.convertToBoolean(callClosure(cl, it)))
                         .findFirst()
                         .orElse(null)
         ).get();
@@ -779,7 +768,7 @@ public class GParsPoolUtil {
         return retrievePool().submit(() ->
                 collection.entrySet()
                         .parallelStream()
-                        .filter(it -> (Boolean) cl.call(it))
+                        .filter(it -> GParsPoolUtilHelper.convertToBoolean(callClosure(cl, it)))
                         .findFirst()
                         .orElse(null)
         ).get();
@@ -808,7 +797,7 @@ public class GParsPoolUtil {
         //return GParsPoolUtilHelper.findAnyParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
         return retrievePool().submit(() ->
                 collection.parallelStream()
-                        .filter(it -> (Boolean) cl.call(it))
+                        .filter(it -> GParsPoolUtilHelper.convertToBoolean(callClosure(cl, it)))
                         .findAny()
                         .orElse(null)
         ).get();
@@ -862,7 +851,7 @@ public class GParsPoolUtil {
         return retrievePool().submit(() ->
                 collection.entrySet()
                         .parallelStream()
-                        .filter(it -> (Boolean) cl.call(it))
+                        .filter(it -> GParsPoolUtilHelper.convertToBoolean(callClosure(cl, it)))
                         .findAny()
                         .orElse(null)
         ).get();
@@ -892,7 +881,7 @@ public class GParsPoolUtil {
 
         return retrievePool().submit(() ->
                 collection.parallelStream()
-                        .filter(it -> GParsPoolUtilHelper.convertToBoolean(predicate.call(it)))
+                        .filter(it -> GParsPoolUtilHelper.convertToBoolean(callClosure(predicate, it)))
                         .collect(Collectors.toList())
         ).get();
     }
@@ -936,11 +925,14 @@ public class GParsPoolUtil {
      */
     public static <K, V> Map<K, V> grepParallel(final Map<K, V> collection, final Object filter) throws ExecutionException, InterruptedException {
         //return buildResultMap(GParsPoolUtilHelper.grepParallelPA(createPA(collection, retrievePool()), filter instanceof Closure ? buildClosureForMaps((Closure<Object>) filter) : filter));
-        final Collection<Map.Entry> entries = toCollection(filter);
+        final Closure<Object> predicate = isClosure(filter) ?
+                (Closure<Object>) filter :
+                collectionContainsClosure(toCollection(filter));
+        
         return retrievePool().submit(() ->
                 collection.entrySet()
                         .parallelStream()
-                        .filter(it -> entries.contains(it))
+                        .filter(it -> GParsPoolUtilHelper.convertToBoolean(callClosure(predicate, it)))
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
         ).get();
     }
@@ -1063,7 +1055,7 @@ public class GParsPoolUtil {
         //return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withFilter(new ClosurePredicate(filter)).size();
         return retrievePool().submit(() ->
                 collection.parallelStream()
-                        .filter(it -> GParsPoolUtilHelper.convertToBoolean(filter.call(it)))
+                        .filter(it -> GParsPoolUtilHelper.convertToBoolean(callClosure(filter, it)))
                         .count()
         ).get().intValue();
     }
@@ -1111,7 +1103,7 @@ public class GParsPoolUtil {
         //return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withFilter(new ClosurePredicate(cl)).any() != null;
         return retrievePool().submit(() ->
                 collection.parallelStream()
-                        .anyMatch(it -> GParsPoolUtilHelper.convertToBoolean(cl.call(it)))
+                        .anyMatch(it -> GParsPoolUtilHelper.convertToBoolean(callClosure(cl, it)))
         ).get();
     }
 
@@ -1166,7 +1158,7 @@ public class GParsPoolUtil {
         return retrievePool().submit(() ->
                 collection.entrySet()
                         .parallelStream()
-                        .anyMatch(it -> GParsPoolUtilHelper.convertToBoolean(cl.call(it)))
+                        .anyMatch(it -> GParsPoolUtilHelper.convertToBoolean(callClosure(cl, it)))
         ).get();
     }
 
@@ -1191,7 +1183,7 @@ public class GParsPoolUtil {
         //return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withFilter(new ClosureNegationPredicate(cl)).any() == null;
         return retrievePool().submit(() ->
                 collection.parallelStream()
-                        .allMatch(it -> GParsPoolUtilHelper.convertToBoolean(cl.call(it)))
+                        .allMatch(it -> GParsPoolUtilHelper.convertToBoolean(callClosure(cl, it)))
         ).get();
     }
 
@@ -1262,7 +1254,7 @@ public class GParsPoolUtil {
         //return groupByParallelPA(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()), cl);
         return (Map<K, List<T>>) retrievePool().submit(() ->
                 collection.parallelStream()
-                        .collect(Collectors.groupingBy(it -> (T) cl.call(it), Collectors.toList()))
+                        .collect(Collectors.groupingBy(it -> (T) callClosure(cl, it), Collectors.toList()))
         ).get();
     }
 
@@ -1671,7 +1663,15 @@ public class GParsPoolUtil {
             return Collections.unmodifiableSet(((Map) object).entrySet());
         }
 
-        return inspectGroovyMetaClassIfNeeded((GroovyObjectSupport) object);
+        if (Map.Entry.class.isAssignableFrom(object.getClass())) {
+            return Collections.unmodifiableList((List<? extends T>) Collections.singletonList(((Map.Entry) object)));
+        }
+
+        if (GroovyObjectSupport.class.isAssignableFrom(object.getClass())) {
+            return inspectGroovyMetaClassIfNeeded((GroovyObjectSupport) object);
+        }
+
+        return Collections.emptyList();
     }
 
     private static <T> Collection<T> inspectGroovyMetaClassIfNeeded(final GroovyObjectSupport object) {
@@ -1710,5 +1710,19 @@ public class GParsPoolUtil {
                 return collection.contains(el);
             }
         };
+    }
+
+    private static  <T> T callClosure(final Closure cl, final Object element) {
+        if (Map.Entry.class.isAssignableFrom(element.getClass()) && cl.getMaximumNumberOfParameters() >= 2) {
+            return (T) cl.call(((Map.Entry) element).getKey(), (((Map.Entry) element).getValue()));
+        }
+        return (T) cl.call(element);
+    }
+
+    private static  <T> T callIndexedClosure(final Closure cl, final Object element, int index) {
+        if (Map.Entry.class.isAssignableFrom(element.getClass()) && cl.getMaximumNumberOfParameters() >= 3) {
+            return (T) cl.call(((Map.Entry) element).getKey(), (((Map.Entry) element).getValue()), index);
+        }
+        return (T) cl.call(element, index);
     }
 }
