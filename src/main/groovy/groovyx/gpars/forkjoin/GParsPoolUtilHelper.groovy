@@ -31,6 +31,10 @@ import java.util.concurrent.Future
  */
 class GParsPoolUtilHelper {
 
+  static boolean convertToBoolean(final o) {
+    return o as Boolean
+  }
+
   public static Closure async(Closure cl) {
     return {Object... args -> (args != null && args.size() == 0) ? GParsPoolUtil.callParallel(cl) : GParsPoolUtil.callParallel({ -> cl(* args) })}
    }

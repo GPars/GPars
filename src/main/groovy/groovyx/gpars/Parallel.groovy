@@ -323,7 +323,7 @@ final class Parallel {
      */
     public def injectParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.foldParallel(getRealSelf(), cl)
+            GParsPoolUtil.injectParallel(getRealSelf(), cl)
         }
     }
 
@@ -339,7 +339,7 @@ final class Parallel {
      */
     public def injectParallel(seed, Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.foldParallel(getRealSelf(), seed, cl)
+            GParsPoolUtil.injectParallel(getRealSelf(), seed, cl)
         }
     }
 
