@@ -34,9 +34,9 @@ buildscript {
 
 plugins {
     // TODO: Cannot use anything other than literals here. Why?
-    id 'org.asciidoctor.convert' version '1.5.3'
-    id 'com.jfrog.bintray' version '1.7.3'
-    id 'com.jfrog.artifactory' version '4.4.14'
+    id 'org.asciidoctor.convert' version '1.5.6'
+    id 'com.jfrog.bintray' version '1.8.0'
+    id 'com.jfrog.artifactory' version '4.5.4'
 }
 
 apply plugin: 'groovy'
@@ -60,7 +60,7 @@ ext {
     theVendor = 'gpars.org'
     theTitle = 'GPars: Groovy Parallel Systems'
     titleForDocumentation = archivesBaseName + ' ' + version
-    copyrightString = 'Copyright &#169; 2008&#8211;2015  V&#225;clav Pech.  All Rights Reserved.'
+    copyrightString = 'Copyright &#169; 2008&#8211;2017  V&#225;clav Pech.  All Rights Reserved.'
     packageTitle = group
     description = 'The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more'
 }
