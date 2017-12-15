@@ -34,7 +34,7 @@ buildscript {
 
 plugins {
     // TODO: Cannot use anything other than literals here. Why?
-    id 'org.asciidoctor.convert' version '1.5.6'
+    id 'org.asciidoctor.convert' version '1.5.7'
     id 'com.jfrog.bintray' version '1.8.0'
     id 'com.jfrog.artifactory' version '4.5.4'
 }
