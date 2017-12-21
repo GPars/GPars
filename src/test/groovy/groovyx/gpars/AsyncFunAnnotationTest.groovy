@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008--2011  The original author or authors
+// Copyright © 2008–2011, 2017  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ class AsyncFunAnnotationTest extends Specification {
 
         when:
         boolean wasCalled = false
-        groovyx.gpars.GParsPool.withPool(5) {
+        GParsPool.withPool(5) {
             def tester = new TestSum()
 
             assert tester.sum(1, 2).val == 3
@@ -44,7 +44,7 @@ class AsyncFunAnnotationTest extends Specification {
         boolean wasCalled = false
         def tester = new TestSum()
 
-        groovyx.gpars.GParsPool.withPool(5) {
+        GParsPool.withPool(5) {
             assert tester.sum(1, 2).val == 3
             assert tester.sum(10, 15) instanceof Promise
             wasCalled = true
@@ -58,7 +58,7 @@ class AsyncFunAnnotationTest extends Specification {
 
         when:
         boolean wasCalled = false
-        groovyx.gpars.GParsPool.withPool(5) {
+        GParsPool.withPool(5) {
             def tester = new TestSum()
             assert tester.sum2(1, 2).val == 3
             assert tester.sum2(10, 15) instanceof Promise
@@ -73,7 +73,7 @@ class AsyncFunAnnotationTest extends Specification {
 
         when:
         boolean wasCalled = false
-        groovyx.gpars.GParsPool.withPool(5) {
+        GParsPool.withPool(5) {
             def tester = new TestSum()
             assert tester.sum3(1, 2).val == 3
             assert tester.sum3(10, 15) instanceof Promise
@@ -89,7 +89,7 @@ class AsyncFunAnnotationTest extends Specification {
 
         when:
         boolean wasCalled = false
-        groovyx.gpars.GParsPool.withPool(5) {
+        GParsPool.withPool(5) {
             def tester = new TestSum()
             assert tester.sum4(1, 2).val == 3
             assert tester.sum4(10, 15) instanceof Promise
@@ -104,7 +104,7 @@ class AsyncFunAnnotationTest extends Specification {
 
         when:
         boolean wasCalled = false
-        groovyx.gpars.GParsPool.withPool(5) {
+        GParsPool.withPool(5) {
             def tester = new TestSum()
             assert tester.sum8(1, 2).val == 3
             assert tester.sum8(10, 15) instanceof Promise
@@ -119,7 +119,7 @@ class AsyncFunAnnotationTest extends Specification {
 
         when:
         boolean wasCalled = false
-        groovyx.gpars.GParsPool.withPool(5) {
+        GParsPool.withPool(5) {
             def tester = new TestSum()
             assert tester.sum10(1, 2) == 3
             assert tester.sum10(10, 15) instanceof Integer
@@ -134,7 +134,7 @@ class AsyncFunAnnotationTest extends Specification {
 
         when:
         boolean wasCalled = false
-        groovyx.gpars.GParsPool.withPool(5) {
+        GParsPool.withPool(5) {
             def tester = new TestSum()
             assert tester.sum7(1, 2).val == 3
             assert tester.sum7(10, 15) instanceof Promise
@@ -149,7 +149,7 @@ class AsyncFunAnnotationTest extends Specification {
 
         when:
         boolean wasCalled = false
-        groovyx.gpars.GParsPool.withPool(5) {
+        GParsPool.withPool(5) {
             def tester = new TestSum()
             assert tester.sum9(1, 2) == 3
             assert tester.sum9(10, 15) instanceof Integer
@@ -164,7 +164,7 @@ class AsyncFunAnnotationTest extends Specification {
 
         when:
         boolean wasCalled = false
-        groovyx.gpars.GParsExecutorsPool.withPool(5) {
+        GParsExecutorsPool.withPool(5) {
             def tester = new MyOtherTester()
             assert tester.sum6(1, 2).val == 3
             assert tester.sum6(10, 15) instanceof Promise
