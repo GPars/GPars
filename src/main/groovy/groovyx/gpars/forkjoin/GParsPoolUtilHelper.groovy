@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008–2012, 2014  The original author or authors
+// Copyright © 2008–2012, 2014, 2017  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@
 
 package groovyx.gpars.forkjoin
 
+import groovyx.gpars.GParsPool
 import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.TransparentParallel
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.scheduler.FJPool
+import groovyx.gpars.util.AsyncUtils
 
 import java.util.concurrent.Future
 
@@ -44,10 +46,18 @@ class GParsPoolUtilHelper {
   }
 
   public static Closure asyncFun(final Closure original, final boolean blocking, final FJPool pool = null) {
+      // TODO Simplify all the pool retrieval.
+      final retrieveFJPool = {
+          final retrievedPool = GParsPool.retrieveCurrentPool()
+          if (retrievedPool != null) {
+              return new FJPool(retrievedPool);
+          }
+          return null
+      }
     final FJPool localPool = pool ?: retrieveFJPool();
     return {final Object[] args ->
       final DataflowVariable result = new DataflowVariable()
-      PAUtils.evaluateArguments(localPool ?: new FJPool(GParsPoolUtil.retrievePool()), args.clone(), 0, [], result, original, false)
+      AsyncUtils.evaluateArguments(localPool ?: new FJPool(GParsPoolUtil.retrievePool()), args.clone(), 0, [], result, original, false)
       blocking ? result.get() : result
     }
   }
