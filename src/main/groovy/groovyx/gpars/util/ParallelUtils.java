@@ -49,7 +49,6 @@ public abstract class ParallelUtils {
 	return collection;
     }
 
-
    /**
     * If the passed-in closure expects two arguments, it is considered to be a map-iterative code and is then wrapped
     * with a single-argument closure, which unwraps the key:value pairs for the original closure.

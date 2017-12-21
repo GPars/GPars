@@ -20,6 +20,7 @@ import groovy.time.Duration
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.scheduler.DefaultPool
 import groovyx.gpars.scheduler.Pool
+import groovyx.gpars.util.AsyncUtils
 import groovyx.gpars.util.GeneralTimer
 
 import java.util.concurrent.Callable
@@ -138,7 +139,7 @@ public class GParsExecutorsPoolUtil {
         final Pool localPool = pool ?: retrieveLocalPool();
         return { final Object[] args ->
             final DataflowVariable result = new DataflowVariable()
-            PAUtils.evaluateArguments(localPool ?: new DefaultPool(GParsExecutorsPool.retrieveCurrentPool() as ThreadPoolExecutor), args.clone(), 0, [], result, original, false)
+            AsyncUtils.evaluateArguments(localPool ?: new DefaultPool(GParsExecutorsPool.retrieveCurrentPool() as ThreadPoolExecutor), args.clone(), 0, [], result, original, false)
             blocking ? result.get() : result
         }
     }
@@ -269,7 +270,7 @@ public class GParsExecutorsPoolUtil {
      * Does parallel collect on a map
      */
     public static Collection<Object> collectParallel(Map collection, Closure cl) {
-        return collectParallel(createCollection(collection), buildClosureForMaps(cl))
+        return collectParallel(collection, buildClosureForMaps(cl))
     }
 
     /**
