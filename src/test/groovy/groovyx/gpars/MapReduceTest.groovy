@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2012  The original author or authors
+// Copyright © 2008-2012, 2017  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -135,7 +135,7 @@ public class MapReduceTest extends GroovyTestCase {
     }
 
     public void testGroupBy() {
-        groovyx.gpars.GParsPool.withPool(5) {
+        GParsPool.withPool(5) {
             assert [1, 2, 3, 4, 5].parallel.groupBy { it > 2 }.size() == 2
             assert [4, 2, 3, 1, 5].parallel.groupBy { Number number -> 1 }.size() == 1
             assert [2, 4, 5, 1, 3].parallel.groupBy { Number number -> number }.size() == 5
@@ -149,7 +149,7 @@ public class MapReduceTest extends GroovyTestCase {
 
     public void testCombine() {
         def words = """The xxxParallel() methods have to follow the contract of their non-parallel peers. So a collectParallel() method must return a legal collection of items, which you can again treat as a Groovy collection. Internally the parallel collect method builds an efficient parallel structure, called parallel array, performs the required operation concurrently and before returning destroys the Parallel Array building the collection of results to return to you. A potential call to let say findAllParallel() on the resulting collection would repeat the whole process of construction and destruction of a Parallel Array instance under the covers. With Map/Reduce you turn your collection into a Parallel Array and back only once. The Map/Reduce family of methods do not return Groovy collections, but are free to pass along the internal Parallel Arrays directly. Invoking the parallel property on a collection will build a Parallel Array for the collection and return a thin wrapper around the Parallel Array instance. Then you can chain all required methods like:""".tokenize()
-        groovyx.gpars.GParsPool.withPool(5) {
+        GParsPool.withPool(5) {
             def result1 = words.parallel.map { [it, 1] }.combine(0, { a, b -> a + b }).getParallel().sort {
                 -it.value
             }.collection
@@ -177,9 +177,9 @@ public class MapReduceTest extends GroovyTestCase {
                 [key1: 'ABC', key2: 4, value: 1.03],
                 [key1: 'DEF', key2: 3, value: 1.04]]
 
-        groovyx.gpars.GParsPool.withPool {
+        GParsPool.withPool {
             def mapInner = { entrylist ->
-                groovyx.gpars.GParsPool.withPool {
+                GParsPool.withPool {
                     entrylist.parallel.map { [it.key2, it.value] }.combine(0) { acc, v -> acc + v }
                 }
             }
@@ -217,9 +217,9 @@ public class MapReduceTest extends GroovyTestCase {
         ]
 
         def wrapUpList = { lst ->
-            groovyx.gpars.GParsPool.withPool {
+            GParsPool.withPool {
                 def mapInner = { entrylist ->
-                    groovyx.gpars.GParsPool.withPool {
+                    GParsPool.withPool {
                         entrylist.getParallel()
                                 .map { [it.key2, it.total] }
                                 .combine(0) { acc, v -> acc + v }
