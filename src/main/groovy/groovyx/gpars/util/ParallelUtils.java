@@ -18,10 +18,11 @@ package groovyx.gpars.util;
 
 import groovy.lang.Closure;
 
-import java.util.Collection;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Methods moved from PAUtils and PAGroovyUtils.
