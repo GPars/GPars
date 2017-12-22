@@ -21,7 +21,6 @@ import groovy.lang.Closure;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -111,5 +110,18 @@ public abstract class ParallelUtils {
        return cl;
    }
 
+    /**
+     * Builds a resulting map out of an map entry collection
+     *
+     * @param result The collection containing map entries
+     * @return A corresponding map instance
+     */
+    public static <K, V> Map<K, V> buildResultMap(final Collection<Map.Entry<K, V>> result) {
+        final Map<K, V> map = new HashMap<K, V>(result.size());
+        for (final Map.Entry<K, V> item : result) {
+            map.put(item.getKey(), item.getValue());
+        }
+        return map;
+    }
 
 }
