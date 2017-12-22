@@ -33,8 +33,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
-import java.util.Collection
-import static groovyx.gpars.util.ParallelUtils.createCollection
 import static groovyx.gpars.util.ParallelUtils.buildClosureForMaps
 import static groovyx.gpars.util.ParallelUtils.buildClosureForMapsWithIndex
 import static groovyx.gpars.util.ParallelUtils.buildResultMap
@@ -55,11 +53,13 @@ public class GParsExecutorsPoolUtil {
      */
     private static final GeneralTimer timer = GParsConfig.retrieveDefaultTimer('GParsExecutorsTimeoutTimer', true)
 
+    // Hack needed for maps.
    private static java.util.Collection createCollection(Object object) {
        def collection = []
        for (element in object) collection << element
        return collection
    }
+
     /**
      * schedules the supplied closure for processing in the underlying thread pool.
      */
@@ -270,7 +270,7 @@ public class GParsExecutorsPoolUtil {
      * Does parallel collect on a map
      */
     public static Collection<Object> collectParallel(Map collection, Closure cl) {
-        return collectParallel(collection, buildClosureForMaps(cl))
+        return collectParallel(createCollection(collection), buildClosureForMaps(cl))
     }
 
     /**
