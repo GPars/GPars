@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// package groovyx.gpars.pa
+package groovyx.gpars.pa
 
-// import groovy.transform.CompileStatic
-// import groovy.transform.TypeCheckingMode
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 
-// /**
-//  * The default ParallelArray wrapper class
-//  */
-// @CompileStatic(value = TypeCheckingMode.PASS)
-// final class PAWrapper<T> extends AbstractPAWrapper {
-//     def PAWrapper(final pa) { super(pa) }
-// }
+/**
+ * The default ParallelArray wrapper class
+ */
+@CompileStatic(value = TypeCheckingMode.PASS)
+final class PAWrapper<T> extends AbstractPAWrapper {
+    def PAWrapper(final pa) { super(pa) }
+}

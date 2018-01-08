@@ -21,6 +21,7 @@ import groovy.lang.GroovyObjectSupport;
 import groovy.time.Duration;
 import groovyx.gpars.forkjoin.CallAsyncTask;
 import groovyx.gpars.forkjoin.GParsPoolUtilHelper;
+import groovyx.gpars.pa.PAWrapper;
 import groovyx.gpars.scheduler.FJPool;
 import groovyx.gpars.util.GeneralTimer;
 import org.codehaus.groovy.runtime.InvokerHelper;
@@ -1486,23 +1487,23 @@ public class GParsPoolUtil {
         return injectParallel(toCollection(collection), seed, cl);
     }
 
-//    /**
-//     * Creates a PAWrapper around a ParallelArray wrapping the elements of the original collection.
-//     * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
-//     * ParallelArray implementation.
-//     */
-//    public static <T> PAWrapper<T> getParallel(final Collection<T> collection) {
-//        return new PAWrapper(GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()));
-//    }
-//
-//    /**
-//     * Creates a PAWrapper around a ParallelArray wrapping the elements of the original collection.
-//     * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
-//     * ParallelArray implementation.
-//     */
-//    public static PAWrapper getParallel(final Object collection) {
-//        return new PAWrapper(GParsPoolUtilHelper.createPA(collection, retrievePool()));
-//    }
+    /**
+     * Creates a PAWrapper around a ParallelArray wrapping the elements of the original collection.
+     * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
+     * ParallelArray implementation.
+     */
+    public static <T> PAWrapper<T> getParallel(final Collection<T> collection) {
+        return new PAWrapper<T>(collection);
+    }
+
+    /**
+     * Creates a PAWrapper around a ParallelArray wrapping the elements of the original collection.
+     * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
+     * ParallelArray implementation.
+     */
+    public static PAWrapper getParallel(final Object collection) {
+        return new PAWrapper(toCollection(collection));
+    }
 //
 //    /**
 //     * Creates a ParallelArray wrapping the elements of the original collection.
