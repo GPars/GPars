@@ -208,19 +208,16 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         if (callback == null) {
             throw new NullPointerException();
         }
-
         WaitingThread newWaiting = null;
         while (state != S_INITIALIZED) {
             if (newWaiting == null) {
                 newWaiting = new WaitingThread(null, null, attachment, callback);
             }
-
             final WaitingThread previous = waiting;
             // it means that writer already started processing queue, so value is already in place
             if (previous == dummyWaitingThread) {
                 break;
             }
-
             newWaiting.previous = previous;
             if (waitingUpdater.compareAndSet(this, previous, newWaiting)) {
                 // ok, we are in the queue, so writer is responsible to process us
@@ -263,13 +260,11 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
             if (newWaiting == null) {
                 newWaiting = new WaitingThread(Thread.currentThread(), null, null, null);
             }
-
             final WaitingThread previous = waiting;
             // it means that writer already started processing queue, so value is already in place
             if (previous == dummyWaitingThread) {
                 break;
             }
-
             newWaiting.previous = previous;
             if (waitingUpdater.compareAndSet(this, previous, newWaiting)) {
                 // ok, we are in the queue, so writer is responsible to process us
@@ -299,13 +294,11 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
             if (newWaiting == null) {
                 newWaiting = new WaitingThread(Thread.currentThread(), null, null, null);
             }
-
             final WaitingThread previous = waiting;
             // it means that writer already started processing queue, so value is already in place
             if (previous == dummyWaitingThread) {
                 break;
             }
-
             newWaiting.previous = previous;
             if (waitingUpdater.compareAndSet(this, previous, newWaiting)) {
                 // ok, we are in the queue, so writer is responsible to process us
@@ -315,7 +308,6 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
                         newWaiting.set(true); // don't unpark please
                         return null;
                     }
-
                     LockSupport.parkNanos(toWait);
                     if (Thread.currentThread().isInterrupted()) handleInterruption(newWaiting);
                 }
@@ -379,11 +371,9 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
                 }
             } catch (InterruptedException ignore) {
             }  //Can ignore since will throw an IllegalStateException below
-
             fireBindError(value, false);
             throw new IllegalStateException(A_DATAFLOW_VARIABLE_CAN_ONLY_BE_ASSIGNED_ONCE_ONLY_RE_ASSIGNMENTS_TO_AN_EQUAL_VALUE_ARE_ALLOWED);
         }
-
         doBind(value);
     }
 
@@ -398,7 +388,6 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
             fireBindError(value, true);
             throw new IllegalStateException("A DataflowVariable can only be assigned once. Use bind() to allow for equal values to be passed into already-bound variables.");
         }
-
         doBind(value);
     }
 
@@ -417,9 +406,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         if (value instanceof Throwable) error = (Throwable) value;
         state = S_INITIALIZED;
         fireOnMessage(value);
-
         final WaitingThread waitingQueue = waitingUpdater.getAndSet(this, dummyWaitingThread);
-
         // no more new waiting threads since that point
         for (WaitingThread currentWaiting = waitingQueue; currentWaiting != null; currentWaiting = currentWaiting.previous) {
             // maybe currentWaiting thread canceled or was interrupted
@@ -463,7 +450,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
                     if (sub instanceof RemoteHost) {
                         final RemoteHost host = (RemoteHost) sub;
                         if (hostId == null || !host.getHostId().equals(hostId)) {
-                            host.write(new BindDataflow(DataflowExpression.this, value, host.getLocalHost().getId()));
+                            host.write(new BindDataflow<T>(DataflowExpression.this, value, host.getLocalHost().getId()));
                         }
                     }
                     if (sub instanceof List) {
@@ -471,7 +458,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
                         synchronized (serialHandle) {
                             for (final SerialContext host : (List<SerialContext>) sub) {
                                 if (hostId == null || !host.getHostId().equals(hostId)) {
-                                    host.write(new BindDataflow(DataflowExpression.this, value, host.getLocalHostId()));
+                                    host.write(new BindDataflow<T>(DataflowExpression.this, value, host.getLocalHostId()));
                                 }
                             }
                         }
@@ -1036,7 +1023,6 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
         parameters.put("outputs", asList(trueBranch, falseBranch));
-
         group.operator(parameters, new BinaryChoiceClosure(code));
     }
 
@@ -1070,7 +1056,6 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
         parameters.put("outputs", asList(outputs));
-
         group.operator(parameters, new ChoiceClosure(code));
     }
 
@@ -1104,7 +1089,6 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         final Map<String, Object> parameters = new HashMap<String, Object>(params);
         parameters.put("inputs", asList(this));
         parameters.put("outputs", asList(outputs));
-
         group.operator(parameters, new SeparationClosure(code));
     }
 
@@ -1272,17 +1256,14 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
             if (!(element instanceof DataflowExpression)) {
                 return element;
             }
-
             final DataflowExpression<?> dataflowExpression = (DataflowExpression<?>) element;
             if (dataflowExpression.state == S_INITIALIZED) {
                 return dataflowExpression.value;
             }
-
             count.incrementAndGet();
             dataflowExpression.getValAsync(this);
             return element;
         }
-
 
         void start() {
             if (count.decrementAndGet() == 0) {
