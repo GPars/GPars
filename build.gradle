@@ -1,6 +1,6 @@
-// GPars - Groovy Parallel Systems
+// GPars – Groovy Parallel Systems
 //
-// Copyright © 2008–2017  The original author or authors
+// Copyright © 2008–2018  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 
 //  Author: Václav Pech
 //  Author: Russel Winder
@@ -36,7 +35,7 @@ plugins {
     // TODO: Cannot use anything other than literals here. Why?
     id 'org.asciidoctor.convert' version '1.5.7'
     id 'com.jfrog.bintray' version '1.8.0'
-    id 'com.jfrog.artifactory' version '4.5.4'
+    id 'com.jfrog.artifactory' version '4.6.2'
 }
 
 apply plugin: 'groovy'
@@ -48,7 +47,7 @@ apply plugin: 'idea'
 
 import org.apache.tools.ant.taskdefs.Javadoc
 
-group = 'org.codehaus.gpars'
+group = 'org.gpars'
 archivesBaseName = 'gpars'
 
 defaultTasks 'test'
@@ -79,7 +78,7 @@ configurations {
 }
 
 dependencies {
-    compile "org.codehaus.groovy:groovy-all:${gpars_groovyVersion}"
+    compile "org.codehaus.groovy:groovy:${gpars_groovyVersion}"
     compile "org.multiverse:multiverse-core:${gpars_multiverseVersion}", { transitive = false }
     compile "io.netty:netty-all:${gpars_nettyVersion}"
     compile "org.codehaus.jcsp:jcsp:${gpars_jcspVersion}"
@@ -386,10 +385,6 @@ artifactoryPublish {
 
 task release(dependsOn: ['build', 'jarSrc', 'jarDoc', 'zipSamples', 'zipJavaDemo', 'zipDist', 'zipGuide']) << {
     println 'We release now'
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.4.1'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
