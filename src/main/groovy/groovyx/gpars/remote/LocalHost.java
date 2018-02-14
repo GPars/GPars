@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-2010, 2013, 2014  The original author or authors
+// Copyright © 2008-2010, 2013, 2014, 2018  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package groovyx.gpars.remote;
 
-import groovyx.gpars.actor.Actor;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.remote.netty.NettyClient;
 import groovyx.gpars.remote.netty.NettyServer;
@@ -25,7 +24,10 @@ import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandles;
 import groovyx.gpars.serial.SerialMsg;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Represents communication point with other local hosts.
@@ -89,7 +91,6 @@ public abstract class LocalHost extends SerialHandles {
         if (server != null) {
             throw new IllegalStateException("Server is already started");
         }
-
         server = NettyTransportProvider.createServer(host, port, this);
         server.start();
     }
@@ -98,7 +99,6 @@ public abstract class LocalHost extends SerialHandles {
         if (server == null) {
             throw new IllegalStateException("Server has not been started");
         }
-
         server.stop();
     }
 
@@ -111,15 +111,14 @@ public abstract class LocalHost extends SerialHandles {
     }
 
     protected <T> DataflowVariable<T> getPromise(Map<String, DataflowVariable<T>> registry, String name, String host, int port, SerialMsg requestMsg) {
-        DataflowVariable remoteVariable = registry.get(name);
+        DataflowVariable<T> remoteVariable = registry.get(name);
         if (remoteVariable == null) {
-            DataflowVariable newRemoteVariable = new DataflowVariable<>();
+            DataflowVariable<T> newRemoteVariable = new DataflowVariable<>();
             remoteVariable = registry.putIfAbsent(name, newRemoteVariable);
             if (remoteVariable == null) {
                 createRequest(host, port, requestMsg);
                 remoteVariable = newRemoteVariable;
             }
-
         }
         return remoteVariable;
     }
