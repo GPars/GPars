@@ -34,8 +34,8 @@ buildscript {
 plugins {
     // TODO: Cannot use anything other than literals here. Why?
     id 'org.asciidoctor.convert' version '1.5.7'
-    id 'com.jfrog.bintray' version '1.8.0'
-    id 'com.jfrog.artifactory' version '4.6.2'
+    id 'com.jfrog.bintray' version '1.8.1'
+    id 'com.jfrog.artifactory' version '4.7.3'
 }
 
 apply plugin: 'groovy'
@@ -59,7 +59,7 @@ ext {
     theVendor = 'gpars.org'
     theTitle = 'GPars: Groovy Parallel Systems'
     titleForDocumentation = archivesBaseName + ' ' + version
-    copyrightString = 'Copyright &#169; 2008&#8211;2017  V&#225;clav Pech.  All Rights Reserved.'
+    copyrightString = 'Copyright &#169; 2008&#8211;2018  V&#225;clav Pech.  All Rights Reserved.'
     packageTitle = group
     description = 'The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more'
 }
@@ -79,9 +79,10 @@ configurations {
 
 dependencies {
     compile "org.codehaus.groovy:groovy:${gpars_groovyVersion}"
+    compile "org.codehaus.groovy:groovy-cli-commons:${gpars_groovyVersion}"
     compile "org.multiverse:multiverse-core:${gpars_multiverseVersion}", { transitive = false }
     compile "io.netty:netty-all:${gpars_nettyVersion}"
-    compile "org.codehaus.jcsp:jcsp:${gpars_jcspVersion}"
+    compile "cspforjava:jcsp:${gpars_jcspVersion}"
     testCompile "org.spockframework:spock-core:${gpars_spockVersion}"
     testCompile "com.google.code.gson:gson:${gpars_gsonVersion}"
     testCompile "com.google.guava:guava:${gpars_guavaVersion}"
@@ -90,7 +91,7 @@ dependencies {
     cover "net.sourceforge.cobertura:cobertura:${gpars_coberturaVersion}"
     testRuntime "net.sourceforge.cobertura:cobertura:${gpars_coberturaVersion}"
     // Have to get some specific dependencies into the GroovyDoc process.
-    groovyDoc "org.codehaus.groovy:groovy-all:${gpars_groovyVersion}"
+    groovyDoc "org.codehaus.groovy:groovy:${gpars_groovyVersion}"
     groovyDoc "org.fusesource.jansi:jansi:${gpars_jansiVersion}"
 }
 
@@ -324,7 +325,6 @@ publishing {
     }
 }
 
-// TODO: What is the bintray organisation (will it be part of groovy)
 // TODO: Activate signing to bintray
 // TODO: Activate sync to Maven Central
 bintray {
