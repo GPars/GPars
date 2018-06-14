@@ -1,6 +1,6 @@
-// GPars - Groovy Parallel Systems
+// GPars — Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008–2010, 2018  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@ package groovyx.gpars.samples.csp
 import groovyx.gpars.csp.PAR
 import groovyx.gpars.csp.plugAndPlay.GNumbers
 import groovyx.gpars.csp.plugAndPlay.GPrint
-import org.jcsp.lang.Channel
-import org.jcsp.lang.One2OneChannel
+
+import jcsp.lang.Channel
+import jcsp.lang.One2OneChannel
 
 One2OneChannel N2P = Channel.createOne2One()
 

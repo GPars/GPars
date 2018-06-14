@@ -1,6 +1,6 @@
-// GPars - Groovy Parallel Systems
+// GPars — Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008–2010, 2018  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,15 @@
 package groovyx.gpars.samples.csp
 
 import groovyx.gpars.csp.PAR
-import org.jcsp.lang.CSProcess
-import org.jcsp.lang.Channel
-import org.jcsp.lang.ChannelOutput
-import org.jcsp.lang.One2OneChannel
 import groovyx.gpars.csp.plugAndPlay.GPrefix
 import groovyx.gpars.csp.plugAndPlay.GPCopy
 import groovyx.gpars.csp.plugAndPlay.GStatePairs
 import groovyx.gpars.csp.plugAndPlay.GPrint
+
+import jcsp.lang.CSProcess
+import jcsp.lang.Channel
+import jcsp.lang.ChannelOutput
+import jcsp.lang.One2OneChannel
 
 class FibonacciV1Process implements CSProcess {
 

@@ -1,6 +1,6 @@
-// GPars - Groovy Parallel Systems
+// GPars — Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008–2010, 2018  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@
 package groovyx.gpars.csp.plugAndPlay
 
 import groovyx.gpars.csp.PAR
-import org.jcsp.lang.CSProcess
-import org.jcsp.lang.ChannelInput
-import org.jcsp.lang.ChannelOutput
-import org.jcsp.plugNplay.ProcessRead
+
+import jcsp.lang.CSProcess
+import jcsp.lang.ChannelInput
+import jcsp.lang.ChannelOutput
+import jcsp.plugNplay.ProcessRead
 
 class GPlus implements CSProcess {
 
@@ -40,4 +41,3 @@ class GPlus implements CSProcess {
         }
     }
 }
-            
