@@ -155,7 +155,7 @@ public class DataflowsTest extends GroovyTestCase {
             barrier.await()
         }
 
-        final def y = data.y
+        def y = data.y
         assertNull y
 
         y = data.y  //retry
@@ -166,8 +166,8 @@ public class DataflowsTest extends GroovyTestCase {
 
     public void testWhenValueBound() {
         final Dataflows data = new Dataflows()
-        final def result1 = new DataflowVariable()
-        final def result2 = new DataflowVariable()
+        final result1 = new DataflowVariable()
+        final result2 = new DataflowVariable()
 
         data.y {result1 << it }
         data.y = 'value'

@@ -57,7 +57,7 @@ def filter(inChannel, outChannel, int prime) {
 // The prime sieve: Daisy-chain Filter processes.
 
 def main() {
-    final DataflowQueue ch = new DataflowQueue()
+    def ch = new DataflowQueue()
     go generate(ch)
     for (i in (1..10)) {
         int prime = ch.val

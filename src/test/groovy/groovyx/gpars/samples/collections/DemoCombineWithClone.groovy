@@ -51,7 +51,7 @@ class PricedCar implements Cloneable {
     }
 
     @Override
-    protected Object clone() {
+    public Object clone() {
         return super.clone()
     }
 }

@@ -45,7 +45,7 @@ private def doTheHaircut(Random random) {
     Thread.sleep(random.nextInt(10) * 1000)
 }
 
-final Actor waitingRoom
+Actor waitingRoom
 
 waitingRoom = group.actor {
     final int capacity = 5

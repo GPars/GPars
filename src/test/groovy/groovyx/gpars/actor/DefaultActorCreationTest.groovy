@@ -74,8 +74,8 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testMessagingWithAct() {
-        final def result = new DataflowVariable()
-        final def actor
+        final result = new DataflowVariable()
+        def actor
         actor = [act: {
             actor.react {
                 result << it
@@ -89,8 +89,8 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testMessagingWithClosure() {
-        final def result = new DataflowVariable()
-        final def actor = new DefaultActor({
+        final result = new DataflowVariable()
+        final actor = new DefaultActor({
             react {
                 result << it
             }
@@ -103,8 +103,8 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testNullMessagingWithAct() {
-        final def result = new DataflowVariable()
-        final def actor
+        final result = new DataflowVariable()
+        def actor
         actor = [act: {
             actor.react {
                 result << it
@@ -133,7 +133,7 @@ class DefaultActorCreationTest extends GroovyTestCase {
 
     public void testLoopingWithAct() {
         final def result = new DataflowQueue()
-        final def actor
+        def actor
         actor = [act: {
             actor.loop {
                 react {
@@ -175,7 +175,7 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testRepliesWithAct() {
-        final def actor
+        def actor
         actor = [act: {
             actor.react {
                 reply it
@@ -211,8 +211,7 @@ class DefaultActorCreationTest extends GroovyTestCase {
     public void testContinuationStyleWithAct() {
         final def result = new DataflowVariable()
         final def continuationResult = new DataflowVariable()
-        final def actor
-        actor = [act: {
+        final actor = [act: {
             actor.react {
                 result << it
             }
@@ -229,7 +228,7 @@ class DefaultActorCreationTest extends GroovyTestCase {
     public void testContinuationStyleWithClosure() {
         final def result = new DataflowVariable()
         final def continuationResult = new DataflowVariable()
-        final def actor = new DefaultActor({
+        final actor = new DefaultActor({
             react {
                 result << it
             }

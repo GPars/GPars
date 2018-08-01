@@ -33,7 +33,7 @@ class GParsConfigTest extends Specification {
 
     def "default pool should be used for default parallel groups"() {
         given:
-        final myPool = new ResizeablePool(true)
+        def myPool = new ResizeablePool(true)
 
         def factory = new PoolFactory() {
             @Override
@@ -71,7 +71,7 @@ class GParsConfigTest extends Specification {
 
     def "default pool should be used in parallel groups"() {
         given:
-        final myPool = new ResizeablePool(true)
+        def myPool = new ResizeablePool(true)
 
         def factory = new PoolFactory() {
             @Override
@@ -115,7 +115,7 @@ class GParsConfigTest extends Specification {
 
     def "default timer factory should be retrieved"() {
         given:
-        final myTimer = new GeneralTimer() {
+        def myTimer = new GeneralTimer() {
             @Override
             void schedule(final Runnable task, final long timeout) {}
 
@@ -125,7 +125,7 @@ class GParsConfigTest extends Specification {
             }
         }
 
-        final myTimerFactory = new TimerFactory() {
+        def myTimerFactory = new TimerFactory() {
             @Override
             GeneralTimer createTimer(final String name, final boolean daemon) {
                 return myTimer

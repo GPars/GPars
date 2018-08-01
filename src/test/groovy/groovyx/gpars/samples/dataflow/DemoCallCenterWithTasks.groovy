@@ -92,7 +92,7 @@ numberOfCalls.times {
 }
 center.close()
 
-final long stopTime = System.nanoTime()
+long stopTime = System.nanoTime()
 println "Done in ${stopTime = startTime} ms"
 
 

@@ -23,7 +23,7 @@ import groovyx.gpars.actor.DefaultActor
  * @author Jan Novotný
  */
 
-final DefaultActor me
+DefaultActor me
 me = Actors.actor {
     def message = 1
 

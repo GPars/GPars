@@ -51,11 +51,8 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
     public void testMapSpecificsForCollect() {
         def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         GParsPool.withPool {
-            final def keyResults = [].asSynchronized()
-            final def valueResults = [].asSynchronized()
-
-            keyResults = map.collectParallel {item -> item.key}
-            valueResults = map.collectParallel {item -> item.value}
+            def keyResults = map.collectParallel {item -> item.key}
+            def valueResults = map.collectParallel {item -> item.value}
             processResults(keyResults, valueResults)
 
             keyResults = map.collectParallel {k, v -> k}
