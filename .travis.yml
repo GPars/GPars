@@ -1,9 +1,11 @@
-dist: trusty
-
 language: groovy
 
 jdk:
   - openjdk8
   - oraclejdk8
-#  - openjdk9
+  - openjdk9
   - oraclejdk9
+  - oraclejdk10
+  - openjdk10
+  - oraclejdk11
+  - openjdk11
