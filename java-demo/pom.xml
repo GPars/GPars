@@ -91,7 +91,7 @@
     <repositories>
         <repository>
             <id>codehaus</id>
-            <url>http://repository.codehaus.org/</url>
+            <url>https://repository.codehaus.org/</url>
             <layout>default</layout>
         </repository>
         <repository>
@@ -107,12 +107,12 @@
             </snapshots>
             <id>codehausSnapshots</id>
             <name>Codehaus Snapshots</name>
-            <url>http://snapshots.repository.codehaus.org/</url>
+            <url>https://snapshots.repository.codehaus.org/</url>
             <layout>default</layout>
         </repository>
         <repository>
             <id>jboss</id>
-            <url>http://repository.jboss.org/maven2/</url>
+            <url>https://repository.jboss.org/maven2/</url>
         </repository>
     </repositories>
 
