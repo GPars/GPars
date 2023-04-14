@@ -33,17 +33,17 @@
 
 plugins {
     // TODO: Cannot use anything other than literals here. Why?
-    id 'org.asciidoctor.convert' version '1.5.8'
-    id 'com.jfrog.bintray' version '1.8.1'
-    id 'com.jfrog.artifactory' version '4.7.3'
+//    id 'org.asciidoctor.convert' version '1.5.8'
+//    id 'com.jfrog.bintray' version '1.8.1'
+//    id 'com.jfrog.artifactory' version '4.7.3'
     id 'groovy'
 }
 
 //apply plugin: 'maven'
 //apply plugin: 'maven-publish'
 //apply plugin: 'osgi'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
+//apply plugin: 'eclipse'
+//apply plugin: 'idea'
 
 //import org.apache.tools.ant.taskdefs.Javadoc
 
@@ -52,14 +52,15 @@ archivesBaseName = 'gpars'
 
 defaultTasks 'test'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 // TODO set language level to 21
 // TODO use groovy 4 and the corresponding spock
 // TODO update to the newest gradlew
 // TODO add virtual threads
 // TODO prune the build script
 // TODO prune the features
+// TODO configure a CI build, remove the CI project files
 
 ext {
     theVendor = 'gpars.org'
@@ -148,7 +149,7 @@ task copyDSLDefinitions(type: Copy) {
 //  To get the details of the "unchecked" issues.
 //compileGroovy.options.compilerArgs = ['-Xlint']
 
-[compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '512M')
+[compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '512M', memoryMaximumSize: '4096M')
 
 
 //task withCoverage { // only here such that it can be put on the command line for enabling coverage
