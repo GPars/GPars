@@ -20,7 +20,7 @@ package groovyx.gpars
  * @author Vaclav Pech
  * Date: Oct 23, 2008
  */
-public class GParsExecutorsPoolOnMapTest extends GroovyTestCase {
+public class GParsExecutorsPoolOnMapTest extends groovy.test.GroovyTestCase {
 
     public void testMapSpecificsForEach() {
         def map = [a: 1, b: 2, c: 3, d: 4, e: 5]

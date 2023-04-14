@@ -23,7 +23,7 @@ import static groovyx.gpars.GParsPool.withPool
  * Author: Vaclav Pech
  */
 
-class MakeConcurrentAndSequentialTest extends GroovyTestCase {
+class MakeConcurrentAndSequentialTest extends groovy.test.GroovyTestCase {
 
     public void testIsConcurrencyActive() {
         def items1 = [1, 2, 3, 4, 5]

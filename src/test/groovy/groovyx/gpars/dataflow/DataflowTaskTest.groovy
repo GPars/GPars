@@ -21,7 +21,7 @@ import groovyx.gpars.group.NonDaemonPGroup
 
 import java.util.concurrent.Callable
 
-public class DataflowTaskTest extends GroovyTestCase {
+public class DataflowTaskTest extends groovy.test.GroovyTestCase {
 
     public void testTaskWithRunnable() {
         def a = new DataflowVariable()

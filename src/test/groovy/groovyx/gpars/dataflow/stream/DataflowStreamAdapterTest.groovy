@@ -27,7 +27,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
-public class DataflowStreamAdapterTest extends GroovyTestCase {
+public class DataflowStreamAdapterTest extends groovy.test.GroovyTestCase {
 
     public void testStream() {
         final CountDownLatch latch = new CountDownLatch(1)

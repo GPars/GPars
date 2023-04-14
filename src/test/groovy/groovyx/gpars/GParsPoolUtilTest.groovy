@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicReference
  * Date: Oct 23, 2008
  */
 @SuppressWarnings("SpellCheckingInspection")
-public class GParsPoolUtilTest extends GroovyTestCase {
+public class GParsPoolUtilTest extends groovy.test.GroovyTestCase {
 
     public void testEach() {
         groovyx.gpars.GParsPool.withPool(5) {

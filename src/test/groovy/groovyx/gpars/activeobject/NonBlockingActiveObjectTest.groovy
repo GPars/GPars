@@ -18,7 +18,7 @@ package groovyx.gpars.activeobject
 
 import groovyx.gpars.dataflow.DataflowVariable
 
-public class NonBlockingActiveObjectTest extends GroovyTestCase {
+public class NonBlockingActiveObjectTest extends groovy.test.GroovyTestCase {
 
     public void testBlockingMethodBlocks() {
         final MyNonBlockingWrapper wrapper = new MyNonBlockingWrapper()

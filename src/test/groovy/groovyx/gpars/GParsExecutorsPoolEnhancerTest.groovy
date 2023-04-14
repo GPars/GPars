@@ -16,7 +16,7 @@
 
 package groovyx.gpars
 
-public class GParsExecutorsPoolEnhancerTest extends GroovyTestCase {
+public class GParsExecutorsPoolEnhancerTest extends groovy.test.GroovyTestCase {
     public void testInstanceEnhancement() {
         final List list = [1, 2, 3, 4, 5]
         GParsExecutorsPoolEnhancer.enhanceInstance list

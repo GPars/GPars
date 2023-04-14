@@ -27,7 +27,7 @@ import org.codehaus.groovy.runtime.NullObject
 
 import java.util.concurrent.TimeUnit
 
-public class DynamicDispatchActorTest extends GroovyTestCase {
+public class DynamicDispatchActorTest extends groovy.test.GroovyTestCase {
     public void testDispatch() {
         final TestDynamicDispatchActor actor = new TestDynamicDispatchActor()
         actor.start()

@@ -20,7 +20,7 @@ import groovyx.gpars.actor.Actor
 import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 
-public class SharedMemoryTest extends GroovyTestCase {
+public class SharedMemoryTest extends groovy.test.GroovyTestCase {
 
     private static final long MAX_COUNTER = 1000
 

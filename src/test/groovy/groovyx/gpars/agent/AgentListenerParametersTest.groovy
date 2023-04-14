@@ -22,7 +22,7 @@ import groovyx.gpars.dataflow.DataflowVariable
  * @author Vaclav Pech
  * Date: June 4, 2010
  */
-public class AgentListenerParametersTest extends GroovyTestCase {
+public class AgentListenerParametersTest extends groovy.test.GroovyTestCase {
 
     public void testListenerWithAgentParameter() {
         final DataflowVariable result = new DataflowVariable()

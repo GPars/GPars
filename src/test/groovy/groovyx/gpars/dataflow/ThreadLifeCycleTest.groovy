@@ -22,7 +22,7 @@ import groovyx.gpars.actor.BlockingActor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
 
-public class ThreadLifeCycleTest extends GroovyTestCase {
+public class ThreadLifeCycleTest extends groovy.test.GroovyTestCase {
 
     public void testPGroup() {
         final Actor actor = Actors.blockingActor {

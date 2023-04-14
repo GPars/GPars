@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * Date: Oct 23, 2008
  */
 
-public class ForkJoinPoolAsyncTest extends GroovyTestCase {
+public class ForkJoinPoolAsyncTest extends groovy.test.GroovyTestCase {
 
     public void testAsyncClosure() {
         GParsPool.withPool(5) {service ->

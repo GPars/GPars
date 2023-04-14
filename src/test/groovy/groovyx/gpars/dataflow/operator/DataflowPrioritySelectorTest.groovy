@@ -31,7 +31,7 @@ import static groovyx.gpars.dataflow.Dataflow.prioritySelector
  * Date: Sep 9, 2009
  */
 
-public class DataflowPrioritySelectorTest extends GroovyTestCase {
+public class DataflowPrioritySelectorTest extends groovy.test.GroovyTestCase {
 
     private PGroup group
 

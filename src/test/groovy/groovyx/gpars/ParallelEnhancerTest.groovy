@@ -19,7 +19,7 @@ package groovyx.gpars
 import java.util.concurrent.ConcurrentHashMap
 
 @SuppressWarnings("SpellCheckingInspection")
-public class ParallelEnhancerTest extends GroovyTestCase {
+public class ParallelEnhancerTest extends groovy.test.GroovyTestCase {
     public void testInstanceEnhancement() {
         final List list = [1, 2, 3, 4, 5]
         ParallelEnhancer.enhanceInstance list

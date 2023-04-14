@@ -24,7 +24,7 @@ import java.util.concurrent.RecursiveAction
 /**
  * @author Vaclav Pech
  */
-public class GParsPoolAsyncFunTest extends GroovyTestCase {
+public class GParsPoolAsyncFunTest extends groovy.test.GroovyTestCase {
 
     public void testFib() {
         groovyx.gpars.GParsPool.withPool(5) {

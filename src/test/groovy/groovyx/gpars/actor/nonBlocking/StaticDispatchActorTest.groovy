@@ -22,7 +22,7 @@ import groovyx.gpars.actor.StaticDispatchActor
 import groovyx.gpars.dataflow.Dataflows
 import groovyx.gpars.group.DefaultPGroup
 
-public class StaticDispatchActorTest extends GroovyTestCase {
+public class StaticDispatchActorTest extends groovy.test.GroovyTestCase {
     public void testDispatch() {
         TestStaticDispatchActor actor = new TestStaticDispatchActor<Integer>()
         actor.start()

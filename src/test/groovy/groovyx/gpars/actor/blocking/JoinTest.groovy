@@ -18,7 +18,7 @@ package groovyx.gpars.actor.blocking
 
 import groovyx.gpars.actor.Actors
 
-public class JoinTest extends GroovyTestCase {
+public class JoinTest extends groovy.test.GroovyTestCase {
     public void testActorJoin() {
         final def actor = Actors.actor { Thread.sleep 500; terminate()}
         actor.join()

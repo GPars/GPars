@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference
  * @author Vaclav Pech
  * Date: Nov 17, 2008
  */
-public class ThreadPoolExceptionTest extends GroovyTestCase {
+public class ThreadPoolExceptionTest extends groovy.test.GroovyTestCase {
     public void testDoInParralelWithException() {
         shouldFail {
             GParsExecutorsPoolUtil.executeAsyncAndWait({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})

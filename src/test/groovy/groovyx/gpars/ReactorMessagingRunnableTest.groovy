@@ -18,7 +18,7 @@ package groovyx.gpars
 
 import groovyx.gpars.dataflow.Dataflows
 
-class ReactorMessagingRunnableTest extends GroovyTestCase {
+class ReactorMessagingRunnableTest extends groovy.test.GroovyTestCase {
     public void testMessagingRunnable() {
         final def df = new Dataflows()
         final def runnable = new MyTestReactorMessagingRunnable(df)

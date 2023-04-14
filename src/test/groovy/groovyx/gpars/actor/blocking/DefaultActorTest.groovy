@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @author Vaclav Pech, Dierk Koenig
  * Date: Jan 7, 2009
  */
-public class DefaultActorTest extends GroovyTestCase {
+public class DefaultActorTest extends groovy.test.GroovyTestCase {
     public void testDefaultMessaging() {
         DefaultTestActor actor = new DefaultTestActor()
         actor.start()

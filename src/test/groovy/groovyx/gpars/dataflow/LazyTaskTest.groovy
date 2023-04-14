@@ -21,7 +21,7 @@ import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
-public class LazyTaskTest extends GroovyTestCase {
+public class LazyTaskTest extends groovy.test.GroovyTestCase {
     def group
 
     @Override

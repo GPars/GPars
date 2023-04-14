@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * @author Vaclav Pech
  * Date: Jan 9, 2009
  */
-public class ActorsTest extends GroovyTestCase {
+public class ActorsTest extends groovy.test.GroovyTestCase {
     public void testDefaultActor() {
         final AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)

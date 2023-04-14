@@ -21,7 +21,7 @@ package groovyx.gpars
  * Author: Vaclav Pech
  */
 
-class MakeConcurrentAndSequentialEnhancerTest extends GroovyTestCase {
+class MakeConcurrentAndSequentialEnhancerTest extends groovy.test.GroovyTestCase {
 
     public void testIsConcurrencyActive() {
         def items1 = [1, 2, 3, 4, 5]

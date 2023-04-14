@@ -24,7 +24,7 @@ import java.util.concurrent.CyclicBarrier
 /**
  * @author Vaclav Pech
  */
-class PoisonWithForkProcessorTest extends GroovyTestCase {
+class PoisonWithForkProcessorTest extends groovy.test.GroovyTestCase {
     private PGroup group
     final DataflowQueue a = new DataflowQueue()
     final DataflowQueue b = new DataflowQueue()

@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit
  * Date: Sep 9, 2009
  */
 
-public class DataflowSelectorTest extends GroovyTestCase {
+public class DataflowSelectorTest extends groovy.test.GroovyTestCase {
 
     private PGroup group
 

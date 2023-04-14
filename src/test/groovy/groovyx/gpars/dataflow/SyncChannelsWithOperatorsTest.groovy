@@ -18,7 +18,7 @@ package groovyx.gpars.dataflow
 
 import groovyx.gpars.group.NonDaemonPGroup
 
-class SyncChannelsWithOperatorsTest extends GroovyTestCase {
+class SyncChannelsWithOperatorsTest extends groovy.test.GroovyTestCase {
     public void testOperators() {
         final DataflowReadChannel queue = new SyncDataflowQueue()
         final DataflowReadChannel result = new SyncDataflowQueue()

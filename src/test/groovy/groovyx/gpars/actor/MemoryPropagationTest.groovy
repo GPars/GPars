@@ -19,7 +19,7 @@ package groovyx.gpars.actor
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 
-class MemoryPropagationTest extends GroovyTestCase {
+class MemoryPropagationTest extends groovy.test.GroovyTestCase {
     private static final int ITERATIONS = 50000
 
     public void testMemoryPropagation() {

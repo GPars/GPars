@@ -21,7 +21,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
-public class DataflowsTest extends GroovyTestCase {
+public class DataflowsTest extends groovy.test.GroovyTestCase {
 
     public void testValueAssignment() {
         final Dataflows data = new Dataflows()

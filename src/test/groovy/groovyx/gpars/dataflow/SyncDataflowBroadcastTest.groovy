@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
-class SyncDataflowBroadcastTest extends GroovyTestCase {
+class SyncDataflowBroadcastTest extends groovy.test.GroovyTestCase {
     public void testBlocking() {
         final SyncDataflowBroadcast<Integer> broadcast = new SyncDataflowBroadcast<Integer>()
         final AtomicBoolean writerReached = new AtomicBoolean(false)

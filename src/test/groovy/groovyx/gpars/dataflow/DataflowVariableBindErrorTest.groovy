@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow
 
-public class DataflowVariableBindErrorTest extends GroovyTestCase {
+public class DataflowVariableBindErrorTest extends groovy.test.GroovyTestCase {
 
     public void testRebindToDifferentValue() {
         final DataflowVariable variable = new DataflowVariable()

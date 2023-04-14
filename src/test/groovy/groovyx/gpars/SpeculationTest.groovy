@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @author Vaclav Pech
  * Date: Aug 25, 2010
  */
-public class SpeculationTest extends GroovyTestCase {
+public class SpeculationTest extends groovy.test.GroovyTestCase {
 
     final neverReachedFlag = new AtomicBoolean(false)
 

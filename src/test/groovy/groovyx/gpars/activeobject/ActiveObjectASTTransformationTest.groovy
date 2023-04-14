@@ -22,7 +22,7 @@ import groovyx.gpars.dataflow.Promise
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
 @SuppressWarnings("SpellCheckingInspection")
-public class ActiveObjectASTTransformationTest extends GroovyTestCase {
+public class ActiveObjectASTTransformationTest extends groovy.test.GroovyTestCase {
     public void testActorIsActive() {
         final actor = new MyWrapper().internalActiveObjectActor
         assert actor.active

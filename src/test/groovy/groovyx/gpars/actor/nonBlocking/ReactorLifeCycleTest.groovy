@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicReference
  * @author Vaclav Pech
  * Date: Aug 24, 2010
  */
-public class ReactorLifeCycleTest extends GroovyTestCase {
+public class ReactorLifeCycleTest extends groovy.test.GroovyTestCase {
 
     PGroup group
 

@@ -25,7 +25,7 @@ import static groovyx.gpars.GParsExecutorsPool.withPool
  * @author Vaclav Pech
  * Date: Nov 23, 2008
  */
-public class ThreadPoolDSLTest extends GroovyTestCase {
+public class ThreadPoolDSLTest extends groovy.test.GroovyTestCase {
     public void testDSLInitialization() {
         withPool {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})

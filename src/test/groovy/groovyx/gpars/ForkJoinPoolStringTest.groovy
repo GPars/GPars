@@ -20,7 +20,7 @@ package groovyx.gpars
  * @author Vaclav Pech
  * Date: Oct 23, 2008
  */
-public class ForkJoinPoolStringTest extends GroovyTestCase {
+public class ForkJoinPoolStringTest extends groovy.test.GroovyTestCase {
     public void testEachParallelWithThreadPoolAndString() {
         GParsPool.withPool(5) {
             def result = Collections.synchronizedSet(new HashSet())

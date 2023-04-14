@@ -21,7 +21,7 @@ import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import static groovyx.gpars.dataflow.Dataflow.task
 
-class StreamAsDataflowChannelTest extends GroovyTestCase {
+class StreamAsDataflowChannelTest extends groovy.test.GroovyTestCase {
 
     public void testInterfaceImplemented() {
         def stream = new DataflowStreamReadAdapter(new DataflowStream())

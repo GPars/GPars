@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutorService
  * @author Vaclav Pech
  * Date: Nov 10, 2008
  */
-public class ThreadPoolStringTest extends GroovyTestCase {
+public class ThreadPoolStringTest extends groovy.test.GroovyTestCase {
 
     public void testEachParallelWithString() {
         def result = Collections.synchronizedSet(new HashSet())

@@ -32,7 +32,7 @@ import static groovyx.gpars.actor.Actors.blockingActor
  * @author Vaclav Pech
  * Date: Apr 16, 2009
  */
-public class ReplyTest extends GroovyTestCase {
+public class ReplyTest extends groovy.test.GroovyTestCase {
 
     public void testMultipleClients() {
         final CyclicBarrier barrier = new CyclicBarrier(3)

@@ -29,7 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList
  * Date: Sep 9, 2009
  */
 
-public class DataflowProcessorEventTest extends GroovyTestCase {
+public class DataflowProcessorEventTest extends groovy.test.GroovyTestCase {
 
     private PGroup group
     final DataflowQueue a = new DataflowQueue()

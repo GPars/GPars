@@ -25,7 +25,7 @@ import static groovyx.gpars.GParsPool.withPool
  * @author Vaclav Pech
  * Date: Nov 23, 2008
  */
-public class ForkJoinPoolDSLTest extends GroovyTestCase {
+public class ForkJoinPoolDSLTest extends groovy.test.GroovyTestCase {
     public void testDSLInitialization() {
         withPool {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})

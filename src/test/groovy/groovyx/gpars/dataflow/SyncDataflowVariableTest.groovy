@@ -22,7 +22,7 @@ import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
-public class SyncDataflowVariableTest extends GroovyTestCase {
+public class SyncDataflowVariableTest extends groovy.test.GroovyTestCase {
 
     public void testWriterBlocking() {
         final SyncDataflowVariable variable = new SyncDataflowVariable(1)

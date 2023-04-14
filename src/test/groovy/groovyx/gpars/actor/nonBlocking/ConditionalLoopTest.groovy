@@ -22,7 +22,7 @@ import static groovyx.gpars.actor.Actors.actor
  * @author Vaclav Pech
  * Date: Aug 25th 2010
  */
-@SuppressWarnings("GroovyEmptyCatchBlock") class ConditionalLoopTest extends GroovyTestCase {
+@SuppressWarnings("GroovyEmptyCatchBlock") class ConditionalLoopTest extends groovy.test.GroovyTestCase {
     public void testNoLoop() {
         int result = 0
         def actor = actor {

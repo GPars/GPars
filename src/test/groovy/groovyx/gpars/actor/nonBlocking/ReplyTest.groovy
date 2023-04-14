@@ -31,7 +31,7 @@ import static groovyx.gpars.actor.Actors.actor
  * @author Vaclav Pech
  * Date: Feb 27, 2009
  */
-public class ReplyTest extends GroovyTestCase {
+public class ReplyTest extends groovy.test.GroovyTestCase {
 
     protected void setUp() {
         super.setUp();

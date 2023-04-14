@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * @author Vaclav Pech
  * Date: Oct 23, 2008
  */
-public class GParsExecutorsPoolTest extends GroovyTestCase {
+public class GParsExecutorsPoolTest extends groovy.test.GroovyTestCase {
 
     public void testDoInParallel() {
         GParsExecutorsPool.withPool {

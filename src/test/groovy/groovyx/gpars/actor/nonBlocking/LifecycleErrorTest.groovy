@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import groovy.transform.PackageScope
 
-public class LifecycleErrorTest extends GroovyTestCase {
+public class LifecycleErrorTest extends groovy.test.GroovyTestCase {
 
     def group = new DefaultPGroup(3)
 

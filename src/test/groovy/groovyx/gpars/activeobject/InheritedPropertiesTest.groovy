@@ -18,7 +18,7 @@ package groovyx.gpars.activeobject
 
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
-public class InheritedPropertiesTest extends GroovyTestCase {
+public class InheritedPropertiesTest extends groovy.test.GroovyTestCase {
     public void testOverridingActorNameNotAllowed() {
         final GroovyShell shell = new GroovyShell()
         shouldFail(MultipleCompilationErrorsException) {

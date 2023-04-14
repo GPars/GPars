@@ -27,7 +27,7 @@ import java.util.concurrent.CyclicBarrier
  * @author Vaclav Pech
  * Date: Aug 18, 2010
  */
-@SuppressWarnings("GroovyEmptyCatchBlock") class AsyncInvocationWithTimeoutTest extends GroovyTestCase {
+@SuppressWarnings("GroovyEmptyCatchBlock") class AsyncInvocationWithTimeoutTest extends groovy.test.GroovyTestCase {
 
     public void testFastCalculation() {
         GParsExecutorsPool.withPool(5) {

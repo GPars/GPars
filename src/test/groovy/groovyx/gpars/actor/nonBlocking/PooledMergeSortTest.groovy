@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
  * @author Vaclav Pech
  * Date: Jan 12, 2009
  */
-public class PooledMergeSortTest extends GroovyTestCase {
+public class PooledMergeSortTest extends groovy.test.GroovyTestCase {
 
     PGroup group
 

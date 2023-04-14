@@ -23,7 +23,7 @@ import groovyx.gpars.scheduler.DefaultPool
 /**
  * @author Vaclav Pech
  */
-public class GParsExecutorsPoolAsyncFunTest extends GroovyTestCase {
+public class GParsExecutorsPoolAsyncFunTest extends groovy.test.GroovyTestCase {
 
     public void testFib() {
         groovyx.gpars.GParsExecutorsPool.withPool(5) {

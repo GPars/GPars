@@ -52,15 +52,20 @@ archivesBaseName = 'gpars'
 
 defaultTasks 'test'
 
-sourceCompatibility = 11
-targetCompatibility = 11
-// TODO set language level to 21
-// TODO use groovy 4 and the corresponding spock
-// TODO update to the newest gradlew
-// TODO add virtual threads
+sourceCompatibility = 17
+targetCompatibility = 17
+// TODO fix failing/hanging tests
 // TODO prune the build script
-// TODO prune the features
-// TODO configure a CI build, remove the CI project files
+// TODO configure a CI build
+// TODO decide how to publish
+// TODO prune the features (stm, etc.)
+// TODO update readme
+// TODO fix the documentation
+// TODO set language level to 21
+// TODO add virtual threads
+// TODO use groups for withPool()
+// TODO enhance groups to handle scopes/failover
+// TODO handle exception propagation from virtual threads
 
 ext {
     theVendor = 'gpars.org'
@@ -85,8 +90,8 @@ configurations {
 }
 
 dependencies {
-    implementation "org.codehaus.groovy:groovy-all:${gpars_groovyVersion}"
-    testImplementation "org.codehaus.groovy:groovy-all:${gpars_groovyVersion}"
+    implementation "org.apache.groovy:groovy-all:${gpars_groovyVersion}"
+    testImplementation "org.apache.groovy:groovy-all:${gpars_groovyVersion}"
 
     implementation "org.multiverse:multiverse-core:${gpars_multiverseVersion}", { transitive = false }
     implementation "io.netty:netty-all:${gpars_nettyVersion}"
@@ -99,7 +104,7 @@ dependencies {
     cover "net.sourceforge.cobertura:cobertura:${gpars_coberturaVersion}"
     runtimeOnly "net.sourceforge.cobertura:cobertura:${gpars_coberturaVersion}"
     // Have to get some specific dependencies into the GroovyDoc process.
-    groovyDoc "org.codehaus.groovy:groovy-all:${gpars_groovyVersion}"
+    groovyDoc "org.apache.groovy:groovy-all:${gpars_groovyVersion}"
     groovyDoc "org.fusesource.jansi:jansi:${gpars_jansiVersion}"
 }
 

@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Date: Jan 16, 2009
  */
 
-public class TimeCategoryActorsTest extends GroovyTestCase {
+public class TimeCategoryActorsTest extends groovy.test.GroovyTestCase {
     public void testReceive() {
         def result = ''
         AtomicBoolean timeoutFlag = new AtomicBoolean()

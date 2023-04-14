@@ -26,7 +26,7 @@ import groovyx.gpars.dataflow.DataflowVariable
  * Date: Jan 15, 2010
  */
 
-class EnhancedRWLockTest extends GroovyTestCase {
+class EnhancedRWLockTest extends groovy.test.GroovyTestCase {
     public void testReadLock() {
         final ReentrantReadWriteLock lock = new EnhancedRWLock(false)
         lock.withReadLock {

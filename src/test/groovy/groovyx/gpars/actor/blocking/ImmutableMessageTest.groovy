@@ -21,7 +21,7 @@ import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 
-public class ImmutableMessageTest extends GroovyTestCase {
+public class ImmutableMessageTest extends groovy.test.GroovyTestCase {
     public void testSend() {
         String result
         final CountDownLatch latch = new CountDownLatch(1)

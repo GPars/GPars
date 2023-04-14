@@ -26,7 +26,7 @@ import static org.multiverse.api.StmUtils.newTxnInteger
 /**
  * @author Vaclav Pech
  */
-class AtomicTest extends GroovyTestCase {
+class AtomicTest extends groovy.test.GroovyTestCase {
     public void testTxnExecutor() {
         final Account account = new Account()
         account.transfer(10)

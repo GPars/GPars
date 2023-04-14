@@ -26,7 +26,7 @@ import static groovyx.gpars.GParsPool.withPool
  * Date: Jan 15, 2010
  */
 
-class ForkJoinTest extends GroovyTestCase {
+class ForkJoinTest extends groovy.test.GroovyTestCase {
     public void testMergeSort() {
         final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5]
 

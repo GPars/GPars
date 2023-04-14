@@ -25,7 +25,7 @@ import groovyx.gpars.group.PGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 
-public class PGroupTest extends GroovyTestCase {
+public class PGroupTest extends groovy.test.GroovyTestCase {
     public void testDefaultGroupDaemon() {
         AtomicBoolean daemon = new AtomicBoolean()
         final CountDownLatch latch = new CountDownLatch(1)

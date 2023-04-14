@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * @author Vaclav Pech
  * Date: Oct 23, 2008
  */
-public class GParsExecutorsPoolUtilTest extends GroovyTestCase {
+public class GParsExecutorsPoolUtilTest extends groovy.test.GroovyTestCase {
 
     public void testAsyncClosure() {
         GParsExecutorsPool.withPool(5) {ExecutorService service ->

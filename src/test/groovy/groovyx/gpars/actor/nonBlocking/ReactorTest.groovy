@@ -25,7 +25,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
-public class ReactorTest extends GroovyTestCase {
+public class ReactorTest extends groovy.test.GroovyTestCase {
 
     public void testSimple() {
         def res = []

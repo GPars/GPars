@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @author Vaclav Pech
  * Date: 13.4.2010
  */
-public class AgentTest extends GroovyTestCase {
+public class AgentTest extends groovy.test.GroovyTestCase {
     public void testList() {
         def jugMembers = new Agent<List>(['Me'])  //add Me
 

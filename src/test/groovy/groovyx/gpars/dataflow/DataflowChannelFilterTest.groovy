@@ -19,7 +19,7 @@ package groovyx.gpars.dataflow
 import groovyx.gpars.dataflow.operator.PoisonPill
 import static groovyx.gpars.dataflow.Dataflow.operator
 
-class DataflowChannelFilterTest extends GroovyTestCase {
+class DataflowChannelFilterTest extends groovy.test.GroovyTestCase {
 
     public void testCreationFromQueue() {
         final DataflowQueue queue = new DataflowQueue()

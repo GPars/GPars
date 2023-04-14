@@ -22,7 +22,7 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
+public class SyncDataflowVariableDefaultTest extends groovy.test.GroovyTestCase {
 
     public void testVariable() {
         final SyncDataflowVariable variable = new SyncDataflowVariable()

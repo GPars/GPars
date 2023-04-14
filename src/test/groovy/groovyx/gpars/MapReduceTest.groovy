@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap
  */
 
 @SuppressWarnings("SpellCheckingInspection")
-public class MapReduceTest extends GroovyTestCase {
+public class MapReduceTest extends groovy.test.GroovyTestCase {
 
     public void testReduce() {
         GParsPool.withPool(5) {

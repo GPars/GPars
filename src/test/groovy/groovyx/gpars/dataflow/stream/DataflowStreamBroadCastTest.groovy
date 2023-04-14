@@ -22,7 +22,7 @@ import groovyx.gpars.dataflow.DataflowReadChannel
 import groovyx.gpars.dataflow.DataflowWriteChannel
 import java.util.concurrent.CyclicBarrier
 
-public class DataflowStreamBroadCastTest extends GroovyTestCase {
+public class DataflowStreamBroadCastTest extends groovy.test.GroovyTestCase {
 
     public void testMultipleThreadedWrite() {
         final DataflowWriteChannel writeStream = new DataflowBroadcast()

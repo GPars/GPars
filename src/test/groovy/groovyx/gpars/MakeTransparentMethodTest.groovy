@@ -26,7 +26,7 @@ import java.util.concurrent.CyclicBarrier
  */
 
 @SuppressWarnings("SpellCheckingInspection")
-class MakeTransparentMethodTest extends GroovyTestCase {
+class MakeTransparentMethodTest extends groovy.test.GroovyTestCase {
     // public void testTransparentEach() {
     //     def items = [1, 2, 3, 4, 5]
     //     final Map map = new ConcurrentHashMap()

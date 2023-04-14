@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
 /**
  * @author Vaclav Pech, Dierk Koenig
  */
-class MessageStreamTest extends GroovyTestCase {
+class MessageStreamTest extends groovy.test.GroovyTestCase {
 
     public void testResultWaiterWithTimeoutAndException() {
         final def waiter = new ResultWaiter()

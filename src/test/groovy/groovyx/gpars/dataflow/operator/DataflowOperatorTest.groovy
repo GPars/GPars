@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Date: Sep 9, 2009
  */
 
-public class DataflowOperatorTest extends GroovyTestCase {
+public class DataflowOperatorTest extends groovy.test.GroovyTestCase {
 
     private PGroup group
 

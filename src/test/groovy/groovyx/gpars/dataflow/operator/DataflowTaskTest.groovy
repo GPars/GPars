@@ -24,7 +24,7 @@ import static groovyx.gpars.dataflow.Dataflow.task
  * Date: Sep 9, 2009
  */
 
-public class DataflowTaskTest extends GroovyTestCase {
+public class DataflowTaskTest extends groovy.test.GroovyTestCase {
 
     public void testTaskRun() {
         final DataflowVariable a = new DataflowVariable()

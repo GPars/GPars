@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * Date: Jan 7, 2009
  */
 
-public class ArraySumTest extends GroovyTestCase {
+public class ArraySumTest extends groovy.test.GroovyTestCase {
 
     public void testArraySummaryUsingActorMethod() {
         PGroup group = new DefaultPGroup(10)

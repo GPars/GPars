@@ -23,7 +23,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 
-public class DeliveryErrorTest extends GroovyTestCase {
+public class DeliveryErrorTest extends groovy.test.GroovyTestCase {
 
     def group
 

@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicReference
  * @author Vaclav Pech, Dierk Koenig
  * Date: Jan 7, 2009
  */
-public class AbstractActorTest extends GroovyTestCase {
+public class AbstractActorTest extends groovy.test.GroovyTestCase {
 
     public void testActorState() {
         Actor actor = new DefaultTestActor()

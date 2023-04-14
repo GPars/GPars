@@ -29,7 +29,7 @@ import static groovyx.gpars.actor.Actors.actor
  * @author Vaclav Pech
  * Date: Feb 17, 2009
  */
-public class LoopTest extends GroovyTestCase {
+public class LoopTest extends groovy.test.GroovyTestCase {
 
     PGroup group
 

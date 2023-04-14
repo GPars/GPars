@@ -29,7 +29,7 @@ import static groovyx.gpars.dataflow.Dataflow.splitter
  * Date: Oct 6, 2009
  */
 
-public class DataflowOperatorShutdownTest extends GroovyTestCase {
+public class DataflowOperatorShutdownTest extends groovy.test.GroovyTestCase {
 
     public void testSingleOperator() {
         final DataflowQueue a = new DataflowQueue()

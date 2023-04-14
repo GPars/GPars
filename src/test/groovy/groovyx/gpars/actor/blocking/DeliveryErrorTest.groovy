@@ -22,7 +22,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 
-public class DeliveryErrorTest extends GroovyTestCase {
+public class DeliveryErrorTest extends groovy.test.GroovyTestCase {
     public void testSuccessfulMessages() {
         AtomicBoolean flag = new AtomicBoolean()
         CountDownLatch latch = new CountDownLatch(1)

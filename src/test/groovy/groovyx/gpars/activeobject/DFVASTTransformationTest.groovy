@@ -18,7 +18,7 @@ package groovyx.gpars.activeobject
 
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
-public class DFVASTTransformationTest extends GroovyTestCase {
+public class DFVASTTransformationTest extends groovy.test.GroovyTestCase {
 
     public void testDFVReturningMethod() {
         final GroovyShell shell = new GroovyShell()

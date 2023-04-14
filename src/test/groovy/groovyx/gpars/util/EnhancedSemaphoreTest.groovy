@@ -23,7 +23,7 @@ import java.util.concurrent.Semaphore
  * @author Vaclav Pech
  * Date: Jan 15, 2010
  */
-class EnhancedSemaphoreTest extends GroovyTestCase {
+class EnhancedSemaphoreTest extends groovy.test.GroovyTestCase {
     public void testSemaphore() {
         final Semaphore semaphore = new EnhancedSemaphore(3)
         semaphore.withSemaphore {

@@ -21,7 +21,7 @@ import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 
-public class PooledActorThreadTest extends GroovyTestCase {
+public class PooledActorThreadTest extends groovy.test.GroovyTestCase {
     public void testActorThread() {
         AtomicBoolean flag1 = new AtomicBoolean()
         AtomicBoolean flag2 = new AtomicBoolean()

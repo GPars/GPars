@@ -22,7 +22,7 @@ import groovyx.gpars.dataflow.Dataflows
 import static groovyx.gpars.dataflow.Dataflow.task
 
 @SuppressWarnings("SpellCheckingInspection")
-class DataflowStreamTest extends GroovyTestCase {
+class DataflowStreamTest extends groovy.test.GroovyTestCase {
 
     def stream = new DataflowStream()
 

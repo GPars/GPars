@@ -18,7 +18,7 @@ package groovyx.gpars.activeobject
 
 import groovyx.gpars.dataflow.DataflowVariable
 
-public class ActiveObjectExceptionASTTransformationTest extends GroovyTestCase {
+public class ActiveObjectExceptionASTTransformationTest extends groovy.test.GroovyTestCase {
 
     public void testCorrectMethod() {
         assert 10 == new MyExceptionWrapper().foo(10)

@@ -24,7 +24,7 @@ import java.util.concurrent.CyclicBarrier
  * @author Vaclav Pech
  * Date: Sep 14, 2009
  */
-public class ReceiveTest extends GroovyTestCase {
+public class ReceiveTest extends groovy.test.GroovyTestCase {
 
     public void testReceive() {
         final Dataflows df = new Dataflows()

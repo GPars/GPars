@@ -22,7 +22,7 @@ import groovyx.gpars.dataflow.DataflowVariable
 import java.util.concurrent.CountDownLatch
 import static groovyx.gpars.actor.Actors.actor
 
-public class NullMessageTest extends GroovyTestCase {
+public class NullMessageTest extends groovy.test.GroovyTestCase {
     public void testNullMessage() {
         def result = ''
         final def latch = new CountDownLatch(1)

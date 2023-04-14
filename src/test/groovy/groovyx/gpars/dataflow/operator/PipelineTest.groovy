@@ -25,7 +25,7 @@ import groovyx.gpars.group.PGroup
 /**
  * @author Vaclav Pech
  */
-public class PipelineTest extends GroovyTestCase {
+public class PipelineTest extends groovy.test.GroovyTestCase {
 
     private PGroup group
 

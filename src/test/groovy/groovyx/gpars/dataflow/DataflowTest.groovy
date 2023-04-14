@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import static groovyx.gpars.actor.Actors.blockingActor
 
-public class DataflowTest extends GroovyTestCase {
+public class DataflowTest extends groovy.test.GroovyTestCase {
 
     public void testSimpleAssignment() {
         DataflowVariable<Integer> x = new DataflowVariable()

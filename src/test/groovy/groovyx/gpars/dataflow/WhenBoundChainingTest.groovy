@@ -24,7 +24,7 @@ import static groovyx.gpars.GParsPool.withPool
  * @author Vaclav Pech
  */
 
-class WhenBoundChainingTest extends GroovyTestCase {
+class WhenBoundChainingTest extends groovy.test.GroovyTestCase {
     public void testBasicChaining() {
         final DataflowVariable variable = new DataflowVariable()
         final DataflowVariable result = new DataflowVariable()

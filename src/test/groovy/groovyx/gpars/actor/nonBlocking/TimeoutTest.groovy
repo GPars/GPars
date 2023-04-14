@@ -29,7 +29,7 @@ import static groovyx.gpars.actor.Actors.actor
  * @author Vaclav Pech
  * Date: Feb 27, 2009
  */
-public class TimeoutTest extends GroovyTestCase {
+public class TimeoutTest extends groovy.test.GroovyTestCase {
 
     protected void setUp() {
         super.setUp();

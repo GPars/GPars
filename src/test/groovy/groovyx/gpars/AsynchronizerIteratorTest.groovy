@@ -16,7 +16,7 @@
 
 package groovyx.gpars
 
-public class ThreadPoolIteratorTest extends GroovyTestCase {
+public class ThreadPoolIteratorTest extends groovy.test.GroovyTestCase {
     public void testIteratorEach() {
         def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 

@@ -22,7 +22,7 @@ import groovyx.gpars.dataflow.Dataflows
  * @author Vaclav Pech
  * Date: June 4, 2010
  */
-public class AgentListenerTest extends GroovyTestCase {
+public class AgentListenerTest extends groovy.test.GroovyTestCase {
     public void testUpdateListeners() {
         final Dataflows flows = new Dataflows()
         def counter = new Agent(0)

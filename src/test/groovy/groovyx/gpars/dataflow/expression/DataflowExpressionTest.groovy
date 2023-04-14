@@ -23,7 +23,7 @@ import groovyx.gpars.dataflow.DataflowVariable
 /**
  * @author Alex Tkachman
  */
-public class DataflowExpressionTest extends GroovyTestCase {
+public class DataflowExpressionTest extends groovy.test.GroovyTestCase {
 
     public void testInvoke() {
         final DataflowVariable a = new DataflowVariable()

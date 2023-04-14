@@ -30,7 +30,7 @@ import java.util.concurrent.CyclicBarrier
  * Date: Mar 8, 2010
  */
 
-public class InternallyParallelDataflowOperatorTest extends GroovyTestCase {
+public class InternallyParallelDataflowOperatorTest extends groovy.test.GroovyTestCase {
 
     private PGroup group
 

@@ -19,7 +19,7 @@ package groovyx.gpars.actor.nonBlocking
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 
-public class RepeatLoopTest extends GroovyTestCase {
+public class RepeatLoopTest extends groovy.test.GroovyTestCase {
 
     public void testLoopWithoutReact() {
         int count = 0

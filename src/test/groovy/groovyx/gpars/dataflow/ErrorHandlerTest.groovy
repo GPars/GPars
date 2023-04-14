@@ -23,7 +23,7 @@ import java.security.AccessControlException
 /**
  * @author Vaclav Pech
  */
-class ErrorHandlerTest extends GroovyTestCase {
+class ErrorHandlerTest extends groovy.test.GroovyTestCase {
     public void testBasicInvocation() {
         def df = new DataflowVariable()
         final result = df.then({ 10 }, { 20 })

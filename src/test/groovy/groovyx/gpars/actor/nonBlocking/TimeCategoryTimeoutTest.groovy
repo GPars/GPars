@@ -28,7 +28,7 @@ import static groovyx.gpars.actor.Actors.actor
  * @author Vaclav Pech
  * Date: Feb 27, 2009
  */
-public class TimeCategoryTimeoutTest extends GroovyTestCase {
+public class TimeCategoryTimeoutTest extends groovy.test.GroovyTestCase {
     protected void setUp() {
         super.setUp();
     }
