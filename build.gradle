@@ -55,6 +55,7 @@ defaultTasks 'test'
 sourceCompatibility = 17
 targetCompatibility = 17
 // TODO fix failing/hanging tests
+// TODO fix the examples
 // TODO prune the build script
 // TODO configure a CI build
 // TODO decide how to publish
@@ -400,60 +401,60 @@ task integrationTest(type: Test, dependsOn: 'test') {
 //    println 'We release now'
 //}
 
-//task demo(type: DemoTask, dependsOn: 'compileGroovy') {
-//    excludedDemos = [
-//            'DemoPotentialDeadlock',                      // may deadlock (on purpose)
-//            'DemoNonDeterministicDeadlockWithDataflows',  // may deadlock (on purpose)
-//            'DemoDeadLock',                               // deadlock (on purpose)
-//            'DemoRemote',                                 // doesn't work in an automated environment
-//            'DemoSwing',                                  // maybe we don't want these to run on the CI ..
-//            'DemoSwingMashup',                            // but they can be run locally
-//            'DemoSwingCollectionProcessing',
-//            'DemoSwingActors',
-//            'DemoSwingDataflowOperators',
-//            'DemoSwingFancyDataflow',                     // Shows UI
-//            'DemoSwingDataflowProgress',                  // Shows UI
-//            'DataflowDemo4',                              // Never stops
-//            'DemoWebPageProcessing',                      // Never stops
-//            'DemoWebPageProcessingWithCaching',           // Never stops
-//            'DemoMapReduce',                              // Relies on internet connection
-//            'DemoNumbers',                                //Never stops
-//            'FibonacciV1',                                //Never stops
-//            'FibonacciV2',                                //Never stops
-//            'DemoSieveEratosthenesCSP',                   //Never stops
-//            'DemoSieveEratosthenesTheGoWay',              //Never stops
-//            'DemoSieveEratosthenesTheGoWayWithOperators', //Never stops
-//            'DemoThreading',                              //Never stops
-//            'DemoProducerConsumer1',                      //Never stops
-//            'DemoPhysicalCalculations',                   //Needs user input
-//            'DemoFibonacci1',                             //Needs classes from its source folder
-//            'DemoFibonacci1WithSynchronousChannels',      //Needs classes from its source folder
-//            'DemoFibonacci2',                             //Needs classes from its source folder
-//            'DemoFibonacci2WithSynchronousChannels',      //Needs classes from its source folder
-//            'DemoNumbers',                                //Needs classes from its source folder
-//            'DemoNumbersWithSynchronousChannels',         //Needs classes from its source folder
-//            'DemoActor_4_4',                              //Specifies absolute paths
-//            'RunReset',                                   //Starts UI
-//            'DemoSwingMergeSort',                         //Starts UI
-//            'DemoVisualForkJoinMergeSort',                //Starts UI
-//            'DemoStm',                                    //Stm
-//            'DemoDirectStm',                              //Stm
-//            'DemoRetry',                                  //Stm
-//            'DemoCustomBlocks',                           //Stm
-//            'DemoLifeWithDataflowOperators',              //Interacts with the user
-//            'DemoSwingLifeWithDataflowOperators',         //Interacts with the user
-//            'DemoSwingLifeWithActors',                    //Interacts with the user
-//            'DemoSwingLifeWithActiveObjects',             //Interacts with the user
-//            'DemoSwingLifeWithAsyncFunctions',            //Interacts with the user
-//            'DemoReplyCompileStatic',                     //Weird compile static issue
-//            'DemoFibonacciWithSingleOperatorCompileStatic',                     //Weird compile static issue
-//    ]
-//    classpath = sourceSets.main.runtimeClasspath
-//    demoFiles = sourceSets.test.allGroovy.matching {
-//        include '**/*Demo*.groovy'
-//        exclude excludedDemos.collect { name -> "**/${name}.groovy".toString() }
-//    }
-//}
+task demo(type: DemoTask, dependsOn: 'compileGroovy') {
+    excludedDemos = [
+            'DemoPotentialDeadlock',                      // may deadlock (on purpose)
+            'DemoNonDeterministicDeadlockWithDataflows',  // may deadlock (on purpose)
+            'DemoDeadLock',                               // deadlock (on purpose)
+            'DemoRemote',                                 // doesn't work in an automated environment
+            'DemoSwing',                                  // maybe we don't want these to run on the CI ..
+            'DemoSwingMashup',                            // but they can be run locally
+            'DemoSwingCollectionProcessing',
+            'DemoSwingActors',
+            'DemoSwingDataflowOperators',
+            'DemoSwingFancyDataflow',                     // Shows UI
+            'DemoSwingDataflowProgress',                  // Shows UI
+            'DataflowDemo4',                              // Never stops
+            'DemoWebPageProcessing',                      // Never stops
+            'DemoWebPageProcessingWithCaching',           // Never stops
+            'DemoMapReduce',                              // Relies on internet connection
+            'DemoNumbers',                                //Never stops
+            'FibonacciV1',                                //Never stops
+            'FibonacciV2',                                //Never stops
+            'DemoSieveEratosthenesCSP',                   //Never stops
+            'DemoSieveEratosthenesTheGoWay',              //Never stops
+            'DemoSieveEratosthenesTheGoWayWithOperators', //Never stops
+            'DemoThreading',                              //Never stops
+            'DemoProducerConsumer1',                      //Never stops
+            'DemoPhysicalCalculations',                   //Needs user input
+            'DemoFibonacci1',                             //Needs classes from its source folder
+            'DemoFibonacci1WithSynchronousChannels',      //Needs classes from its source folder
+            'DemoFibonacci2',                             //Needs classes from its source folder
+            'DemoFibonacci2WithSynchronousChannels',      //Needs classes from its source folder
+            'DemoNumbers',                                //Needs classes from its source folder
+            'DemoNumbersWithSynchronousChannels',         //Needs classes from its source folder
+            'DemoActor_4_4',                              //Specifies absolute paths
+            'RunReset',                                   //Starts UI
+            'DemoSwingMergeSort',                         //Starts UI
+            'DemoVisualForkJoinMergeSort',                //Starts UI
+            'DemoStm',                                    //Stm
+            'DemoDirectStm',                              //Stm
+            'DemoRetry',                                  //Stm
+            'DemoCustomBlocks',                           //Stm
+            'DemoLifeWithDataflowOperators',              //Interacts with the user
+            'DemoSwingLifeWithDataflowOperators',         //Interacts with the user
+            'DemoSwingLifeWithActors',                    //Interacts with the user
+            'DemoSwingLifeWithActiveObjects',             //Interacts with the user
+            'DemoSwingLifeWithAsyncFunctions',            //Interacts with the user
+            'DemoReplyCompileStatic',                     //Weird compile static issue
+            'DemoFibonacciWithSingleOperatorCompileStatic',                     //Weird compile static issue
+    ]
+    classpath = sourceSets.main.runtimeClasspath
+    demoFiles = sourceSets.test.allGroovy.matching {
+        include '**/*Demo*.groovy'
+        exclude excludedDemos.collect { name -> "**/${name}.groovy".toString() }
+    }
+}
 
 //idea {
 //    module {

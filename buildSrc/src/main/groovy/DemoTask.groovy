@@ -1,12 +1,13 @@
 import org.gradle.api.file.FileCollection
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
 
 class DemoTask extends DefaultTask {
     @InputFiles FileCollection classpath
     @InputFiles FileCollection demoFiles
-    List excludedDemos
+    @Input List excludedDemos
 
     @TaskAction
     def runDemos() {
