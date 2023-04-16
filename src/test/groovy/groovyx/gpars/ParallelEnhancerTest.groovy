@@ -87,22 +87,22 @@ public class ParallelEnhancerTest extends groovy.test.GroovyTestCase {
     }
 
     private String performExceptionCheck(List list) {
-        shouldFail(IllegalArgumentException) {
+        shouldFail(java.util.concurrent.ExecutionException) {
             list.anyParallel { if (it > 4) throw new IllegalArgumentException('test') else false }
         }
-        shouldFail(IllegalArgumentException) {
+        shouldFail(java.util.concurrent.ExecutionException) {
             list.everyParallel { if (it > 4) throw new IllegalArgumentException('test') else true }
         }
-        shouldFail(IllegalArgumentException) {
+        shouldFail(java.util.concurrent.ExecutionException) {
             list.findParallel { if (it > 4) throw new IllegalArgumentException('test') else false }
         }
-        shouldFail(IllegalArgumentException) {
+        shouldFail(java.util.concurrent.ExecutionException) {
             list.findAllParallel { if (it > 4) throw new IllegalArgumentException('test') else true }
         }
-        shouldFail(IllegalArgumentException) {
+        shouldFail(java.util.concurrent.ExecutionException) {
             list.collectParallel { if (it > 4) throw new IllegalArgumentException('test') else 1 }
         }
-        shouldFail(IllegalArgumentException) {
+        shouldFail(java.util.concurrent.ExecutionException) {
             list.eachParallel { if (it > 4) throw new IllegalArgumentException('test') }
         }
     }

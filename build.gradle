@@ -56,6 +56,7 @@ sourceCompatibility = 17
 targetCompatibility = 17
 // TODO fix failing/hanging tests
 // TODO fix the examples
+// TODO prune TODOs
 // TODO prune the build script
 // TODO configure a CI build
 // TODO decide how to publish

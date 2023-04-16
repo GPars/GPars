@@ -33,3 +33,4 @@ class Child extends Parent {
 final Parent item = new Child()
 item.foo()
 
+Thread.sleep(5000)

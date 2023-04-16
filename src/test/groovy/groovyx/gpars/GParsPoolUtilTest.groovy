@@ -325,12 +325,12 @@ public class GParsPoolUtilTest extends groovy.test.GroovyTestCase {
             exceptionCount.incrementAndGet()
         } as UncaughtExceptionHandler
 
-        shouldFail(RuntimeException.class) {
+        shouldFail(java.util.concurrent.ExecutionException.class) {
             groovyx.gpars.GParsPool.withPool(5, handler) { ForkJoinPool pool ->
                 'abc'.eachParallel { throw new RuntimeException('test') }
             }
         }
-//        assertEquals 3, exceptionCount.get()
+        assertEquals 0, exceptionCount.get()
     }
 
     public testNestedCalls() {

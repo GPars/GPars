@@ -42,6 +42,7 @@ import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 // TODO: delete
 //import groovyx.gpars.pa.CallClosure;
@@ -258,7 +259,15 @@ public class GParsPoolUtil {
         final List<ForkJoinTask> tasks = new LinkedList<>();
         collection.stream()
                 .forEach(it -> tasks.add(pool.submit(() -> callClosure(cl, it))));
-        tasks.forEach(ForkJoinTask::join);
+        try {
+            tasks.forEach(ForkJoinTask::join);
+        } catch (Exception e) {
+            throw new ExecutionException(e);
+        }
+        final Stream<Throwable> exceptions = tasks.stream().filter(ForkJoinTask::isCompletedAbnormally).map(ForkJoinTask::getException);
+        if (exceptions.count() > 0) {
+            throw new ExecutionException(exceptions.findFirst().get());
+        }
         return collection;
     }
 
@@ -332,17 +341,25 @@ public class GParsPoolUtil {
      * Note that the {@code result} variable is synchronized to prevent race conditions between multiple threads.
      * </p>
      */
-    public static <T> Collection<T> eachWithIndexParallel(final Collection<T> collection, final Closure cl) {
+    public static <T> Collection<T> eachWithIndexParallel(final Collection<T> collection, final Closure cl) throws ExecutionException, InterruptedException {
         final AtomicInteger counter = new AtomicInteger(0);
         final List<ForkJoinTask> tasks = new LinkedList<>();
         final ForkJoinPool pool = retrievePool();
 
-        collection.parallelStream()
+        collection.stream()
                 .forEachOrdered(it -> {
                     int index = counter.getAndIncrement();
                     tasks.add(pool.submit(() -> callIndexedClosure(cl, it, index)));
                 });
-        tasks.forEach(ForkJoinTask::join);
+        try {
+            tasks.forEach(ForkJoinTask::join);
+        } catch (Exception e) {
+            throw new ExecutionException(e);
+        }
+        final Stream<Throwable> exceptions = tasks.stream().filter(ForkJoinTask::isCompletedAbnormally).map(ForkJoinTask::getException);
+        if (exceptions.count() > 0) {
+            throw new ExecutionException(exceptions.findFirst().get());
+        }
         return collection;
     }
 
@@ -892,7 +909,7 @@ public class GParsPoolUtil {
      * }
      * </pre>
      */
-    public static int countParallel(final Collection collection, final Object filter) throws ExecutionException, InterruptedException {
+    public static long countParallel(final Collection collection, final Object filter) throws ExecutionException, InterruptedException {
         /*
         return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withFilter(new Ops.Predicate<Object>() {
             @Override
@@ -924,7 +941,7 @@ public class GParsPoolUtil {
      * }
      * </pre>
      */
-    public static int countParallel(final Object collection, final Object filter) throws ExecutionException, InterruptedException {
+    public static long countParallel(final Object collection, final Object filter) throws ExecutionException, InterruptedException {
         return countParallel(toCollection(collection), filter);
     }
 
@@ -945,7 +962,7 @@ public class GParsPoolUtil {
      * }
      * </pre>
      */
-    public static int countParallel(final Collection collection, final Closure filter) throws ExecutionException, InterruptedException {
+    public static long countParallel(final Collection collection, final Closure filter) throws ExecutionException, InterruptedException {
         //return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).withFilter(new ClosurePredicate(filter)).size();
         return retrievePool().submit(() ->
                 collection.parallelStream()
@@ -970,7 +987,7 @@ public class GParsPoolUtil {
      * }
      * </pre>
      */
-    public static int countParallel(final Object collection, final Closure filter) throws ExecutionException, InterruptedException {
+    public static long countParallel(final Object collection, final Closure filter) throws ExecutionException, InterruptedException {
         return countParallel(toCollection(collection), filter);
     }
 
