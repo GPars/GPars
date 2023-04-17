@@ -15,7 +15,7 @@
 // limitations under the License.
 
 /**
- * Demonstrates parallel collection processing using ParallelArrays through the GParsPool class.
+ * Demonstrates parallel collection processing through the GParsPool class.
  */
 
 package groovyx.gpars.samples.collections

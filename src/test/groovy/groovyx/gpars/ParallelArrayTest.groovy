@@ -15,9 +15,6 @@
 // limitations under the License.
 
 package groovyx.gpars
-
-// TODO: delete
-//import groovyx.gpars.extra166y.Ops
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -25,24 +22,14 @@ import java.util.concurrent.ConcurrentHashMap
  * Date: Nov 6, 2009
  */
 
-public class ParallelArrayTest extends groovy.test.GroovyTestCase {
+public class ParallelStreamTest extends groovy.test.GroovyTestCase {
 
     public void testReduce() {
         GParsPool.withPool(5) {
             assert 15 == [1, 2, 3, 4, 5].parallelStream().map({it}).reduce({a, b -> a + b}).get()
-            //assert 'abc' == 'abc'.parallelArray.withMapping({it} as Ops.Op).reduce({a, b -> a + b} as Ops.Reducer, null)
         }
     }
 
-    /**
-    @SuppressWarnings("GroovyMethodWithMoreThanThreeNegations")
-    public void testFilterOperations() {
-        GParsPool.withPool(5) {
-            assert 'aa' == 'abcde'.parallelArray.withFilter({it != 'e'} as Ops.Predicate).withMapping({it * 2} as Ops.Op).all().withFilter({it != 'cc'} as Ops.Predicate).min()
-        }
-    }
-    */
-    
     public void testNestedMap() {
         GParsPool.withPool(5) {
             assert 65 == [1, 2, 3, 4, 5].parallelStream().map({it + 10}).reduce({a, b -> a + b}).get()
@@ -66,20 +53,6 @@ public class ParallelArrayTest extends groovy.test.GroovyTestCase {
         GParsPool.withPool(5) {
             assert 1 == [1, 2, 3, 4, 5].parallelStream().min({a, b -> a - b} as Comparator).get()
             assert 5 == [1, 2, 3, 4, 5].parallelStream().max({a, b -> a - b} as Comparator).get()
-            //assert 'a' == 'abc'.parallelArray.withMapping({it} as Ops.Op).min()
-            //assert 'c' == 'abc'.parallelArray.withMapping({it} as Ops.Op).max()
         }
     }
-
-    /**
-    public void testSort() {
-        GParsPool.withPool(5) {
-            final List sortedNums = [1, 2, 3, 4, 5]
-            final def pa = [1, 2, 3, 4, 5].parallelArray.withMapping({it} as Ops.Op).all()
-            pa.sort({a, b -> a - b} as Comparator)
-            assert sortedNums == pa.all().asList()
-        }
-    }
-    */
-
 }

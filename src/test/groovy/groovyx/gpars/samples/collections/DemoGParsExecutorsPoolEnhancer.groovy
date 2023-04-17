@@ -19,7 +19,7 @@ package groovyx.gpars.samples.collections
 import groovyx.gpars.GParsExecutorsPoolEnhancer
 
 /**
- * Demonstrates parallel collection processing using ParallelArrays through the ParallelEnhancer class.
+ * Demonstrates parallel collection processing through the ParallelEnhancer class.
  */
 
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]

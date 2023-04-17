@@ -21,10 +21,6 @@ import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.ParallelEnhancer
 import java.util.concurrent.ForkJoinPool
 
-// TODO: delete
-//import groovyx.gpars.extra166y.Ops.Reducer
-//import groovyx.gpars.extra166y.ParallelArray
-
 import static groovyx.gpars.GParsPool.withExistingPool
 import static groovyx.gpars.GParsPool.withPool
 
@@ -58,8 +54,6 @@ withExistingPool(pool) {
     println GParsPoolUtil.sumParallel(nums)
     println GParsPoolUtil.getParallel(nums).sum()
     println GParsPoolUtil.getParallel(nums).sum()
-    println ParallelArray.createFromCopy(nums.toArray(new Long[nums.size()]), pool).reduce({ a, b -> a + b }).get()
-//    println ParallelArray.createFromCopy(nums, pool).reduce({a, b -> a + b} as Reducer, null)
 }
 
 withPool {
@@ -100,7 +94,7 @@ withPool {
     sleep 2000
     println ""
     println GParsPoolUtil.getParallel(nums).sum()
-    println "parallel summing numbers inside a withPool using PA"
+    println "parallel summing numbers inside a withPool using parallel streams"
     start = System.currentTimeMillis()
     println GParsPoolUtil.getParallel(nums).sum()
     println "time: ${System.currentTimeMillis() - start}ms"
@@ -109,21 +103,12 @@ withPool {
 withPool {
     sleep 2000
     println ""
-    println "parallel summing numbers inside a withPool using PA ignoring PA build time"
+    println "parallel summing numbers inside a withPool using parallel streams ignoring the parallel streams build time"
     final def pnums = GParsPoolUtil.getParallel(nums)
     start = System.currentTimeMillis()
     println pnums.sum()
     println "time: ${System.currentTimeMillis() - start}ms"
 }
-
-println ""
-sleep 2000
-println "parallel summing numbers inside a withPool using PA directly"
-start = System.currentTimeMillis()
-def pnums = ParallelArray.createFromCopy(nums.toArray(new Long[nums.size()]), pool)
-//def pnums = ParallelArray.createFromCopy(nums, pool)
-println pnums.reduce({ a, b -> a + b }).get()
-println "time: ${System.currentTimeMillis() - start}ms"
 
 sleep 2000
 println ""

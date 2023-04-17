@@ -19,7 +19,7 @@ package groovyx.gpars.samples.collections
 import groovyx.gpars.ParallelEnhancer
 
 /**
- * Demonstrates parallel collection processing using ParallelArrays through the ParallelEnhancer class.
+ * Demonstrates parallel collection processing through the ParallelEnhancer class.
  * Shows the makeConcurrent() and makeSequential() methods, which enable switching between concurrent and sequential semantics on collections.
  */
 

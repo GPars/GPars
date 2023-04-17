@@ -19,7 +19,7 @@ package groovyx.gpars.samples.collections
 import groovyx.gpars.ParallelEnhancer
 
 /**
- * Demonstrates parallel collection processing using ParallelArrays through the ParallelEnhancer class.
+ * Demonstrates parallel collection processing through the ParallelEnhancer class.
  * Shows the asConcurrent() blocks, which enable block-scoped concurrent semantics on collections.
  */
 
