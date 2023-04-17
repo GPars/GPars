@@ -35,8 +35,8 @@ task {
             3
         },
         {
-            throw new RuntimeException('test')
+            throw new RuntimeException('Simulating an exception in one of the subtasks')
         }).then(
         { println 'Never printed since an error was thrown and an error handler gets invoked instead' },
-        { println 'Error: ' + it })
+        { println 'Error caught in one of the subtasks: ' + it })
         .join()
