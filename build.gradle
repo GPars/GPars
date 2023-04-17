@@ -54,16 +54,14 @@ defaultTasks 'test'
 
 sourceCompatibility = 17
 targetCompatibility = 17
-// TODO fix failing/hanging tests
-// TODO fix the examples
-// TODO prune TODOs
+// TODO prune TODOs in code
 // TODO prune the build script
 // TODO configure a CI build
 // TODO decide how to publish
 // TODO prune the features (stm, etc.)
 // TODO update readme
 // TODO fix the documentation
-// TODO set language level to 21
+// TODO set language level to 21 for virtual threads
 // TODO add virtual threads
 // TODO use groups for withPool()
 // TODO enhance groups to handle scopes/failover
