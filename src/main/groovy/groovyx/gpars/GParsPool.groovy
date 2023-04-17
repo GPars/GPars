@@ -76,7 +76,7 @@ public class GParsPool {
     }
 
     private static createPool(int poolSize, UncaughtExceptionHandler handler) {
-        final allNums = ScriptBytecodeAdapter.createRange(1, Integer.MAX_VALUE, true, false)
+        final allNums = ScriptBytecodeAdapter.createRange(1, Integer.MAX_VALUE, false, false)
         if (!(poolSize in allNums)) throw new IllegalArgumentException("Invalid value $poolSize for the pool size has been specified. Please supply a positive int number.")
         final ForkJoinPool pool = new ForkJoinPool(poolSize, ForkJoinPool.defaultForkJoinWorkerThreadFactory, handler, false)
         return pool

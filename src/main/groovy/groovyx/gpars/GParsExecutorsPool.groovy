@@ -79,7 +79,7 @@ class GParsExecutorsPool {
     }
 
     private static createPool(int poolSize, ThreadFactory threadFactory) {
-        final allNums = ScriptBytecodeAdapter.createRange(1, Integer.MAX_VALUE, true, false)
+        final allNums = ScriptBytecodeAdapter.createRange(1, Integer.MAX_VALUE, false, false)
         if (!(poolSize in allNums)) throw new IllegalArgumentException("Invalid value $poolSize for the pool size has been specified. Please supply a positive int number.")
         if (!threadFactory) throw new IllegalArgumentException("No value specified for threadFactory.")
         return Executors.newFixedThreadPool(poolSize, threadFactory)
