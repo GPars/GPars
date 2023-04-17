@@ -56,7 +56,7 @@ public class DataflowTaskTest extends groovy.test.GroovyTestCase {
         Dataflow.usingGroup(group) {
             Dataflow.task {
                 queue << Dataflow.retrieveCurrentDFPGroup()
-                'http://gpars.codehaus.org'
+                'http://gpars.org'
             }
             .then { page -> queue << Dataflow.retrieveCurrentDFPGroup(); page.toUpperCase() }
             .then { page -> page.contains('GROOVY') }.then { queue << Dataflow.retrieveCurrentDFPGroup(); throw new RuntimeException('test') }
@@ -76,7 +76,7 @@ public class DataflowTaskTest extends groovy.test.GroovyTestCase {
         Dataflow.usingGroup(group1) {
             Dataflow.task {
                 queue << Dataflow.retrieveCurrentDFPGroup()
-                'http://gpars.codehaus.org'
+                'http://gpars.org'
             }
             .then { page -> queue << Dataflow.retrieveCurrentDFPGroup(); page.toUpperCase() }
             .then { page -> page.contains('GROOVY') }.then(group2) { queue << Dataflow.retrieveCurrentDFPGroup(); throw new RuntimeException('test') }

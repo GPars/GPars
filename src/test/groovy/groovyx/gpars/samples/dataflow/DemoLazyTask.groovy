@@ -20,7 +20,7 @@ import groovyx.gpars.dataflow.Dataflow
 
 def pageContent = Dataflow.lazyTask {
     println "Downloading"
-    "http://gpars.codehaus.org".toURL().text
+    "http://gpars.org".toURL().text
 }
 
 println "No-one has asked for the value just yet. Bound = ${pageContent.bound}"

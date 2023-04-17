@@ -20,6 +20,7 @@ import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.forkjoin.AbstractForkJoinWorker
 import groovyx.gpars.forkjoin.ForkJoinUtils
 import groovyx.gpars.util.PoolUtils
+import org.codehaus.groovy.runtime.ScriptBytecodeAdapter
 
 import java.lang.Thread.UncaughtExceptionHandler
 import java.util.concurrent.Future
@@ -75,7 +76,8 @@ public class GParsPool {
     }
 
     private static createPool(int poolSize, UncaughtExceptionHandler handler) {
-        if (!(poolSize in 1..Integer.MAX_VALUE)) throw new IllegalArgumentException("Invalid value $poolSize for the pool size has been specified. Please supply a positive int number.")
+        final allNums = ScriptBytecodeAdapter.createRange(1, Integer.MAX_VALUE, true, false)
+        if (!(poolSize in allNums)) throw new IllegalArgumentException("Invalid value $poolSize for the pool size has been specified. Please supply a positive int number.")
         final ForkJoinPool pool = new ForkJoinPool(poolSize, ForkJoinPool.defaultForkJoinWorkerThreadFactory, handler, false)
         return pool
     }

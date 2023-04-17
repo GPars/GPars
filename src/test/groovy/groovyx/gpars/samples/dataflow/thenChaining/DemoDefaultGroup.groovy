@@ -31,7 +31,7 @@ def anotherGroup = new NonDaemonPGroup(10)
 
 Dataflow.usingGroup(group) {
     task {
-        'http://gpars.codehaus.org'.toURL().text
+        'http://gpars.org'.toURL().text
     }
     .then { page -> page.toUpperCase() }
     .then { page -> page.contains('GROOVY') }.then { println Dataflow.retrieveCurrentDFPGroup(); it }

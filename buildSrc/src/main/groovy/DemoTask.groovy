@@ -18,7 +18,6 @@ class DemoTask extends DefaultTask {
             println "*** starting demo $file.name"
             try {
                 shell.evaluate(file)
-                ok += 1
             } catch (Exception ex) {
                 failed << [file: file, exception: ex]
             }

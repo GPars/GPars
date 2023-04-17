@@ -18,6 +18,7 @@ package groovyx.gpars
 
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.util.PoolUtils
+import org.codehaus.groovy.runtime.ScriptBytecodeAdapter
 
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
@@ -78,7 +79,8 @@ class GParsExecutorsPool {
     }
 
     private static createPool(int poolSize, ThreadFactory threadFactory) {
-        if (!(poolSize in 1..Integer.MAX_VALUE)) throw new IllegalArgumentException("Invalid value $poolSize for the pool size has been specified. Please supply a positive int number.")
+        final allNums = ScriptBytecodeAdapter.createRange(1, Integer.MAX_VALUE, true, false)
+        if (!(poolSize in allNums)) throw new IllegalArgumentException("Invalid value $poolSize for the pool size has been specified. Please supply a positive int number.")
         if (!threadFactory) throw new IllegalArgumentException("No value specified for threadFactory.")
         return Executors.newFixedThreadPool(poolSize, threadFactory)
     }

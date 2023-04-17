@@ -23,7 +23,7 @@ Closure<String> download = { url ->
     url.toURL().text
 }
 
-def pageContent = new LazyDataflowVariable(download.curry("http://gpars.codehaus.org"))
+def pageContent = new LazyDataflowVariable(download.curry("http://gpars.org"))
 
 println "No-one has asked for the value just yet. Bound = ${pageContent.bound}"
 sleep 1000

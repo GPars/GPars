@@ -23,7 +23,7 @@ import static groovyx.gpars.dataflow.Dataflow.task
  */
 
 task {
-    'gpars.codehaus.org'.toURL().text  //should throw MalformedURLException
+    'http://gpars.org'.toURL().text  //should throw MalformedURLException
 }
 .then { page -> page.toUpperCase() }
 .then { page -> page.contains('GROOVY') }
