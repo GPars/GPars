@@ -21,6 +21,7 @@
 //  Author: Rene Groeschke
 //  Author: Hamlet D'Arcy - Updated OSGi configuration
 //  Author: Schalk W. Cronjé
+//  Author: Andres Almiray
 
 //buildscript {
 //    repositories {
@@ -34,13 +35,12 @@
 plugins {
     // TODO: Cannot use anything other than literals here. Why?
 //    id 'org.asciidoctor.convert' version '1.5.8'
-//    id 'com.jfrog.bintray' version '1.8.1'
-//    id 'com.jfrog.artifactory' version '4.7.3'
     id 'groovy'
+    id 'maven-publish'
+    id 'distribution'
+    id 'org.jreleaser' version '1.5.1'
 }
 
-//apply plugin: 'maven'
-//apply plugin: 'maven-publish'
 //apply plugin: 'osgi'
 //apply plugin: 'eclipse'
 //apply plugin: 'idea'
@@ -78,7 +78,6 @@ ext {
 
 repositories {
     if (gpars_useMavenLocal) { mavenLocal() }
-    jcenter()
     mavenCentral()
 }
 
@@ -259,142 +258,48 @@ task integrationTest(type: Test, dependsOn: 'test') {
 //             'pdf-fontsdir': 'fonts',
 //             'pdf-style': 'gpars'
 //}
-//
-//task jarDoc(type: Jar, dependsOn: [javadoc, groovydoc]) {
-//    classifier = 'javadoc'
-//    from docsDir
-//}
-//
-//task jarSrc(type: Jar, dependsOn: classes) {
-//    classifier = 'sources'
-//    from sourceSets.main.allSource
-//}
-//
-//artifacts {
-//    archives(jarSrc)
-//    archives(jarDoc)
-//}
-//
-//task zipGuide(type: Zip, dependsOn: asciidoctor) {
-//    appendix = 'guide'
-//    from(buildDir.name + '/asciidoc')
-//}
-//
-//task zipSamples(type: Zip) {
-//    appendix = 'samples'
-//    from sourceSets.test.allSource.matching {
-//        include 'groovyx/gpars/samples/**'
-//    }
-//}
-//
-//task zipJavaDemo(type: Zip) {
-//    appendix = 'mvn-java-demo'
-//    from('java-demo'){
-//        include 'src/**'
-//        include 'pom.xml'
-//    }
-//}
-//
-//task zipDist(type: Zip) {
-//    from jar.outputs.files
-//    from(sourceSets.main.runtimeClasspath){
-//        include('netty*', 'multiverse*')
-//    }
-//    from('licenses'){
-//        include '*'
-//        into 'licenses'
-//    }
-//    from('src/main/resources/META-INF/'){
-//        include('LICENSE.txt', 'NOTICE.txt')
-//    }
-//    appendix = 'all'
-//}
-//
-//publishing {
-//    publications {
-//        gParsPublish(MavenPublication) {
-//            artifactId 'gpars'
-//            from components.java
-//
-//            artifact jarDoc {
-//                classifier = 'javadoc'
-//            }
-//            artifact jarSrc {
-//                classifier = 'sources'
-//            }
-//            artifact zipGuide {
-//                classifier = 'guide'
-//            }
-//            artifact zipSamples {
-//                classifier = 'samples'
-//            }
-//            artifact zipJavaDemo {
-//                classifier = 'mvn-java-demo'
-//            }
-//            artifact zipDist {
-//                classifier = 'all'
-//            }
-//        }
-//    }
-//}
 
-// TODO: Activate signing to bintray
-// TODO: Activate sync to Maven Central
-//bintray {
-//    user = project.properties.gpars_bintrayUser
-//    key = project.properties.gpars_bintrayKey
-//    publish = false
-//    dryRun = false
-//    configurations = ['archives']
-//    pkg {
-//        userOrg = 'gpars'
-//        repo = 'maven'
-//        name = 'gpars'
-//        desc = project.description
-//        labels = ['groovy','gpars']
-//        publicDownloadNumbers = true
-//        websiteUrl = 'http://gpars.org'
-//        issueTrackerUrl = 'https://github.com/GPars/GPars/issues'
-//        vcsUrl = 'https://github.com/GPars/GPars.git'
-//        licenses = ['Apache-2.0']
-//        version {
-//            name = project.version
-//            vcsTag = "v${project.version}"
-//            gpg {
-//                sign = false
-//                passphrase = project.properties.bintrayGpgPassphrase
-//            }
-////            mavenCentralSync {
-////                sync = true //Optional (true by default). Determines whether to sync the version to Maven Central.
-////                user = 'userToken' //OSS user token
-////                password = 'paasword' //OSS user password
-////                close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
-////            }
-//        }
-//    }
-//}
+distributions {
+    // guide {
+    //     contents {
+    //         from(buildDir.name + '/asciidoc')
+    //     }
+    // }
 
-//bintrayUpload {
-//    dependsOn build, jarDoc, jarSrc
-//    onlyIf{project.properties.gpars_bintrayUser && project.properties.gpars_bintrayKey && !version.contains('SNAPSHOT')}
-//}
-//
-//artifactory {
-//    publish {
-//        contextUrl = 'http://oss.jfrog.org'
-//        repository {
-//            repoKey = 'oss-snapshot-local'
-//            username = project.properties.gpars_bintrayUser
-//            password = project.properties.gpars_bintrayKey
-//        }
-//    }
-//}
-//
-//artifactoryPublish {
-//    dependsOn 'generatePomFileForGParsPublishPublication'
-//    publications(publishing.publications.gParsPublish)
-//    onlyIf{project.properties.gpars_bintrayUser && project.properties.gpars_bintrayKey && version.contains('SNAPSHOT')}
-//}
+    samples {
+        contents {
+            from sourceSets.test.allSource.matching {
+                include 'groovyx/gpars/samples/**'
+            }
+        }
+    }
+
+    'mvn-java-demo' {
+        contents {
+            from('java-demo'){
+                include 'src/**'
+                include 'pom.xml'
+            }
+        }
+    }
+
+    dist {
+        contents {
+            from jar.outputs.files
+            from(sourceSets.main.runtimeClasspath){
+                include('netty*', 'multiverse*')
+            }
+            from('licenses'){
+                include '*'
+                into 'licenses'
+            }
+            from('src/main/resources/META-INF/'){
+                include('LICENSE.txt', 'NOTICE.txt')
+            }
+        }
+    }
+}
+
 //
 //task release(dependsOn: ['build', 'jarSrc', 'jarDoc', 'zipSamples', 'zipJavaDemo', 'zipDist', 'zipGuide']) << {
 //    println 'We release now'
@@ -500,3 +405,94 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
 //        new Coverage(this).setup()
 //    }
 //}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = project.group
+            artifactId = 'app'
+
+            from components.java
+
+            pom {
+                name = 'GPars'
+                description = project.ext.description
+                url = 'http://gpars.github.io'
+                inceptionYear = '2008'
+                licenses {
+                    license {
+                        name = 'Apache-2.0'
+                        url = 'https://spdx.org/licenses/Apache-2.0.html'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'vaclav'
+                        name = 'Václav Pech'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/GPars/GPars.git'
+                    developerConnection = 'scm:git:ssh://github.com/GPars/GPars.git'
+                    url = 'https://github.com/GPars/GPars'
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir('staging-deploy')
+        }
+    }
+}
+
+// https://github.com/jreleaser/jreleaser/issues/1318
+def projectDescription = project.ext.description
+def projectCopyright = project.ext.copyrightString
+
+jreleaser {
+    dryrun = true
+
+    project {
+        description = projectDescription
+        copyright = projectCopyright
+    }
+
+    signing {
+        active = 'ALWAYS'
+        armored = true
+    }
+
+    deploy {
+        maven {
+            nexus2 {
+                'maven-central' {
+                    active = 'ALWAYS'
+                    url = 'https://s01.oss.sonatype.org/service/local'
+                    snapshotUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+                    closeRepository = true
+                    releaseRepository = true
+                    stagingRepository('build/staging-deploy')
+                }
+            }
+        }
+    }
+
+    files {
+        artifact {
+            path = 'build/distributions/{{projectName}}-dist-{{projectVersion}}.zip'
+        }
+        artifact {
+            path = 'build/distributions/{{projectName}}-mvn-java-demo-{{projectVersion}}.zip'
+        }
+        artifact {
+            path = 'build/distributions/{{projectName}}-samples-{{projectVersion}}.zip'
+        }
+    }
+}
